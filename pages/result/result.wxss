@@ -1,0 +1,212 @@
+.summary-hero {
+  padding: 20rpx 8rpx 8rpx;
+  animation: fade-up 0.5s ease both;
+}
+
+.summary-label {
+  font-size: 24rpx;
+  color: var(--color-muted);
+  letter-spacing: 1rpx;
+}
+
+.summary-main {
+  margin-top: 10rpx;
+  display: flex;
+  align-items: flex-end;
+  gap: 8rpx;
+}
+
+.summary-number {
+  font-family: var(--font-display);
+  font-size: 72rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+  line-height: 1;
+}
+
+.summary-unit {
+  margin-bottom: 10rpx;
+  font-size: 28rpx;
+  color: var(--color-muted);
+}
+
+.summary-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx 16rpx;
+  animation: fade-up 0.55s ease both;
+  animation-delay: 0.05s;
+}
+
+.metric {
+  width: calc(50% - 8rpx);
+}
+
+.metric-value {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+  word-break: break-all;
+}
+
+.metric-value.accent {
+  color: var(--color-accent);
+}
+
+.metric-label {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.chart-panel {
+  animation: fade-up 0.6s ease both;
+  animation-delay: 0.1s;
+}
+
+.pie-canvas {
+  display: block;
+  width: 100%;
+  height: 420rpx;
+  margin-top: 12rpx;
+}
+
+.legend {
+  margin-top: 8rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 26rpx;
+  color: var(--color-ink);
+}
+
+.legend-amount {
+  margin-left: auto;
+  color: var(--color-muted);
+  font-size: 24rpx;
+}
+
+.dot {
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 50%;
+}
+
+.dot.principal {
+  background: var(--color-principal);
+}
+
+.dot.interest {
+  background: var(--color-interest);
+}
+
+.split-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+  font-size: 28rpx;
+}
+
+.split-row:last-child {
+  border-bottom: none;
+}
+
+.schedule-panel {
+  animation: fade-up 0.65s ease both;
+  animation-delay: 0.15s;
+}
+
+.schedule-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.toggle {
+  flex-shrink: 0;
+  padding: 10rpx 18rpx;
+  font-size: 24rpx;
+  color: var(--color-brand-soft);
+  border: 1rpx solid rgba(31, 107, 82, 0.28);
+  border-radius: 999rpx;
+}
+
+.table-head,
+.table-row {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.table-head {
+  margin-top: 22rpx;
+  padding: 12rpx 0;
+  font-size: 22rpx;
+  color: var(--color-muted);
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.table-body {
+  max-height: 640rpx;
+}
+
+.table-row {
+  padding: 16rpx 0;
+  font-size: 22rpx;
+  color: var(--color-ink);
+  border-bottom: 1rpx solid rgba(20, 35, 28, 0.06);
+}
+
+.col {
+  flex: 1;
+  text-align: right;
+  min-width: 0;
+}
+
+.col.month {
+  flex: 0 0 72rpx;
+  text-align: left;
+  color: var(--color-muted);
+}
+
+.interest-text {
+  color: var(--color-accent);
+}
+
+.empty {
+  min-height: 100vh;
+  padding: 120rpx 40rpx;
+  text-align: center;
+}
+
+.empty-text {
+  margin-bottom: 40rpx;
+  font-size: 30rpx;
+  color: var(--color-muted);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

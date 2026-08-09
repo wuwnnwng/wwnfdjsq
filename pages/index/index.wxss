@@ -1,0 +1,93 @@
+.hero {
+  padding: 12rpx 8rpx 8rpx;
+  animation: rise-in 0.55s ease both;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 56rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  color: var(--color-brand);
+  line-height: 1.2;
+}
+
+.hero-line {
+  margin-top: 14rpx;
+  font-size: 26rpx;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.panel {
+  animation: rise-in 0.6s ease both;
+}
+
+.panel:nth-of-type(2) {
+  animation-delay: 0.05s;
+}
+
+.panel:nth-of-type(3) {
+  animation-delay: 0.1s;
+}
+
+.panel:nth-of-type(4),
+.panel:nth-of-type(5) {
+  animation-delay: 0.15s;
+}
+
+.type-segment {
+  margin-top: 22rpx;
+}
+
+.segment {
+  margin-top: 22rpx;
+}
+
+.year-slider {
+  flex: 1;
+  margin: 0 8rpx 0 0;
+}
+
+.year-value {
+  width: 88rpx;
+  text-align: right;
+  font-size: 28rpx;
+  color: var(--color-brand-soft);
+  font-weight: 600;
+}
+
+.tip {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.primary-btn {
+  animation: pulse-soft 2.4s ease-in-out infinite;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 16rpx 36rpx rgba(11, 61, 46, 0.22);
+  }
+  50% {
+    transform: translateY(-2rpx);
+    box-shadow: 0 20rpx 40rpx rgba(11, 61, 46, 0.28);
+  }
+}

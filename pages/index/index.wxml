@@ -1,0 +1,156 @@
+<view class="page">
+  <view class="hero">
+    <view class="brand">房贷计算器</view>
+    <view class="hero-line">公积金 · 商贷 · 组合贷，一键算出还款计划</view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title">贷款类型</view>
+    <view class="section-desc">选择你的贷款组合方式</view>
+    <view class="segment type-segment">
+      <view
+        class="segment-item {{loanType === 'provident' ? 'active' : ''}}"
+        data-type="provident"
+        bindtap="onLoanTypeChange"
+      >公积金贷</view>
+      <view
+        class="segment-item {{loanType === 'commercial' ? 'active' : ''}}"
+        data-type="commercial"
+        bindtap="onLoanTypeChange"
+      >商贷</view>
+      <view
+        class="segment-item {{loanType === 'combo' ? 'active' : ''}}"
+        data-type="combo"
+        bindtap="onLoanTypeChange"
+      >组合贷款</view>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title">还款方式</view>
+    <view class="section-desc">等额本息月供稳定，等额本金利息更少</view>
+    <view class="segment">
+      <view
+        class="segment-item {{method === 'equalInterest' ? 'active' : ''}}"
+        data-method="equalInterest"
+        bindtap="onMethodChange"
+      >等额本息</view>
+      <view
+        class="segment-item {{method === 'equalPrincipal' ? 'active' : ''}}"
+        data-method="equalPrincipal"
+        bindtap="onMethodChange"
+      >等额本金</view>
+    </view>
+  </view>
+
+  <view class="panel" wx:if="{{showCommercial}}">
+    <view class="section-title">商业贷款</view>
+    <view class="section-desc">填写商贷金额、年限与年利率</view>
+
+    <view class="field">
+      <text class="field-label">贷款金额</text>
+      <view class="field-control">
+        <input
+          class="field-input"
+          type="digit"
+          value="{{commercialAmount}}"
+          data-field="commercialAmount"
+          bindinput="onInput"
+          placeholder="请输入"
+        />
+        <text class="field-unit">万元</text>
+      </view>
+    </view>
+
+    <view class="field">
+      <text class="field-label">贷款年限</text>
+      <view class="field-control">
+        <slider
+          class="year-slider"
+          min="1"
+          max="30"
+          step="1"
+          value="{{commercialYears}}"
+          activeColor="#1f6b52"
+          backgroundColor="rgba(20,35,28,0.08)"
+          block-size="18"
+          data-field="commercialYears"
+          bindchange="onSliderChange"
+        />
+        <text class="year-value">{{commercialYears}}年</text>
+      </view>
+    </view>
+
+    <view class="field">
+      <text class="field-label">年利率</text>
+      <view class="field-control">
+        <input
+          class="field-input"
+          type="digit"
+          value="{{commercialRate}}"
+          data-field="commercialRate"
+          bindinput="onInput"
+          placeholder="如 3.45"
+        />
+        <text class="field-unit">%</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="panel" wx:if="{{showProvident}}">
+    <view class="section-title">公积金贷款</view>
+    <view class="section-desc">填写公积金金额、年限与年利率</view>
+
+    <view class="field">
+      <text class="field-label">贷款金额</text>
+      <view class="field-control">
+        <input
+          class="field-input"
+          type="digit"
+          value="{{providentAmount}}"
+          data-field="providentAmount"
+          bindinput="onInput"
+          placeholder="请输入"
+        />
+        <text class="field-unit">万元</text>
+      </view>
+    </view>
+
+    <view class="field">
+      <text class="field-label">贷款年限</text>
+      <view class="field-control">
+        <slider
+          class="year-slider"
+          min="1"
+          max="30"
+          step="1"
+          value="{{providentYears}}"
+          activeColor="#1f6b52"
+          backgroundColor="rgba(20,35,28,0.08)"
+          block-size="18"
+          data-field="providentYears"
+          bindchange="onSliderChange"
+        />
+        <text class="year-value">{{providentYears}}年</text>
+      </view>
+    </view>
+
+    <view class="field">
+      <text class="field-label">年利率</text>
+      <view class="field-control">
+        <input
+          class="field-input"
+          type="digit"
+          value="{{providentRate}}"
+          data-field="providentRate"
+          bindinput="onInput"
+          placeholder="如 2.85"
+        />
+        <text class="field-unit">%</text>
+      </view>
+    </view>
+  </view>
+
+  <button class="primary-btn" bindtap="onCalculate">开始计算</button>
+  <view class="tip">结果页将展示月供、总利息、还款计划与本金利息占比饼图</view>
+</view>

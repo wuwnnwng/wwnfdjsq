@@ -152,5 +152,5 @@
   </view>
 
   <button class="primary-btn" bindtap="onCalculate">开始计算</button>
-  <view class="tip">结果页将展示月供、总利息、还款计划与本金利息占比饼图</view>
+  <view class="disclaimer">计算结果仅供参考，实际以银行审批为准</view>
 </view>

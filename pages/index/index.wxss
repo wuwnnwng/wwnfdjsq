@@ -57,12 +57,13 @@
   font-weight: 600;
 }
 
-.tip {
-  margin-top: 20rpx;
+.disclaimer {
+  margin-top: 28rpx;
+  padding: 0 12rpx;
   text-align: center;
   font-size: 22rpx;
   color: var(--color-muted);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .primary-btn {

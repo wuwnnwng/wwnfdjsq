@@ -39,19 +39,6 @@
       id="pieCanvas"
       class="pie-canvas"
     ></canvas>
-
-    <view class="legend">
-      <view class="legend-item">
-        <view class="dot principal"></view>
-        <text>本金 {{principalRatio}}%</text>
-        <text class="legend-amount">{{display.totalPrincipal}} 元</text>
-      </view>
-      <view class="legend-item">
-        <view class="dot interest"></view>
-        <text>利息 {{interestRatio}}%</text>
-        <text class="legend-amount">{{display.totalInterest}} 元</text>
-      </view>
-    </view>
   </view>
 
   <view class="panel" wx:if="{{loanType === 'combo'}}">

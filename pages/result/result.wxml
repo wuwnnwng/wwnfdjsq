@@ -18,7 +18,7 @@
     </view>
     <view class="metric" wx:if="{{isRemaining}}">
       <view class="metric-value">{{display.remainingYears}}年</view>
-      <view class="metric-label">剩余还款年份</view>
+      <view class="metric-label">剩余还款年</view>
     </view>
     <view class="metric">
       <view class="metric-value">{{display.totalPrincipal}}</view>

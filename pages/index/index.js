@@ -9,11 +9,11 @@ Page({
     showMethodTip: false,
 
     commercialAmount: '100',
-    commercialYears: 30,
+    commercialYears: '30',
     commercialRate: '3.45',
 
     providentAmount: '50',
-    providentYears: 30,
+    providentYears: '30',
     providentRate: '2.85'
   },
 
@@ -49,19 +49,19 @@ Page({
     })
   },
 
-  onSliderChange(e) {
-    const field = e.currentTarget.dataset.field
-    this.setData({
-      [field]: e.detail.value
-    })
+  isValidYears(years) {
+    const n = Number(years)
+    return Number.isInteger(n) && n >= 1 && n <= 30
   },
 
   validate() {
     const {
       loanType,
       commercialAmount,
+      commercialYears,
       commercialRate,
       providentAmount,
+      providentYears,
       providentRate
     } = this.data
 
@@ -73,6 +73,10 @@ Page({
         wx.showToast({ title: '请填写商贷金额', icon: 'none' })
         return false
       }
+      if (!this.isValidYears(commercialYears)) {
+        wx.showToast({ title: '商贷年限请填 1-30 的整数', icon: 'none' })
+        return false
+      }
       if (!(Number(commercialRate) >= 0)) {
         wx.showToast({ title: '请填写商贷利率', icon: 'none' })
         return false
@@ -82,6 +86,10 @@ Page({
     if (needProvident) {
       if (!(Number(providentAmount) > 0)) {
         wx.showToast({ title: '请填写公积金金额', icon: 'none' })
+        return false
+      }
+      if (!this.isValidYears(providentYears)) {
+        wx.showToast({ title: '公积金年限请填 1-30 的整数', icon: 'none' })
         return false
       }
       if (!(Number(providentRate) >= 0)) {

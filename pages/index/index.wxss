@@ -123,19 +123,6 @@
   margin-top: 22rpx;
 }
 
-.year-slider {
-  flex: 1;
-  margin: 0 8rpx 0 0;
-}
-
-.year-value {
-  width: 88rpx;
-  text-align: right;
-  font-size: 28rpx;
-  color: var(--color-brand-soft);
-  font-weight: 600;
-}
-
 .disclaimer {
   margin-top: 28rpx;
   padding: 0 12rpx;

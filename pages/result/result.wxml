@@ -17,7 +17,7 @@
       <view class="metric-label">当前执行利率</view>
     </view>
     <view class="metric" wx:if="{{isRemaining}}">
-      <view class="metric-value">{{display.remainingYearsText}}</view>
+      <view class="metric-value">{{display.remainingYears}}年</view>
       <view class="metric-label">剩余还款年份</view>
     </view>
     <view class="metric">

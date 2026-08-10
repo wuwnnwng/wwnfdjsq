@@ -269,14 +269,6 @@ function countPaidMonths(firstRepaymentDate, now = new Date()) {
   return (nowYear - start.year) * 12 + (nowMonth - start.month) + 1
 }
 
-function formatRemainingYearsText(remainingMonths) {
-  const years = Math.floor(remainingMonths / 12)
-  const months = remainingMonths % 12
-  if (years <= 0) return `${months}个月`
-  if (months === 0) return `${years}年`
-  return `${years}年${months}个月`
-}
-
 /**
  * 根据当月本金/利息/剩余本金等，反推执行利率与剩余年限
  * 约定：剩余本金 = 还完当月本金后的余额
@@ -324,12 +316,18 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     return { ok: false, message: '已超过原贷款总期数，请检查输入' }
   }
 
-  const remainingMonths = totalMonths - paidMonths
-  if (remainingMonths <= 0) {
+  const remainingMonthsRaw = totalMonths - paidMonths
+  if (remainingMonthsRaw <= 0) {
     return { ok: false, message: '贷款已还清或无剩余期数' }
   }
 
-  const remainingYears = remainingMonths / 12
+  // 年份保留两位小数，再反推期数，保证展示与重算一致
+  const remainingYears = round2(remainingMonthsRaw / 12)
+  const remainingMonths = Math.round(remainingYears * 12)
+
+  if (remainingMonths <= 0) {
+    return { ok: false, message: '贷款已还清或无剩余期数' }
+  }
 
   return {
     ok: true,
@@ -345,9 +343,10 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     totalMonths,
     paidMonths,
     remainingMonths,
+    remainingMonthsRaw,
     remainingYears,
-    remainingYearsDisplay: round2(remainingYears).toFixed(2),
-    remainingYearsText: formatRemainingYearsText(remainingMonths)
+    remainingYearsDisplay: remainingYears.toFixed(2),
+    remainingYearsText: `${remainingYears.toFixed(2)}年`
   }
 }
 

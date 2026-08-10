@@ -269,9 +269,9 @@
       </view>
       <view class="derived-row">
         <text class="derived-label">剩余还款年份</text>
-        <text class="derived-value">{{derivedReady ? derivedRemainingYearsText : '--'}}</text>
+        <text class="derived-value">{{derivedReady ? derivedRemainingYears + '年' : '--'}}</text>
       </view>
-      <view class="derived-hint" wx:if="{{derivedReady}}">约 {{derivedRemainingYears}} 年（剩余 {{derivedRemainingMonths}} 期）</view>
+      <view class="derived-hint" wx:if="{{derivedReady}}">剩余 {{derivedRemainingMonths}} 期</view>
       <view class="derived-hint warn" wx:elif="{{derivedMessage}}">{{derivedMessage}}</view>
     </view>
   </block>

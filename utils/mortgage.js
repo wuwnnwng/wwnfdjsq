@@ -320,18 +320,13 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     return { ok: false, message: '已超过原贷款总期数，请检查输入' }
   }
 
-  const remainingMonthsRaw = totalMonths - paidMonths
-  if (remainingMonthsRaw <= 0) {
-    return { ok: false, message: '贷款已还清或无剩余期数' }
-  }
-
-  // 年份保留两位小数，再反推期数，保证展示与重算一致
-  const remainingYears = round2(remainingMonthsRaw / 12)
-  const remainingMonths = Math.round(remainingYears * 12)
-
+  const remainingMonths = totalMonths - paidMonths
   if (remainingMonths <= 0) {
     return { ok: false, message: '贷款已还清或无剩余期数' }
   }
+
+  // 年份仅用于页面展示；实际重算一律传剩余期数
+  const remainingYearsDisplay = round2(remainingMonths / 12).toFixed(2)
 
   return {
     ok: true,
@@ -347,10 +342,9 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     totalMonths,
     paidMonths,
     remainingMonths,
-    remainingMonthsRaw,
-    remainingYears,
-    remainingYearsDisplay: remainingYears.toFixed(2),
-    remainingYearsText: `${remainingYears.toFixed(2)}年`
+    remainingYears: Number(remainingYearsDisplay),
+    remainingYearsDisplay,
+    remainingYearsText: `${remainingYearsDisplay}年`
   }
 }
 
@@ -367,7 +361,7 @@ function calculateRemainingMortgage(options) {
 
   const loan = calculateLoanByYuan(
     derived.remainingPrincipal,
-    derived.remainingMonths,
+    derived.remainingMonths, // 例：301，不用 25.08 年去换算
     derived.annualRatePercent,
     method
   )

@@ -248,25 +248,29 @@ function calculateMortgage(options) {
   })
 }
 
-function parseYearMonth(dateStr) {
+function parseDateParts(dateStr) {
   if (!dateStr || typeof dateStr !== 'string') return null
   const parts = dateStr.split('-').map((item) => Number(item))
   if (parts.length < 2) return null
-  const [year, month] = parts
+  const [year, month, day = 1] = parts
   if (!year || !month || month < 1 || month > 12) return null
-  return { year, month }
+  const safeDay = day >= 1 && day <= 31 ? day : 1
+  return { year, month, day: safeDay }
 }
 
 /**
- * 首次还款月到当前月（含当月）已还期数
+ * 已还期数（按年月差，不含“当月再 +1”）
+ * 例：首次 2021-09，当前 2026-08
+ * → (2026-2021)*12 + (8-9) = 59 期
+ * → 剩余 360-59=301 期 → 25.08 年
  */
 function countPaidMonths(firstRepaymentDate, now = new Date()) {
-  const start = parseYearMonth(firstRepaymentDate)
+  const start = parseDateParts(firstRepaymentDate)
   if (!start) return -1
 
   const nowYear = now.getFullYear()
   const nowMonth = now.getMonth() + 1
-  return (nowYear - start.year) * 12 + (nowMonth - start.month) + 1
+  return (nowYear - start.year) * 12 + (nowMonth - start.month)
 }
 
 /**
@@ -285,7 +289,7 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     return { ok: false, message: '首次贷款期限请填 1-30 的整数' }
   }
 
-  if (!parseYearMonth(firstRepaymentDate)) {
+  if (!parseDateParts(firstRepaymentDate)) {
     return { ok: false, message: '请选择首次还款日期' }
   }
 
@@ -308,8 +312,8 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
   const totalMonths = Math.round(originalYears * 12)
   const paidMonths = countPaidMonths(firstRepaymentDate, now)
 
-  if (paidMonths < 1) {
-    return { ok: false, message: '首次还款日期不能晚于当前月份' }
+  if (paidMonths < 0) {
+    return { ok: false, message: '首次还款日期不能晚于当前日期' }
   }
 
   if (paidMonths > totalMonths) {

@@ -1,6 +1,6 @@
 /**
  * 房贷计算工具
- * 支持：公积金贷 / 商贷 / 组合贷
+ * 支持：公积金贷 / 商贷 / 组合贷 / 已有贷款剩余计划
  * 还款方式：等额本息 / 等额本金
  */
 
@@ -11,6 +11,10 @@ function toNumber(value, fallback = 0) {
 
 function round2(n) {
   return Math.round((n + Number.EPSILON) * 100) / 100
+}
+
+function round4(n) {
+  return Math.round((n + Number.EPSILON) * 10000) / 10000
 }
 
 function formatMoney(n) {
@@ -24,29 +28,29 @@ function formatMoneyWithComma(n) {
   return `${withComma}.${decimal}`
 }
 
+function emptyLoanResult() {
+  return {
+    principal: 0,
+    months: 0,
+    monthlyRate: 0,
+    firstMonthPayment: 0,
+    lastMonthPayment: 0,
+    totalPayment: 0,
+    totalInterest: 0,
+    schedule: []
+  }
+}
+
 /**
- * 单笔贷款计算
- * @param {number} principalWan 贷款本金（万元）
- * @param {number} years 贷款年限
- * @param {number} annualRatePercent 年利率（%）
- * @param {'equalInterest'|'equalPrincipal'} method 还款方式
+ * 按「元 + 期数」计算单笔贷款
  */
-function calculateLoan(principalWan, years, annualRatePercent, method) {
-  const principal = round2(toNumber(principalWan) * 10000)
-  const months = Math.max(0, Math.round(toNumber(years) * 12))
+function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
+  const principal = round2(toNumber(principalYuan))
+  const totalMonths = Math.max(0, Math.round(toNumber(months)))
   const monthlyRate = toNumber(annualRatePercent) / 100 / 12
 
-  if (principal <= 0 || months <= 0) {
-    return {
-      principal: 0,
-      months: 0,
-      monthlyRate: 0,
-      firstMonthPayment: 0,
-      lastMonthPayment: 0,
-      totalPayment: 0,
-      totalInterest: 0,
-      schedule: []
-    }
+  if (principal <= 0 || totalMonths <= 0) {
+    return emptyLoanResult()
   }
 
   const schedule = []
@@ -55,11 +59,11 @@ function calculateLoan(principalWan, years, annualRatePercent, method) {
   let totalInterest = 0
 
   if (method === 'equalPrincipal') {
-    const monthlyPrincipal = principal / months
+    const monthlyPrincipal = principal / totalMonths
 
-    for (let i = 1; i <= months; i += 1) {
+    for (let i = 1; i <= totalMonths; i += 1) {
       const interest = remaining * monthlyRate
-      const principalPart = i === months ? remaining : monthlyPrincipal
+      const principalPart = i === totalMonths ? remaining : monthlyPrincipal
       const payment = principalPart + interest
 
       remaining = Math.max(0, remaining - principalPart)
@@ -75,21 +79,20 @@ function calculateLoan(principalWan, years, annualRatePercent, method) {
       })
     }
   } else {
-    // 等额本息
     let monthlyPayment
     if (monthlyRate === 0) {
-      monthlyPayment = principal / months
+      monthlyPayment = principal / totalMonths
     } else {
-      const factor = Math.pow(1 + monthlyRate, months)
+      const factor = Math.pow(1 + monthlyRate, totalMonths)
       monthlyPayment = (principal * monthlyRate * factor) / (factor - 1)
     }
 
-    for (let i = 1; i <= months; i += 1) {
+    for (let i = 1; i <= totalMonths; i += 1) {
       const interest = remaining * monthlyRate
       let principalPart = monthlyPayment - interest
       let payment = monthlyPayment
 
-      if (i === months) {
+      if (i === totalMonths) {
         principalPart = remaining
         payment = principalPart + interest
       }
@@ -110,7 +113,7 @@ function calculateLoan(principalWan, years, annualRatePercent, method) {
 
   return {
     principal: round2(principal),
-    months,
+    months: totalMonths,
     monthlyRate,
     firstMonthPayment: schedule[0] ? schedule[0].payment : 0,
     lastMonthPayment: schedule.length ? schedule[schedule.length - 1].payment : 0,
@@ -118,6 +121,18 @@ function calculateLoan(principalWan, years, annualRatePercent, method) {
     totalInterest: round2(totalInterest),
     schedule
   }
+}
+
+/**
+ * 单笔贷款计算（金额单位：万元，年限：年）
+ */
+function calculateLoan(principalWan, years, annualRatePercent, method) {
+  return calculateLoanByYuan(
+    toNumber(principalWan) * 10000,
+    toNumber(years) * 12,
+    annualRatePercent,
+    method
+  )
 }
 
 function mergeSchedules(left, right) {
@@ -139,24 +154,64 @@ function mergeSchedules(left, right) {
   return schedule
 }
 
+function buildMortgageResult({
+  mode,
+  loanType,
+  method,
+  commercial,
+  provident,
+  schedule,
+  extra = {}
+}) {
+  const totalPrincipal = round2(commercial.principal + provident.principal)
+  const totalInterest = round2(commercial.totalInterest + provident.totalInterest)
+  const totalPayment = round2(commercial.totalPayment + provident.totalPayment)
+  const months = Math.max(commercial.months, provident.months)
+  const firstMonthPayment = schedule[0] ? schedule[0].payment : 0
+  const lastMonthPayment = schedule.length ? schedule[schedule.length - 1].payment : 0
+  const principalRatio = totalPayment > 0 ? (totalPrincipal / totalPayment) * 100 : 0
+  const interestRatio = totalPayment > 0 ? (totalInterest / totalPayment) * 100 : 0
+
+  return {
+    mode: mode || 'new',
+    loanType,
+    method,
+    commercial,
+    provident,
+    months,
+    totalPrincipal,
+    totalInterest,
+    totalPayment,
+    firstMonthPayment: round2(firstMonthPayment),
+    lastMonthPayment: round2(lastMonthPayment),
+    principalRatio: round2(principalRatio),
+    interestRatio: round2(interestRatio),
+    schedule,
+    ...extra,
+    display: {
+      totalPrincipal: formatMoneyWithComma(totalPrincipal),
+      totalInterest: formatMoneyWithComma(totalInterest),
+      totalPayment: formatMoneyWithComma(totalPayment),
+      firstMonthPayment: formatMoneyWithComma(firstMonthPayment),
+      lastMonthPayment: formatMoneyWithComma(lastMonthPayment),
+      monthlyDecrease:
+        method === 'equalPrincipal' && schedule.length > 1
+          ? formatMoneyWithComma(schedule[0].payment - schedule[1].payment)
+          : '0.00',
+      ...(extra.display || {})
+    }
+  }
+}
+
 /**
- * 统一入口
- * @param {object} options
- * @param {'provident'|'commercial'|'combo'} options.loanType
- * @param {'equalInterest'|'equalPrincipal'} options.method
- * @param {number} options.commercialAmount 商贷金额（万元）
- * @param {number} options.commercialYears
- * @param {number} options.commercialRate
- * @param {number} options.providentAmount 公积金金额（万元）
- * @param {number} options.providentYears
- * @param {number} options.providentRate
+ * 新贷款统一入口
  */
 function calculateMortgage(options) {
   const method = options.method === 'equalPrincipal' ? 'equalPrincipal' : 'equalInterest'
   const loanType = options.loanType || 'commercial'
 
-  let commercial = calculateLoan(0, 0, 0, method)
-  let provident = calculateLoan(0, 0, 0, method)
+  let commercial = emptyLoanResult()
+  let provident = emptyLoanResult()
 
   if (loanType === 'commercial' || loanType === 'combo') {
     commercial = calculateLoan(
@@ -183,48 +238,167 @@ function calculateMortgage(options) {
         ? provident.schedule
         : commercial.schedule
 
-  const totalPrincipal = round2(commercial.principal + provident.principal)
-  const totalInterest = round2(commercial.totalInterest + provident.totalInterest)
-  const totalPayment = round2(commercial.totalPayment + provident.totalPayment)
-  const months = Math.max(commercial.months, provident.months)
-  const firstMonthPayment = schedule[0] ? schedule[0].payment : 0
-  const lastMonthPayment = schedule.length ? schedule[schedule.length - 1].payment : 0
-
-  const principalRatio = totalPayment > 0 ? (totalPrincipal / totalPayment) * 100 : 0
-  const interestRatio = totalPayment > 0 ? (totalInterest / totalPayment) * 100 : 0
-
-  return {
+  return buildMortgageResult({
+    mode: 'new',
     loanType,
     method,
     commercial,
     provident,
-    months,
-    totalPrincipal,
-    totalInterest,
-    totalPayment,
-    firstMonthPayment: round2(firstMonthPayment),
-    lastMonthPayment: round2(lastMonthPayment),
-    principalRatio: round2(principalRatio),
-    interestRatio: round2(interestRatio),
-    schedule,
-    display: {
-      totalPrincipal: formatMoneyWithComma(totalPrincipal),
-      totalInterest: formatMoneyWithComma(totalInterest),
-      totalPayment: formatMoneyWithComma(totalPayment),
-      firstMonthPayment: formatMoneyWithComma(firstMonthPayment),
-      lastMonthPayment: formatMoneyWithComma(lastMonthPayment),
-      monthlyDecrease:
-        method === 'equalPrincipal' && schedule.length > 1
-          ? formatMoneyWithComma(schedule[0].payment - schedule[1].payment)
-          : '0.00'
-    }
+    schedule
+  })
+}
+
+function parseYearMonth(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return null
+  const parts = dateStr.split('-').map((item) => Number(item))
+  if (parts.length < 2) return null
+  const [year, month] = parts
+  if (!year || !month || month < 1 || month > 12) return null
+  return { year, month }
+}
+
+/**
+ * 首次还款月到当前月（含当月）已还期数
+ */
+function countPaidMonths(firstRepaymentDate, now = new Date()) {
+  const start = parseYearMonth(firstRepaymentDate)
+  if (!start) return -1
+
+  const nowYear = now.getFullYear()
+  const nowMonth = now.getMonth() + 1
+  return (nowYear - start.year) * 12 + (nowMonth - start.month) + 1
+}
+
+function formatRemainingYearsText(remainingMonths) {
+  const years = Math.floor(remainingMonths / 12)
+  const months = remainingMonths % 12
+  if (years <= 0) return `${months}个月`
+  if (months === 0) return `${years}年`
+  return `${years}年${months}个月`
+}
+
+/**
+ * 根据当月本金/利息/剩余本金等，反推执行利率与剩余年限
+ * 约定：剩余本金 = 还完当月本金后的余额
+ * 因此期初本金 = 剩余本金 + 当月还款本金，月利率 = 当月利息 / 期初本金
+ */
+function deriveRemainingLoanInfo(options, now = new Date()) {
+  const originalYears = toNumber(options.originalYears)
+  const monthPrincipal = toNumber(options.monthPrincipal)
+  const monthInterest = toNumber(options.monthInterest)
+  const remainingPrincipal = toNumber(options.remainingPrincipal)
+  const firstRepaymentDate = options.firstRepaymentDate
+
+  if (!(originalYears >= 1 && originalYears <= 30) || !Number.isInteger(originalYears)) {
+    return { ok: false, message: '首次贷款期限请填 1-30 的整数' }
   }
+
+  if (!parseYearMonth(firstRepaymentDate)) {
+    return { ok: false, message: '请选择首次还款日期' }
+  }
+
+  if (!(monthPrincipal > 0)) {
+    return { ok: false, message: '请填写当月还款本金' }
+  }
+
+  if (!(monthInterest >= 0)) {
+    return { ok: false, message: '请填写当月还款利息' }
+  }
+
+  if (!(remainingPrincipal > 0)) {
+    return { ok: false, message: '请填写剩余本金' }
+  }
+
+  const beginPrincipal = remainingPrincipal + monthPrincipal
+  const monthlyRate = monthInterest / beginPrincipal
+  const annualRatePercent = monthlyRate * 12 * 100
+
+  const totalMonths = Math.round(originalYears * 12)
+  const paidMonths = countPaidMonths(firstRepaymentDate, now)
+
+  if (paidMonths < 1) {
+    return { ok: false, message: '首次还款日期不能晚于当前月份' }
+  }
+
+  if (paidMonths > totalMonths) {
+    return { ok: false, message: '已超过原贷款总期数，请检查输入' }
+  }
+
+  const remainingMonths = totalMonths - paidMonths
+  if (remainingMonths <= 0) {
+    return { ok: false, message: '贷款已还清或无剩余期数' }
+  }
+
+  const remainingYears = remainingMonths / 12
+
+  return {
+    ok: true,
+    originalYears,
+    firstRepaymentDate,
+    monthPrincipal: round2(monthPrincipal),
+    monthInterest: round2(monthInterest),
+    remainingPrincipal: round2(remainingPrincipal),
+    beginPrincipal: round2(beginPrincipal),
+    monthlyRate,
+    annualRatePercent,
+    annualRateDisplay: round4(annualRatePercent).toFixed(4),
+    totalMonths,
+    paidMonths,
+    remainingMonths,
+    remainingYears,
+    remainingYearsDisplay: round2(remainingYears).toFixed(2),
+    remainingYearsText: formatRemainingYearsText(remainingMonths)
+  }
+}
+
+/**
+ * 已有贷款：反推利率/剩余年限后，按剩余本金重算还款计划
+ */
+function calculateRemainingMortgage(options) {
+  const method = options.method === 'equalPrincipal' ? 'equalPrincipal' : 'equalInterest'
+  const derived = deriveRemainingLoanInfo(options)
+
+  if (!derived.ok) {
+    return { ok: false, message: derived.message }
+  }
+
+  const loan = calculateLoanByYuan(
+    derived.remainingPrincipal,
+    derived.remainingMonths,
+    derived.annualRatePercent,
+    method
+  )
+
+  const result = buildMortgageResult({
+    mode: 'remaining',
+    loanType: 'remaining',
+    method,
+    commercial: loan,
+    provident: emptyLoanResult(),
+    schedule: loan.schedule,
+    extra: {
+      derived,
+      display: {
+        annualRate: derived.annualRateDisplay,
+        remainingYears: derived.remainingYearsDisplay,
+        remainingYearsText: derived.remainingYearsText,
+        paidMonths: String(derived.paidMonths),
+        remainingMonths: String(derived.remainingMonths)
+      }
+    }
+  })
+
+  return { ok: true, result }
 }
 
 module.exports = {
   calculateMortgage,
+  calculateRemainingMortgage,
+  deriveRemainingLoanInfo,
   calculateLoan,
+  calculateLoanByYuan,
   formatMoney,
   formatMoneyWithComma,
-  round2
+  round2,
+  round4
 }

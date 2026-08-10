@@ -12,17 +12,25 @@
   </view>
 
   <view class="panel metrics">
+    <view class="metric" wx:if="{{isRemaining}}">
+      <view class="metric-value">{{display.annualRate}}%</view>
+      <view class="metric-label">当前执行利率</view>
+    </view>
+    <view class="metric" wx:if="{{isRemaining}}">
+      <view class="metric-value">{{display.remainingYearsText}}</view>
+      <view class="metric-label">剩余还款年份</view>
+    </view>
     <view class="metric">
       <view class="metric-value">{{display.totalPrincipal}}</view>
-      <view class="metric-label">贷款总额（元）</view>
+      <view class="metric-label">{{isRemaining ? '剩余本金（元）' : '贷款总额（元）'}}</view>
     </view>
     <view class="metric">
       <view class="metric-value accent">{{display.totalInterest}}</view>
-      <view class="metric-label">支付利息（元）</view>
+      <view class="metric-label">{{isRemaining ? '剩余利息（元）' : '支付利息（元）'}}</view>
     </view>
     <view class="metric">
       <view class="metric-value">{{display.totalPayment}}</view>
-      <view class="metric-label">还款总额（元）</view>
+      <view class="metric-label">{{isRemaining ? '剩余还款总额（元）' : '还款总额（元）'}}</view>
     </view>
     <view class="metric" wx:if="{{method === 'equalPrincipal'}}">
       <view class="metric-value">{{display.lastMonthPayment}}</view>
@@ -57,7 +65,7 @@
     <view class="schedule-head">
       <view>
         <view class="section-title">还款计划</view>
-        <view class="section-desc">共 {{months}} 期，可展开查看每月明细</view>
+        <view class="section-desc">共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}，可展开查看每月明细</view>
       </view>
       <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开全部'}}</view>
     </view>

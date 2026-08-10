@@ -1,7 +1,12 @@
-const { calculateMortgage } = require('../../utils/mortgage')
+const {
+  calculateMortgage,
+  calculateRemainingMortgage,
+  deriveRemainingLoanInfo
+} = require('../../utils/mortgage')
 
 Page({
   data: {
+    calcMode: 'new',
     loanType: 'combo',
     method: 'equalInterest',
     showCommercial: true,
@@ -14,7 +19,20 @@ Page({
 
     providentAmount: '50',
     providentYears: '30',
-    providentRate: '2.85'
+    providentRate: '2.85',
+
+    originalYears: '30',
+    firstRepaymentDate: '',
+    monthPrincipal: '',
+    monthInterest: '',
+    remainingPrincipal: '',
+
+    derivedReady: false,
+    derivedAnnualRate: '--',
+    derivedRemainingYears: '--',
+    derivedRemainingYearsText: '--',
+    derivedRemainingMonths: '--',
+    derivedMessage: ''
   },
 
   onShowMethodTip() {
@@ -26,6 +44,15 @@ Page({
   },
 
   preventMove() {},
+
+  onCalcModeChange(e) {
+    this.setData({
+      calcMode: e.currentTarget.dataset.mode
+    })
+    if (e.currentTarget.dataset.mode === 'remaining') {
+      this.refreshDerived()
+    }
+  },
 
   onLoanTypeChange(e) {
     const loanType = e.currentTarget.dataset.type
@@ -49,12 +76,89 @@ Page({
     })
   },
 
+  onRemainingInput(e) {
+    const field = e.currentTarget.dataset.field
+    this.setData(
+      {
+        [field]: e.detail.value
+      },
+      () => this.refreshDerived()
+    )
+  },
+
+  onFirstDateChange(e) {
+    this.setData(
+      {
+        firstRepaymentDate: e.detail.value
+      },
+      () => this.refreshDerived()
+    )
+  },
+
+  refreshDerived() {
+    const {
+      originalYears,
+      firstRepaymentDate,
+      monthPrincipal,
+      monthInterest,
+      remainingPrincipal
+    } = this.data
+
+    const hasAnyInput =
+      originalYears ||
+      firstRepaymentDate ||
+      monthPrincipal ||
+      monthInterest ||
+      remainingPrincipal
+
+    if (!hasAnyInput) {
+      this.setData({
+        derivedReady: false,
+        derivedAnnualRate: '--',
+        derivedRemainingYears: '--',
+        derivedRemainingYearsText: '--',
+        derivedRemainingMonths: '--',
+        derivedMessage: ''
+      })
+      return
+    }
+
+    const derived = deriveRemainingLoanInfo({
+      originalYears,
+      firstRepaymentDate,
+      monthPrincipal,
+      monthInterest,
+      remainingPrincipal
+    })
+
+    if (!derived.ok) {
+      this.setData({
+        derivedReady: false,
+        derivedAnnualRate: '--',
+        derivedRemainingYears: '--',
+        derivedRemainingYearsText: '--',
+        derivedRemainingMonths: '--',
+        derivedMessage: derived.message
+      })
+      return
+    }
+
+    this.setData({
+      derivedReady: true,
+      derivedAnnualRate: derived.annualRateDisplay,
+      derivedRemainingYears: derived.remainingYearsDisplay,
+      derivedRemainingYearsText: derived.remainingYearsText,
+      derivedRemainingMonths: String(derived.remainingMonths),
+      derivedMessage: ''
+    })
+  },
+
   isValidYears(years) {
     const n = Number(years)
     return Number.isInteger(n) && n >= 1 && n <= 30
   },
 
-  validate() {
+  validateNewLoan() {
     const {
       loanType,
       commercialAmount,
@@ -101,8 +205,30 @@ Page({
     return true
   },
 
+  validateRemainingLoan() {
+    const derived = deriveRemainingLoanInfo({
+      originalYears: this.data.originalYears,
+      firstRepaymentDate: this.data.firstRepaymentDate,
+      monthPrincipal: this.data.monthPrincipal,
+      monthInterest: this.data.monthInterest,
+      remainingPrincipal: this.data.remainingPrincipal
+    })
+
+    if (!derived.ok) {
+      wx.showToast({ title: derived.message, icon: 'none' })
+      return false
+    }
+
+    return true
+  },
+
   onCalculate() {
-    if (!this.validate()) return
+    if (this.data.calcMode === 'remaining') {
+      this.calculateRemaining()
+      return
+    }
+
+    if (!this.validateNewLoan()) return
 
     const {
       loanType,
@@ -131,12 +257,31 @@ Page({
       return
     }
 
-    // 还款计划可能很长，用本地缓存传递，避免 URL 过长
-    wx.setStorageSync('mortgageResult', {
-      ...result,
-      // schedule 单独存，结果页按需读取
+    this.goResult(result)
+  },
+
+  calculateRemaining() {
+    if (!this.validateRemainingLoan()) return
+
+    const { ok, result, message } = calculateRemainingMortgage({
+      method: this.data.method,
+      originalYears: this.data.originalYears,
+      firstRepaymentDate: this.data.firstRepaymentDate,
+      monthPrincipal: this.data.monthPrincipal,
+      monthInterest: this.data.monthInterest,
+      remainingPrincipal: this.data.remainingPrincipal
     })
 
+    if (!ok) {
+      wx.showToast({ title: message || '计算失败', icon: 'none' })
+      return
+    }
+
+    this.goResult(result)
+  },
+
+  goResult(result) {
+    wx.setStorageSync('mortgageResult', result)
     wx.navigateTo({
       url: '/pages/result/result'
     })

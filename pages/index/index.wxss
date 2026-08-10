@@ -36,6 +36,85 @@
   animation-delay: 0.15s;
 }
 
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.help-icon {
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 34rpx;
+  text-align: center;
+  border-radius: 50%;
+  border: 2rpx solid rgba(95, 114, 104, 0.55);
+  color: var(--color-muted);
+  font-size: 24rpx;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.tip-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx;
+  background: rgba(20, 35, 28, 0.45);
+}
+
+.tip-dialog {
+  width: 100%;
+  max-width: 620rpx;
+  padding: 36rpx 32rpx 28rpx;
+  border-radius: 24rpx;
+  background: #f7f8f6;
+  box-shadow: 0 24rpx 60rpx rgba(11, 61, 46, 0.2);
+}
+
+.tip-title {
+  font-family: var(--font-display);
+  font-size: 34rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+  text-align: center;
+}
+
+.tip-block {
+  margin-top: 24rpx;
+}
+
+.tip-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.tip-text {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  line-height: 1.65;
+  color: var(--color-muted);
+}
+
+.tip-confirm {
+  margin-top: 32rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+}
+
 .type-segment {
   margin-top: 22rpx;
 }

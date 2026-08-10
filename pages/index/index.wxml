@@ -27,7 +27,10 @@
   </view>
 
   <view class="panel">
-    <view class="section-title">还款方式</view>
+    <view class="section-title-row">
+      <view class="section-title">还款方式</view>
+      <view class="help-icon" catchtap="onShowMethodTip" aria-role="button" aria-label="还款方式说明">!</view>
+    </view>
     <view class="section-desc">等额本息月供稳定，等额本金利息更少</view>
     <view class="segment">
       <view
@@ -40,6 +43,21 @@
         data-method="equalPrincipal"
         bindtap="onMethodChange"
       >等额本金</view>
+    </view>
+  </view>
+
+  <view class="tip-mask" wx:if="{{showMethodTip}}" catchtouchmove="preventMove" bindtap="onHideMethodTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">还款方式说明</view>
+      <view class="tip-block">
+        <view class="tip-name">等额本息</view>
+        <view class="tip-text">每月还款金额固定不变。前期利息占比较高、本金占比较低，后期逐渐变为还本金为主。适合收入稳定、希望月供压力平稳的用户。</view>
+      </view>
+      <view class="tip-block">
+        <view class="tip-name">等额本金</view>
+        <view class="tip-text">每月偿还的本金固定，利息随剩余本金逐月减少，因此月供会越来越少，总利息通常也更少，但前期还款压力更大。</view>
+      </view>
+      <view class="tip-confirm" bindtap="onHideMethodTip">我知道了</view>
     </view>
   </view>
 

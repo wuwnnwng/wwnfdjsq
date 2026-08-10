@@ -6,6 +6,7 @@ Page({
     method: 'equalInterest',
     showCommercial: true,
     showProvident: true,
+    showMethodTip: false,
 
     commercialAmount: '100',
     commercialYears: 30,
@@ -15,6 +16,16 @@ Page({
     providentYears: 30,
     providentRate: '2.85'
   },
+
+  onShowMethodTip() {
+    this.setData({ showMethodTip: true })
+  },
+
+  onHideMethodTip() {
+    this.setData({ showMethodTip: false })
+  },
+
+  preventMove() {},
 
   onLoanTypeChange(e) {
     const loanType = e.currentTarget.dataset.type

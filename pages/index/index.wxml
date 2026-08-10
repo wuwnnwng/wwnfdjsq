@@ -6,7 +6,7 @@
 
   <view class="panel">
     <view class="section-title">计算场景</view>
-    <view class="section-desc">新贷款测算，或根据当月账单推算剩余计划</view>
+    <view class="section-desc">新贷款测算，或根据最近一次还款账单推算剩余计划</view>
     <view class="segment type-segment">
       <view
         class="segment-item {{calcMode === 'new' ? 'active' : ''}}"
@@ -185,7 +185,7 @@
   <block wx:else>
     <view class="panel">
       <view class="section-title">剩余贷款参数</view>
-      <view class="section-desc">可从银行 App 还款详情中抄录当月本金、利息与剩余本金</view>
+      <view class="section-desc">可从银行 App 还款详情中抄录最近一次还款本金、利息与剩余本金</view>
 
       <view class="field">
         <text class="field-label">首次贷款期限</text>
@@ -214,7 +214,7 @@
       </view>
 
       <view class="field">
-        <text class="field-label">当月还款本金</text>
+        <text class="field-label">最近一次还款本金</text>
         <view class="field-control">
           <input
             class="field-input"
@@ -229,7 +229,7 @@
       </view>
 
       <view class="field">
-        <text class="field-label">当月还款利息</text>
+        <text class="field-label">最近一次还款利息</text>
         <view class="field-control">
           <input
             class="field-input"
@@ -252,7 +252,7 @@
             value="{{remainingPrincipal}}"
             data-field="remainingPrincipal"
             bindinput="onRemainingInput"
-            placeholder="还完当月后余额"
+            placeholder="还完最近一期后余额"
           />
           <text class="field-unit">元</text>
         </view>

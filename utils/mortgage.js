@@ -274,9 +274,9 @@ function countPaidMonths(firstRepaymentDate, now = new Date()) {
 }
 
 /**
- * 根据当月本金/利息/剩余本金等，反推执行利率与剩余年限
- * 约定：剩余本金 = 还完当月本金后的余额
- * 因此期初本金 = 剩余本金 + 当月还款本金，月利率 = 当月利息 / 期初本金
+ * 根据最近一次还款本金/利息/剩余本金等，反推执行利率与剩余年限
+ * 约定：剩余本金 = 还完最近一次还款本金后的余额
+ * 因此期初本金 = 剩余本金 + 最近一次还款本金，月利率 = 最近一次还款利息 / 期初本金
  */
 function deriveRemainingLoanInfo(options, now = new Date()) {
   const originalYears = toNumber(options.originalYears)
@@ -294,11 +294,11 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
   }
 
   if (!(monthPrincipal > 0)) {
-    return { ok: false, message: '请填写当月还款本金' }
+    return { ok: false, message: '请填写最近一次还款本金' }
   }
 
   if (!(monthInterest >= 0)) {
-    return { ok: false, message: '请填写当月还款利息' }
+    return { ok: false, message: '请填写最近一次还款利息' }
   }
 
   if (!(remainingPrincipal > 0)) {

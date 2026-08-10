@@ -7,9 +7,9 @@ const {
 Page({
   data: {
     calcMode: 'new',
-    loanType: 'combo',
+    loanType: 'provident',
     method: 'equalInterest',
-    showCommercial: true,
+    showCommercial: false,
     showProvident: true,
     showMethodTip: false,
 

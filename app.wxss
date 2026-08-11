@@ -33,7 +33,7 @@ canvas {
 
 .page {
   min-height: 100vh;
-  padding: 32rpx 28rpx 48rpx;
+  padding: 32rpx 28rpx 80rpx;
 }
 
 .section-title {
@@ -121,9 +121,16 @@ canvas {
 }
 
 .primary-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 36rpx;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0;
   height: 96rpx;
-  line-height: 96rpx;
+  line-height: 1.2;
+  text-align: center;
   border-radius: 999rpx;
   font-size: 32rpx;
   font-weight: 600;

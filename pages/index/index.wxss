@@ -1,22 +1,25 @@
-.hero {
-  padding: 12rpx 8rpx 8rpx;
+.hero-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
   animation: rise-in 0.55s ease both;
 }
 
 .brand {
+  flex-shrink: 0;
   font-family: var(--font-display);
-  font-size: 56rpx;
+  font-size: 40rpx;
   font-weight: 700;
-  letter-spacing: 2rpx;
+  letter-spacing: 1rpx;
   color: var(--color-brand);
   line-height: 1.2;
 }
 
-.hero-line {
-  margin-top: 14rpx;
-  font-size: 26rpx;
-  color: var(--color-muted);
-  line-height: 1.6;
+.mode-segment {
+  flex: 1;
+  max-width: 360rpx;
+  justify-content: flex-end;
 }
 
 .panel {

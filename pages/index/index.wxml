@@ -1,13 +1,7 @@
 <view class="page">
-  <view class="hero">
+  <view class="panel hero-panel">
     <view class="brand">房贷计算器</view>
-    <view class="hero-line">{{calcMode === 'new' ? '公积金 · 商贷 · 组合贷，一键算出还款计划' : '已有贷款也可测算：反推利率与剩余年限，重算还款计划'}}</view>
-  </view>
-
-  <view class="panel">
-    <view class="section-title">计算场景</view>
-    <view class="section-desc">新贷款测算，或根据最近一次还款账单推算剩余计划</view>
-    <view class="segment type-segment">
+    <view class="segment segment-row mode-segment">
       <view
         class="segment-item {{calcMode === 'new' ? 'active' : ''}}"
         data-mode="new"
@@ -40,7 +34,6 @@
   <block wx:if="{{calcMode === 'new'}}">
     <view class="panel">
       <view class="section-title">贷款信息</view>
-      <view class="section-desc">选择还款方式，填写金额信息，再选择贷款类型</view>
 
       <view class="inline-row first">
         <view class="inline-label-wrap">

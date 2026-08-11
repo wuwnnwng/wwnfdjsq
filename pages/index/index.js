@@ -23,7 +23,7 @@ Page({
     providentRate: '2.85',
 
     originalYears: '30',
-    firstRepaymentDate: '2021-09-27',
+    firstRepaymentDate: '',
     monthPrincipal: '766.02',
     monthInterest: '706.66',
     remainingPrincipal: '325383.31',

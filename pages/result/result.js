@@ -1,5 +1,10 @@
 const { formatMoneyWithComma } = require('../../utils/mortgage')
 const { renderPie } = require('../../utils/pie')
+const {
+  enableShareMenu,
+  getShareAppMessage,
+  getShareTimeline
+} = require('../../utils/share')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -51,6 +56,8 @@ Page({
   },
 
   onLoad() {
+    enableShareMenu()
+
     const result = wx.getStorageSync('mortgageResult')
     if (!result || !result.totalPrincipal) {
       this.setData({ ready: false })
@@ -88,6 +95,14 @@ Page({
       fullSchedule,
       visibleSchedule: fullSchedule.slice(0, previewCount)
     })
+  },
+
+  onShareAppMessage() {
+    return getShareAppMessage()
+  },
+
+  onShareTimeline() {
+    return getShareTimeline()
   },
 
   onReady() {

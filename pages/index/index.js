@@ -3,6 +3,11 @@ const {
   calculateRemainingMortgage,
   deriveRemainingLoanInfo
 } = require('../../utils/mortgage')
+const {
+  enableShareMenu,
+  getShareAppMessage,
+  getShareTimeline
+} = require('../../utils/share')
 
 Page({
   data: {
@@ -34,6 +39,18 @@ Page({
     derivedRemainingYearsText: '--',
     derivedRemainingMonths: '--',
     derivedMessage: ''
+  },
+
+  onLoad() {
+    enableShareMenu()
+  },
+
+  onShareAppMessage() {
+    return getShareAppMessage()
+  },
+
+  onShareTimeline() {
+    return getShareTimeline()
   },
 
   onShowMethodTip() {

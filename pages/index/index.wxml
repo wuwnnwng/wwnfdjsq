@@ -36,18 +36,18 @@
     </view>
   </view>
 
-  <!-- 新贷款：还款方式 + 贷款类型 + 基本信息合并为一块 -->
+  <!-- 新贷款：还款方式 → 金额填写 → 贷款类型 -->
   <block wx:if="{{calcMode === 'new'}}">
     <view class="panel">
       <view class="section-title">贷款信息</view>
-      <view class="section-desc">选择还款方式与贷款类型，并填写对应基本信息</view>
+      <view class="section-desc">选择还款方式，填写金额信息，再选择贷款类型</view>
 
-      <view class="sub-block first">
-        <view class="section-title-row">
-          <view class="sub-title">还款方式</view>
+      <view class="inline-row first">
+        <view class="inline-label-wrap">
+          <text class="inline-label">还款方式</text>
           <view class="help-icon" catchtap="onShowMethodTip" aria-role="button" aria-label="还款方式说明">!</view>
         </view>
-        <view class="segment">
+        <view class="segment segment-row">
           <view
             class="segment-item {{method === 'equalInterest' ? 'active' : ''}}"
             data-method="equalInterest"
@@ -58,27 +58,6 @@
             data-method="equalPrincipal"
             bindtap="onMethodChange"
           >等额本金</view>
-        </view>
-      </view>
-
-      <view class="sub-block">
-        <view class="sub-title">贷款类型</view>
-        <view class="segment type-segment">
-          <view
-            class="segment-item {{loanType === 'provident' ? 'active' : ''}}"
-            data-type="provident"
-            bindtap="onLoanTypeChange"
-          >公积金贷</view>
-          <view
-            class="segment-item {{loanType === 'commercial' ? 'active' : ''}}"
-            data-type="commercial"
-            bindtap="onLoanTypeChange"
-          >商贷</view>
-          <view
-            class="segment-item {{loanType === 'combo' ? 'active' : ''}}"
-            data-type="combo"
-            bindtap="onLoanTypeChange"
-          >组合贷款</view>
         </view>
       </view>
 
@@ -171,6 +150,27 @@
             />
             <text class="field-unit">%</text>
           </view>
+        </view>
+      </view>
+
+      <view class="inline-row">
+        <text class="inline-label">贷款类型</text>
+        <view class="segment segment-row">
+          <view
+            class="segment-item {{loanType === 'provident' ? 'active' : ''}}"
+            data-type="provident"
+            bindtap="onLoanTypeChange"
+          >公积金贷</view>
+          <view
+            class="segment-item {{loanType === 'commercial' ? 'active' : ''}}"
+            data-type="commercial"
+            bindtap="onLoanTypeChange"
+          >商贷</view>
+          <view
+            class="segment-item {{loanType === 'combo' ? 'active' : ''}}"
+            data-type="combo"
+            bindtap="onLoanTypeChange"
+          >组合贷款</view>
         </view>
       </view>
     </view>

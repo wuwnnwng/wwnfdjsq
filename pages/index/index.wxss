@@ -123,6 +123,53 @@
   margin-top: 22rpx;
 }
 
+.inline-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.inline-row.first {
+  margin-top: 20rpx;
+  padding-top: 0;
+  border-top: none;
+}
+
+.inline-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-shrink: 0;
+}
+
+.inline-label {
+  flex-shrink: 0;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.segment-row {
+  flex: 1;
+  margin-top: 0;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.segment-row .segment-item {
+  flex: 1;
+  min-width: 0;
+  padding: 12rpx 8rpx;
+  font-size: 24rpx;
+  white-space: nowrap;
+}
+
 .sub-block {
   margin-top: 28rpx;
   padding-top: 24rpx;

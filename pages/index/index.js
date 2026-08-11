@@ -72,10 +72,16 @@ Page({
   preventMove() {},
 
   onCalcModeChange(e) {
-    this.setData({
-      calcMode: e.currentTarget.dataset.mode
-    })
-    if (e.currentTarget.dataset.mode === 'remaining') {
+    const calcMode = e.currentTarget.dataset.mode
+    const patch = { calcMode }
+
+    // 已有贷款不支持先息后本
+    if (calcMode === 'remaining' && this.data.method === 'interestFirst') {
+      patch.method = 'equalInterest'
+    }
+
+    this.setData(patch)
+    if (calcMode === 'remaining') {
       this.refreshDerived()
     }
   },
@@ -288,6 +294,11 @@ Page({
 
   calculateRemaining() {
     if (!this.validateRemainingLoan()) return
+
+    if (this.data.method === 'interestFirst') {
+      wx.showToast({ title: '已有贷款暂不支持先息后本', icon: 'none' })
+      return
+    }
 
     const { ok, result, message } = calculateRemainingMortgage({
       method: this.data.method,

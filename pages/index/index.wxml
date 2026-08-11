@@ -198,11 +198,6 @@
             data-method="equalPrincipal"
             bindtap="onMethodChange"
           >等额本金</view>
-          <view
-            class="segment-item {{method === 'interestFirst' ? 'active' : ''}}"
-            data-method="interestFirst"
-            bindtap="onMethodChange"
-          >先息后本</view>
         </view>
       </view>
     </view>

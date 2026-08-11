@@ -268,7 +268,10 @@
   padding: 0;
   line-height: 1.2;
   text-align: center;
-  animation: pulse-soft 2.4s ease-in-out infinite;
+  color: var(--color-brand);
+  background: transparent;
+  box-shadow: none;
+  border: 2rpx solid rgba(11, 61, 46, 0.22);
 }
 
 @keyframes rise-in {
@@ -279,17 +282,5 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes pulse-soft {
-  0%,
-  100% {
-    transform: translateY(0);
-    box-shadow: 0 16rpx 36rpx rgba(11, 61, 46, 0.22);
-  }
-  50% {
-    transform: translateY(-2rpx);
-    box-shadow: 0 20rpx 40rpx rgba(11, 61, 46, 0.28);
   }
 }

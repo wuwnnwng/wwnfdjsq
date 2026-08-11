@@ -134,9 +134,10 @@ canvas {
   border-radius: 999rpx;
   font-size: 32rpx;
   font-weight: 600;
-  color: #fff;
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
-  box-shadow: 0 16rpx 36rpx rgba(11, 61, 46, 0.22);
+  color: var(--color-brand);
+  background: transparent;
+  box-shadow: none;
+  border: 2rpx solid rgba(11, 61, 46, 0.22);
 }
 
 .primary-btn::after {

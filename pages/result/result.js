@@ -28,6 +28,7 @@ Page({
     ready: false,
     mode: 'new',
     isRemaining: false,
+    isCombo: false,
     loanType: '',
     method: '',
     loanTypeLabel: '',
@@ -38,7 +39,15 @@ Page({
     providentFirst: '0.00',
     showAllSchedule: false,
     visibleSchedule: [],
-    fullSchedule: []
+    fullSchedule: [],
+    showSplitTip: false,
+    splitDetail: {
+      month: 0,
+      providentPrincipal: '0.00',
+      providentInterest: '0.00',
+      commercialPrincipal: '0.00',
+      commercialInterest: '0.00'
+    }
   },
 
   onLoad() {
@@ -51,6 +60,7 @@ Page({
     const fullSchedule = decorateSchedule(result.schedule)
     const previewCount = 12
     const isRemaining = result.mode === 'remaining' || result.loanType === 'remaining'
+    const isCombo = result.loanType === 'combo'
 
     this.pieData = {
       principal: result.totalPrincipal,
@@ -61,6 +71,7 @@ Page({
       ready: true,
       mode: result.mode || 'new',
       isRemaining,
+      isCombo,
       loanType: result.loanType,
       method: result.method,
       loanTypeLabel: LOAN_TYPE_LABEL[result.loanType] || '',
@@ -95,6 +106,31 @@ Page({
         : this.data.fullSchedule.slice(0, 12)
     })
   },
+
+  onInterestTap(e) {
+    if (!this.data.isCombo) return
+
+    const index = e.currentTarget.dataset.index
+    const item = this.data.visibleSchedule[index]
+    if (!item || !item.commercial || !item.provident) return
+
+    this.setData({
+      showSplitTip: true,
+      splitDetail: {
+        month: item.month,
+        providentPrincipal: formatMoneyWithComma(item.provident.principal),
+        providentInterest: formatMoneyWithComma(item.provident.interest),
+        commercialPrincipal: formatMoneyWithComma(item.commercial.principal),
+        commercialInterest: formatMoneyWithComma(item.commercial.interest)
+      }
+    })
+  },
+
+  onHideSplitTip() {
+    this.setData({ showSplitTip: false })
+  },
+
+  preventMove() {},
 
   onRecalculate() {
     wx.navigateBack({

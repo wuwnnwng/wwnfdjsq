@@ -147,7 +147,19 @@ function mergeSchedules(left, right) {
       payment: round2(a.payment + b.payment),
       principal: round2(a.principal + b.principal),
       interest: round2(a.interest + b.interest),
-      remaining: round2(a.remaining + b.remaining)
+      remaining: round2(a.remaining + b.remaining),
+      commercial: {
+        payment: round2(a.payment),
+        principal: round2(a.principal),
+        interest: round2(a.interest),
+        remaining: round2(a.remaining)
+      },
+      provident: {
+        payment: round2(b.payment),
+        principal: round2(b.principal),
+        interest: round2(b.interest),
+        remaining: round2(b.remaining)
+      }
     })
   }
 

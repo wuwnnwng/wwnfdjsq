@@ -123,6 +123,24 @@
   margin-top: 22rpx;
 }
 
+.sub-block {
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.sub-block.first {
+  margin-top: 20rpx;
+  padding-top: 0;
+  border-top: none;
+}
+
+.sub-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
 .picker-value {
   min-width: 240rpx;
   text-align: right;

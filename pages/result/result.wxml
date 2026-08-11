@@ -65,7 +65,7 @@
     <view class="schedule-head">
       <view>
         <view class="section-title">还款计划</view>
-        <view class="section-desc">共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}，可展开查看每月明细</view>
+        <view class="section-desc">共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}，可展开查看每月明细{{isCombo ? '；点击利息可查看拆分' : ''}}</view>
       </view>
       <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开全部'}}</view>
     </view>
@@ -74,7 +74,7 @@
       <text class="col month">期数</text>
       <text class="col">月供</text>
       <text class="col">本金</text>
-      <text class="col">利息</text>
+      <text class="col">利息{{isCombo ? ' · 点我' : ''}}</text>
       <text class="col">剩余</text>
     </view>
 
@@ -83,10 +83,31 @@
         <text class="col month">{{item.month}}</text>
         <text class="col">{{item.paymentText}}</text>
         <text class="col">{{item.principalText}}</text>
-        <text class="col interest-text">{{item.interestText}}</text>
+        <text
+          class="col interest-text {{isCombo ? 'clickable' : ''}}"
+          data-index="{{index}}"
+          catchtap="onInterestTap"
+        >{{item.interestText}}</text>
         <text class="col">{{item.remainingText}}</text>
       </view>
     </scroll-view>
+  </view>
+
+  <view class="tip-mask" wx:if="{{showSplitTip}}" catchtouchmove="preventMove" bindtap="onHideSplitTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">第 {{splitDetail.month}} 期拆分</view>
+      <view class="tip-block">
+        <view class="tip-name">公积金贷款</view>
+        <view class="tip-text">还款本金 {{splitDetail.providentPrincipal}} 元</view>
+        <view class="tip-text">还款利息 {{splitDetail.providentInterest}} 元</view>
+      </view>
+      <view class="tip-block">
+        <view class="tip-name">商业贷款</view>
+        <view class="tip-text">还款本金 {{splitDetail.commercialPrincipal}} 元</view>
+        <view class="tip-text">还款利息 {{splitDetail.commercialInterest}} 元</view>
+      </view>
+      <view class="tip-confirm" bindtap="onHideSplitTip">我知道了</view>
+    </view>
   </view>
 
   <button class="primary-btn" bindtap="onRecalculate">重新计算</button>

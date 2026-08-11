@@ -75,10 +75,12 @@
 .tip-dialog {
   width: 100%;
   max-width: 620rpx;
+  max-height: 80vh;
   padding: 36rpx 32rpx 28rpx;
   border-radius: 24rpx;
   background: #f7f8f6;
   box-shadow: 0 24rpx 60rpx rgba(11, 61, 46, 0.2);
+  overflow-y: auto;
 }
 
 .tip-title {

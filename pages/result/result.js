@@ -15,7 +15,14 @@ const LOAN_TYPE_LABEL = {
 
 const METHOD_LABEL = {
   equalInterest: '等额本息',
-  equalPrincipal: '等额本金'
+  equalPrincipal: '等额本金',
+  interestFirst: '先息后本'
+}
+
+const PAYMENT_LABEL = {
+  equalInterest: '每月还款',
+  equalPrincipal: '首月还款',
+  interestFirst: '每月利息'
 }
 
 function decorateSchedule(list) {
@@ -38,6 +45,8 @@ Page({
     method: '',
     loanTypeLabel: '',
     methodLabel: '',
+    paymentLabel: '每月还款',
+    summaryPayment: '0.00',
     display: {},
     months: 0,
     commercialFirst: '0.00',
@@ -83,6 +92,8 @@ Page({
       method: result.method,
       loanTypeLabel: LOAN_TYPE_LABEL[result.loanType] || '',
       methodLabel: METHOD_LABEL[result.method] || '',
+      paymentLabel: PAYMENT_LABEL[result.method] || '每月还款',
+      summaryPayment: (result.display && result.display.firstMonthPayment) || '0.00',
       display: result.display,
       months: result.months,
       commercialFirst: formatMoneyWithComma(

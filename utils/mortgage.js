@@ -1,7 +1,7 @@
 /**
  * 房贷计算工具
  * 支持：公积金贷 / 商贷 / 组合贷 / 已有贷款剩余计划
- * 还款方式：等额本息 / 等额本金
+ * 还款方式：等额本息 / 等额本金 / 先息后本
  */
 
 function toNumber(value, fallback = 0) {
@@ -28,6 +28,12 @@ function formatMoneyWithComma(n) {
   return `${withComma}.${decimal}`
 }
 
+const METHOD_LIST = ['equalInterest', 'equalPrincipal', 'interestFirst']
+
+function normalizeMethod(method) {
+  return METHOD_LIST.indexOf(method) >= 0 ? method : 'equalInterest'
+}
+
 function emptyLoanResult() {
   return {
     principal: 0,
@@ -41,6 +47,16 @@ function emptyLoanResult() {
   }
 }
 
+function pushScheduleItem(schedule, month, payment, principalPart, interest, remaining) {
+  schedule.push({
+    month,
+    payment: round2(payment),
+    principal: round2(principalPart),
+    interest: round2(interest),
+    remaining: round2(remaining)
+  })
+}
+
 /**
  * 按「元 + 期数」计算单笔贷款
  */
@@ -48,6 +64,7 @@ function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
   const principal = round2(toNumber(principalYuan))
   const totalMonths = Math.max(0, Math.round(toNumber(months)))
   const monthlyRate = toNumber(annualRatePercent) / 100 / 12
+  const normalizedMethod = normalizeMethod(method)
 
   if (principal <= 0 || totalMonths <= 0) {
     return emptyLoanResult()
@@ -58,7 +75,7 @@ function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
   let totalPayment = 0
   let totalInterest = 0
 
-  if (method === 'equalPrincipal') {
+  if (normalizedMethod === 'equalPrincipal') {
     const monthlyPrincipal = principal / totalMonths
 
     for (let i = 1; i <= totalMonths; i += 1) {
@@ -69,16 +86,22 @@ function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
       remaining = Math.max(0, remaining - principalPart)
       totalPayment += payment
       totalInterest += interest
+      pushScheduleItem(schedule, i, payment, principalPart, interest, remaining)
+    }
+  } else if (normalizedMethod === 'interestFirst') {
+    // 先息后本：前期只还利息，到期一次还清本金
+    for (let i = 1; i <= totalMonths; i += 1) {
+      const interest = remaining * monthlyRate
+      const principalPart = i === totalMonths ? remaining : 0
+      const payment = principalPart + interest
 
-      schedule.push({
-        month: i,
-        payment: round2(payment),
-        principal: round2(principalPart),
-        interest: round2(interest),
-        remaining: round2(remaining)
-      })
+      remaining = Math.max(0, remaining - principalPart)
+      totalPayment += payment
+      totalInterest += interest
+      pushScheduleItem(schedule, i, payment, principalPart, interest, remaining)
     }
   } else {
+    // 等额本息
     let monthlyPayment
     if (monthlyRate === 0) {
       monthlyPayment = principal / totalMonths
@@ -100,14 +123,7 @@ function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
       remaining = Math.max(0, remaining - principalPart)
       totalPayment += payment
       totalInterest += interest
-
-      schedule.push({
-        month: i,
-        payment: round2(payment),
-        principal: round2(principalPart),
-        interest: round2(interest),
-        remaining: round2(remaining)
-      })
+      pushScheduleItem(schedule, i, payment, principalPart, interest, remaining)
     }
   }
 
@@ -219,7 +235,7 @@ function buildMortgageResult({
  * 新贷款统一入口
  */
 function calculateMortgage(options) {
-  const method = options.method === 'equalPrincipal' ? 'equalPrincipal' : 'equalInterest'
+  const method = normalizeMethod(options.method)
   const loanType = options.loanType || 'commercial'
 
   let commercial = emptyLoanResult()
@@ -364,7 +380,7 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
  * 已有贷款：反推利率/剩余年限后，按剩余本金重算还款计划
  */
 function calculateRemainingMortgage(options) {
-  const method = options.method === 'equalPrincipal' ? 'equalPrincipal' : 'equalInterest'
+  const method = normalizeMethod(options.method)
   const derived = deriveRemainingLoanInfo(options)
 
   if (!derived.ok) {
@@ -406,6 +422,8 @@ module.exports = {
   deriveRemainingLoanInfo,
   calculateLoan,
   calculateLoanByYuan,
+  normalizeMethod,
+  METHOD_LIST,
   formatMoney,
   formatMoneyWithComma,
   round2,

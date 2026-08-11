@@ -2,12 +2,13 @@
   <view class="summary-hero">
     <view class="summary-label">{{loanTypeLabel}} · {{methodLabel}}</view>
     <view class="summary-main">
-      <text class="summary-number">{{display.firstMonthPayment}}</text>
+      <text class="summary-number">{{summaryPayment}}</text>
       <text class="summary-unit">元</text>
     </view>
     <view class="summary-sub">
-      {{method === 'equalInterest' ? '每月还款' : '首月还款'}}
+      {{paymentLabel}}
       <text wx:if="{{method === 'equalPrincipal'}}"> · 每月递减约 {{display.monthlyDecrease}} 元</text>
+      <text wx:if="{{method === 'interestFirst'}}"> · 到期另还全部本金</text>
     </view>
   </view>
 
@@ -32,7 +33,7 @@
       <view class="metric-value">{{display.totalPayment}}</view>
       <view class="metric-label">{{isRemaining ? '剩余还款总额（元）' : '还款总额（元）'}}</view>
     </view>
-    <view class="metric" wx:if="{{method === 'equalPrincipal'}}">
+    <view class="metric" wx:if="{{method === 'equalPrincipal' || method === 'interestFirst'}}">
       <view class="metric-value">{{display.lastMonthPayment}}</view>
       <view class="metric-label">末月还款（元）</view>
     </view>

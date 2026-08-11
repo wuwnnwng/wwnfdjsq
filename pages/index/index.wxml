@@ -304,6 +304,8 @@
     </view>
   </block>
 
-  <button class="primary-btn" bindtap="onCalculate">开始计算</button>
-  <view class="disclaimer">计算结果仅供参考，实际以银行审批为准</view>
+  <view class="footer-block">
+    <button class="primary-btn" bindtap="onCalculate">开始计算</button>
+    <view class="disclaimer">计算结果仅供参考，实际以银行审批为准</view>
+  </view>
 </view>

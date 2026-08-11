@@ -251,27 +251,34 @@
   color: var(--color-accent);
 }
 
+.footer-block {
+  margin-top: 28rpx;
+  margin-left: -28rpx;
+  margin-right: -28rpx;
+  margin-bottom: -80rpx;
+  padding: 28rpx 28rpx 80rpx;
+  background: #f3f6f4;
+}
+
 .disclaimer {
-  margin-top: 36rpx;
-  margin-bottom: 12rpx;
+  margin-top: 28rpx;
+  margin-bottom: 0;
   padding: 0 12rpx;
   text-align: center;
   font-size: 22rpx;
   color: var(--color-muted);
   line-height: 1.6;
+  background: transparent;
 }
 
 .primary-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 0;
   padding: 0;
   line-height: 1.2;
   text-align: center;
-  color: var(--color-brand);
-  background: transparent;
-  box-shadow: none;
-  border: 2rpx solid rgba(11, 61, 46, 0.22);
 }
 
 @keyframes rise-in {

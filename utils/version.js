@@ -2,7 +2,7 @@
  * 本地版本号：结构或缓存规则有变更时，递增此版本即可自动清理旧数据。
  * 注意：这与微信后台发布的小程序版本号不是同一个概念。
  */
-const APP_VERSION = '1.0.2'
+const APP_VERSION = '1.0.3'
 const VERSION_STORAGE_KEY = 'app_version'
 
 /** 版本升级时需要清理的本地缓存 key */

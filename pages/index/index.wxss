@@ -114,6 +114,11 @@
   color: var(--color-muted);
 }
 
+.tip-single {
+  margin-top: 24rpx;
+  text-align: center;
+}
+
 .tip-confirm {
   margin-top: 32rpx;
   height: 80rpx;

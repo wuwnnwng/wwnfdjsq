@@ -12,6 +12,7 @@ Page({
     showCommercial: false,
     showProvident: true,
     showMethodTip: false,
+    showRemainingTip: false,
 
     commercialAmount: '100',
     commercialYears: '30',
@@ -22,10 +23,10 @@ Page({
     providentRate: '2.85',
 
     originalYears: '30',
-    firstRepaymentDate: '',
-    monthPrincipal: '',
-    monthInterest: '',
-    remainingPrincipal: '',
+    firstRepaymentDate: '2021-09-27',
+    monthPrincipal: '766.02',
+    monthInterest: '706.66',
+    remainingPrincipal: '325383.31',
 
     derivedReady: false,
     derivedAnnualRate: '--',
@@ -41,6 +42,14 @@ Page({
 
   onHideMethodTip() {
     this.setData({ showMethodTip: false })
+  },
+
+  onShowRemainingTip() {
+    this.setData({ showRemainingTip: true })
+  },
+
+  onHideRemainingTip() {
+    this.setData({ showRemainingTip: false })
   },
 
   preventMove() {},

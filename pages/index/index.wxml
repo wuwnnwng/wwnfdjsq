@@ -170,30 +170,34 @@
     </view>
   </block>
 
-  <!-- 已有贷款：保持原结构 -->
+  <!-- 已有贷款 -->
   <block wx:else>
     <view class="panel">
-      <view class="section-title-row">
-        <view class="section-title">还款方式</view>
-        <view class="help-icon" catchtap="onShowMethodTip" aria-role="button" aria-label="还款方式说明">!</view>
-      </view>
-      <view class="segment">
-        <view
-          class="segment-item {{method === 'equalInterest' ? 'active' : ''}}"
-          data-method="equalInterest"
-          bindtap="onMethodChange"
-        >等额本息</view>
-        <view
-          class="segment-item {{method === 'equalPrincipal' ? 'active' : ''}}"
-          data-method="equalPrincipal"
-          bindtap="onMethodChange"
-        >等额本金</view>
+      <view class="inline-row first">
+        <view class="inline-label-wrap">
+          <text class="inline-label">还款方式</text>
+          <view class="help-icon" catchtap="onShowMethodTip" aria-role="button" aria-label="还款方式说明">!</view>
+        </view>
+        <view class="segment segment-row">
+          <view
+            class="segment-item {{method === 'equalInterest' ? 'active' : ''}}"
+            data-method="equalInterest"
+            bindtap="onMethodChange"
+          >等额本息</view>
+          <view
+            class="segment-item {{method === 'equalPrincipal' ? 'active' : ''}}"
+            data-method="equalPrincipal"
+            bindtap="onMethodChange"
+          >等额本金</view>
+        </view>
       </view>
     </view>
 
     <view class="panel">
-      <view class="section-title">剩余贷款参数</view>
-      <view class="section-desc">可从银行 App 还款详情中抄录最近一次还款本金、利息与剩余本金</view>
+      <view class="section-title-row">
+        <view class="section-title">剩余贷款参数</view>
+        <view class="help-icon" catchtap="onShowRemainingTip" aria-role="button" aria-label="剩余贷款参数说明">!</view>
+      </view>
 
       <view class="field">
         <text class="field-label">首次贷款期限</text>
@@ -267,9 +271,16 @@
       </view>
     </view>
 
+    <view class="tip-mask" wx:if="{{showRemainingTip}}" catchtouchmove="preventMove" bindtap="onHideRemainingTip">
+      <view class="tip-dialog" catchtap="preventMove">
+        <view class="tip-title">剩余贷款参数说明</view>
+        <view class="tip-text tip-single">可从银行 App 还款详情中抄录最近一次还款本金、利息与剩余本金</view>
+        <view class="tip-confirm" bindtap="onHideRemainingTip">我知道了</view>
+      </view>
+    </view>
+
     <view class="panel derived-panel">
       <view class="section-title">自动推算结果</view>
-      <view class="section-desc">填写完整后自动计算，并用于重算剩余还款计划</view>
 
       <view class="derived-row">
         <text class="derived-label">当前执行利率</text>

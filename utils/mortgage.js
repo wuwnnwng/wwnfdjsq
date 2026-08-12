@@ -303,6 +303,7 @@ function countPaidMonths(firstRepaymentDate, now = new Date()) {
 
 /**
  * 根据最近一次还款本金/利息/剩余本金等，反推执行利率与剩余年限
+ * 也可直接填写当前执行利率，跳过最近一期本金/利息
  * 约定：剩余本金 = 还完最近一次还款本金后的余额
  * 因此期初本金 = 剩余本金 + 最近一次还款本金，月利率 = 最近一次还款利息 / 期初本金
  */
@@ -312,6 +313,12 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
   const monthInterest = toNumber(options.monthInterest)
   const remainingPrincipal = toNumber(options.remainingPrincipal)
   const firstRepaymentDate = options.firstRepaymentDate
+  const manualRateRaw = options.manualAnnualRate
+  const hasManualRate =
+    manualRateRaw !== undefined &&
+    manualRateRaw !== null &&
+    String(manualRateRaw).trim() !== ''
+  const manualAnnualRate = toNumber(manualRateRaw)
 
   if (!(originalYears >= 1 && originalYears <= 30) || !Number.isInteger(originalYears)) {
     return { ok: false, message: '首次贷款期限请填 1-30 的整数' }
@@ -321,21 +328,33 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     return { ok: false, message: '请选择首次还款日期' }
   }
 
-  if (!(monthPrincipal > 0)) {
-    return { ok: false, message: '请填写最近一次还款本金' }
-  }
-
-  if (!(monthInterest >= 0)) {
-    return { ok: false, message: '请填写最近一次还款利息' }
-  }
-
   if (!(remainingPrincipal > 0)) {
     return { ok: false, message: '请填写剩余本金' }
   }
 
-  const beginPrincipal = remainingPrincipal + monthPrincipal
-  const monthlyRate = monthInterest / beginPrincipal
-  const annualRatePercent = monthlyRate * 12 * 100
+  let monthlyRate
+  let annualRatePercent
+  let beginPrincipal = remainingPrincipal
+
+  if (hasManualRate) {
+    if (!(manualAnnualRate >= 0)) {
+      return { ok: false, message: '请填写有效的当前执行利率' }
+    }
+    annualRatePercent = manualAnnualRate
+    monthlyRate = annualRatePercent / 100 / 12
+  } else {
+    if (!(monthPrincipal > 0)) {
+      return { ok: false, message: '请填写最近一次还款本金' }
+    }
+
+    if (!(monthInterest >= 0)) {
+      return { ok: false, message: '请填写最近一次还款利息' }
+    }
+
+    beginPrincipal = remainingPrincipal + monthPrincipal
+    monthlyRate = monthInterest / beginPrincipal
+    annualRatePercent = monthlyRate * 12 * 100
+  }
 
   const totalMonths = Math.round(originalYears * 12)
   const paidMonths = countPaidMonths(firstRepaymentDate, now)
@@ -360,8 +379,9 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     ok: true,
     originalYears,
     firstRepaymentDate,
-    monthPrincipal: round2(monthPrincipal),
-    monthInterest: round2(monthInterest),
+    hasManualRate,
+    monthPrincipal: hasManualRate ? 0 : round2(monthPrincipal),
+    monthInterest: hasManualRate ? 0 : round2(monthInterest),
     remainingPrincipal: round2(remainingPrincipal),
     beginPrincipal: round2(beginPrincipal),
     monthlyRate,

@@ -235,6 +235,21 @@
       </view>
 
       <view class="field">
+        <text class="field-label">当前执行利率</text>
+        <view class="field-control">
+          <input
+            class="field-input"
+            type="digit"
+            value="{{manualAnnualRate}}"
+            data-field="manualAnnualRate"
+            bindinput="onRemainingInput"
+            placeholder="选填，知利率可填"
+          />
+          <text class="field-unit">%</text>
+        </view>
+      </view>
+
+      <view class="field" wx:if="{{!hasManualRate}}">
         <text class="field-label">最近一次还款本金</text>
         <view class="field-control">
           <input
@@ -249,7 +264,7 @@
         </view>
       </view>
 
-      <view class="field">
+      <view class="field" wx:if="{{!hasManualRate}}">
         <text class="field-label">最近一次还款利息</text>
         <view class="field-control">
           <input
@@ -283,7 +298,7 @@
     <view class="tip-mask" wx:if="{{showRemainingTip}}" catchtouchmove="preventMove" bindtap="onHideRemainingTip">
       <view class="tip-dialog" catchtap="preventMove">
         <view class="tip-title">剩余贷款参数说明</view>
-        <view class="tip-text tip-single">可从银行 App 还款详情中抄录最近一次还款本金、利息与剩余本金</view>
+        <view class="tip-text tip-single">知道当前执行利率可直接填写；不知道则从银行 App 抄录最近一次还款本金、利息与剩余本金</view>
         <view class="tip-confirm" bindtap="onHideRemainingTip">我知道了</view>
       </view>
     </view>
@@ -291,7 +306,7 @@
     <view class="panel derived-panel">
       <view class="section-title">自动推算结果</view>
 
-      <view class="derived-row">
+      <view class="derived-row" wx:if="{{!hasManualRate}}">
         <text class="derived-label">当前执行利率</text>
         <text class="derived-value">{{derivedReady ? derivedAnnualRate + '%' : '--'}}</text>
       </view>

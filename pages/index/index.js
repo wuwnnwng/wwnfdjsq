@@ -29,6 +29,8 @@ Page({
 
     originalYears: '30',
     firstRepaymentDate: '',
+    manualAnnualRate: '',
+    hasManualRate: false,
     monthPrincipal: '766.02',
     monthInterest: '706.66',
     remainingPrincipal: '325383.31',
@@ -110,12 +112,14 @@ Page({
 
   onRemainingInput(e) {
     const field = e.currentTarget.dataset.field
-    this.setData(
-      {
-        [field]: e.detail.value
-      },
-      () => this.refreshDerived()
-    )
+    const value = e.detail.value
+    const patch = { [field]: value }
+
+    if (field === 'manualAnnualRate') {
+      patch.hasManualRate = String(value || '').trim() !== ''
+    }
+
+    this.setData(patch, () => this.refreshDerived())
   },
 
   onFirstDateChange(e) {
@@ -131,20 +135,25 @@ Page({
     const {
       originalYears,
       firstRepaymentDate,
+      manualAnnualRate,
       monthPrincipal,
       monthInterest,
       remainingPrincipal
     } = this.data
 
+    const hasManualRate = String(manualAnnualRate || '').trim() !== ''
+
     const hasAnyInput =
       originalYears ||
       firstRepaymentDate ||
+      manualAnnualRate ||
       monthPrincipal ||
       monthInterest ||
       remainingPrincipal
 
     if (!hasAnyInput) {
       this.setData({
+        hasManualRate,
         derivedReady: false,
         derivedAnnualRate: '--',
         derivedRemainingYears: '--',
@@ -158,6 +167,7 @@ Page({
     const derived = deriveRemainingLoanInfo({
       originalYears,
       firstRepaymentDate,
+      manualAnnualRate,
       monthPrincipal,
       monthInterest,
       remainingPrincipal
@@ -165,6 +175,7 @@ Page({
 
     if (!derived.ok) {
       this.setData({
+        hasManualRate,
         derivedReady: false,
         derivedAnnualRate: '--',
         derivedRemainingYears: '--',
@@ -176,6 +187,7 @@ Page({
     }
 
     this.setData({
+      hasManualRate,
       derivedReady: true,
       derivedAnnualRate: derived.annualRateDisplay,
       derivedRemainingYears: derived.remainingYearsDisplay,
@@ -241,6 +253,7 @@ Page({
     const derived = deriveRemainingLoanInfo({
       originalYears: this.data.originalYears,
       firstRepaymentDate: this.data.firstRepaymentDate,
+      manualAnnualRate: this.data.manualAnnualRate,
       monthPrincipal: this.data.monthPrincipal,
       monthInterest: this.data.monthInterest,
       remainingPrincipal: this.data.remainingPrincipal
@@ -304,6 +317,7 @@ Page({
       method: this.data.method,
       originalYears: this.data.originalYears,
       firstRepaymentDate: this.data.firstRepaymentDate,
+      manualAnnualRate: this.data.manualAnnualRate,
       monthPrincipal: this.data.monthPrincipal,
       monthInterest: this.data.monthInterest,
       remainingPrincipal: this.data.remainingPrincipal

@@ -25,6 +25,16 @@ const PAYMENT_LABEL = {
   interestFirst: '每月利息'
 }
 
+const PREPAY_TYPE_LABEL = {
+  full: '一次性提前还清',
+  partial: '部分提前还款'
+}
+
+const ADJUST_MODE_LABEL = {
+  shorten: '缩短年限，月供基本不变',
+  reduce: '减少月供，年限不变'
+}
+
 function decorateSchedule(list) {
   return (list || []).map((item) => ({
     ...item,
@@ -35,11 +45,19 @@ function decorateSchedule(list) {
   }))
 }
 
+function roundYears(months) {
+  const n = Number(months) || 0
+  return (Math.round((n / 12) * 100) / 100).toFixed(2)
+}
+
 Page({
   data: {
     ready: false,
     mode: 'new',
     isRemaining: false,
+    isEarlyRepayment: false,
+    isFullPrepay: false,
+    isPartialPrepay: false,
     isCombo: false,
     loanType: '',
     method: '',
@@ -48,6 +66,7 @@ Page({
     paymentLabel: '每月还款',
     summaryPayment: '0.00',
     display: {},
+    earlyInfo: {},
     months: 0,
     commercialFirst: '0.00',
     providentFirst: '0.00',
@@ -77,6 +96,26 @@ Page({
     const previewCount = 12
     const isRemaining = result.mode === 'remaining' || result.loanType === 'remaining'
     const isCombo = result.loanType === 'combo'
+    const early = result.earlyRepayment || null
+    const isEarlyRepayment = !!(early && early.enabled)
+    const isFullPrepay = isEarlyRepayment && early.prepayType === 'full'
+    const isPartialPrepay = isEarlyRepayment && early.prepayType === 'partial'
+
+    let paymentLabel = PAYMENT_LABEL[result.method] || '每月还款'
+    let summaryPayment = (result.display && result.display.firstMonthPayment) || '0.00'
+    let loanTypeLabel = LOAN_TYPE_LABEL[result.loanType] || ''
+
+    if (isFullPrepay) {
+      loanTypeLabel = '已有贷款 · 提前还清'
+      paymentLabel = '结清应还'
+      summaryPayment = (result.display && result.display.firstMonthPayment) || '0.00'
+    } else if (isPartialPrepay) {
+      loanTypeLabel = '已有贷款 · 提前还款'
+      paymentLabel = '调整后月供'
+      summaryPayment =
+        (result.display && result.display.afterMonthlyPayment) ||
+        formatMoneyWithComma(early.afterFirstMonthPayment || 0)
+    }
 
     this.pieData = {
       principal: result.totalPrincipal,
@@ -87,14 +126,27 @@ Page({
       ready: true,
       mode: result.mode || 'new',
       isRemaining,
+      isEarlyRepayment,
+      isFullPrepay,
+      isPartialPrepay,
       isCombo,
       loanType: result.loanType,
       method: result.method,
-      loanTypeLabel: LOAN_TYPE_LABEL[result.loanType] || '',
+      loanTypeLabel,
       methodLabel: METHOD_LABEL[result.method] || '',
-      paymentLabel: PAYMENT_LABEL[result.method] || '每月还款',
-      summaryPayment: (result.display && result.display.firstMonthPayment) || '0.00',
+      paymentLabel,
+      summaryPayment,
       display: result.display,
+      earlyInfo: isEarlyRepayment
+        ? {
+            typeLabel: PREPAY_TYPE_LABEL[early.prepayType] || '',
+            adjustLabel: ADJUST_MODE_LABEL[early.adjustMode] || '',
+            prepayAmount: formatMoneyWithComma(early.prepayAmountYuan || 0),
+            interestSaved: formatMoneyWithComma(early.interestSaved || 0),
+            afterMonths: String(early.afterMonths || 0),
+            afterYears: roundYears(early.afterMonths || 0)
+          }
+        : {},
       months: result.months,
       commercialFirst: formatMoneyWithComma(
         (result.commercial && result.commercial.firstMonthPayment) || 0

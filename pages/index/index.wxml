@@ -303,6 +303,73 @@
           </view>
         </view>
 
+        <view class="inline-row">
+          <text class="inline-label">提前还款</text>
+          <view class="segment segment-row">
+            <view
+              class="segment-item {{earlyRepayment ? '' : 'active'}}"
+              data-enabled="0"
+              bindtap="onEarlyRepaymentToggle"
+            >否</view>
+            <view
+              class="segment-item {{earlyRepayment ? 'active' : ''}}"
+              data-enabled="1"
+              bindtap="onEarlyRepaymentToggle"
+            >是</view>
+          </view>
+        </view>
+
+        <block wx:if="{{earlyRepayment}}">
+          <view class="field">
+            <text class="field-label">提前还款类型</text>
+            <view class="field-control field-control-segment">
+              <view class="segment segment-row compact-segment">
+                <view
+                  class="segment-item {{prepayType === 'full' ? 'active' : ''}}"
+                  data-type="full"
+                  bindtap="onPrepayTypeChange"
+                >一次性还清</view>
+                <view
+                  class="segment-item {{prepayType === 'partial' ? 'active' : ''}}"
+                  data-type="partial"
+                  bindtap="onPrepayTypeChange"
+                >部分提前还</view>
+              </view>
+            </view>
+          </view>
+
+          <view class="field" wx:if="{{prepayType === 'partial'}}">
+            <text class="field-label">部分还款金额</text>
+            <view class="field-control">
+              <input
+                class="field-input"
+                type="number"
+                value="{{prepayAmountWan}}"
+                data-field="prepayAmountWan"
+                bindinput="onPrepayAmountInput"
+                placeholder="正整数"
+              />
+              <text class="field-unit">万元</text>
+            </view>
+          </view>
+
+          <view class="field field-stack" wx:if="{{prepayType === 'partial'}}">
+            <text class="field-label">调整方式</text>
+            <view class="segment segment-wrap">
+              <view
+                class="segment-item {{adjustMode === 'shorten' ? 'active' : ''}}"
+                data-mode="shorten"
+                bindtap="onAdjustModeChange"
+              >缩短年限，月供基本不变</view>
+              <view
+                class="segment-item {{adjustMode === 'reduce' ? 'active' : ''}}"
+                data-mode="reduce"
+                bindtap="onAdjustModeChange"
+              >减少月供，年限不变</view>
+            </view>
+          </view>
+        </block>
+
         <view class="derived-block">
           <view class="section-title">自动推算结果</view>
 

@@ -35,6 +35,11 @@ Page({
     monthInterest: '706.66',
     remainingPrincipal: '325383.31',
 
+    earlyRepayment: false,
+    prepayType: 'full',
+    prepayAmountWan: '',
+    adjustMode: 'shorten',
+
     derivedReady: false,
     derivedAnnualRate: '--',
     derivedRemainingYears: '--',
@@ -129,6 +134,30 @@ Page({
       },
       () => this.refreshDerived()
     )
+  },
+
+  onEarlyRepaymentToggle(e) {
+    const enabled = e.currentTarget.dataset.enabled === '1' || e.currentTarget.dataset.enabled === 1
+    this.setData({ earlyRepayment: !!enabled })
+  },
+
+  onPrepayTypeChange(e) {
+    this.setData({
+      prepayType: e.currentTarget.dataset.type
+    })
+  },
+
+  onAdjustModeChange(e) {
+    this.setData({
+      adjustMode: e.currentTarget.dataset.mode
+    })
+  },
+
+  onPrepayAmountInput(e) {
+    // 仅保留数字，过滤小数点等
+    const raw = String(e.detail.value || '')
+    const digits = raw.replace(/\D/g, '')
+    this.setData({ prepayAmountWan: digits })
   },
 
   refreshDerived() {
@@ -264,6 +293,18 @@ Page({
       return false
     }
 
+    if (this.data.earlyRepayment && this.data.prepayType === 'partial') {
+      const wan = Number(this.data.prepayAmountWan)
+      if (!Number.isInteger(wan) || wan < 1) {
+        wx.showToast({ title: '部分还款金额请填正整数（万元）', icon: 'none' })
+        return false
+      }
+      if (wan * 10000 >= derived.remainingPrincipal) {
+        wx.showToast({ title: '部分还款须小于剩余本金', icon: 'none' })
+        return false
+      }
+    }
+
     return true
   },
 
@@ -320,7 +361,11 @@ Page({
       manualAnnualRate: this.data.manualAnnualRate,
       monthPrincipal: this.data.monthPrincipal,
       monthInterest: this.data.monthInterest,
-      remainingPrincipal: this.data.remainingPrincipal
+      remainingPrincipal: this.data.remainingPrincipal,
+      earlyRepayment: this.data.earlyRepayment,
+      prepayType: this.data.prepayType,
+      prepayAmountWan: this.data.prepayAmountWan,
+      adjustMode: this.data.adjustMode
     })
 
     if (!ok) {

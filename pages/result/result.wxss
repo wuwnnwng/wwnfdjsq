@@ -90,6 +90,16 @@
   border-bottom: none;
 }
 
+.split-value-wrap {
+  max-width: 58%;
+  text-align: right;
+  line-height: 1.4;
+}
+
+.early-hint {
+  margin-top: 16rpx;
+}
+
 .schedule-panel {
   animation: fade-up 0.65s ease both;
   animation-delay: 0.15s;

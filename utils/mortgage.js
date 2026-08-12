@@ -1,6 +1,6 @@
 /**
  * 房贷计算工具
- * 支持：公积金贷 / 商贷 / 组合贷 / 已有贷款剩余计划
+ * 支持：公积金贷 / 商贷 / 组合贷 / 已有贷款剩余计划 / 提前还款测算
  * 还款方式：等额本息 / 等额本金 / 先息后本
  */
 
@@ -397,7 +397,126 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
 }
 
 /**
+ * 等额本息：固定月供反推所需期数
+ */
+function monthsNeededForEqualInterest(principal, monthlyPayment, monthlyRate) {
+  const p = toNumber(principal)
+  const m = toNumber(monthlyPayment)
+  if (!(p > 0) || !(m > 0)) return 0
+
+  if (monthlyRate <= 0) {
+    return Math.max(1, Math.ceil(p / m))
+  }
+
+  const denom = m - p * monthlyRate
+  if (denom <= 0) {
+    // 月供不足以覆盖利息，无法缩短到有效期数
+    return -1
+  }
+
+  const n = Math.log(m / denom) / Math.log(1 + monthlyRate)
+  return Math.max(1, Math.ceil(n))
+}
+
+/**
+ * 部分提前还款后：缩短年限（月供基本不变）
+ */
+function recalculateShortenTerm(newPrincipal, baseline, annualRatePercent, method) {
+  const monthlyRate = toNumber(annualRatePercent) / 100 / 12
+  let months
+
+  if (method === 'equalPrincipal') {
+    const monthlyPrincipal =
+      baseline.months > 0 ? baseline.principal / baseline.months : 0
+    if (!(monthlyPrincipal > 0)) {
+      return { ok: false, message: '无法按原本金摊还额缩短年限' }
+    }
+    months = Math.max(1, Math.ceil(newPrincipal / monthlyPrincipal))
+  } else {
+    months = monthsNeededForEqualInterest(
+      newPrincipal,
+      baseline.firstMonthPayment,
+      monthlyRate
+    )
+    if (months < 0) {
+      return { ok: false, message: '提前还款后月供不足以覆盖利息，请改用减少月供' }
+    }
+  }
+
+  return {
+    ok: true,
+    loan: calculateLoanByYuan(newPrincipal, months, annualRatePercent, method)
+  }
+}
+
+/**
+ * 一次性提前还清：当期利息 + 全部剩余本金，形成 1 期结清计划
+ */
+function buildFullPrepayLoan(remainingPrincipal, annualRatePercent) {
+  const principal = round2(remainingPrincipal)
+  const monthlyRate = toNumber(annualRatePercent) / 100 / 12
+  const interest = round2(principal * monthlyRate)
+  const payment = round2(principal + interest)
+  const schedule = []
+  pushScheduleItem(schedule, 1, payment, principal, interest, 0)
+
+  return {
+    principal,
+    months: 1,
+    monthlyRate,
+    firstMonthPayment: payment,
+    lastMonthPayment: payment,
+    totalPayment: payment,
+    totalInterest: interest,
+    schedule
+  }
+}
+
+function parseEarlyRepaymentOptions(options, remainingPrincipal) {
+  const enabled = !!options.earlyRepayment
+  if (!enabled) {
+    return { ok: true, enabled: false }
+  }
+
+  const prepayType = options.prepayType === 'full' ? 'full' : 'partial'
+  if (prepayType === 'full') {
+    return {
+      ok: true,
+      enabled: true,
+      prepayType: 'full',
+      prepayAmountYuan: round2(remainingPrincipal),
+      adjustMode: ''
+    }
+  }
+
+  const prepayWanRaw = String(options.prepayAmountWan || '').trim()
+  const prepayWan = Number(prepayWanRaw)
+  if (!prepayWanRaw || !Number.isInteger(prepayWan) || prepayWan < 1) {
+    return { ok: false, message: '部分还款金额请填正整数（万元）' }
+  }
+
+  const prepayAmountYuan = prepayWan * 10000
+  if (prepayAmountYuan >= remainingPrincipal) {
+    return {
+      ok: false,
+      message: '部分还款须小于剩余本金，否则请选一次性提前还清'
+    }
+  }
+
+  const adjustMode = options.adjustMode === 'reduce' ? 'reduce' : 'shorten'
+  return {
+    ok: true,
+    enabled: true,
+    prepayType: 'partial',
+    prepayAmountYuan,
+    prepayAmountWan: prepayWan,
+    adjustMode
+  }
+}
+
+/**
  * 已有贷款：反推利率/剩余年限后，按剩余本金重算还款计划
+ * 可选：提前还款测算（一次性还清 / 部分还款 + 缩短年限或减少月供）
  */
 function calculateRemainingMortgage(options) {
   const method = normalizeMethod(options.method)
@@ -407,12 +526,104 @@ function calculateRemainingMortgage(options) {
     return { ok: false, message: derived.message }
   }
 
-  const loan = calculateLoanByYuan(
+  const baseline = calculateLoanByYuan(
     derived.remainingPrincipal,
-    derived.remainingMonths, // 例：301，不用 25.08 年去换算
+    derived.remainingMonths,
     derived.annualRatePercent,
     method
   )
+
+  const early = parseEarlyRepaymentOptions(options, derived.remainingPrincipal)
+  if (!early.ok) {
+    return { ok: false, message: early.message }
+  }
+
+  let loan = baseline
+  let earlyInfo = null
+
+  if (early.enabled) {
+    if (early.prepayType === 'full') {
+      loan = buildFullPrepayLoan(derived.remainingPrincipal, derived.annualRatePercent)
+      earlyInfo = {
+        enabled: true,
+        prepayType: 'full',
+        adjustMode: '',
+        prepayAmountYuan: early.prepayAmountYuan,
+        afterPrincipal: 0,
+        afterMonths: 1,
+        baselineInterest: baseline.totalInterest,
+        interestSaved: round2(baseline.totalInterest - loan.totalInterest)
+      }
+    } else {
+      const afterPrincipal = round2(derived.remainingPrincipal - early.prepayAmountYuan)
+      let afterLoan
+
+      if (early.adjustMode === 'reduce') {
+        afterLoan = calculateLoanByYuan(
+          afterPrincipal,
+          derived.remainingMonths,
+          derived.annualRatePercent,
+          method
+        )
+      } else {
+        const shortened = recalculateShortenTerm(
+          afterPrincipal,
+          baseline,
+          derived.annualRatePercent,
+          method
+        )
+        if (!shortened.ok) {
+          return { ok: false, message: shortened.message }
+        }
+        afterLoan = shortened.loan
+      }
+
+      // 还款计划：第 1 期为提前还款本金，其后为剩余贷款计划
+      const schedule = []
+      pushScheduleItem(schedule, 1, early.prepayAmountYuan, early.prepayAmountYuan, 0, afterPrincipal)
+      afterLoan.schedule.forEach((item) => {
+        schedule.push({
+          ...item,
+          month: item.month + 1
+        })
+      })
+
+      const totalInterest = round2(afterLoan.totalInterest)
+      const totalPayment = round2(early.prepayAmountYuan + afterLoan.totalPayment)
+
+      loan = {
+        principal: derived.remainingPrincipal,
+        months: schedule.length,
+        monthlyRate: afterLoan.monthlyRate,
+        firstMonthPayment: schedule[0].payment,
+        lastMonthPayment: schedule[schedule.length - 1].payment,
+        totalPayment,
+        totalInterest,
+        schedule,
+        // 提前还款后的常规月供（第 2 期起），便于结果页展示
+        afterFirstMonthPayment: afterLoan.firstMonthPayment
+      }
+
+      earlyInfo = {
+        enabled: true,
+        prepayType: 'partial',
+        adjustMode: early.adjustMode,
+        prepayAmountYuan: early.prepayAmountYuan,
+        prepayAmountWan: early.prepayAmountWan,
+        afterPrincipal,
+        afterMonths: afterLoan.months,
+        afterFirstMonthPayment: afterLoan.firstMonthPayment,
+        baselineInterest: baseline.totalInterest,
+        baselineMonths: baseline.months,
+        baselineFirstMonthPayment: baseline.firstMonthPayment,
+        interestSaved: round2(baseline.totalInterest - totalInterest)
+      }
+    }
+  }
+
+  const remainingYearsDisplay = earlyInfo
+    ? round2((earlyInfo.afterMonths || loan.months) / 12).toFixed(2)
+    : derived.remainingYearsDisplay
 
   const result = buildMortgageResult({
     mode: 'remaining',
@@ -423,12 +634,28 @@ function calculateRemainingMortgage(options) {
     schedule: loan.schedule,
     extra: {
       derived,
+      earlyRepayment: earlyInfo,
       display: {
         annualRate: derived.annualRateDisplay,
-        remainingYears: derived.remainingYearsDisplay,
-        remainingYearsText: derived.remainingYearsText,
+        remainingYears: remainingYearsDisplay,
+        remainingYearsText: `${remainingYearsDisplay}年`,
         paidMonths: String(derived.paidMonths),
-        remainingMonths: String(derived.remainingMonths)
+        remainingMonths: String(
+          earlyInfo ? earlyInfo.afterMonths || loan.months : derived.remainingMonths
+        ),
+        earlyPrepayAmount: earlyInfo
+          ? formatMoneyWithComma(earlyInfo.prepayAmountYuan)
+          : '',
+        interestSaved: earlyInfo ? formatMoneyWithComma(earlyInfo.interestSaved) : '',
+        afterMonthlyPayment:
+          earlyInfo && earlyInfo.prepayType === 'partial'
+            ? formatMoneyWithComma(earlyInfo.afterFirstMonthPayment)
+            : '',
+        baselineMonthlyPayment: earlyInfo
+          ? formatMoneyWithComma(
+              earlyInfo.baselineFirstMonthPayment || baseline.firstMonthPayment
+            )
+          : ''
       }
     }
   })

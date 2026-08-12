@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page page-shell">
   <view class="panel hero-panel">
     <view class="brand">房贷计算器</view>
     <view class="segment segment-row mode-segment">
@@ -35,289 +35,293 @@
     </view>
   </view>
 
-  <!-- 新贷款：还款方式 → 金额填写 → 贷款类型 -->
-  <block wx:if="{{calcMode === 'new'}}">
-    <view class="panel">
-      <view class="section-title">贷款信息</view>
-
-      <view class="inline-row first">
-        <view class="inline-label-wrap">
-          <text class="inline-label">还款方式</text>
-          <view class="help-icon" catchtap="onShowMethodTip" aria-role="button" aria-label="还款方式说明">!</view>
-        </view>
-        <view class="segment segment-row">
-          <view
-            class="segment-item {{method === 'equalInterest' ? 'active' : ''}}"
-            data-method="equalInterest"
-            bindtap="onMethodChange"
-          >等额本息</view>
-          <view
-            class="segment-item {{method === 'equalPrincipal' ? 'active' : ''}}"
-            data-method="equalPrincipal"
-            bindtap="onMethodChange"
-          >等额本金</view>
-          <view
-            class="segment-item {{method === 'interestFirst' ? 'active' : ''}}"
-            data-method="interestFirst"
-            bindtap="onMethodChange"
-          >先息后本</view>
-        </view>
-      </view>
-
-      <view class="sub-block" wx:if="{{showCommercial}}">
-        <view class="sub-title">商业贷款</view>
-        <view class="field">
-          <text class="field-label">贷款金额</text>
-          <view class="field-control">
-            <input
-              class="field-input"
-              type="digit"
-              value="{{commercialAmount}}"
-              data-field="commercialAmount"
-              bindinput="onInput"
-              placeholder="请输入"
-            />
-            <text class="field-unit">万元</text>
-          </view>
-        </view>
-        <view class="field">
-          <text class="field-label">贷款年限</text>
-          <view class="field-control">
-            <input
-              class="field-input"
-              type="number"
-              value="{{commercialYears}}"
-              data-field="commercialYears"
-              bindinput="onInput"
-              placeholder="如 30"
-            />
-            <text class="field-unit">年</text>
-          </view>
-        </view>
-        <view class="field">
-          <text class="field-label">年利率</text>
-          <view class="field-control">
-            <input
-              class="field-input"
-              type="digit"
-              value="{{commercialRate}}"
-              data-field="commercialRate"
-              bindinput="onInput"
-              placeholder="如 3.45"
-            />
-            <text class="field-unit">%</text>
-          </view>
-        </view>
-      </view>
-
-      <view class="sub-block" wx:if="{{showProvident}}">
-        <view class="sub-title">公积金贷款</view>
-        <view class="field">
-          <text class="field-label">贷款金额</text>
-          <view class="field-control">
-            <input
-              class="field-input"
-              type="digit"
-              value="{{providentAmount}}"
-              data-field="providentAmount"
-              bindinput="onInput"
-              placeholder="请输入"
-            />
-            <text class="field-unit">万元</text>
-          </view>
-        </view>
-        <view class="field">
-          <text class="field-label">贷款年限</text>
-          <view class="field-control">
-            <input
-              class="field-input"
-              type="number"
-              value="{{providentYears}}"
-              data-field="providentYears"
-              bindinput="onInput"
-              placeholder="如 30"
-            />
-            <text class="field-unit">年</text>
-          </view>
-        </view>
-        <view class="field">
-          <text class="field-label">年利率</text>
-          <view class="field-control">
-            <input
-              class="field-input"
-              type="digit"
-              value="{{providentRate}}"
-              data-field="providentRate"
-              bindinput="onInput"
-              placeholder="如 2.85"
-            />
-            <text class="field-unit">%</text>
-          </view>
-        </view>
-      </view>
-
-      <view class="inline-row">
-        <text class="inline-label">贷款类型</text>
-        <view class="segment segment-row">
-          <view
-            class="segment-item {{loanType === 'provident' ? 'active' : ''}}"
-            data-type="provident"
-            bindtap="onLoanTypeChange"
-          >公积金贷</view>
-          <view
-            class="segment-item {{loanType === 'commercial' ? 'active' : ''}}"
-            data-type="commercial"
-            bindtap="onLoanTypeChange"
-          >商贷</view>
-          <view
-            class="segment-item {{loanType === 'combo' ? 'active' : ''}}"
-            data-type="combo"
-            bindtap="onLoanTypeChange"
-          >组合贷款</view>
-        </view>
-      </view>
+  <view class="tip-mask" wx:if="{{showRemainingTip}}" catchtouchmove="preventMove" bindtap="onHideRemainingTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">剩余贷款参数说明</view>
+      <view class="tip-text tip-single">知道当前执行利率可直接填写；不知道则从银行 App 抄录最近一次还款本金、利息与剩余本金</view>
+      <view class="tip-confirm" bindtap="onHideRemainingTip">我知道了</view>
     </view>
-  </block>
+  </view>
 
-  <!-- 已有贷款 -->
-  <block wx:else>
-    <view class="panel">
-      <view class="inline-row first">
-        <view class="inline-label-wrap">
-          <text class="inline-label">还款方式</text>
-          <view class="help-icon" catchtap="onShowMethodTip" aria-role="button" aria-label="还款方式说明">!</view>
+  <scroll-view scroll-y class="form-scroll" enhanced show-scrollbar="{{false}}">
+    <!-- 新贷款：还款方式 → 金额填写 → 贷款类型 -->
+    <block wx:if="{{calcMode === 'new'}}">
+      <view class="panel">
+        <view class="section-title">贷款信息</view>
+
+        <view class="inline-row first">
+          <view class="inline-label-wrap">
+            <text class="inline-label">还款方式</text>
+            <view class="help-icon" catchtap="onShowMethodTip" aria-role="button" aria-label="还款方式说明">!</view>
+          </view>
+          <view class="segment segment-row">
+            <view
+              class="segment-item {{method === 'equalInterest' ? 'active' : ''}}"
+              data-method="equalInterest"
+              bindtap="onMethodChange"
+            >等额本息</view>
+            <view
+              class="segment-item {{method === 'equalPrincipal' ? 'active' : ''}}"
+              data-method="equalPrincipal"
+              bindtap="onMethodChange"
+            >等额本金</view>
+            <view
+              class="segment-item {{method === 'interestFirst' ? 'active' : ''}}"
+              data-method="interestFirst"
+              bindtap="onMethodChange"
+            >先息后本</view>
+          </view>
         </view>
-        <view class="segment segment-row">
-          <view
-            class="segment-item {{method === 'equalInterest' ? 'active' : ''}}"
-            data-method="equalInterest"
-            bindtap="onMethodChange"
-          >等额本息</view>
-          <view
-            class="segment-item {{method === 'equalPrincipal' ? 'active' : ''}}"
-            data-method="equalPrincipal"
-            bindtap="onMethodChange"
-          >等额本金</view>
-        </view>
-      </view>
-    </view>
 
-    <view class="panel">
-      <view class="section-title-row">
-        <view class="section-title">剩余贷款参数</view>
-        <view class="help-icon" catchtap="onShowRemainingTip" aria-role="button" aria-label="剩余贷款参数说明">!</view>
-      </view>
-
-      <view class="field">
-        <text class="field-label">首次贷款期限</text>
-        <view class="field-control">
-          <input
-            class="field-input"
-            type="number"
-            value="{{originalYears}}"
-            data-field="originalYears"
-            bindinput="onRemainingInput"
-            placeholder="如 30"
-          />
-          <text class="field-unit">年</text>
-        </view>
-      </view>
-
-      <view class="field">
-        <text class="field-label">首次还款日期</text>
-        <view class="field-control">
-          <picker mode="date" value="{{firstRepaymentDate}}" bindchange="onFirstDateChange">
-            <view class="picker-value {{firstRepaymentDate ? '' : 'placeholder'}}">
-              {{firstRepaymentDate || '请选择日期'}}
+        <view class="sub-block" wx:if="{{showCommercial}}">
+          <view class="sub-title">商业贷款</view>
+          <view class="field">
+            <text class="field-label">贷款金额</text>
+            <view class="field-control">
+              <input
+                class="field-input"
+                type="digit"
+                value="{{commercialAmount}}"
+                data-field="commercialAmount"
+                bindinput="onInput"
+                placeholder="请输入"
+              />
+              <text class="field-unit">万元</text>
             </view>
-          </picker>
+          </view>
+          <view class="field">
+            <text class="field-label">贷款年限</text>
+            <view class="field-control">
+              <input
+                class="field-input"
+                type="number"
+                value="{{commercialYears}}"
+                data-field="commercialYears"
+                bindinput="onInput"
+                placeholder="如 30"
+              />
+              <text class="field-unit">年</text>
+            </view>
+          </view>
+          <view class="field">
+            <text class="field-label">年利率</text>
+            <view class="field-control">
+              <input
+                class="field-input"
+                type="digit"
+                value="{{commercialRate}}"
+                data-field="commercialRate"
+                bindinput="onInput"
+                placeholder="如 3.45"
+              />
+              <text class="field-unit">%</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="sub-block" wx:if="{{showProvident}}">
+          <view class="sub-title">公积金贷款</view>
+          <view class="field">
+            <text class="field-label">贷款金额</text>
+            <view class="field-control">
+              <input
+                class="field-input"
+                type="digit"
+                value="{{providentAmount}}"
+                data-field="providentAmount"
+                bindinput="onInput"
+                placeholder="请输入"
+              />
+              <text class="field-unit">万元</text>
+            </view>
+          </view>
+          <view class="field">
+            <text class="field-label">贷款年限</text>
+            <view class="field-control">
+              <input
+                class="field-input"
+                type="number"
+                value="{{providentYears}}"
+                data-field="providentYears"
+                bindinput="onInput"
+                placeholder="如 30"
+              />
+              <text class="field-unit">年</text>
+            </view>
+          </view>
+          <view class="field">
+            <text class="field-label">年利率</text>
+            <view class="field-control">
+              <input
+                class="field-input"
+                type="digit"
+                value="{{providentRate}}"
+                data-field="providentRate"
+                bindinput="onInput"
+                placeholder="如 2.85"
+              />
+              <text class="field-unit">%</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="inline-row">
+          <text class="inline-label">贷款类型</text>
+          <view class="segment segment-row">
+            <view
+              class="segment-item {{loanType === 'provident' ? 'active' : ''}}"
+              data-type="provident"
+              bindtap="onLoanTypeChange"
+            >公积金贷</view>
+            <view
+              class="segment-item {{loanType === 'commercial' ? 'active' : ''}}"
+              data-type="commercial"
+              bindtap="onLoanTypeChange"
+            >商贷</view>
+            <view
+              class="segment-item {{loanType === 'combo' ? 'active' : ''}}"
+              data-type="combo"
+              bindtap="onLoanTypeChange"
+            >组合贷款</view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 已有贷款：还款方式固定在滚动区顶部，参数与推算结果一起滑动 -->
+    <block wx:else>
+      <view class="panel">
+        <view class="inline-row first">
+          <view class="inline-label-wrap">
+            <text class="inline-label">还款方式</text>
+            <view class="help-icon" catchtap="onShowMethodTip" aria-role="button" aria-label="还款方式说明">!</view>
+          </view>
+          <view class="segment segment-row">
+            <view
+              class="segment-item {{method === 'equalInterest' ? 'active' : ''}}"
+              data-method="equalInterest"
+              bindtap="onMethodChange"
+            >等额本息</view>
+            <view
+              class="segment-item {{method === 'equalPrincipal' ? 'active' : ''}}"
+              data-method="equalPrincipal"
+              bindtap="onMethodChange"
+            >等额本金</view>
+          </view>
         </view>
       </view>
 
-      <view class="field">
-        <text class="field-label">当前执行利率</text>
-        <view class="field-control">
-          <input
-            class="field-input"
-            type="digit"
-            value="{{manualAnnualRate}}"
-            data-field="manualAnnualRate"
-            bindinput="onRemainingInput"
-            placeholder="选填，知利率可填"
-          />
-          <text class="field-unit">%</text>
+      <view class="panel remaining-form-panel">
+        <view class="section-title-row">
+          <view class="section-title">剩余贷款参数</view>
+          <view class="help-icon" catchtap="onShowRemainingTip" aria-role="button" aria-label="剩余贷款参数说明">!</view>
+        </view>
+
+        <view class="field">
+          <text class="field-label">首次贷款期限</text>
+          <view class="field-control">
+            <input
+              class="field-input"
+              type="number"
+              value="{{originalYears}}"
+              data-field="originalYears"
+              bindinput="onRemainingInput"
+              placeholder="如 30"
+            />
+            <text class="field-unit">年</text>
+          </view>
+        </view>
+
+        <view class="field">
+          <text class="field-label">首次还款日期</text>
+          <view class="field-control">
+            <picker mode="date" value="{{firstRepaymentDate}}" bindchange="onFirstDateChange">
+              <view class="picker-value {{firstRepaymentDate ? '' : 'placeholder'}}">
+                {{firstRepaymentDate || '请选择日期'}}
+              </view>
+            </picker>
+          </view>
+        </view>
+
+        <view class="field">
+          <text class="field-label">当前执行利率</text>
+          <view class="field-control">
+            <input
+              class="field-input"
+              type="digit"
+              value="{{manualAnnualRate}}"
+              data-field="manualAnnualRate"
+              bindinput="onRemainingInput"
+              placeholder="选填，知利率可填"
+            />
+            <text class="field-unit">%</text>
+          </view>
+        </view>
+
+        <view class="field" wx:if="{{!hasManualRate}}">
+          <text class="field-label">最近一次还款本金</text>
+          <view class="field-control">
+            <input
+              class="field-input"
+              type="digit"
+              value="{{monthPrincipal}}"
+              data-field="monthPrincipal"
+              bindinput="onRemainingInput"
+              placeholder="请输入"
+            />
+            <text class="field-unit">元</text>
+          </view>
+        </view>
+
+        <view class="field" wx:if="{{!hasManualRate}}">
+          <text class="field-label">最近一次还款利息</text>
+          <view class="field-control">
+            <input
+              class="field-input"
+              type="digit"
+              value="{{monthInterest}}"
+              data-field="monthInterest"
+              bindinput="onRemainingInput"
+              placeholder="请输入"
+            />
+            <text class="field-unit">元</text>
+          </view>
+        </view>
+
+        <view class="field">
+          <text class="field-label">剩余本金</text>
+          <view class="field-control">
+            <input
+              class="field-input"
+              type="digit"
+              value="{{remainingPrincipal}}"
+              data-field="remainingPrincipal"
+              bindinput="onRemainingInput"
+              placeholder="还完最近一期后余额"
+            />
+            <text class="field-unit">元</text>
+          </view>
+        </view>
+
+        <view class="derived-block">
+          <view class="section-title">自动推算结果</view>
+
+          <view class="derived-row" wx:if="{{!hasManualRate}}">
+            <text class="derived-label">当前执行利率</text>
+            <text class="derived-value">{{derivedReady ? derivedAnnualRate + '%' : '--'}}</text>
+          </view>
+          <view class="derived-row">
+            <text class="derived-label">剩余还款年</text>
+            <text class="derived-value">{{derivedReady ? derivedRemainingYears + '年' : '--'}}</text>
+          </view>
+          <view class="derived-hint" wx:if="{{derivedReady}}">剩余 {{derivedRemainingMonths}} 期</view>
+          <view class="derived-hint warn" wx:elif="{{derivedMessage}}">{{derivedMessage}}</view>
         </view>
       </view>
+    </block>
 
-      <view class="field" wx:if="{{!hasManualRate}}">
-        <text class="field-label">最近一次还款本金</text>
-        <view class="field-control">
-          <input
-            class="field-input"
-            type="digit"
-            value="{{monthPrincipal}}"
-            data-field="monthPrincipal"
-            bindinput="onRemainingInput"
-            placeholder="请输入"
-          />
-          <text class="field-unit">元</text>
-        </view>
-      </view>
-
-      <view class="field" wx:if="{{!hasManualRate}}">
-        <text class="field-label">最近一次还款利息</text>
-        <view class="field-control">
-          <input
-            class="field-input"
-            type="digit"
-            value="{{monthInterest}}"
-            data-field="monthInterest"
-            bindinput="onRemainingInput"
-            placeholder="请输入"
-          />
-          <text class="field-unit">元</text>
-        </view>
-      </view>
-
-      <view class="field">
-        <text class="field-label">剩余本金</text>
-        <view class="field-control">
-          <input
-            class="field-input"
-            type="digit"
-            value="{{remainingPrincipal}}"
-            data-field="remainingPrincipal"
-            bindinput="onRemainingInput"
-            placeholder="还完最近一期后余额"
-          />
-          <text class="field-unit">元</text>
-        </view>
-      </view>
-    </view>
-
-    <view class="tip-mask" wx:if="{{showRemainingTip}}" catchtouchmove="preventMove" bindtap="onHideRemainingTip">
-      <view class="tip-dialog" catchtap="preventMove">
-        <view class="tip-title">剩余贷款参数说明</view>
-        <view class="tip-text tip-single">知道当前执行利率可直接填写；不知道则从银行 App 抄录最近一次还款本金、利息与剩余本金</view>
-        <view class="tip-confirm" bindtap="onHideRemainingTip">我知道了</view>
-      </view>
-    </view>
-
-    <view class="panel derived-panel">
-      <view class="section-title">自动推算结果</view>
-
-      <view class="derived-row" wx:if="{{!hasManualRate}}">
-        <text class="derived-label">当前执行利率</text>
-        <text class="derived-value">{{derivedReady ? derivedAnnualRate + '%' : '--'}}</text>
-      </view>
-      <view class="derived-row">
-        <text class="derived-label">剩余还款年</text>
-        <text class="derived-value">{{derivedReady ? derivedRemainingYears + '年' : '--'}}</text>
-      </view>
-      <view class="derived-hint" wx:if="{{derivedReady}}">剩余 {{derivedRemainingMonths}} 期</view>
-      <view class="derived-hint warn" wx:elif="{{derivedMessage}}">{{derivedMessage}}</view>
-    </view>
-  </block>
+    <view class="form-scroll-spacer"></view>
+  </scroll-view>
 
   <view class="footer-block">
     <button class="primary-btn" bindtap="onCalculate">开始计算</button>

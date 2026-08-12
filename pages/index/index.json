@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "房贷计算器",
+  "disableScroll": true,
   "usingComponents": {}
 }

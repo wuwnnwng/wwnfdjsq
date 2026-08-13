@@ -1,7 +1,14 @@
 const { checkLocalVersion, checkMiniProgramUpdate } = require('./utils/version')
+const { getThemeId } = require('./utils/theme')
 
 App({
+  globalData: {
+    theme: 'forest'
+  },
+
   onLaunch() {
+    this.globalData.theme = getThemeId()
+
     const versionInfo = checkLocalVersion()
     if (versionInfo.upgraded) {
       console.log(

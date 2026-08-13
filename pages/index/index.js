@@ -9,6 +9,12 @@ const {
   getShareTimeline
 } = require('../../utils/share')
 const { getLprDisplay, loadLprDisplay } = require('../../utils/lpr')
+const {
+  getThemeId,
+  setThemeId,
+  applyThemeChrome,
+  THEME_LIST
+} = require('../../utils/theme')
 
 Page({
   data: {
@@ -20,6 +26,8 @@ Page({
     showMethodTip: false,
     showRemainingTip: false,
     showLprTip: false,
+    theme: getThemeId(),
+    themeList: THEME_LIST,
 
     commercialAmount: '100',
     commercialYears: '30',
@@ -56,7 +64,24 @@ Page({
 
   onLoad() {
     enableShareMenu()
+    this.applyTheme(getThemeId())
     this.refreshLpr()
+  },
+
+  onShow() {
+    this.applyTheme(getThemeId())
+  },
+
+  applyTheme(themeId) {
+    const theme = setThemeId(themeId)
+    this.setData({ theme })
+    applyThemeChrome(theme)
+  },
+
+  onThemeChange(e) {
+    const theme = e.currentTarget.dataset.theme
+    if (!theme || theme === this.data.theme) return
+    this.applyTheme(theme)
   },
 
   async refreshLpr() {

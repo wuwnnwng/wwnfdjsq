@@ -1,4 +1,4 @@
-<view class="page" wx:if="{{ready}}">
+<view class="page theme-{{theme}}" wx:if="{{ready}}">
   <view class="summary-hero">
     <view class="summary-label">{{loanTypeLabel}} · {{methodLabel}}</view>
     <view class="summary-main">
@@ -149,7 +149,7 @@
   <button class="primary-btn" bindtap="onRecalculate">重新计算</button>
 </view>
 
-<view class="empty" wx:else>
+<view class="page theme-{{theme}} empty" wx:else>
   <view class="empty-text">暂无计算结果</view>
   <button class="primary-btn" bindtap="onRecalculate">返回填写</button>
 </view>

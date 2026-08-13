@@ -13,6 +13,8 @@ function drawPieChart(canvas, ctx, options) {
     interest,
     principalColor = '#1f6b52',
     interestColor = '#c45c26',
+    holeColor = '#f7f8f6',
+    inkColor = '#14231c',
     dpr = 1
   } = options
 
@@ -68,10 +70,10 @@ function drawPieChart(canvas, ctx, options) {
   // 中心挖空，做成环形图更清晰
   ctx.beginPath()
   ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2)
-  ctx.fillStyle = '#f7f8f6'
+  ctx.fillStyle = holeColor
   ctx.fill()
 
-  ctx.fillStyle = '#14231c'
+  ctx.fillStyle = inkColor
   ctx.font = `600 ${Math.round(outerRadius * 0.2)}px sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -119,7 +121,7 @@ function drawPieChart(canvas, ctx, options) {
     ctx.lineWidth = 1.5
     ctx.stroke()
 
-    ctx.fillStyle = '#14231c'
+    ctx.fillStyle = inkColor
     ctx.textAlign = alignLeft ? 'left' : 'right'
     ctx.textBaseline = 'middle'
     ctx.font = `600 ${Math.round(outerRadius * 0.14)}px sans-serif`
@@ -150,6 +152,10 @@ function renderPie(componentOrPage, canvasId, data) {
       drawPieChart(canvas, ctx, {
         principal: data.principal || 0,
         interest: data.interest || 0,
+        principalColor: data.principalColor,
+        interestColor: data.interestColor,
+        holeColor: data.holeColor,
+        inkColor: data.inkColor,
         dpr
       })
     })

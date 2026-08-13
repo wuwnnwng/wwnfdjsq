@@ -1,6 +1,31 @@
-<view class="page page-shell">
+<view class="page page-shell theme-{{theme}}">
   <view class="panel hero-panel">
-    <view class="brand">房贷计算器</view>
+    <view class="brand-wrap">
+      <view class="brand">房贷计算器</view>
+      <view class="theme-switch" aria-label="切换皮肤">
+        <view
+          class="theme-dot forest {{theme === 'forest' ? 'active' : ''}}"
+          data-theme="forest"
+          bindtap="onThemeChange"
+          aria-role="button"
+          aria-label="青绿皮肤"
+        ></view>
+        <view
+          class="theme-dot ocean {{theme === 'ocean' ? 'active' : ''}}"
+          data-theme="ocean"
+          bindtap="onThemeChange"
+          aria-role="button"
+          aria-label="商务蓝皮肤"
+        ></view>
+        <view
+          class="theme-dot amber {{theme === 'amber' ? 'active' : ''}}"
+          data-theme="amber"
+          bindtap="onThemeChange"
+          aria-role="button"
+          aria-label="琥珀金皮肤"
+        ></view>
+      </view>
+    </view>
     <view class="segment segment-row mode-segment">
       <view
         class="segment-item {{calcMode === 'new' ? 'active' : ''}}"

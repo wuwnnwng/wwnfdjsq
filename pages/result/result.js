@@ -5,6 +5,7 @@ const {
   getShareAppMessage,
   getShareTimeline
 } = require('../../utils/share')
+const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -53,6 +54,7 @@ function roundYears(months) {
 Page({
   data: {
     ready: false,
+    theme: getThemeId(),
     mode: 'new',
     isRemaining: false,
     isEarlyRepayment: false,
@@ -85,6 +87,9 @@ Page({
 
   onLoad() {
     enableShareMenu()
+    const theme = getThemeId()
+    this.setData({ theme })
+    applyThemeChrome(theme)
 
     const result = wx.getStorageSync('mortgageResult')
     if (!result || !result.totalPrincipal) {
@@ -169,10 +174,23 @@ Page({
     return getShareTimeline()
   },
 
+  onShow() {
+    const theme = getThemeId()
+    this.setData({ theme })
+    applyThemeChrome(theme)
+  },
+
   onReady() {
     if (!this.data.ready) return
     setTimeout(() => {
-      renderPie(this, 'pieCanvas', this.pieData || {})
+      const theme = getTheme(this.data.theme)
+      renderPie(this, 'pieCanvas', {
+        ...(this.pieData || {}),
+        principalColor: theme.principal,
+        interestColor: theme.interest,
+        holeColor: theme.dialog,
+        inkColor: theme.ink
+      })
     }, 50)
   },
 

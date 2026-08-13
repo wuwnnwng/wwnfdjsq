@@ -624,6 +624,11 @@ function calculateRemainingMortgage(options) {
 
       const totalInterest = round2(afterLoan.totalInterest)
       const totalPayment = round2(early.prepayAmountYuan + afterLoan.totalPayment)
+      // 等额本金每月递减：取调整后剩余计划相邻两期，勿用「提前还款当期」去减
+      const afterMonthlyDecrease =
+        method === 'equalPrincipal' && afterLoan.schedule.length > 1
+          ? round2(afterLoan.schedule[0].payment - afterLoan.schedule[1].payment)
+          : 0
 
       loan = {
         principal: derived.remainingPrincipal,
@@ -635,7 +640,8 @@ function calculateRemainingMortgage(options) {
         totalInterest,
         schedule,
         // 提前还款后的常规月供（第 2 期起），便于结果页展示
-        afterFirstMonthPayment: afterLoan.firstMonthPayment
+        afterFirstMonthPayment: afterLoan.firstMonthPayment,
+        afterMonthlyDecrease
       }
 
       earlyInfo = {
@@ -647,6 +653,7 @@ function calculateRemainingMortgage(options) {
         afterPrincipal,
         afterMonths: afterLoan.months,
         afterFirstMonthPayment: afterLoan.firstMonthPayment,
+        afterMonthlyDecrease,
         baselineInterest: baseline.totalInterest,
         baselineMonths: baseline.months,
         baselineFirstMonthPayment: baseline.firstMonthPayment,
@@ -660,6 +667,39 @@ function calculateRemainingMortgage(options) {
     ? round2((earlyInfo.afterMonths || loan.months) / 12).toFixed(2)
     : derived.remainingYearsDisplay
 
+  const displayExtra = {
+    annualRate: derived.annualRateDisplay,
+    remainingYears: remainingYearsDisplay,
+    remainingYearsText: `${remainingYearsDisplay}年`,
+    paidMonths: String(derived.paidMonths),
+    remainingMonths: String(
+      earlyInfo ? earlyInfo.afterMonths || loan.months : derived.remainingMonths
+    ),
+    earlyPrepayAmount: earlyInfo
+      ? formatMoneyWithComma(earlyInfo.prepayAmountYuan)
+      : '',
+    interestSaved: earlyInfo ? formatMoneyWithComma(earlyInfo.interestSaved) : '',
+    afterMonthlyPayment:
+      earlyInfo && earlyInfo.prepayType === 'partial'
+        ? formatMoneyWithComma(earlyInfo.afterFirstMonthPayment)
+        : '',
+    baselineMonthlyPayment: earlyInfo
+      ? formatMoneyWithComma(
+          earlyInfo.baselineFirstMonthPayment || baseline.firstMonthPayment
+        )
+      : ''
+  }
+
+  if (
+    earlyInfo &&
+    earlyInfo.prepayType === 'partial' &&
+    method === 'equalPrincipal'
+  ) {
+    displayExtra.monthlyDecrease = formatMoneyWithComma(
+      earlyInfo.afterMonthlyDecrease || 0
+    )
+  }
+
   const result = buildMortgageResult({
     mode: 'remaining',
     loanType: 'remaining',
@@ -670,28 +710,7 @@ function calculateRemainingMortgage(options) {
     extra: {
       derived,
       earlyRepayment: earlyInfo,
-      display: {
-        annualRate: derived.annualRateDisplay,
-        remainingYears: remainingYearsDisplay,
-        remainingYearsText: `${remainingYearsDisplay}年`,
-        paidMonths: String(derived.paidMonths),
-        remainingMonths: String(
-          earlyInfo ? earlyInfo.afterMonths || loan.months : derived.remainingMonths
-        ),
-        earlyPrepayAmount: earlyInfo
-          ? formatMoneyWithComma(earlyInfo.prepayAmountYuan)
-          : '',
-        interestSaved: earlyInfo ? formatMoneyWithComma(earlyInfo.interestSaved) : '',
-        afterMonthlyPayment:
-          earlyInfo && earlyInfo.prepayType === 'partial'
-            ? formatMoneyWithComma(earlyInfo.afterFirstMonthPayment)
-            : '',
-        baselineMonthlyPayment: earlyInfo
-          ? formatMoneyWithComma(
-              earlyInfo.baselineFirstMonthPayment || baseline.firstMonthPayment
-            )
-          : ''
-      }
+      display: displayExtra
     }
   })
 

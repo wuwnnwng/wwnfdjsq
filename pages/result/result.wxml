@@ -7,7 +7,7 @@
     </view>
     <view class="summary-sub">
       {{paymentLabel}}
-      <text wx:if="{{method === 'equalPrincipal'}}"> · 每月递减约 {{display.monthlyDecrease}} 元</text>
+      <text wx:if="{{method === 'equalPrincipal' && !isFullPrepay}}"> · 每月递减约 {{display.monthlyDecrease}} 元</text>
       <text wx:if="{{method === 'interestFirst'}}"> · 到期另还全部本金</text>
     </view>
   </view>

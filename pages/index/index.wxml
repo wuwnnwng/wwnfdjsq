@@ -185,6 +185,27 @@
             >组合贷款</view>
           </view>
         </view>
+
+        <view class="lpr-block">
+          <view class="lpr-head">
+            <text class="lpr-title">LPR 基准利率</text>
+            <text class="lpr-status" wx:if="{{lprLoading}}">查询中…</text>
+            <text class="lpr-status" wx:elif="{{lprError}}">{{lprError}}</text>
+          </view>
+          <view class="derived-row">
+            <text class="derived-label">1年期 LPR</text>
+            <text class="derived-value">{{lpr.oneYear}}%</text>
+          </view>
+          <view class="derived-row">
+            <text class="derived-label">5年期以上 LPR</text>
+            <text class="derived-value">{{lpr.fiveYear}}%</text>
+          </view>
+          <view class="derived-row">
+            <text class="derived-label">公布日期</text>
+            <text class="derived-value">{{lpr.publishedAt}}</text>
+          </view>
+          <view class="lpr-hint">房贷一般参考 5 年期以上 LPR；数据来自公开接口</view>
+        </view>
       </view>
     </block>
 

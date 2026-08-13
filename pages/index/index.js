@@ -8,6 +8,7 @@ const {
   getShareAppMessage,
   getShareTimeline
 } = require('../../utils/share')
+const { getLprDisplay, loadLprDisplay } = require('../../utils/lpr')
 
 Page({
   data: {
@@ -40,6 +41,10 @@ Page({
     prepayAmountWan: '',
     adjustMode: 'shorten',
 
+    lpr: getLprDisplay(),
+    lprLoading: false,
+    lprError: '',
+
     derivedReady: false,
     derivedAnnualRate: '--',
     derivedRemainingYears: '--',
@@ -50,6 +55,29 @@ Page({
 
   onLoad() {
     enableShareMenu()
+    this.refreshLpr()
+  },
+
+  async refreshLpr() {
+    this.setData({ lprLoading: true, lprError: '' })
+    try {
+      const lpr = await loadLprDisplay()
+      this.setData({
+        lpr: {
+          oneYear: lpr.oneYear,
+          fiveYear: lpr.fiveYear,
+          publishedAt: lpr.publishedAt
+        },
+        lprLoading: false,
+        lprError: lpr.source === 'fallback' ? '暂用本地兜底数据' : ''
+      })
+    } catch (e) {
+      this.setData({
+        lpr: getLprDisplay(),
+        lprLoading: false,
+        lprError: '查询失败，已显示缓存/兜底'
+      })
+    }
   },
 
   onShareAppMessage() {

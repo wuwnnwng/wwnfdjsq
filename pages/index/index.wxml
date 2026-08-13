@@ -43,6 +43,25 @@
     </view>
   </view>
 
+  <view class="tip-mask" wx:if="{{showLprTip}}" catchtouchmove="preventMove" bindtap="onHideLprTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">LPR 基准利率</view>
+      <view class="tip-block">
+        <view class="tip-name">最新报价</view>
+        <view class="tip-text">1年期 LPR：{{lpr.oneYear}}%</view>
+        <view class="tip-text">5年期以上 LPR：{{lpr.fiveYear}}%</view>
+        <view class="tip-text">公布日期：{{lpr.publishedAt}}</view>
+        <view class="tip-text" wx:if="{{lprLoading}}">正在查询最新数据…</view>
+        <view class="tip-text" wx:elif="{{lprError}}">{{lprError}}</view>
+      </view>
+      <view class="tip-block">
+        <view class="tip-name">什么是 LPR</view>
+        <view class="tip-text">LPR（贷款市场报价利率）是银行发放贷款的定价参考基准，由全国银行间同业拆借中心每月公布。房贷利率一般在「5年期以上 LPR」基础上加减基点确定。</view>
+      </view>
+      <view class="tip-confirm" bindtap="onHideLprTip">我知道了</view>
+    </view>
+  </view>
+
   <scroll-view scroll-y class="form-scroll" enhanced show-scrollbar="{{false}}">
     <!-- 新贷款：还款方式 → 金额填写 → 贷款类型 -->
     <block wx:if="{{calcMode === 'new'}}">
@@ -186,25 +205,11 @@
           </view>
         </view>
 
-        <view class="lpr-block">
-          <view class="lpr-head">
-            <text class="lpr-title">LPR 基准利率</text>
-            <text class="lpr-status" wx:if="{{lprLoading}}">查询中…</text>
-            <text class="lpr-status" wx:elif="{{lprError}}">{{lprError}}</text>
+        <view class="inline-row">
+          <view class="inline-label-wrap">
+            <text class="inline-label">LPR 基准利率</text>
+            <view class="help-icon" catchtap="onShowLprTip" aria-role="button" aria-label="LPR 基准利率说明">!</view>
           </view>
-          <view class="derived-row">
-            <text class="derived-label">1年期 LPR</text>
-            <text class="derived-value">{{lpr.oneYear}}%</text>
-          </view>
-          <view class="derived-row">
-            <text class="derived-label">5年期以上 LPR</text>
-            <text class="derived-value">{{lpr.fiveYear}}%</text>
-          </view>
-          <view class="derived-row">
-            <text class="derived-label">公布日期</text>
-            <text class="derived-value">{{lpr.publishedAt}}</text>
-          </view>
-          <view class="lpr-hint">房贷一般参考 5 年期以上 LPR；数据来自公开接口</view>
         </view>
       </view>
     </block>

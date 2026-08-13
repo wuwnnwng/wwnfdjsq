@@ -19,6 +19,7 @@ Page({
     showProvident: true,
     showMethodTip: false,
     showRemainingTip: false,
+    showLprTip: false,
 
     commercialAmount: '100',
     commercialYears: '30',
@@ -102,6 +103,15 @@ Page({
 
   onHideRemainingTip() {
     this.setData({ showRemainingTip: false })
+  },
+
+  onShowLprTip() {
+    this.setData({ showLprTip: true })
+    this.refreshLpr()
+  },
+
+  onHideLprTip() {
+    this.setData({ showLprTip: false })
   },
 
   preventMove() {},

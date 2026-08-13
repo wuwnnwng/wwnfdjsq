@@ -65,6 +65,9 @@
       <text>提前后剩余期数</text>
       <text>{{earlyInfo.afterMonths}} 期</text>
     </view>
+    <view class="section-desc early-hint" wx:if="{{earlyInfo.nextRepaymentDate}}">
+      提前还款日期默认下次还款日：{{earlyInfo.nextRepaymentDate}}
+    </view>
     <view class="section-desc early-hint" wx:if="{{isFullPrepay}}">还款计划为 1 期结清：当期利息 + 全部剩余本金</view>
     <view class="section-desc early-hint" wx:elif="{{isPartialPrepay}}">还款计划第 1 期为提前还款本金，其后为调整后的剩余月供计划</view>
   </view>

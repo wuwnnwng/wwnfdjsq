@@ -144,7 +144,8 @@ Page({
             prepayAmount: formatMoneyWithComma(early.prepayAmountYuan || 0),
             interestSaved: formatMoneyWithComma(early.interestSaved || 0),
             afterMonths: String(early.afterMonths || 0),
-            afterYears: roundYears(early.afterMonths || 0)
+            afterYears: roundYears(early.afterMonths || 0),
+            nextRepaymentDate: early.nextRepaymentDate || ''
           }
         : {},
       months: result.months,

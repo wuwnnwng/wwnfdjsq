@@ -58,7 +58,7 @@ function pushScheduleItem(schedule, month, payment, principalPart, interest, rem
 }
 
 /**
- * 按「元 + 期数」计算单笔贷款
+ * 按「元 + 期数」计算单笔贷款 减少月供 年限不变
  */
 function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
   const principal = round2(toNumber(principalYuan))
@@ -284,6 +284,33 @@ function parseDateParts(dateStr) {
   if (!year || !month || month < 1 || month > 12) return null
   const safeDay = day >= 1 && day <= 31 ? day : 1
   return { year, month, day: safeDay }
+}
+
+function formatDateParts(parts) {
+  if (!parts) return ''
+  const mm = String(parts.month).padStart(2, '0')
+  const dd = String(parts.day).padStart(2, '0')
+  return `${parts.year}-${mm}-${dd}`
+}
+
+function addMonthsToDate(dateStr, monthsToAdd) {
+  const start = parseDateParts(dateStr)
+  if (!start) return ''
+  const base = new Date(Date.UTC(start.year, start.month - 1, 1))
+  base.setUTCMonth(base.getUTCMonth() + monthsToAdd)
+  const year = base.getUTCFullYear()
+  const month = base.getUTCMonth() + 1
+  const maxDay = new Date(Date.UTC(year, month, 0)).getUTCDate()
+  const day = Math.min(start.day, maxDay)
+  return formatDateParts({ year, month, day })
+}
+
+/**
+ * 下次还款日 = 首次还款日 + 已还期数 个月
+ */
+function resolveNextRepaymentDate(firstRepaymentDate, paidMonths) {
+  if (!(paidMonths >= 0)) return ''
+  return addMonthsToDate(firstRepaymentDate, paidMonths)
 }
 
 /**
@@ -540,8 +567,14 @@ function calculateRemainingMortgage(options) {
 
   let loan = baseline
   let earlyInfo = null
+  const nextRepaymentDate = resolveNextRepaymentDate(
+    derived.firstRepaymentDate,
+    derived.paidMonths
+  )
 
+  // 是否提前还款
   if (early.enabled) {
+    // 一次性结清
     if (early.prepayType === 'full') {
       loan = buildFullPrepayLoan(derived.remainingPrincipal, derived.annualRatePercent)
       earlyInfo = {
@@ -552,7 +585,8 @@ function calculateRemainingMortgage(options) {
         afterPrincipal: 0,
         afterMonths: 1,
         baselineInterest: baseline.totalInterest,
-        interestSaved: round2(baseline.totalInterest - loan.totalInterest)
+        interestSaved: round2(baseline.totalInterest - loan.totalInterest),
+        nextRepaymentDate
       }
     } else {
       const afterPrincipal = round2(derived.remainingPrincipal - early.prepayAmountYuan)
@@ -616,7 +650,8 @@ function calculateRemainingMortgage(options) {
         baselineInterest: baseline.totalInterest,
         baselineMonths: baseline.months,
         baselineFirstMonthPayment: baseline.firstMonthPayment,
-        interestSaved: round2(baseline.totalInterest - totalInterest)
+        interestSaved: round2(baseline.totalInterest - totalInterest),
+        nextRepaymentDate
       }
     }
   }

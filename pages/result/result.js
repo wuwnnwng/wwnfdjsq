@@ -4,9 +4,9 @@ const {
   enableShareMenu,
   getResultShareAppMessage,
   getResultShareTimeline,
-  parseResultShareQuery,
-  tipShareTimeline
+  parseResultShareQuery
 } = require('../../utils/share')
+const { shareResultLongImage } = require('../../utils/share-image')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
 const { getRewardQrPath, saveRewardQrToAlbum } = require('../../utils/reward')
 
@@ -83,6 +83,7 @@ Page({
     showRewardTip: false,
     rewardQrPath: getRewardQrPath(),
     fromShare: false,
+    scheduleTruncated: false,
     splitDetail: {
       month: 0,
       providentPrincipal: '0.00',
@@ -119,9 +120,12 @@ Page({
       interest: shared.pieInterest
     }
 
+    const fullSchedule = decorateSchedule(shared.schedule || [])
+
     this.setData({
       ready: true,
       fromShare: true,
+      scheduleTruncated: !!shared.scheduleTruncated,
       mode: shared.isRemaining ? 'remaining' : 'new',
       isRemaining: shared.isRemaining,
       isEarlyRepayment: shared.isEarlyRepayment,
@@ -135,13 +139,13 @@ Page({
       paymentLabel: shared.paymentLabel,
       summaryPayment: shared.summaryPayment,
       display: shared.display,
-      earlyInfo: shared.earlyInfo,
+      earlyInfo: shared.earlyInfo || {},
       months: shared.months,
       commercialFirst: '0.00',
       providentFirst: '0.00',
       showAllSchedule: false,
-      showEarlyInfo: false,
-      fullSchedule: [],
+      showEarlyInfo: !!shared.isEarlyRepayment,
+      fullSchedule,
       visibleSchedule: []
     })
   },
@@ -211,12 +215,21 @@ Page({
         (result.provident && result.provident.firstMonthPayment) || 0
       ),
       showAllSchedule: false,
+      scheduleTruncated: false,
       fullSchedule,
       visibleSchedule: []
     })
   },
 
   getShareView() {
+    const scheduleSource = (this.data.fullSchedule || []).map((item) => ({
+      month: item.month,
+      payment: item.payment,
+      principal: item.principal,
+      interest: item.interest,
+      remaining: item.remaining
+    }))
+
     return {
       loanTypeLabel: this.data.loanTypeLabel,
       methodLabel: this.data.methodLabel,
@@ -229,6 +242,7 @@ Page({
       isPartialPrepay: this.data.isPartialPrepay,
       display: this.data.display || {},
       earlyInfo: this.data.earlyInfo || {},
+      schedule: scheduleSource,
       piePrincipal: (this.pieData && this.pieData.principal) || 0,
       pieInterest: (this.pieData && this.pieData.interest) || 0
     }
@@ -254,8 +268,9 @@ Page({
     return getResultShareTimeline(this.getShareView())
   },
 
-  onShareTimelineTap() {
-    tipShareTimeline()
+  onShareLongImage() {
+    if (!this.data.ready) return
+    shareResultLongImage(this.getShareView(), getTheme(this.data.theme)).catch(() => {})
   },
 
   onShowRewardTip() {
@@ -291,8 +306,8 @@ Page({
   },
 
   onToggleSchedule() {
-    if (this.data.fromShare) {
-      wx.showToast({ title: '分享卡片不含完整还款计划', icon: 'none' })
+    if (this.data.fromShare && !(this.data.fullSchedule || []).length) {
+      wx.showToast({ title: '可点底部「分享完整长图」查看', icon: 'none' })
       return
     }
     const showAllSchedule = !this.data.showAllSchedule

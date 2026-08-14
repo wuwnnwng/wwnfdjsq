@@ -23,12 +23,6 @@ function getShareTimeline() {
   }
 }
 
-function round2(n) {
-  const x = Number(n)
-  if (!Number.isFinite(x)) return 0
-  return Math.round((x + Number.EPSILON) * 100) / 100
-}
-
 /**
  * 计算结果分享文案
  */
@@ -47,11 +41,12 @@ function buildResultShareTitle({
   return '房贷计算器｜查看我的计算结果'
 }
 
-function buildBaseSnap(view) {
-  const early = view.earlyInfo || {}
-  const display = view.display || {}
-  return {
-    v: 2,
+/**
+ * 压缩计算结果摘要，供分享打开后回显
+ */
+function encodeResultShareQuery(view) {
+  const snap = {
+    v: 1,
     lt: view.loanTypeLabel || '',
     ml: view.methodLabel || '',
     pl: view.paymentLabel || '',
@@ -61,115 +56,42 @@ function buildBaseSnap(view) {
     ie: view.isEarlyRepayment ? 1 : 0,
     if: view.isFullPrepay ? 1 : 0,
     ip: view.isPartialPrepay ? 1 : 0,
-    tp: display.totalPrincipal || '',
-    ti: display.totalInterest || '',
-    tt: display.totalPayment || '',
-    ar: display.annualRate || '',
-    ry: display.remainingYears || '',
-    md: display.monthlyDecrease || '',
-    ea: early.prepayAmount || '',
-    es: early.interestSaved || '',
-    ey: early.afterYears || '',
-    et: early.typeLabel || '',
-    ej: early.adjustLabel || '',
-    em: early.afterMonths || '',
-    ed: early.nextRepaymentDate || '',
+    tp: (view.display && view.display.totalPrincipal) || '',
+    ti: (view.display && view.display.totalInterest) || '',
+    tt: (view.display && view.display.totalPayment) || '',
+    ar: (view.display && view.display.annualRate) || '',
+    ry: (view.display && view.display.remainingYears) || '',
+    md: (view.display && view.display.monthlyDecrease) || '',
+    ea: (view.earlyInfo && view.earlyInfo.prepayAmount) || '',
+    es: (view.earlyInfo && view.earlyInfo.interestSaved) || '',
+    ey: (view.earlyInfo && view.earlyInfo.afterYears) || '',
     pc: Number(view.piePrincipal) || 0,
-    pi: Number(view.pieInterest) || 0,
-    // sc: [[pay, principal, interest, remaining], ...]
-    sc: [],
-    st: 0
-  }
-}
-
-function packSchedule(list, maxLen) {
-  const rows = []
-  let text = '[]'
-  const source = Array.isArray(list) ? list : []
-
-  for (let i = 0; i < source.length; i += 1) {
-    const item = source[i] || {}
-    const next = rows.concat([[
-      round2(item.payment),
-      round2(item.principal),
-      round2(item.interest),
-      round2(item.remaining)
-    ]])
-    const encoded = JSON.stringify(next)
-    if (encoded.length > maxLen) break
-    rows.push(next[next.length - 1])
-    text = encoded
+    pi: Number(view.pieInterest) || 0
   }
 
-  return {
-    rows,
-    truncated: rows.length < source.length,
-    packedLen: text.length
-  }
-}
-
-/**
- * 压缩计算结果（含提前还款说明 + 尽量完整的还款计划）
- * 分享 path 有长度限制，计划过长时自动截断并标记
- */
-function encodeResultShareQuery(view) {
   try {
-    const snap = buildBaseSnap(view)
-    const baseLen = encodeURIComponent(JSON.stringify(snap)).length
-    // path 总长约 1024，预留前缀与余量
-    const budget = Math.max(200, 900 - baseLen)
-    const packed = packSchedule(view.schedule || [], budget)
-    snap.sc = packed.rows
-    snap.st = packed.truncated ? 1 : 0
-
-    const query = `s=${encodeURIComponent(JSON.stringify(snap))}`
-    if (query.length > 980) {
-      // 极端情况再砍计划
-      snap.sc = packed.rows.slice(0, Math.max(1, Math.floor(packed.rows.length / 2)))
-      snap.st = 1
-      return `s=${encodeURIComponent(JSON.stringify(snap))}`
-    }
-    return query
+    return `s=${encodeURIComponent(JSON.stringify(snap))}`
   } catch (e) {
     return ''
   }
-}
-
-function unpackSchedule(sc) {
-  if (!Array.isArray(sc)) return []
-  return sc.map((row, index) => {
-    const payment = round2(row && row[0])
-    const principal = round2(row && row[1])
-    const interest = round2(row && row[2])
-    const remaining = round2(row && row[3])
-    return {
-      month: index + 1,
-      payment,
-      principal,
-      interest,
-      remaining
-    }
-  })
 }
 
 function parseResultShareQuery(query) {
   if (!query || !query.s) return null
   try {
     const snap = JSON.parse(decodeURIComponent(query.s))
-    if (!snap || (snap.v !== 1 && snap.v !== 2)) return null
-    const schedule = unpackSchedule(snap.sc)
+    if (!snap || snap.v !== 1) return null
     return {
       fromShare: true,
       loanTypeLabel: snap.lt || '计算结果',
       methodLabel: snap.ml || '',
       paymentLabel: snap.pl || '每月还款',
       summaryPayment: snap.sp || '0.00',
-      months: Number(snap.mo) || schedule.length || 0,
+      months: Number(snap.mo) || 0,
       isRemaining: !!snap.ir,
       isEarlyRepayment: !!snap.ie,
       isFullPrepay: !!snap.if,
       isPartialPrepay: !!snap.ip,
-      scheduleTruncated: !!snap.st,
       display: {
         totalPrincipal: snap.tp || '--',
         totalInterest: snap.ti || '--',
@@ -182,12 +104,11 @@ function parseResultShareQuery(query) {
         prepayAmount: snap.ea || '',
         interestSaved: snap.es || '',
         afterYears: snap.ey || '',
-        typeLabel: snap.et || '',
-        adjustLabel: snap.ej || '',
-        afterMonths: snap.em || '',
-        nextRepaymentDate: snap.ed || ''
+        typeLabel: '',
+        adjustLabel: '',
+        afterMonths: '',
+        nextRepaymentDate: ''
       },
-      schedule,
       piePrincipal: Number(snap.pc) || 0,
       pieInterest: Number(snap.pi) || 0
     }
@@ -215,7 +136,7 @@ function getResultShareTimeline(view) {
 function tipShareTimeline() {
   wx.showModal({
     title: '分享到朋友圈',
-    content: '请点击右上角「···」，选择「分享到朋友圈」。完整还款计划会尽量带上；若期数较多，可用「分享完整长图」。',
+    content: '请点击右上角「···」，选择「分享到朋友圈」',
     showCancel: false,
     confirmText: '知道了'
   })
@@ -230,6 +151,5 @@ module.exports = {
   parseResultShareQuery,
   getResultShareAppMessage,
   getResultShareTimeline,
-  tipShareTimeline,
-  round2
+  tipShareTimeline
 }

@@ -1,3 +1,8 @@
+const {
+  calculateMortgage,
+  calculateRemainingMortgage
+} = require('./mortgage')
+
 /**
  * 开启右上角「转发好友 / 分享朋友圈」菜单
  */
@@ -42,9 +47,133 @@ function buildResultShareTitle({
 }
 
 /**
- * 压缩计算结果摘要，供分享打开后回显
+ * 压缩计算入参，分享打开后本地重算完整还款计划
+ * 新贷款: {v:2,m:'n',...}
+ * 已有贷款: {v:2,m:'r',...}
+ */
+function encodeShareInput(shareInput) {
+  if (!shareInput || typeof shareInput !== 'object') return null
+  try {
+    let snap
+    if (shareInput.mode === 'remaining') {
+      snap = {
+        v: 2,
+        m: 'r',
+        mt: shareInput.method || '',
+        oy: shareInput.originalYears || '',
+        fd: shareInput.firstRepaymentDate || '',
+        ar: shareInput.manualAnnualRate || '',
+        mp: shareInput.monthPrincipal || '',
+        mi: shareInput.monthInterest || '',
+        rp: shareInput.remainingPrincipal || '',
+        er: shareInput.earlyRepayment ? 1 : 0,
+        pt: shareInput.prepayType || 'full',
+        paw: shareInput.prepayAmountWan || '',
+        am: shareInput.adjustMode || 'shorten'
+      }
+    } else {
+      snap = {
+        v: 2,
+        m: 'n',
+        lt: shareInput.loanType || '',
+        mt: shareInput.method || '',
+        ca: shareInput.commercialAmount || '',
+        cy: shareInput.commercialYears || '',
+        cr: shareInput.commercialRate || '',
+        pa: shareInput.providentAmount || '',
+        py: shareInput.providentYears || '',
+        pr: shareInput.providentRate || ''
+      }
+    }
+    return `p=${encodeURIComponent(JSON.stringify(snap))}`
+  } catch (e) {
+    return null
+  }
+}
+
+function parseShareInputQuery(query) {
+  if (!query || !query.p) return null
+  try {
+    const snap = JSON.parse(decodeURIComponent(query.p))
+    if (!snap || snap.v !== 2) return null
+    if (snap.m === 'r') {
+      return {
+        mode: 'remaining',
+        method: snap.mt || '',
+        originalYears: snap.oy || '',
+        firstRepaymentDate: snap.fd || '',
+        manualAnnualRate: snap.ar || '',
+        monthPrincipal: snap.mp || '',
+        monthInterest: snap.mi || '',
+        remainingPrincipal: snap.rp || '',
+        earlyRepayment: !!snap.er,
+        prepayType: snap.pt || 'full',
+        prepayAmountWan: snap.paw || '',
+        adjustMode: snap.am || 'shorten'
+      }
+    }
+    return {
+      mode: 'new',
+      loanType: snap.lt || '',
+      method: snap.mt || '',
+      commercialAmount: snap.ca || '',
+      commercialYears: snap.cy || '',
+      commercialRate: snap.cr || '',
+      providentAmount: snap.pa || '',
+      providentYears: snap.py || '',
+      providentRate: snap.pr || ''
+    }
+  } catch (e) {
+    return null
+  }
+}
+
+function rebuildResultFromShareInput(input) {
+  if (!input || typeof input !== 'object') return null
+  try {
+    if (input.mode === 'remaining') {
+      const { ok, result } = calculateRemainingMortgage({
+        method: input.method,
+        originalYears: input.originalYears,
+        firstRepaymentDate: input.firstRepaymentDate,
+        manualAnnualRate: input.manualAnnualRate,
+        monthPrincipal: input.monthPrincipal,
+        monthInterest: input.monthInterest,
+        remainingPrincipal: input.remainingPrincipal,
+        earlyRepayment: !!input.earlyRepayment,
+        prepayType: input.prepayType || 'full',
+        prepayAmountWan: input.prepayAmountWan || '',
+        adjustMode: input.adjustMode || 'shorten'
+      })
+      if (!ok || !result) return null
+      result.shareInput = input
+      return result
+    }
+    const result = calculateMortgage({
+      loanType: input.loanType,
+      method: input.method,
+      commercialAmount: input.commercialAmount,
+      commercialYears: input.commercialYears,
+      commercialRate: input.commercialRate,
+      providentAmount: input.providentAmount,
+      providentYears: input.providentYears,
+      providentRate: input.providentRate
+    })
+    if (!result || !result.totalPrincipal) return null
+    result.shareInput = input
+    return result
+  } catch (e) {
+    return null
+  }
+}
+
+/**
+ * 旧版摘要分享（兼容已发出的链接）
  */
 function encodeResultShareQuery(view) {
+  const paramQuery = encodeShareInput(view && view.shareInput)
+  if (paramQuery) return paramQuery
+
   const snap = {
     v: 1,
     lt: view.loanTypeLabel || '',
@@ -147,6 +276,9 @@ module.exports = {
   getShareAppMessage,
   getShareTimeline,
   buildResultShareTitle,
+  encodeShareInput,
+  parseShareInputQuery,
+  rebuildResultFromShareInput,
   encodeResultShareQuery,
   parseResultShareQuery,
   getResultShareAppMessage,

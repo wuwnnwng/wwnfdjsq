@@ -4,7 +4,9 @@ const {
   enableShareMenu,
   getResultShareAppMessage,
   getResultShareTimeline,
+  parseShareInputQuery,
   parseResultShareQuery,
+  rebuildResultFromShareInput,
   tipShareTimeline
 } = require('../../utils/share')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
@@ -81,8 +83,10 @@ Page({
     fullSchedule: [],
     showSplitTip: false,
     showRewardTip: false,
+    showShareLockTip: false,
     rewardQrPath: getRewardQrPath(),
     fromShare: false,
+    scheduleUnlocked: false,
     splitDetail: {
       month: 0,
       providentPrincipal: '0.00',
@@ -98,6 +102,15 @@ Page({
     this.setData({ theme })
     applyThemeChrome(theme)
 
+    const shareInput = parseShareInputQuery(options || {})
+    if (shareInput) {
+      const result = rebuildResultFromShareInput(shareInput)
+      if (result) {
+        this.applyLocalResult(result, { fromShare: true, scheduleUnlocked: true })
+        return
+      }
+    }
+
     const shared = parseResultShareQuery(options || {})
     if (shared) {
       this.applySharedResult(shared)
@@ -110,10 +123,12 @@ Page({
       return
     }
 
-    this.applyLocalResult(result)
+    // 本机计算结果：需分享后才可查看还款计划
+    this.applyLocalResult(result, { fromShare: false, scheduleUnlocked: false })
   },
 
   applySharedResult(shared) {
+    this.shareInput = null
     this.pieData = {
       principal: shared.piePrincipal,
       interest: shared.pieInterest
@@ -122,6 +137,7 @@ Page({
     this.setData({
       ready: true,
       fromShare: true,
+      scheduleUnlocked: false,
       mode: shared.isRemaining ? 'remaining' : 'new',
       isRemaining: shared.isRemaining,
       isEarlyRepayment: shared.isEarlyRepayment,
@@ -146,7 +162,12 @@ Page({
     })
   },
 
-  applyLocalResult(result) {
+  applyLocalResult(result, options = {}) {
+    const fromShare = !!options.fromShare
+    const scheduleUnlocked = options.scheduleUnlocked != null
+      ? !!options.scheduleUnlocked
+      : fromShare
+
     const fullSchedule = decorateSchedule(result.schedule)
     const isRemaining = result.mode === 'remaining' || result.loanType === 'remaining'
     const isCombo = result.loanType === 'combo'
@@ -171,6 +192,7 @@ Page({
         formatMoneyWithComma(early.afterFirstMonthPayment || 0)
     }
 
+    this.shareInput = result.shareInput || null
     this.pieData = {
       principal: result.totalPrincipal,
       interest: result.totalInterest
@@ -178,7 +200,8 @@ Page({
 
     this.setData({
       ready: true,
-      fromShare: false,
+      fromShare,
+      scheduleUnlocked,
       mode: result.mode || 'new',
       isRemaining,
       isEarlyRepayment,
@@ -230,8 +253,22 @@ Page({
       display: this.data.display || {},
       earlyInfo: this.data.earlyInfo || {},
       piePrincipal: (this.pieData && this.pieData.principal) || 0,
-      pieInterest: (this.pieData && this.pieData.interest) || 0
+      pieInterest: (this.pieData && this.pieData.interest) || 0,
+      shareInput: this.shareInput || null
     }
+  },
+
+  unlockScheduleAfterShare() {
+    if (this.data.fromShare || this.data.scheduleUnlocked) return
+    if (!this.data.fullSchedule || !this.data.fullSchedule.length) return
+
+    this.setData({
+      scheduleUnlocked: true,
+      showShareLockTip: false,
+      showAllSchedule: true,
+      visibleSchedule: this.data.fullSchedule
+    })
+    wx.showToast({ title: '已解锁还款计划', icon: 'success' })
   },
 
   onShareAppMessage() {
@@ -241,6 +278,7 @@ Page({
         path: '/pages/index/index'
       }
     }
+    this.unlockScheduleAfterShare()
     return getResultShareAppMessage(this.getShareView())
   },
 
@@ -251,6 +289,7 @@ Page({
         query: ''
       }
     }
+    this.unlockScheduleAfterShare()
     return getResultShareTimeline(this.getShareView())
   },
 
@@ -291,15 +330,27 @@ Page({
   },
 
   onToggleSchedule() {
-    if (this.data.fromShare) {
-      wx.showToast({ title: '分享卡片不含完整还款计划', icon: 'none' })
+    // 旧版摘要分享页：无完整计划
+    if (this.data.fromShare && (!this.data.fullSchedule || !this.data.fullSchedule.length)) {
+      wx.showToast({ title: '请重新分享以查看还款计划', icon: 'none' })
       return
     }
+
+    // 本机结果页：未分享则引导分享
+    if (!this.data.fromShare && !this.data.scheduleUnlocked) {
+      this.setData({ showShareLockTip: true })
+      return
+    }
+
     const showAllSchedule = !this.data.showAllSchedule
     this.setData({
       showAllSchedule,
       visibleSchedule: showAllSchedule ? this.data.fullSchedule : []
     })
+  },
+
+  onHideShareLockTip() {
+    this.setData({ showShareLockTip: false })
   },
 
   onToggleEarlyInfo() {

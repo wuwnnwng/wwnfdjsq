@@ -108,11 +108,12 @@
       <view class="schedule-head">
         <view>
           <view class="section-title">还款计划</view>
-          <view class="section-desc" wx:if="{{isFullPrepay}}">共 1 期结清计划，可查看明细</view>
+          <view class="section-desc" wx:if="{{!fromShare && !scheduleUnlocked}}">共 {{months}} 期，分享好友或朋友圈后可查看明细</view>
+          <view class="section-desc" wx:elif="{{isFullPrepay}}">共 1 期结清计划，可查看明细</view>
           <view class="section-desc" wx:elif="{{isPartialPrepay}}">共 {{months}} 期（第 1 期为提前还款，其后为剩余月供），可展开查看明细</view>
           <view class="section-desc" wx:else>共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}，可展开查看每月明细{{isCombo ? '；点击利息可查看拆分' : ''}}</view>
         </view>
-        <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开'}}</view>
+        <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : (!fromShare && !scheduleUnlocked ? '分享后查看' : '展开')}}</view>
       </view>
 
       <view class="table-head" wx:if="{{showAllSchedule}}">
@@ -172,6 +173,16 @@
       <view class="tip-text tip-single">安卓请先保存到相册，再用微信「扫一扫 → 相册」识别</view>
       <view class="tip-confirm" bindtap="onSaveRewardQr">保存赞赏码到相册</view>
       <view class="tip-confirm ghost" bindtap="onHideRewardTip">关闭</view>
+    </view>
+  </view>
+
+  <view class="tip-mask" wx:if="{{showShareLockTip}}" catchtouchmove="preventMove" bindtap="onHideShareLockTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">查看还款计划</view>
+      <view class="tip-text tip-single">分享给好友或朋友圈后，即可查看完整还款计划</view>
+      <button class="tip-confirm tip-share-btn" open-type="share">分享好友</button>
+      <view class="tip-confirm ghost" bindtap="onShareTimelineTap">分享朋友圈</view>
+      <view class="tip-confirm ghost" bindtap="onHideShareLockTip">取消</view>
     </view>
   </view>
 

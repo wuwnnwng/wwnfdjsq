@@ -400,7 +400,8 @@ Page({
       providentRate
     } = this.data
 
-    const result = calculateMortgage({
+    const shareInput = {
+      mode: 'new',
       loanType,
       method,
       commercialAmount,
@@ -409,13 +410,16 @@ Page({
       providentAmount,
       providentYears,
       providentRate
-    })
+    }
+
+    const result = calculateMortgage(shareInput)
 
     if (result.totalPrincipal <= 0) {
       wx.showToast({ title: '请输入有效贷款金额', icon: 'none' })
       return
     }
 
+    result.shareInput = shareInput
     this.goResult(result)
   },
 
@@ -427,7 +431,8 @@ Page({
       return
     }
 
-    const { ok, result, message } = calculateRemainingMortgage({
+    const shareInput = {
+      mode: 'remaining',
       method: this.data.method,
       originalYears: this.data.originalYears,
       firstRepaymentDate: this.data.firstRepaymentDate,
@@ -439,13 +444,16 @@ Page({
       prepayType: this.data.prepayType,
       prepayAmountWan: this.data.prepayAmountWan,
       adjustMode: this.data.adjustMode
-    })
+    }
+
+    const { ok, result, message } = calculateRemainingMortgage(shareInput)
 
     if (!ok) {
       wx.showToast({ title: message || '计算失败', icon: 'none' })
       return
     }
 
+    result.shareInput = shareInput
     this.goResult(result)
   },
 

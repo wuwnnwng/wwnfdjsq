@@ -15,7 +15,6 @@ const {
   applyThemeChrome,
   THEME_LIST
 } = require('../../utils/theme')
-const { getRewardQrPath, previewRewardQr } = require('../../utils/reward')
 
 Page({
   data: {
@@ -27,8 +26,6 @@ Page({
     showMethodTip: false,
     showRemainingTip: false,
     showLprTip: false,
-    showRewardTip: false,
-    rewardQrPath: getRewardQrPath(),
     theme: getThemeId(),
     themeList: THEME_LIST,
 
@@ -150,18 +147,6 @@ Page({
 
   onHideLprTip() {
     this.setData({ showLprTip: false })
-  },
-
-  onShowRewardTip() {
-    this.setData({ showRewardTip: true })
-  },
-
-  onHideRewardTip() {
-    this.setData({ showRewardTip: false })
-  },
-
-  onPreviewRewardQr() {
-    previewRewardQr()
   },
 
   preventMove() {},

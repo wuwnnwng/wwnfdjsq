@@ -2,8 +2,10 @@ const { formatMoneyWithComma } = require('../../utils/mortgage')
 const { renderPie } = require('../../utils/pie')
 const {
   enableShareMenu,
-  getShareAppMessage,
-  getShareTimeline
+  getResultShareAppMessage,
+  getResultShareTimeline,
+  parseResultShareQuery,
+  tipShareTimeline
 } = require('../../utils/share')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
 
@@ -77,6 +79,7 @@ Page({
     visibleSchedule: [],
     fullSchedule: [],
     showSplitTip: false,
+    fromShare: false,
     splitDetail: {
       month: 0,
       providentPrincipal: '0.00',
@@ -86,11 +89,17 @@ Page({
     }
   },
 
-  onLoad() {
+  onLoad(options) {
     enableShareMenu()
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+
+    const shared = parseResultShareQuery(options || {})
+    if (shared) {
+      this.applySharedResult(shared)
+      return
+    }
 
     const result = wx.getStorageSync('mortgageResult')
     if (!result || !result.totalPrincipal) {
@@ -98,8 +107,44 @@ Page({
       return
     }
 
+    this.applyLocalResult(result)
+  },
+
+  applySharedResult(shared) {
+    this.pieData = {
+      principal: shared.piePrincipal,
+      interest: shared.pieInterest
+    }
+
+    this.setData({
+      ready: true,
+      fromShare: true,
+      mode: shared.isRemaining ? 'remaining' : 'new',
+      isRemaining: shared.isRemaining,
+      isEarlyRepayment: shared.isEarlyRepayment,
+      isFullPrepay: shared.isFullPrepay,
+      isPartialPrepay: shared.isPartialPrepay,
+      isCombo: false,
+      loanType: shared.isRemaining ? 'remaining' : 'shared',
+      method: '',
+      loanTypeLabel: shared.loanTypeLabel,
+      methodLabel: shared.methodLabel,
+      paymentLabel: shared.paymentLabel,
+      summaryPayment: shared.summaryPayment,
+      display: shared.display,
+      earlyInfo: shared.earlyInfo,
+      months: shared.months,
+      commercialFirst: '0.00',
+      providentFirst: '0.00',
+      showAllSchedule: false,
+      showEarlyInfo: false,
+      fullSchedule: [],
+      visibleSchedule: []
+    })
+  },
+
+  applyLocalResult(result) {
     const fullSchedule = decorateSchedule(result.schedule)
-    const previewCount = 12
     const isRemaining = result.mode === 'remaining' || result.loanType === 'remaining'
     const isCombo = result.loanType === 'combo'
     const early = result.earlyRepayment || null
@@ -130,6 +175,7 @@ Page({
 
     this.setData({
       ready: true,
+      fromShare: false,
       mode: result.mode || 'new',
       isRemaining,
       isEarlyRepayment,
@@ -163,16 +209,50 @@ Page({
       ),
       showAllSchedule: false,
       fullSchedule,
-      visibleSchedule: fullSchedule.slice(0, previewCount)
+      visibleSchedule: []
     })
   },
 
+  getShareView() {
+    return {
+      loanTypeLabel: this.data.loanTypeLabel,
+      methodLabel: this.data.methodLabel,
+      paymentLabel: this.data.paymentLabel,
+      summaryPayment: this.data.summaryPayment,
+      months: this.data.months,
+      isRemaining: this.data.isRemaining,
+      isEarlyRepayment: this.data.isEarlyRepayment,
+      isFullPrepay: this.data.isFullPrepay,
+      isPartialPrepay: this.data.isPartialPrepay,
+      display: this.data.display || {},
+      earlyInfo: this.data.earlyInfo || {},
+      piePrincipal: (this.pieData && this.pieData.principal) || 0,
+      pieInterest: (this.pieData && this.pieData.interest) || 0
+    }
+  },
+
   onShareAppMessage() {
-    return getShareAppMessage()
+    if (!this.data.ready) {
+      return {
+        title: '房贷计算器｜公积金、商贷、组合贷一键算清',
+        path: '/pages/index/index'
+      }
+    }
+    return getResultShareAppMessage(this.getShareView())
   },
 
   onShareTimeline() {
-    return getShareTimeline()
+    if (!this.data.ready) {
+      return {
+        title: '房贷计算器｜公积金、商贷、组合贷一键算清',
+        query: ''
+      }
+    }
+    return getResultShareTimeline(this.getShareView())
+  },
+
+  onShareTimelineTap() {
+    tipShareTimeline()
   },
 
   onShow() {
@@ -196,12 +276,14 @@ Page({
   },
 
   onToggleSchedule() {
+    if (this.data.fromShare) {
+      wx.showToast({ title: '分享卡片不含完整还款计划', icon: 'none' })
+      return
+    }
     const showAllSchedule = !this.data.showAllSchedule
     this.setData({
       showAllSchedule,
-      visibleSchedule: showAllSchedule
-        ? this.data.fullSchedule
-        : this.data.fullSchedule.slice(0, 12)
+      visibleSchedule: showAllSchedule ? this.data.fullSchedule : []
     })
   },
 
@@ -237,6 +319,10 @@ Page({
   preventMove() {},
 
   onRecalculate() {
+    if (this.data.fromShare) {
+      wx.redirectTo({ url: '/pages/index/index' })
+      return
+    }
     wx.navigateBack({
       fail: () => {
         wx.redirectTo({ url: '/pages/index/index' })

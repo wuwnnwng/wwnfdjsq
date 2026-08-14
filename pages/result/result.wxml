@@ -113,10 +113,10 @@
           <view class="section-desc" wx:elif="{{isPartialPrepay}}">共 {{months}} 期（第 1 期为提前还款，其后为剩余月供），可展开查看明细</view>
           <view class="section-desc" wx:else>共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}，可展开查看每月明细{{isCombo ? '；点击利息可查看拆分' : ''}}</view>
         </view>
-        <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开全部'}}</view>
+        <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开'}}</view>
       </view>
 
-      <view class="table-head">
+      <view class="table-head" wx:if="{{showAllSchedule}}">
         <text class="col month">期数</text>
         <text class="col">月供</text>
         <text class="col">本金</text>
@@ -124,7 +124,7 @@
         <text class="col">剩余</text>
       </view>
 
-      <scroll-view scroll-y class="table-body">
+      <scroll-view scroll-y class="table-body" wx:if="{{showAllSchedule}}">
         <view class="table-row" wx:for="{{visibleSchedule}}" wx:key="month">
           <text class="col month">{{item.month}}</text>
           <text class="col">{{item.paymentText}}</text>
@@ -160,7 +160,11 @@
   </view>
 
   <view class="footer-block">
-    <button class="primary-btn" bindtap="onRecalculate">重新计算</button>
+    <view class="share-row">
+      <button class="share-btn" open-type="share">分享好友</button>
+      <button class="share-btn ghost" bindtap="onShareTimelineTap">分享朋友圈</button>
+    </view>
+    <button class="primary-btn" bindtap="onRecalculate">{{fromShare ? '去计算' : '重新计算'}}</button>
   </view>
 </view>
 

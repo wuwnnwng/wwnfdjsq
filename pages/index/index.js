@@ -47,7 +47,7 @@ Page({
 
     earlyRepayment: false,
     prepayType: 'full',
-    prepayAmountWan: '',
+    prepayAmountWan: '10',
     adjustMode: 'shorten',
 
     lpr: getLprDisplay(),
@@ -66,6 +66,16 @@ Page({
     enableShareMenu()
     this.applyTheme(getThemeId())
     this.refreshLpr()
+
+    const now = new Date()
+    const mm = String(now.getMonth() + 1).padStart(2, '0')
+    const dd = String(now.getDate()).padStart(2, '0')
+    this.setData(
+      {
+        firstRepaymentDate: `${now.getFullYear()}-${mm}-${dd}`
+      },
+      () => this.refreshDerived()
+    )
   },
 
   onShow() {

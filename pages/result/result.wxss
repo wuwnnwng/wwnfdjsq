@@ -34,6 +34,37 @@
   box-shadow: 0 -8rpx 24rpx var(--color-shadow);
 }
 
+.share-row {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.share-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  height: 80rpx;
+  line-height: 1.2;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1rpx solid var(--color-line);
+}
+
+.share-btn::after {
+  border: none;
+}
+
+.share-btn.ghost {
+  color: var(--color-brand-soft);
+}
+
 .footer-block .primary-btn {
   display: flex;
   align-items: center;

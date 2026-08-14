@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "计算结果",
+  "disableScroll": true,
   "usingComponents": {}
 }

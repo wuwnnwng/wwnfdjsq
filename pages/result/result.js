@@ -73,6 +73,7 @@ Page({
     commercialFirst: '0.00',
     providentFirst: '0.00',
     showAllSchedule: false,
+    showEarlyInfo: false,
     visibleSchedule: [],
     fullSchedule: [],
     showSplitTip: false,
@@ -201,6 +202,12 @@ Page({
       visibleSchedule: showAllSchedule
         ? this.data.fullSchedule
         : this.data.fullSchedule.slice(0, 12)
+    })
+  },
+
+  onToggleEarlyInfo() {
+    this.setData({
+      showEarlyInfo: !this.data.showEarlyInfo
     })
   },
 

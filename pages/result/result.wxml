@@ -1,133 +1,146 @@
-<view class="page theme-{{theme}}" wx:if="{{ready}}">
-  <view class="summary-hero">
-    <view class="summary-label">{{loanTypeLabel}} · {{methodLabel}}</view>
-    <view class="summary-main">
-      <text class="summary-number">{{summaryPayment}}</text>
-      <text class="summary-unit">元</text>
-    </view>
-    <view class="summary-sub">
-      {{paymentLabel}}
-      <text wx:if="{{method === 'equalPrincipal' && !isFullPrepay}}"> · 每月递减约 {{display.monthlyDecrease}} 元</text>
-      <text wx:if="{{method === 'interestFirst'}}"> · 到期另还全部本金</text>
-    </view>
-  </view>
-
-  <view class="panel metrics">
-    <view class="metric" wx:if="{{isRemaining}}">
-      <view class="metric-value">{{display.annualRate}}%</view>
-      <view class="metric-label">当前执行利率</view>
-    </view>
-    <view class="metric" wx:if="{{isRemaining && !isEarlyRepayment}}">
-      <view class="metric-value">{{display.remainingYears}}年</view>
-      <view class="metric-label">剩余还款年</view>
-    </view>
-    <view class="metric" wx:if="{{isPartialPrepay}}">
-      <view class="metric-value">{{earlyInfo.afterYears}}年</view>
-      <view class="metric-label">调整后剩余年限</view>
-    </view>
-    <view class="metric" wx:if="{{isEarlyRepayment}}">
-      <view class="metric-value">{{earlyInfo.prepayAmount}}</view>
-      <view class="metric-label">提前还款额（元）</view>
-    </view>
-    <view class="metric" wx:if="{{isEarlyRepayment}}">
-      <view class="metric-value accent">{{earlyInfo.interestSaved}}</view>
-      <view class="metric-label">预计节省利息（元）</view>
-    </view>
-    <view class="metric">
-      <view class="metric-value">{{display.totalPrincipal}}</view>
-      <view class="metric-label">{{isRemaining ? '剩余本金（元）' : '贷款总额（元）'}}</view>
-    </view>
-    <view class="metric">
-      <view class="metric-value accent">{{display.totalInterest}}</view>
-      <view class="metric-label">{{isFullPrepay ? '结清利息（元）' : (isRemaining ? '剩余利息（元）' : '支付利息（元）')}}</view>
-    </view>
-    <view class="metric">
-      <view class="metric-value">{{display.totalPayment}}</view>
-      <view class="metric-label">{{isFullPrepay ? '结清总额（元）' : (isRemaining ? '剩余还款总额（元）' : '还款总额（元）')}}</view>
-    </view>
-    <view class="metric" wx:if="{{method === 'equalPrincipal' || method === 'interestFirst'}}">
-      <view class="metric-value">{{display.lastMonthPayment}}</view>
-      <view class="metric-label">末月还款（元）</view>
-    </view>
-  </view>
-
-  <view class="panel" wx:if="{{isEarlyRepayment}}">
-    <view class="section-title">提前还款说明</view>
-    <view class="split-row">
-      <text>提前还款类型</text>
-      <text>{{earlyInfo.typeLabel}}</text>
-    </view>
-    <view class="split-row" wx:if="{{isPartialPrepay}}">
-      <text>调整方式</text>
-      <text class="split-value-wrap">{{earlyInfo.adjustLabel}}</text>
-    </view>
-    <view class="split-row" wx:if="{{isPartialPrepay}}">
-      <text>提前后剩余期数</text>
-      <text>{{earlyInfo.afterMonths}} 期</text>
-    </view>
-    <view class="section-desc early-hint" wx:if="{{earlyInfo.nextRepaymentDate}}">
-      提前还款日期默认下次还款日：{{earlyInfo.nextRepaymentDate}}
-    </view>
-    <view class="section-desc early-hint" wx:if="{{isFullPrepay}}">还款计划为 1 期结清：当期利息 + 全部剩余本金</view>
-    <view class="section-desc early-hint" wx:elif="{{isPartialPrepay}}">还款计划第 1 期为提前还款本金，其后为调整后的剩余月供计划</view>
-  </view>
-
-  <view class="panel chart-panel">
-    <view class="section-title">本金与利息占比</view>
-    <view class="section-desc">还款总额中，本金与利息各占多少</view>
-
-    <canvas
-      type="2d"
-      id="pieCanvas"
-      class="pie-canvas"
-    ></canvas>
-  </view>
-
-  <view class="panel" wx:if="{{loanType === 'combo'}}">
-    <view class="section-title">组合贷拆分</view>
-    <view class="split-row">
-      <text>商贷月供（首月）</text>
-      <text>{{commercialFirst}} 元</text>
-    </view>
-    <view class="split-row">
-      <text>公积金月供（首月）</text>
-      <text>{{providentFirst}} 元</text>
-    </view>
-  </view>
-
-  <view class="panel schedule-panel">
-    <view class="schedule-head">
-      <view>
-        <view class="section-title">还款计划</view>
-        <view class="section-desc" wx:if="{{isFullPrepay}}">共 1 期结清计划，可查看明细</view>
-        <view class="section-desc" wx:elif="{{isPartialPrepay}}">共 {{months}} 期（第 1 期为提前还款，其后为剩余月供），可展开查看明细</view>
-        <view class="section-desc" wx:else>共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}，可展开查看每月明细{{isCombo ? '；点击利息可查看拆分' : ''}}</view>
+<view class="page page-shell theme-{{theme}}" wx:if="{{ready}}">
+  <scroll-view scroll-y class="content-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="summary-hero">
+      <view class="summary-label">{{loanTypeLabel}} · {{methodLabel}}</view>
+      <view class="summary-main">
+        <text class="summary-number">{{summaryPayment}}</text>
+        <text class="summary-unit">元</text>
       </view>
-      <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开全部'}}</view>
-    </view>
-
-    <view class="table-head">
-      <text class="col month">期数</text>
-      <text class="col">月供</text>
-      <text class="col">本金</text>
-      <text class="col">利息{{isCombo ? ' · 点我' : ''}}</text>
-      <text class="col">剩余</text>
-    </view>
-
-    <scroll-view scroll-y class="table-body">
-      <view class="table-row" wx:for="{{visibleSchedule}}" wx:key="month">
-        <text class="col month">{{item.month}}</text>
-        <text class="col">{{item.paymentText}}</text>
-        <text class="col">{{item.principalText}}</text>
-        <text
-          class="col interest-text {{isCombo ? 'clickable' : ''}}"
-          data-index="{{index}}"
-          catchtap="onInterestTap"
-        >{{item.interestText}}</text>
-        <text class="col">{{item.remainingText}}</text>
+      <view class="summary-sub">
+        {{paymentLabel}}
+        <text wx:if="{{method === 'equalPrincipal' && !isFullPrepay}}"> · 每月递减约 {{display.monthlyDecrease}} 元</text>
+        <text wx:if="{{method === 'interestFirst'}}"> · 到期另还全部本金</text>
       </view>
-    </scroll-view>
-  </view>
+    </view>
+
+    <view class="panel metrics">
+      <view class="metric" wx:if="{{isRemaining}}">
+        <view class="metric-value">{{display.annualRate}}%</view>
+        <view class="metric-label">当前执行利率</view>
+      </view>
+      <view class="metric" wx:if="{{isRemaining && !isEarlyRepayment}}">
+        <view class="metric-value">{{display.remainingYears}}年</view>
+        <view class="metric-label">剩余还款年</view>
+      </view>
+      <view class="metric" wx:if="{{isPartialPrepay}}">
+        <view class="metric-value">{{earlyInfo.afterYears}}年</view>
+        <view class="metric-label">调整后剩余年限</view>
+      </view>
+      <view class="metric" wx:if="{{isEarlyRepayment}}">
+        <view class="metric-value">{{earlyInfo.prepayAmount}}</view>
+        <view class="metric-label">提前还款额（元）</view>
+      </view>
+      <view class="metric" wx:if="{{isEarlyRepayment}}">
+        <view class="metric-value accent">{{earlyInfo.interestSaved}}</view>
+        <view class="metric-label">预计节省利息（元）</view>
+      </view>
+      <view class="metric">
+        <view class="metric-value">{{display.totalPrincipal}}</view>
+        <view class="metric-label">{{isRemaining ? '剩余本金（元）' : '贷款总额（元）'}}</view>
+      </view>
+      <view class="metric">
+        <view class="metric-value accent">{{display.totalInterest}}</view>
+        <view class="metric-label">{{isFullPrepay ? '结清利息（元）' : (isRemaining ? '剩余利息（元）' : '支付利息（元）')}}</view>
+      </view>
+      <view class="metric">
+        <view class="metric-value">{{display.totalPayment}}</view>
+        <view class="metric-label">{{isFullPrepay ? '结清总额（元）' : (isRemaining ? '剩余还款总额（元）' : '还款总额（元）')}}</view>
+      </view>
+      <view class="metric" wx:if="{{method === 'equalPrincipal' || method === 'interestFirst'}}">
+        <view class="metric-value">{{display.lastMonthPayment}}</view>
+        <view class="metric-label">末月还款（元）</view>
+      </view>
+    </view>
+
+    <view class="panel" wx:if="{{isEarlyRepayment}}">
+      <view class="schedule-head" bindtap="onToggleEarlyInfo">
+        <view>
+          <view class="section-title">提前还款说明</view>
+          <view class="section-desc">{{showEarlyInfo ? '点击收起明细' : '默认收起，点击展开查看'}}</view>
+        </view>
+        <view class="toggle">{{showEarlyInfo ? '收起' : '展开'}}</view>
+      </view>
+
+      <block wx:if="{{showEarlyInfo}}">
+        <view class="split-row">
+          <text>提前还款类型</text>
+          <text>{{earlyInfo.typeLabel}}</text>
+        </view>
+        <view class="split-row" wx:if="{{isPartialPrepay}}">
+          <text>调整方式</text>
+          <text class="split-value-wrap">{{earlyInfo.adjustLabel}}</text>
+        </view>
+        <view class="split-row" wx:if="{{isPartialPrepay}}">
+          <text>提前后剩余期数</text>
+          <text>{{earlyInfo.afterMonths}} 期</text>
+        </view>
+        <view class="section-desc early-hint" wx:if="{{earlyInfo.nextRepaymentDate}}">
+          提前还款日期默认下次还款日：{{earlyInfo.nextRepaymentDate}}
+        </view>
+        <view class="section-desc early-hint" wx:if="{{isFullPrepay}}">还款计划为 1 期结清：当期利息 + 全部剩余本金</view>
+        <view class="section-desc early-hint" wx:elif="{{isPartialPrepay}}">还款计划第 1 期为提前还款本金，其后为调整后的剩余月供计划</view>
+      </block>
+    </view>
+
+    <view class="panel chart-panel">
+      <view class="section-title">本金与利息占比</view>
+      <view class="section-desc">还款总额中，本金与利息各占多少</view>
+
+      <canvas
+        type="2d"
+        id="pieCanvas"
+        class="pie-canvas"
+      ></canvas>
+    </view>
+
+    <view class="panel" wx:if="{{loanType === 'combo'}}">
+      <view class="section-title">组合贷拆分</view>
+      <view class="split-row">
+        <text>商贷月供（首月）</text>
+        <text>{{commercialFirst}} 元</text>
+      </view>
+      <view class="split-row">
+        <text>公积金月供（首月）</text>
+        <text>{{providentFirst}} 元</text>
+      </view>
+    </view>
+
+    <view class="panel schedule-panel">
+      <view class="schedule-head">
+        <view>
+          <view class="section-title">还款计划</view>
+          <view class="section-desc" wx:if="{{isFullPrepay}}">共 1 期结清计划，可查看明细</view>
+          <view class="section-desc" wx:elif="{{isPartialPrepay}}">共 {{months}} 期（第 1 期为提前还款，其后为剩余月供），可展开查看明细</view>
+          <view class="section-desc" wx:else>共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}，可展开查看每月明细{{isCombo ? '；点击利息可查看拆分' : ''}}</view>
+        </view>
+        <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开全部'}}</view>
+      </view>
+
+      <view class="table-head">
+        <text class="col month">期数</text>
+        <text class="col">月供</text>
+        <text class="col">本金</text>
+        <text class="col">利息{{isCombo ? ' · 点我' : ''}}</text>
+        <text class="col">剩余</text>
+      </view>
+
+      <scroll-view scroll-y class="table-body">
+        <view class="table-row" wx:for="{{visibleSchedule}}" wx:key="month">
+          <text class="col month">{{item.month}}</text>
+          <text class="col">{{item.paymentText}}</text>
+          <text class="col">{{item.principalText}}</text>
+          <text
+            class="col interest-text {{isCombo ? 'clickable' : ''}}"
+            data-index="{{index}}"
+            catchtap="onInterestTap"
+          >{{item.interestText}}</text>
+          <text class="col">{{item.remainingText}}</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="content-scroll-spacer"></view>
+  </scroll-view>
 
   <view class="tip-mask" wx:if="{{showSplitTip}}" catchtouchmove="preventMove" bindtap="onHideSplitTip">
     <view class="tip-dialog" catchtap="preventMove">
@@ -146,7 +159,9 @@
     </view>
   </view>
 
-  <button class="primary-btn" bindtap="onRecalculate">重新计算</button>
+  <view class="footer-block">
+    <button class="primary-btn" bindtap="onRecalculate">重新计算</button>
+  </view>
 </view>
 
 <view class="page theme-{{theme}} empty" wx:else>

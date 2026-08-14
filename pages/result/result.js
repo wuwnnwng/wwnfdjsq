@@ -8,7 +8,7 @@ const {
   tipShareTimeline
 } = require('../../utils/share')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
-const { getRewardQrPath, previewRewardQr } = require('../../utils/reward')
+const { getRewardQrPath, saveRewardQrToAlbum } = require('../../utils/reward')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -266,8 +266,8 @@ Page({
     this.setData({ showRewardTip: false })
   },
 
-  onPreviewRewardQr() {
-    previewRewardQr()
+  onSaveRewardQr() {
+    saveRewardQrToAlbum()
   },
 
   onShow() {

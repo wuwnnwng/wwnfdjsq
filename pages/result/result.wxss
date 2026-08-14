@@ -290,6 +290,13 @@
   background: #fff;
 }
 
+.tip-confirm.ghost {
+  margin-top: 16rpx;
+  color: var(--color-brand);
+  background: transparent;
+  border: 1rpx solid var(--color-line);
+}
+
 .tip-confirm {
   margin-top: 32rpx;
   height: 80rpx;

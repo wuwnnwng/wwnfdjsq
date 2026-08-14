@@ -292,6 +292,25 @@
   color: var(--color-muted);
 }
 
+.plan-name-input {
+  margin-top: 28rpx;
+  width: 100%;
+  height: 80rpx;
+  padding: 0 24rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: var(--color-ink);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1rpx solid var(--color-line);
+}
+
+.tip-confirm.ghost {
+  margin-top: 16rpx;
+  color: var(--color-brand);
+  background: transparent;
+  border: 1rpx solid var(--color-line);
+}
+
 .segment-row {
   flex: 1;
   margin-top: 0;

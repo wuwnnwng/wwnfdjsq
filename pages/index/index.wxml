@@ -73,8 +73,8 @@
       <view class="tip-title">我的方案</view>
       <view class="tip-summary">最多保存 {{planMaxCount}} 条，当前 {{planList.length}} 条</view>
       <view class="plan-list" wx:if="{{planList.length}}">
-        <view class="plan-item" wx:for="{{planList}}" wx:key="id" bindtap="onSelectPlan" data-id="{{item.id}}">
-          <view class="plan-item-main">
+        <view class="plan-item" wx:for="{{planList}}" wx:key="id">
+          <view class="plan-item-main" bindtap="onSelectPlan" data-id="{{item.id}}">
             <view class="plan-item-name">{{item.name}}</view>
             <view class="plan-item-desc">{{item.summary}}</view>
           </view>
@@ -86,6 +86,23 @@
       </view>
       <view class="plan-empty" wx:else>暂无保存的方案，计算后可在结果页保留</view>
       <view class="tip-confirm" bindtap="onHidePlans">关闭</view>
+    </view>
+  </view>
+
+  <view class="tip-mask" wx:if="{{showRenamePlan}}" catchtouchmove="preventMove" bindtap="onHideRenamePlan">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">编辑方案名称</view>
+      <view class="tip-text tip-single">可直接修改名称，不影响已保存的测算参数</view>
+      <input
+        class="plan-name-input"
+        value="{{planNameDraft}}"
+        maxlength="{{planNameMaxLen}}"
+        placeholder="请输入方案名称"
+        focus
+        bindinput="onPlanNameInput"
+      />
+      <view class="tip-confirm" bindtap="onConfirmRenamePlan">保存</view>
+      <view class="tip-confirm ghost" bindtap="onHideRenamePlan">取消</view>
     </view>
   </view>
 

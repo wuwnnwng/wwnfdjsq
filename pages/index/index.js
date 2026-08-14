@@ -15,7 +15,14 @@ const {
   applyThemeChrome,
   THEME_LIST
 } = require('../../utils/theme')
-const { MAX_PLANS, listPlans, getPlan, removePlan } = require('../../utils/plans')
+const {
+  MAX_PLANS,
+  NAME_MAX_LEN,
+  listPlans,
+  getPlan,
+  renamePlan,
+  removePlan
+} = require('../../utils/plans')
 
 Page({
   data: {
@@ -28,8 +35,12 @@ Page({
     showRemainingTip: false,
     showLprTip: false,
     showPlans: false,
+    showRenamePlan: false,
     planList: [],
     planMaxCount: MAX_PLANS,
+    planNameDraft: '',
+    planNameMaxLen: NAME_MAX_LEN,
+    renamePlanId: '',
     theme: getThemeId(),
     themeList: THEME_LIST,
 
@@ -226,15 +237,52 @@ Page({
   onSelectPlan(e) {
     const plan = this.getPlanByEvent(e)
     if (!plan) return
-    this.applyPlanToForm(plan.input, () => this.onCalculate())
+    this.applyPlanToForm(plan.input, () => {
+      wx.showToast({ title: '已填入，可修改后开始计算', icon: 'none' })
+    })
   },
 
   onEditPlan(e) {
     const plan = this.getPlanByEvent(e)
     if (!plan) return
-    this.applyPlanToForm(plan.input, () => {
-      wx.showToast({ title: '已填入，可修改后重新计算', icon: 'none' })
+    this.setData({
+      showPlans: false,
+      showRenamePlan: true,
+      renamePlanId: plan.id,
+      planNameDraft: plan.name
     })
+  },
+
+  onHideRenamePlan() {
+    this.setData({
+      showRenamePlan: false,
+      showPlans: true,
+      renamePlanId: '',
+      planNameDraft: '',
+      planList: listPlans()
+    })
+  },
+
+  onPlanNameInput(e) {
+    this.setData({
+      planNameDraft: e.detail.value
+    })
+  },
+
+  onConfirmRenamePlan() {
+    const { ok, message, list } = renamePlan(this.data.renamePlanId, this.data.planNameDraft)
+    if (!ok) {
+      wx.showToast({ title: message || '保存失败', icon: 'none' })
+      return
+    }
+    this.setData({
+      showRenamePlan: false,
+      showPlans: true,
+      renamePlanId: '',
+      planNameDraft: '',
+      planList: list || listPlans()
+    })
+    wx.showToast({ title: '名称已更新', icon: 'success' })
   },
 
   onDeletePlan(e) {

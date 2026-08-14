@@ -11,6 +11,7 @@ const {
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
 const { getRewardQrPath, saveRewardQrToAlbum } = require('../../utils/reward')
 const {
+  MAX_PLANS,
   NAME_MAX_LEN,
   defaultPlanName,
   isPlanLimitReached,
@@ -284,7 +285,7 @@ Page({
       return
     }
     if (isPlanLimitReached()) {
-      wx.showToast({ title: '最多保存 10 条方案，请先删除', icon: 'none' })
+      wx.showToast({ title: `最多保存 ${MAX_PLANS} 条方案，请先删除`, icon: 'none' })
       return
     }
     this.setData({

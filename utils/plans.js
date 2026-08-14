@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'mortgagePlans'
-const MAX_PLANS = 10
+const MAX_PLANS = 6
 const NAME_MAX_LEN = 20
 
 const LOAN_TYPE_LABEL = {
@@ -131,6 +131,24 @@ function savePlan({ name, input }) {
   return { ok: true, list: list.map(decoratePlan) }
 }
 
+function renamePlan(id, name) {
+  const trimmed = normalizeName(name)
+  if (!trimmed) {
+    return { ok: false, message: '请填写方案名称' }
+  }
+  const list = readPlans()
+  const index = list.findIndex((item) => item.id === id)
+  if (index < 0) {
+    return { ok: false, message: '方案不存在' }
+  }
+  list[index] = {
+    ...list[index],
+    name: trimmed
+  }
+  writePlans(list)
+  return { ok: true, list: list.map(decoratePlan) }
+}
+
 function removePlan(id) {
   const list = readPlans().filter((item) => item.id !== id)
   writePlans(list)
@@ -145,5 +163,6 @@ module.exports = {
   getPlan,
   isPlanLimitReached,
   savePlan,
+  renamePlan,
   removePlan
 }

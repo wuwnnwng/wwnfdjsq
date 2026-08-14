@@ -85,6 +85,10 @@
   gap: 12rpx;
 }
 
+.section-title-row .section-title {
+  flex-shrink: 0;
+}
+
 .help-icon {
   width: 36rpx;
   height: 36rpx;
@@ -209,6 +213,83 @@
   font-weight: 600;
   color: var(--color-ink);
   white-space: nowrap;
+}
+
+.plan-entry {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 10rpx 18rpx;
+  font-size: 24rpx;
+  color: var(--color-brand-soft);
+  border: 1rpx solid var(--color-line);
+  border-radius: 999rpx;
+}
+
+.plan-dialog {
+  max-height: 80vh;
+}
+
+.plan-list {
+  margin-top: 24rpx;
+}
+
+.plan-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.plan-item:last-child {
+  border-bottom: none;
+}
+
+.plan-item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-item-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+  word-break: break-all;
+}
+
+.plan-item-desc {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+.plan-item-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.plan-action {
+  padding: 8rpx 16rpx;
+  font-size: 22rpx;
+  color: var(--color-brand-soft);
+  border: 1rpx solid var(--color-line);
+  border-radius: 999rpx;
+}
+
+.plan-action.danger {
+  color: var(--color-accent);
+}
+
+.plan-empty {
+  margin-top: 32rpx;
+  margin-bottom: 8rpx;
+  text-align: center;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: var(--color-muted);
 }
 
 .segment-row {

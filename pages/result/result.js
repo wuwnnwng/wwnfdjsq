@@ -6,11 +6,16 @@ const {
   getResultShareTimeline,
   parseShareInputQuery,
   parseResultShareQuery,
-  rebuildResultFromShareInput,
-  tipShareTimeline
+  rebuildResultFromShareInput
 } = require('../../utils/share')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
 const { getRewardQrPath, saveRewardQrToAlbum } = require('../../utils/reward')
+const {
+  NAME_MAX_LEN,
+  defaultPlanName,
+  isPlanLimitReached,
+  savePlan
+} = require('../../utils/plans')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -83,6 +88,9 @@ Page({
     fullSchedule: [],
     showSplitTip: false,
     showRewardTip: false,
+    showSavePlanTip: false,
+    planNameDraft: '',
+    planNameMaxLen: NAME_MAX_LEN,
     rewardQrPath: getRewardQrPath(),
     fromShare: false,
     splitDetail: {
@@ -270,8 +278,42 @@ Page({
     return getResultShareTimeline(this.getShareView())
   },
 
-  onShareTimelineTap() {
-    tipShareTimeline()
+  onShowSavePlan() {
+    if (!this.shareInput) {
+      wx.showToast({ title: '当前结果无法保存', icon: 'none' })
+      return
+    }
+    if (isPlanLimitReached()) {
+      wx.showToast({ title: '最多保存 10 条方案，请先删除', icon: 'none' })
+      return
+    }
+    this.setData({
+      showSavePlanTip: true,
+      planNameDraft: defaultPlanName(this.shareInput)
+    })
+  },
+
+  onHideSavePlan() {
+    this.setData({ showSavePlanTip: false })
+  },
+
+  onPlanNameInput(e) {
+    this.setData({
+      planNameDraft: e.detail.value
+    })
+  },
+
+  onConfirmSavePlan() {
+    const { ok, message } = savePlan({
+      name: this.data.planNameDraft,
+      input: this.shareInput
+    })
+    if (!ok) {
+      wx.showToast({ title: message || '保存失败', icon: 'none' })
+      return
+    }
+    this.setData({ showSavePlanTip: false })
+    wx.showToast({ title: '方案已保存', icon: 'success' })
   },
 
   onShowRewardTip() {

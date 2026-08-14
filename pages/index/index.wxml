@@ -68,6 +68,27 @@
     </view>
   </view>
 
+  <view class="tip-mask" wx:if="{{showPlans}}" catchtouchmove="preventMove" bindtap="onHidePlans">
+    <view class="tip-dialog plan-dialog" catchtap="preventMove">
+      <view class="tip-title">我的方案</view>
+      <view class="tip-summary">最多保存 {{planMaxCount}} 条，当前 {{planList.length}} 条</view>
+      <view class="plan-list" wx:if="{{planList.length}}">
+        <view class="plan-item" wx:for="{{planList}}" wx:key="id" bindtap="onSelectPlan" data-id="{{item.id}}">
+          <view class="plan-item-main">
+            <view class="plan-item-name">{{item.name}}</view>
+            <view class="plan-item-desc">{{item.summary}}</view>
+          </view>
+          <view class="plan-item-actions">
+            <view class="plan-action" catchtap="onEditPlan" data-id="{{item.id}}">编辑</view>
+            <view class="plan-action danger" catchtap="onDeletePlan" data-id="{{item.id}}">删除</view>
+          </view>
+        </view>
+      </view>
+      <view class="plan-empty" wx:else>暂无保存的方案，计算后可在结果页保留</view>
+      <view class="tip-confirm" bindtap="onHidePlans">关闭</view>
+    </view>
+  </view>
+
   <view class="tip-mask" wx:if="{{showLprTip}}" catchtouchmove="preventMove" bindtap="onHideLprTip">
     <view class="tip-dialog" catchtap="preventMove">
       <view class="tip-title">LPR 基准利率</view>
@@ -235,6 +256,7 @@
             <text class="inline-label">LPR 基准利率</text>
             <view class="help-icon" catchtap="onShowLprTip" aria-role="button" aria-label="LPR 基准利率说明">!</view>
           </view>
+          <view class="plan-entry" bindtap="onShowPlans" aria-role="button" aria-label="我的方案">我的方案</view>
         </view>
       </view>
     </block>
@@ -266,6 +288,7 @@
         <view class="section-title-row">
           <view class="section-title">剩余贷款参数</view>
           <view class="help-icon" catchtap="onShowRemainingTip" aria-role="button" aria-label="剩余贷款参数说明">!</view>
+          <view class="plan-entry" bindtap="onShowPlans" aria-role="button" aria-label="我的方案">我的方案</view>
         </view>
 
         <view class="field">

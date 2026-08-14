@@ -175,10 +175,26 @@
     </view>
   </view>
 
+  <view class="tip-mask" wx:if="{{showSavePlanTip}}" catchtouchmove="preventMove" bindtap="onHideSavePlan">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">保留方案</view>
+      <view class="tip-text tip-single">给方案起个名字，下次可从「我的方案」直接测算</view>
+      <input
+        class="plan-name-input"
+        value="{{planNameDraft}}"
+        maxlength="{{planNameMaxLen}}"
+        placeholder="请输入方案名称"
+        bindinput="onPlanNameInput"
+      />
+      <view class="tip-confirm" bindtap="onConfirmSavePlan">保存</view>
+      <view class="tip-confirm ghost" bindtap="onHideSavePlan">取消</view>
+    </view>
+  </view>
+
   <view class="footer-block">
     <view class="share-row">
       <button class="share-btn" open-type="share">分享好友</button>
-      <button class="share-btn ghost" bindtap="onShareTimelineTap">分享朋友圈</button>
+      <button class="share-btn ghost" bindtap="onShowSavePlan">保留方案</button>
     </view>
   </view>
 </view>

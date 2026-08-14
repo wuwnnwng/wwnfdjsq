@@ -15,6 +15,7 @@ const {
   applyThemeChrome,
   THEME_LIST
 } = require('../../utils/theme')
+const { MAX_PLANS, listPlans, getPlan, removePlan } = require('../../utils/plans')
 
 Page({
   data: {
@@ -26,6 +27,9 @@ Page({
     showMethodTip: false,
     showRemainingTip: false,
     showLprTip: false,
+    showPlans: false,
+    planList: [],
+    planMaxCount: MAX_PLANS,
     theme: getThemeId(),
     themeList: THEME_LIST,
 
@@ -147,6 +151,107 @@ Page({
 
   onHideLprTip() {
     this.setData({ showLprTip: false })
+  },
+
+  onShowPlans() {
+    this.setData({
+      showPlans: true,
+      planList: listPlans()
+    })
+  },
+
+  onHidePlans() {
+    this.setData({ showPlans: false })
+  },
+
+  getPlanByEvent(e) {
+    const id = e.currentTarget.dataset.id
+    const plan = getPlan(id)
+    if (!plan || !plan.input) {
+      wx.showToast({ title: '方案不存在', icon: 'none' })
+      return null
+    }
+    return plan
+  },
+
+  buildFormPatch(input) {
+    if (input.mode === 'remaining') {
+      const method = input.method === 'interestFirst' ? 'equalInterest' : (input.method || 'equalInterest')
+      return {
+        calcMode: 'remaining',
+        method,
+        originalYears: input.originalYears || '',
+        firstRepaymentDate: input.firstRepaymentDate || '',
+        manualAnnualRate: input.manualAnnualRate || '',
+        hasManualRate: String(input.manualAnnualRate || '').trim() !== '',
+        monthPrincipal: input.monthPrincipal || '',
+        monthInterest: input.monthInterest || '',
+        remainingPrincipal: input.remainingPrincipal || '',
+        earlyRepayment: !!input.earlyRepayment,
+        prepayType: input.prepayType || 'full',
+        prepayAmountWan: input.prepayAmountWan || '10',
+        adjustMode: input.adjustMode || 'shorten'
+      }
+    }
+
+    const loanType = input.loanType || 'provident'
+    return {
+      calcMode: 'new',
+      loanType,
+      method: input.method || 'equalInterest',
+      showCommercial: loanType === 'commercial' || loanType === 'combo',
+      showProvident: loanType === 'provident' || loanType === 'combo',
+      commercialAmount: input.commercialAmount || '',
+      commercialYears: input.commercialYears || '',
+      commercialRate: input.commercialRate || '',
+      providentAmount: input.providentAmount || '',
+      providentYears: input.providentYears || '',
+      providentRate: input.providentRate || ''
+    }
+  },
+
+  applyPlanToForm(input, callback) {
+    const patch = {
+      showPlans: false,
+      ...this.buildFormPatch(input)
+    }
+    this.setData(patch, () => {
+      if (patch.calcMode === 'remaining') {
+        this.refreshDerived()
+      }
+      if (typeof callback === 'function') callback()
+    })
+  },
+
+  onSelectPlan(e) {
+    const plan = this.getPlanByEvent(e)
+    if (!plan) return
+    this.applyPlanToForm(plan.input, () => this.onCalculate())
+  },
+
+  onEditPlan(e) {
+    const plan = this.getPlanByEvent(e)
+    if (!plan) return
+    this.applyPlanToForm(plan.input, () => {
+      wx.showToast({ title: '已填入，可修改后重新计算', icon: 'none' })
+    })
+  },
+
+  onDeletePlan(e) {
+    const plan = this.getPlanByEvent(e)
+    if (!plan) return
+    wx.showModal({
+      title: '删除方案',
+      content: `确定删除「${plan.name}」？`,
+      confirmText: '删除',
+      confirmColor: '#c45c26',
+      success: (res) => {
+        if (!res.confirm) return
+        const { list } = removePlan(plan.id)
+        this.setData({ planList: list || listPlans() })
+        wx.showToast({ title: '已删除', icon: 'success' })
+      }
+    })
   },
 
   preventMove() {},

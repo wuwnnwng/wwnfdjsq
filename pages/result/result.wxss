@@ -45,11 +45,11 @@
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 0;
+  padding: 0 8rpx;
   height: 80rpx;
   line-height: 1.2;
   border-radius: 999rpx;
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
   color: var(--color-brand);
   background: rgba(255, 255, 255, 0.72);
@@ -275,6 +275,19 @@
   font-size: 24rpx;
   line-height: 1.65;
   color: var(--color-muted);
+}
+
+.tip-single {
+  text-align: center;
+}
+
+.reward-dialog .reward-qr {
+  display: block;
+  width: 420rpx;
+  max-width: 100%;
+  margin: 28rpx auto 8rpx;
+  border-radius: 16rpx;
+  background: #fff;
 }
 
 .tip-confirm {

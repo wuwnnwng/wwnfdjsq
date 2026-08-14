@@ -8,6 +8,7 @@ const {
   tipShareTimeline
 } = require('../../utils/share')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
+const { getRewardQrPath, previewRewardQr } = require('../../utils/reward')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -79,6 +80,8 @@ Page({
     visibleSchedule: [],
     fullSchedule: [],
     showSplitTip: false,
+    showRewardTip: false,
+    rewardQrPath: getRewardQrPath(),
     fromShare: false,
     splitDetail: {
       month: 0,
@@ -253,6 +256,18 @@ Page({
 
   onShareTimelineTap() {
     tipShareTimeline()
+  },
+
+  onShowRewardTip() {
+    this.setData({ showRewardTip: true })
+  },
+
+  onHideRewardTip() {
+    this.setData({ showRewardTip: false })
+  },
+
+  onPreviewRewardQr() {
+    previewRewardQr()
   },
 
   onShow() {

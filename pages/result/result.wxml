@@ -158,10 +158,28 @@
     </view>
   </view>
 
+  <view class="tip-mask" wx:if="{{showRewardTip}}" catchtouchmove="preventMove" bindtap="onHideRewardTip">
+    <view class="tip-dialog reward-dialog" catchtap="preventMove">
+      <view class="tip-title">打赏支持</view>
+      <view class="tip-text tip-single">如果觉得好用，请作者喝杯咖啡吧</view>
+      <image
+        class="reward-qr"
+        src="{{rewardQrPath}}"
+        mode="widthFix"
+        show-menu-by-longpress
+        bindtap="onPreviewRewardQr"
+        aria-label="赞赏码"
+      />
+      <view class="tip-text tip-single">长按识别赞赏码，或点击放大</view>
+      <view class="tip-confirm" bindtap="onHideRewardTip">关闭</view>
+    </view>
+  </view>
+
   <view class="footer-block">
     <view class="share-row">
       <button class="share-btn" open-type="share">分享好友</button>
       <button class="share-btn ghost" bindtap="onShareTimelineTap">分享朋友圈</button>
+      <button class="share-btn ghost" bindtap="onShowRewardTip">打赏支持</button>
     </view>
   </view>
 </view>

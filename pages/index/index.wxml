@@ -87,6 +87,23 @@
     </view>
   </view>
 
+  <view class="tip-mask" wx:if="{{showRewardTip}}" catchtouchmove="preventMove" bindtap="onHideRewardTip">
+    <view class="tip-dialog reward-dialog" catchtap="preventMove">
+      <view class="tip-title">打赏支持</view>
+      <view class="tip-text tip-single">如果觉得好用，请作者喝杯咖啡吧</view>
+      <image
+        class="reward-qr"
+        src="{{rewardQrPath}}"
+        mode="widthFix"
+        show-menu-by-longpress
+        bindtap="onPreviewRewardQr"
+        aria-label="赞赏码"
+      />
+      <view class="tip-text tip-single">长按识别赞赏码，或点击放大</view>
+      <view class="tip-confirm" bindtap="onHideRewardTip">关闭</view>
+    </view>
+  </view>
+
   <scroll-view scroll-y class="form-scroll" enhanced show-scrollbar="{{false}}">
     <!-- 新贷款：还款方式 → 金额填写 → 贷款类型 -->
     <block wx:if="{{calcMode === 'new'}}">
@@ -444,5 +461,6 @@
   <view class="footer-block">
     <button class="primary-btn" bindtap="onCalculate">开始计算</button>
     <view class="disclaimer">计算结果仅供参考，实际以银行审批为准</view>
+    <view class="reward-entry" bindtap="onShowRewardTip">觉得有用？打赏支持一下</view>
   </view>
 </view>

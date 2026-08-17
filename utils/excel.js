@@ -178,9 +178,10 @@ function zipStore(files) {
 function sheetCell(col, rowIndex, value) {
   const ref = `${colName(col)}${rowIndex}`
   if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'n')) {
-    return `<c r="${ref}"><v>${value.n}</v></c>`
+    return `<c r="${ref}" t="n"><v>${value.n}</v></c>`
   }
-  return `<c r="${ref}" t="inlineStr"><is><t>${escapeXml(value)}</t></is></c>`
+  // 微信内置预览不支持 inlineStr，文字必须写在 <v> 里才能显示表头
+  return `<c r="${ref}" t="str"><v>${escapeXml(value == null ? '' : value)}</v></c>`
 }
 
 function buildSheetXml(records) {
@@ -211,31 +212,28 @@ function kv(label, value, asNumber) {
 function buildSummaryRecords(payload) {
   const display = payload.display || {}
   const early = payload.earlyInfo || {}
-  const input = payload.shareInput || {}
-  const rows = [
-    ['房贷测算结果'],
-    kv('贷款类型', payload.loanTypeLabel || ''),
-    kv('还款方式', payload.methodLabel || ''),
-    kv(payload.paymentLabel || '还款金额', payload.summaryPayment || '')
-  ]
+  const rows = [['项目', '内容']]
+
+  rows.push(kv('贷款类型', payload.loanTypeLabel || ''))
+  rows.push(kv('还款方式', payload.methodLabel || ''))
+  rows.push(kv(payload.paymentLabel || '还款金额', payload.summaryPayment || ''))
+
+  if (payload.method === 'equalPrincipal' && !payload.isFullPrepay && display.monthlyDecrease) {
+    rows.push(kv('每月递减约（元）', display.monthlyDecrease))
+  }
+  if (payload.method === 'interestFirst' && !payload.isFullPrepay) {
+    rows.push(kv('说明', '到期另还全部本金'))
+  }
 
   if (payload.isRemaining) {
     if (display.annualRate) rows.push(kv('当前执行利率', `${display.annualRate}%`))
-    if (display.remainingYears) rows.push(kv('剩余还款年', `${display.remainingYears}年`))
+    if (!payload.isEarlyRepayment && display.remainingYears) {
+      rows.push(kv('剩余还款年', `${display.remainingYears}年`))
+    }
   }
 
-  if (input.mode === 'new' || (!payload.isRemaining && input.loanType)) {
-    if (input.commercialAmount) rows.push(kv('商贷金额（万元）', input.commercialAmount))
-    if (input.commercialYears) rows.push(kv('商贷年限（年）', input.commercialYears))
-    if (input.commercialRate) rows.push(kv('商贷年利率（%）', input.commercialRate))
-    if (input.providentAmount) rows.push(kv('公积金金额（万元）', input.providentAmount))
-    if (input.providentYears) rows.push(kv('公积金年限（年）', input.providentYears))
-    if (input.providentRate) rows.push(kv('公积金年利率（%）', input.providentRate))
-  }
-
-  if (payload.isRemaining && input.mode === 'remaining') {
-    if (input.originalYears) rows.push(kv('首次贷款期限（年）', input.originalYears))
-    if (input.firstRepaymentDate) rows.push(kv('首次还款日期', input.firstRepaymentDate))
+  if (payload.isPartialPrepay && early.afterYears) {
+    rows.push(kv('调整后剩余年限', `${early.afterYears}年`))
   }
 
   if (payload.isEarlyRepayment) {
@@ -243,7 +241,7 @@ function buildSummaryRecords(payload) {
     if (early.adjustLabel) rows.push(kv('调整方式', early.adjustLabel))
     if (early.prepayAmount) rows.push(kv('提前还款额（元）', early.prepayAmount))
     if (early.interestSaved) rows.push(kv('预计节省利息（元）', early.interestSaved))
-    if (early.afterYears) rows.push(kv('调整后剩余年限', `${early.afterYears}年`))
+    if (early.afterMonths) rows.push(kv('提前后剩余期数', `${early.afterMonths} 期`))
     if (early.nextRepaymentDate) rows.push(kv('提前还款日期', early.nextRepaymentDate))
   }
 
@@ -276,8 +274,6 @@ function buildSummaryRecords(payload) {
     rows.push(kv('末月还款（元）', display.lastMonthPayment))
   }
 
-  rows.push([''])
-  rows.push(kv('说明', '计算结果仅供参考，实际以银行审批为准'))
   return rows
 }
 

@@ -335,6 +335,7 @@ function countPaidMonths(firstRepaymentDate, now = new Date()) {
  * 因此期初本金 = 剩余本金 + 最近一次还款本金，月利率 = 最近一次还款利息 / 期初本金
  */
 function deriveRemainingLoanInfo(options, now = new Date()) {
+  const method = normalizeMethod(options.method)
   const originalYears = toNumber(options.originalYears)
   const monthPrincipal = toNumber(options.monthPrincipal)
   const monthInterest = toNumber(options.monthInterest)
@@ -370,7 +371,12 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     annualRatePercent = manualAnnualRate
     monthlyRate = annualRatePercent / 100 / 12
   } else {
-    if (!(monthPrincipal > 0)) {
+    // 先息后本每月通常不还本金，允许最近一次还款本金为 0
+    if (method === 'interestFirst') {
+      if (!(monthPrincipal >= 0)) {
+        return { ok: false, message: '请填写最近一次还款本金' }
+      }
+    } else if (!(monthPrincipal > 0)) {
       return { ok: false, message: '请填写最近一次还款本金' }
     }
 
@@ -459,6 +465,9 @@ function recalculateShortenTerm(newPrincipal, baseline, annualRatePercent, metho
       return { ok: false, message: '无法按原本金摊还额缩短年限' }
     }
     months = Math.max(1, Math.ceil(newPrincipal / monthlyPrincipal))
+  } else if (method === 'interestFirst') {
+    const ratio = baseline.principal > 0 ? newPrincipal / baseline.principal : 1
+    months = Math.max(1, Math.ceil((baseline.months || 1) * ratio))
   } else {
     months = monthsNeededForEqualInterest(
       newPrincipal,

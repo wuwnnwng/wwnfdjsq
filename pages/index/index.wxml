@@ -129,8 +129,6 @@
     <!-- 新贷款：还款方式 → 金额填写 → 贷款类型 -->
     <block wx:if="{{calcMode === 'new'}}">
       <view class="panel">
-        <view class="section-title">贷款信息</view>
-
         <view class="inline-row first">
           <view class="inline-label-wrap">
             <text class="inline-label">还款方式</text>
@@ -297,6 +295,11 @@
               data-method="equalPrincipal"
               bindtap="onMethodChange"
             >等额本金</view>
+            <view
+              class="segment-item {{method === 'interestFirst' ? 'active' : ''}}"
+              data-method="interestFirst"
+              bindtap="onMethodChange"
+            >先息后本</view>
           </view>
         </view>
       </view>
@@ -353,10 +356,11 @@
           <text class="field-label">最近一次还款本金</text>
           <view class="field-control">
             <input
-              class="field-input"
+              class="field-input {{method === 'interestFirst' ? 'disabled' : ''}}"
               type="digit"
               value="{{monthPrincipal}}"
               data-field="monthPrincipal"
+              disabled="{{method === 'interestFirst'}}"
               bindinput="onRemainingInput"
               placeholder="请输入"
             />

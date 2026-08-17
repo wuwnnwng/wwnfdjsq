@@ -168,6 +168,11 @@ canvas {
   color: var(--color-ink);
 }
 
+.field-input.disabled {
+  color: var(--color-muted);
+  opacity: 0.55;
+}
+
 .field-unit {
   flex-shrink: 0;
   font-size: 24rpx;
@@ -208,19 +213,18 @@ canvas {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 36rpx;
-  margin-left: 0;
-  margin-right: 0;
+  margin: 36rpx 0 0;
   padding: 0;
-  height: 96rpx;
-  line-height: 1.2;
+  min-height: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
   text-align: center;
   border-radius: 999rpx;
-  font-size: 32rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: #fff;
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
-  box-shadow: 0 16rpx 36rpx var(--color-shadow-strong);
+  box-shadow: 0 10rpx 24rpx var(--color-shadow);
 }
 
 .primary-btn::after {

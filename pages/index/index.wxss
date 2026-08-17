@@ -475,19 +475,19 @@
   margin-left: -28rpx;
   margin-right: -28rpx;
   margin-bottom: 0;
-  padding: 20rpx 28rpx calc(20rpx + env(safe-area-inset-bottom));
+  padding: 12rpx 28rpx calc(12rpx + env(safe-area-inset-bottom));
   background: var(--color-footer);
-  box-shadow: 0 -8rpx 24rpx var(--color-shadow);
+  box-shadow: 0 -4rpx 16rpx var(--color-shadow);
 }
 
 .disclaimer {
-  margin-top: 16rpx;
+  margin-top: 8rpx;
   margin-bottom: 0;
   padding: 0 12rpx;
   text-align: center;
-  font-size: 22rpx;
+  font-size: 20rpx;
   color: var(--color-muted);
-  line-height: 1.6;
+  line-height: 1.4;
   background: transparent;
 }
 
@@ -495,9 +495,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0;
+  margin: 0;
   padding: 0;
-  line-height: 1.2;
+  min-height: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
   text-align: center;
 }
 

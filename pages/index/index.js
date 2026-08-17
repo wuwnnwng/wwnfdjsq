@@ -187,7 +187,11 @@ Page({
 
   buildFormPatch(input) {
     if (input.mode === 'remaining') {
-      const method = input.method === 'interestFirst' ? 'equalInterest' : (input.method || 'equalInterest')
+      const method = input.method || 'equalInterest'
+      const hasMonthPrincipal =
+        input.monthPrincipal !== undefined &&
+        input.monthPrincipal !== null &&
+        String(input.monthPrincipal) !== ''
       return {
         calcMode: 'remaining',
         method,
@@ -195,7 +199,9 @@ Page({
         firstRepaymentDate: input.firstRepaymentDate || '',
         manualAnnualRate: input.manualAnnualRate || '',
         hasManualRate: String(input.manualAnnualRate || '').trim() !== '',
-        monthPrincipal: input.monthPrincipal || '',
+        monthPrincipal: method === 'interestFirst'
+          ? '0'
+          : (hasMonthPrincipal ? String(input.monthPrincipal) : ''),
         monthInterest: input.monthInterest || '',
         remainingPrincipal: input.remainingPrincipal || '',
         earlyRepayment: !!input.earlyRepayment,
@@ -317,9 +323,8 @@ Page({
     const calcMode = e.currentTarget.dataset.mode
     const patch = { calcMode }
 
-    // 已有贷款不支持先息后本
     if (calcMode === 'remaining' && this.data.method === 'interestFirst') {
-      patch.method = 'equalInterest'
+      patch.monthPrincipal = '0'
     }
 
     this.setData(patch)
@@ -342,8 +347,15 @@ Page({
     const patch = { method }
     if (method === 'interestFirst') {
       Object.assign(patch, this.loanTypePatch('commercial'))
+      if (this.data.calcMode === 'remaining') {
+        patch.monthPrincipal = '0'
+      }
     }
-    this.setData(patch)
+    this.setData(patch, () => {
+      if (this.data.calcMode === 'remaining') {
+        this.refreshDerived()
+      }
+    })
   },
 
   onInput(e) {
@@ -355,6 +367,10 @@ Page({
 
   onRemainingInput(e) {
     const field = e.currentTarget.dataset.field
+    if (field === 'monthPrincipal' && this.data.method === 'interestFirst') {
+      this.setData({ monthPrincipal: '0' })
+      return
+    }
     const value = e.detail.value
     const patch = { [field]: value }
 
@@ -432,6 +448,7 @@ Page({
     }
 
     const derived = deriveRemainingLoanInfo({
+      method: this.data.method,
       originalYears,
       firstRepaymentDate,
       manualAnnualRate,
@@ -523,6 +540,7 @@ Page({
 
   validateRemainingLoan() {
     const derived = deriveRemainingLoanInfo({
+      method: this.data.method,
       originalYears: this.data.originalYears,
       firstRepaymentDate: this.data.firstRepaymentDate,
       manualAnnualRate: this.data.manualAnnualRate,
@@ -595,11 +613,6 @@ Page({
 
   calculateRemaining() {
     if (!this.validateRemainingLoan()) return
-
-    if (this.data.method === 'interestFirst') {
-      wx.showToast({ title: '已有贷款暂不支持先息后本', icon: 'none' })
-      return
-    }
 
     const shareInput = {
       mode: 'remaining',

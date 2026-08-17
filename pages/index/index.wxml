@@ -154,7 +154,7 @@
         </view>
 
         <view class="sub-block" wx:if="{{showCommercial}}">
-          <view class="sub-title">商业贷款</view>
+          <view class="sub-title" wx:if="{{loanType === 'combo'}}">商业贷款</view>
           <view class="field">
             <text class="field-label">贷款金额</text>
             <view class="field-control">
@@ -200,7 +200,7 @@
         </view>
 
         <view class="sub-block" wx:if="{{showProvident}}">
-          <view class="sub-title">公积金贷款</view>
+          <view class="sub-title" wx:if="{{loanType === 'combo'}}">公积金贷款</view>
           <view class="field">
             <text class="field-label">贷款金额</text>
             <view class="field-control">

@@ -56,7 +56,6 @@
       <view class="schedule-head" bindtap="onToggleEarlyInfo">
         <view>
           <view class="section-title">提前还款说明</view>
-          <view class="section-desc">{{showEarlyInfo ? '点击收起明细' : '默认收起，点击展开查看'}}</view>
         </view>
         <view class="toggle">{{showEarlyInfo ? '收起' : '展开'}}</view>
       </view>
@@ -83,7 +82,6 @@
 
     <view class="panel chart-panel">
       <view class="section-title">本金与利息占比</view>
-      <view class="section-desc">还款总额中，本金与利息各占多少</view>
 
       <canvas
         type="2d"
@@ -108,9 +106,9 @@
       <view class="schedule-head">
         <view>
           <view class="section-title">还款计划</view>
-          <view class="section-desc" wx:if="{{isFullPrepay}}">共 1 期结清计划，可展开查看明细</view>
-          <view class="section-desc" wx:elif="{{isPartialPrepay}}">共 {{months}} 期（第 1 期为提前还款，其后为剩余月供），可展开查看明细</view>
-          <view class="section-desc" wx:else>共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}，可展开查看每月明细{{isCombo ? '；点击利息可查看拆分' : ''}}</view>
+          <view class="section-desc" wx:if="{{isFullPrepay}}">共 1 期结清计划</view>
+          <view class="section-desc" wx:elif="{{isPartialPrepay}}">共 {{months}} 期（第 1 期为提前还款，其后为剩余月供）</view>
+          <view class="section-desc" wx:else>共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}{{isCombo ? '；点击利息可查看拆分' : ''}}</view>
         </view>
         <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开'}}</view>
       </view>

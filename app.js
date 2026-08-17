@@ -12,7 +12,7 @@ App({
     const versionInfo = checkLocalVersion()
     if (versionInfo.upgraded) {
       console.log(
-        `[version] 本地版本已从 ${versionInfo.from} 升级到 ${versionInfo.to}，已清理旧缓存`
+        `[version] 本地版本已从 ${versionInfo.from} 升级到 ${versionInfo.to}，已清理计算缓存并保留我的方案`
       )
     }
 

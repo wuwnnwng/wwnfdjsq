@@ -156,6 +156,7 @@ function removePlan(id) {
 }
 
 module.exports = {
+  STORAGE_KEY,
   MAX_PLANS,
   NAME_MAX_LEN,
   defaultPlanName,

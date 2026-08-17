@@ -1,12 +1,18 @@
 /**
  * 本地版本号：结构或缓存规则有变更时，递增此版本即可自动清理旧数据。
  * 注意：这与微信后台发布的小程序版本号不是同一个概念。
+ * 「我的方案」属于用户数据，升级时必须保留，不得列入清理列表。
  */
-const APP_VERSION = '1.0.4'
+const { STORAGE_KEY: PLANS_STORAGE_KEY } = require('./plans')
+
+const APP_VERSION = '1.0.5'
 const VERSION_STORAGE_KEY = 'app_version'
 
-/** 版本升级时需要清理的本地缓存 key */
+/** 版本升级时需要清理的本地缓存 key（计算缓存等，不含用户方案） */
 const CLEAR_KEYS_ON_UPGRADE = ['mortgageResult']
+
+/** 版本升级时必须保留的用户数据 */
+const KEEP_KEYS_ON_UPGRADE = [PLANS_STORAGE_KEY]
 
 function getStoredVersion() {
   try {
@@ -24,14 +30,41 @@ function setStoredVersion(version) {
   }
 }
 
+function snapshotKeepKeys() {
+  const snapshot = {}
+  KEEP_KEYS_ON_UPGRADE.forEach((key) => {
+    try {
+      snapshot[key] = wx.getStorageSync(key)
+    } catch (e) {
+      // ignore
+    }
+  })
+  return snapshot
+}
+
+function restoreKeepKeys(snapshot) {
+  KEEP_KEYS_ON_UPGRADE.forEach((key) => {
+    const value = snapshot[key]
+    if (value === '' || value === undefined) return
+    try {
+      wx.setStorageSync(key, value)
+    } catch (e) {
+      // ignore
+    }
+  })
+}
+
 function clearLegacyStorage() {
+  const preserved = snapshotKeepKeys()
   CLEAR_KEYS_ON_UPGRADE.forEach((key) => {
+    if (KEEP_KEYS_ON_UPGRADE.indexOf(key) >= 0) return
     try {
       wx.removeStorageSync(key)
     } catch (e) {
       // ignore
     }
   })
+  restoreKeepKeys(preserved)
 }
 
 /**
@@ -89,7 +122,7 @@ function checkMiniProgramUpdate() {
   updateManager.onUpdateFailed(() => {
     wx.showModal({
       title: '更新失败',
-      content: '新版本下载失败，请删除小程序后重新打开，或稍后再试。',
+      content: '新版本下载失败，请检查网络后重新打开，或稍后再试。请勿删除小程序，以免丢失已保存的方案。',
       showCancel: false
     })
   })

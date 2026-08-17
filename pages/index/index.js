@@ -205,19 +205,28 @@ Page({
       }
     }
 
-    const loanType = input.loanType || 'provident'
+    const method = input.method || 'equalInterest'
+    const loanType = method === 'interestFirst'
+      ? 'commercial'
+      : (input.loanType || 'provident')
     return {
       calcMode: 'new',
-      loanType,
-      method: input.method || 'equalInterest',
-      showCommercial: loanType === 'commercial' || loanType === 'combo',
-      showProvident: loanType === 'provident' || loanType === 'combo',
+      method,
+      ...this.loanTypePatch(loanType),
       commercialAmount: input.commercialAmount || '',
       commercialYears: input.commercialYears || '',
       commercialRate: input.commercialRate || '',
       providentAmount: input.providentAmount || '',
       providentYears: input.providentYears || '',
       providentRate: input.providentRate || ''
+    }
+  },
+
+  loanTypePatch(loanType) {
+    return {
+      loanType,
+      showCommercial: loanType === 'commercial' || loanType === 'combo',
+      showProvident: loanType === 'provident' || loanType === 'combo'
     }
   },
 
@@ -321,17 +330,20 @@ Page({
 
   onLoanTypeChange(e) {
     const loanType = e.currentTarget.dataset.type
-    this.setData({
-      loanType,
-      showCommercial: loanType === 'commercial' || loanType === 'combo',
-      showProvident: loanType === 'provident' || loanType === 'combo'
-    })
+    if (this.data.method === 'interestFirst' && loanType !== 'commercial') {
+      wx.showToast({ title: '先息后本仅支持商贷', icon: 'none' })
+      return
+    }
+    this.setData(this.loanTypePatch(loanType))
   },
 
   onMethodChange(e) {
-    this.setData({
-      method: e.currentTarget.dataset.method
-    })
+    const method = e.currentTarget.dataset.method
+    const patch = { method }
+    if (method === 'interestFirst') {
+      Object.assign(patch, this.loanTypePatch('commercial'))
+    }
+    this.setData(patch)
   },
 
   onInput(e) {
@@ -467,6 +479,11 @@ Page({
       providentYears,
       providentRate
     } = this.data
+
+    if (this.data.method === 'interestFirst' && loanType !== 'commercial') {
+      wx.showToast({ title: '先息后本仅支持商贷', icon: 'none' })
+      return false
+    }
 
     const needCommercial = loanType === 'commercial' || loanType === 'combo'
     const needProvident = loanType === 'provident' || loanType === 'combo'

@@ -251,7 +251,7 @@
           <text class="inline-label">贷款类型</text>
           <view class="segment segment-row">
             <view
-              class="segment-item {{loanType === 'provident' ? 'active' : ''}}"
+              class="segment-item {{loanType === 'provident' ? 'active' : ''}} {{method === 'interestFirst' ? 'disabled' : ''}}"
               data-type="provident"
               bindtap="onLoanTypeChange"
             >公积金贷</view>
@@ -261,7 +261,7 @@
               bindtap="onLoanTypeChange"
             >商贷</view>
             <view
-              class="segment-item {{loanType === 'combo' ? 'active' : ''}}"
+              class="segment-item {{loanType === 'combo' ? 'active' : ''}} {{method === 'interestFirst' ? 'disabled' : ''}}"
               data-type="combo"
               bindtap="onLoanTypeChange"
             >组合贷款</view>

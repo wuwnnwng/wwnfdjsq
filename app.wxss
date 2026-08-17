@@ -199,6 +199,11 @@ canvas {
   box-shadow: 0 10rpx 24rpx var(--color-shadow);
 }
 
+.segment-item.disabled {
+  opacity: 0.38;
+  background: rgba(255, 255, 255, 0.28);
+}
+
 .primary-btn {
   display: flex;
   align-items: center;

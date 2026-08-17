@@ -1,7 +1,19 @@
 /**
- * 将测算结果导出为可被 Excel 打开的 .xls（SpreadsheetML）
- * 写入小程序本地用户目录后，用系统文档预览打开，并可从右上角菜单保存到手机。
+ * 导出真正的 .xlsx（OOXML + ZIP）。
+ * 微信预览器只认标准 xlsx/xls 文件头，XML 冒充 .xls 会提示格式不可识别并闪退。
  */
+
+const CRC_TABLE = (() => {
+  const table = new Uint32Array(256)
+  for (let i = 0; i < 256; i += 1) {
+    let c = i
+    for (let j = 0; j < 8; j += 1) {
+      c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
+    }
+    table[i] = c >>> 0
+  }
+  return table
+})()
 
 function pad2(n) {
   return String(n).padStart(2, '0')
@@ -14,37 +26,11 @@ function stamp() {
 
 function escapeXml(value) {
   return String(value == null ? '' : value)
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-}
-
-function cellString(value, styleId) {
-  const style = styleId ? ` ss:StyleID="${styleId}"` : ''
-  return `<Cell${style}><Data ss:Type="String">${escapeXml(value)}</Data></Cell>`
-}
-
-function cellNumber(value, styleId) {
-  const n = Number(value)
-  const safe = Number.isFinite(n) ? n : 0
-  const style = styleId ? ` ss:StyleID="${styleId}"` : ''
-  return `<Cell${style}><Data ss:Type="Number">${safe}</Data></Cell>`
-}
-
-function row(cells) {
-  return `<Row>${cells.join('')}</Row>`
-}
-
-function kvRow(label, value, asNumber) {
-  return row([
-    cellString(label, 'sLabel'),
-    asNumber ? cellNumber(value, 'sMoney') : cellString(value)
-  ])
-}
-
-function headerRow(labels) {
-  return row(labels.map((label) => cellString(label, 'sHeader')))
 }
 
 function moneyOf(item, key) {
@@ -53,43 +39,212 @@ function moneyOf(item, key) {
   return Number.isFinite(n) ? n : 0
 }
 
-function buildSummaryRows(payload) {
+function num(value) {
+  const n = Number(value)
+  return { n: Number.isFinite(n) ? n : 0 }
+}
+
+function colName(index) {
+  let n = index
+  let name = ''
+  while (n >= 0) {
+    name = String.fromCharCode((n % 26) + 65) + name
+    n = Math.floor(n / 26) - 1
+  }
+  return name
+}
+
+function utf8Bytes(str) {
+  const text = String(str || '')
+  if (typeof TextEncoder === 'function') {
+    return new TextEncoder().encode(text)
+  }
+  const raw = unescape(encodeURIComponent(text))
+  const bytes = new Uint8Array(raw.length)
+  for (let i = 0; i < raw.length; i += 1) {
+    bytes[i] = raw.charCodeAt(i)
+  }
+  return bytes
+}
+
+function u16(n) {
+  return new Uint8Array([n & 0xff, (n >>> 8) & 0xff])
+}
+
+function u32(n) {
+  return new Uint8Array([
+    n & 0xff,
+    (n >>> 8) & 0xff,
+    (n >>> 16) & 0xff,
+    (n >>> 24) & 0xff
+  ])
+}
+
+function concatBytes(parts) {
+  let total = 0
+  parts.forEach((part) => {
+    total += part.length
+  })
+  const out = new Uint8Array(total)
+  let offset = 0
+  parts.forEach((part) => {
+    out.set(part, offset)
+    offset += part.length
+  })
+  return out
+}
+
+function crc32(bytes) {
+  let crc = 0xffffffff
+  for (let i = 0; i < bytes.length; i += 1) {
+    crc = CRC_TABLE[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8)
+  }
+  return (crc ^ 0xffffffff) >>> 0
+}
+
+function dosDateTime(now = new Date()) {
+  const time =
+    (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2)
+  const date =
+    ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()
+  return { time, date }
+}
+
+function zipStore(files) {
+  const { time, date } = dosDateTime()
+  const locals = []
+  const centrals = []
+  let offset = 0
+
+  files.forEach((file) => {
+    const nameBytes = utf8Bytes(file.name)
+    const data = file.data
+    const crc = crc32(data)
+    const local = concatBytes([
+      u32(0x04034b50),
+      u16(20),
+      u16(0),
+      u16(0),
+      u16(time),
+      u16(date),
+      u32(crc),
+      u32(data.length),
+      u32(data.length),
+      u16(nameBytes.length),
+      u16(0),
+      nameBytes,
+      data
+    ])
+    locals.push(local)
+    centrals.push(
+      concatBytes([
+        u32(0x02014b50),
+        u16(20),
+        u16(20),
+        u16(0),
+        u16(0),
+        u16(time),
+        u16(date),
+        u32(crc),
+        u32(data.length),
+        u32(data.length),
+        u16(nameBytes.length),
+        u16(0),
+        u16(0),
+        u16(0),
+        u16(0),
+        u32(0),
+        u32(offset),
+        nameBytes
+      ])
+    )
+    offset += local.length
+  })
+
+  const central = concatBytes(centrals)
+  const eocd = concatBytes([
+    u32(0x06054b50),
+    u16(0),
+    u16(0),
+    u16(files.length),
+    u16(files.length),
+    u32(central.length),
+    u32(offset),
+    u16(0)
+  ])
+  return concatBytes(locals.concat([central, eocd]))
+}
+
+function sheetCell(col, rowIndex, value) {
+  const ref = `${colName(col)}${rowIndex}`
+  if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'n')) {
+    return `<c r="${ref}"><v>${value.n}</v></c>`
+  }
+  return `<c r="${ref}" t="inlineStr"><is><t>${escapeXml(value)}</t></is></c>`
+}
+
+function buildSheetXml(records) {
+  const rowsXml = records
+    .map((record, index) => {
+      const r = index + 1
+      const cells = (record || [])
+        .map((value, col) => sheetCell(col, r, value == null ? '' : value))
+        .join('')
+      return `<row r="${r}">${cells}</row>`
+    })
+    .join('')
+  const maxCol = records.reduce((max, record) => Math.max(max, (record || []).length), 1)
+  const lastRow = Math.max(records.length, 1)
+  const dim = `A1:${colName(maxCol - 1)}${lastRow}`
+
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <dimension ref="${dim}"/>
+  <sheetData>${rowsXml}</sheetData>
+</worksheet>`
+}
+
+function kv(label, value, asNumber) {
+  return asNumber ? [label, num(value)] : [label, value == null ? '' : String(value)]
+}
+
+function buildSummaryRecords(payload) {
   const display = payload.display || {}
   const early = payload.earlyInfo || {}
   const input = payload.shareInput || {}
   const rows = [
-    row([cellString('房贷测算结果', 'sTitle')]),
-    kvRow('贷款类型', payload.loanTypeLabel || ''),
-    kvRow('还款方式', payload.methodLabel || ''),
-    kvRow(payload.paymentLabel || '还款金额', payload.summaryPayment || '')
+    ['房贷测算结果'],
+    kv('贷款类型', payload.loanTypeLabel || ''),
+    kv('还款方式', payload.methodLabel || ''),
+    kv(payload.paymentLabel || '还款金额', payload.summaryPayment || '')
   ]
 
   if (payload.isRemaining) {
-    if (display.annualRate) rows.push(kvRow('当前执行利率', `${display.annualRate}%`))
-    if (display.remainingYears) rows.push(kvRow('剩余还款年', `${display.remainingYears}年`))
+    if (display.annualRate) rows.push(kv('当前执行利率', `${display.annualRate}%`))
+    if (display.remainingYears) rows.push(kv('剩余还款年', `${display.remainingYears}年`))
   }
 
   if (input.mode === 'new' || (!payload.isRemaining && input.loanType)) {
-    if (input.commercialAmount) rows.push(kvRow('商贷金额（万元）', input.commercialAmount))
-    if (input.commercialYears) rows.push(kvRow('商贷年限（年）', input.commercialYears))
-    if (input.commercialRate) rows.push(kvRow('商贷年利率（%）', input.commercialRate))
-    if (input.providentAmount) rows.push(kvRow('公积金金额（万元）', input.providentAmount))
-    if (input.providentYears) rows.push(kvRow('公积金年限（年）', input.providentYears))
-    if (input.providentRate) rows.push(kvRow('公积金年利率（%）', input.providentRate))
+    if (input.commercialAmount) rows.push(kv('商贷金额（万元）', input.commercialAmount))
+    if (input.commercialYears) rows.push(kv('商贷年限（年）', input.commercialYears))
+    if (input.commercialRate) rows.push(kv('商贷年利率（%）', input.commercialRate))
+    if (input.providentAmount) rows.push(kv('公积金金额（万元）', input.providentAmount))
+    if (input.providentYears) rows.push(kv('公积金年限（年）', input.providentYears))
+    if (input.providentRate) rows.push(kv('公积金年利率（%）', input.providentRate))
   }
 
   if (payload.isRemaining && input.mode === 'remaining') {
-    if (input.originalYears) rows.push(kvRow('首次贷款期限（年）', input.originalYears))
-    if (input.firstRepaymentDate) rows.push(kvRow('首次还款日期', input.firstRepaymentDate))
+    if (input.originalYears) rows.push(kv('首次贷款期限（年）', input.originalYears))
+    if (input.firstRepaymentDate) rows.push(kv('首次还款日期', input.firstRepaymentDate))
   }
 
   if (payload.isEarlyRepayment) {
-    if (early.typeLabel) rows.push(kvRow('提前还款类型', early.typeLabel))
-    if (early.adjustLabel) rows.push(kvRow('调整方式', early.adjustLabel))
-    if (early.prepayAmount) rows.push(kvRow('提前还款额（元）', early.prepayAmount))
-    if (early.interestSaved) rows.push(kvRow('预计节省利息（元）', early.interestSaved))
-    if (early.afterYears) rows.push(kvRow('调整后剩余年限', `${early.afterYears}年`))
-    if (early.nextRepaymentDate) rows.push(kvRow('提前还款日期', early.nextRepaymentDate))
+    if (early.typeLabel) rows.push(kv('提前还款类型', early.typeLabel))
+    if (early.adjustLabel) rows.push(kv('调整方式', early.adjustLabel))
+    if (early.prepayAmount) rows.push(kv('提前还款额（元）', early.prepayAmount))
+    if (early.interestSaved) rows.push(kv('预计节省利息（元）', early.interestSaved))
+    if (early.afterYears) rows.push(kv('调整后剩余年限', `${early.afterYears}年`))
+    if (early.nextRepaymentDate) rows.push(kv('提前还款日期', early.nextRepaymentDate))
   }
 
   const principalLabel = payload.isRemaining ? '剩余本金（元）' : '贷款总额（元）'
@@ -98,93 +253,116 @@ function buildSummaryRows(payload) {
     : payload.isRemaining
       ? '剩余利息（元）'
       : '支付利息（元）'
-  const paymentLabel = payload.isFullPrepay
+  const totalLabel = payload.isFullPrepay
     ? '结清总额（元）'
     : payload.isRemaining
       ? '剩余还款总额（元）'
       : '还款总额（元）'
 
-  rows.push(kvRow(principalLabel, display.totalPrincipal || ''))
-  rows.push(kvRow(interestLabel, display.totalInterest || ''))
-  rows.push(kvRow(paymentLabel, display.totalPayment || ''))
-  rows.push(kvRow('还款期数', payload.months || 0, true))
+  rows.push(kv(principalLabel, display.totalPrincipal || ''))
+  rows.push(kv(interestLabel, display.totalInterest || ''))
+  rows.push(kv(totalLabel, display.totalPayment || ''))
+  rows.push(kv('还款期数', payload.months || 0, true))
 
   if (payload.isCombo) {
-    rows.push(kvRow('商贷月供（首月）', payload.commercialFirst || ''))
-    rows.push(kvRow('公积金月供（首月）', payload.providentFirst || ''))
+    rows.push(kv('商贷月供（首月）', payload.commercialFirst || ''))
+    rows.push(kv('公积金月供（首月）', payload.providentFirst || ''))
   }
 
-  if (display.lastMonthPayment && (payload.method === 'equalPrincipal' || payload.method === 'interestFirst')) {
-    rows.push(kvRow('末月还款（元）', display.lastMonthPayment))
+  if (
+    display.lastMonthPayment &&
+    (payload.method === 'equalPrincipal' || payload.method === 'interestFirst')
+  ) {
+    rows.push(kv('末月还款（元）', display.lastMonthPayment))
   }
 
-  rows.push(row([]))
-  rows.push(kvRow('说明', '计算结果仅供参考，实际以银行审批为准'))
+  rows.push([''])
+  rows.push(kv('说明', '计算结果仅供参考，实际以银行审批为准'))
   return rows
 }
 
-function buildScheduleRows(payload) {
+function buildScheduleRecords(payload) {
   const isCombo = !!payload.isCombo
-  const headers = isCombo
-    ? ['期数', '月供', '本金', '利息', '剩余本金', '商贷本金', '商贷利息', '公积金本金', '公积金利息']
-    : ['期数', '月供', '本金', '利息', '剩余本金']
+  const rows = [
+    isCombo
+      ? ['期数', '月供', '本金', '利息', '剩余本金', '商贷本金', '商贷利息', '公积金本金', '公积金利息']
+      : ['期数', '月供', '本金', '利息', '剩余本金']
+  ]
 
-  const rows = [headerRow(headers)]
-  const list = payload.schedule || []
-
-  list.forEach((item) => {
-    const cells = [
-      cellNumber(item.month),
-      cellNumber(moneyOf(item, 'payment'), 'sMoney'),
-      cellNumber(moneyOf(item, 'principal'), 'sMoney'),
-      cellNumber(moneyOf(item, 'interest'), 'sMoney'),
-      cellNumber(moneyOf(item, 'remaining'), 'sMoney')
+  ;(payload.schedule || []).forEach((item) => {
+    const line = [
+      num(item.month),
+      num(moneyOf(item, 'payment')),
+      num(moneyOf(item, 'principal')),
+      num(moneyOf(item, 'interest')),
+      num(moneyOf(item, 'remaining'))
     ]
     if (isCombo) {
-      cells.push(cellNumber(moneyOf(item.commercial, 'principal'), 'sMoney'))
-      cells.push(cellNumber(moneyOf(item.commercial, 'interest'), 'sMoney'))
-      cells.push(cellNumber(moneyOf(item.provident, 'principal'), 'sMoney'))
-      cells.push(cellNumber(moneyOf(item.provident, 'interest'), 'sMoney'))
+      line.push(num(moneyOf(item.commercial, 'principal')))
+      line.push(num(moneyOf(item.commercial, 'interest')))
+      line.push(num(moneyOf(item.provident, 'principal')))
+      line.push(num(moneyOf(item.provident, 'interest')))
     }
-    rows.push(row(cells))
+    rows.push(line)
   })
 
   return rows
 }
 
-function buildWorkbookXml(payload) {
-  const summaryRows = buildSummaryRows(payload).join('')
-  const scheduleRows = buildScheduleRows(payload).join('')
+function buildXlsxBytes(payload) {
+  const sheet1 = buildSheetXml(buildSummaryRecords(payload))
+  const sheet2 = buildSheetXml(buildScheduleRecords(payload))
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:o="urn:schemas-microsoft-com:office:office"
- xmlns:x="urn:schemas-microsoft-com:office:excel"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-  <Styles>
-    <Style ss:ID="sTitle"><Font ss:Bold="1" ss:Size="14"/></Style>
-    <Style ss:ID="sHeader"><Font ss:Bold="1"/><Interior ss:Color="#E8F0EC" ss:Pattern="Solid"/></Style>
-    <Style ss:ID="sLabel"><Font ss:Bold="1"/></Style>
-    <Style ss:ID="sMoney"><NumberFormat ss:Format="#,##0.00"/></Style>
-  </Styles>
-  <Worksheet ss:Name="测算摘要">
-    <Table ss:DefaultColumnWidth="88">${summaryRows}</Table>
-  </Worksheet>
-  <Worksheet ss:Name="还款计划">
-    <Table ss:DefaultColumnWidth="80">${scheduleRows}</Table>
-  </Worksheet>
-</Workbook>`
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>`
+
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`
+
+  const workbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="测算摘要" sheetId="1" r:id="rId1"/>
+    <sheet name="还款计划" sheetId="2" r:id="rId2"/>
+  </sheets>
+</workbook>`
+
+  const workbookRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>
+</Relationships>`
+
+  return zipStore([
+    { name: '[Content_Types].xml', data: utf8Bytes(contentTypes) },
+    { name: '_rels/.rels', data: utf8Bytes(rootRels) },
+    { name: 'xl/workbook.xml', data: utf8Bytes(workbook) },
+    { name: 'xl/_rels/workbook.xml.rels', data: utf8Bytes(workbookRels) },
+    { name: 'xl/worksheets/sheet1.xml', data: utf8Bytes(sheet1) },
+    { name: 'xl/worksheets/sheet2.xml', data: utf8Bytes(sheet2) }
+  ])
 }
 
-function writeExcelFile(xml) {
+function toArrayBuffer(bytes) {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+}
+
+function writeExcelFile(bytes) {
   return new Promise((resolve, reject) => {
     const fs = wx.getFileSystemManager()
-    const filePath = `${wx.env.USER_DATA_PATH}/fangdai-${stamp()}.xls`
+    const filePath = `${wx.env.USER_DATA_PATH}/fangdai-${stamp()}.xlsx`
     fs.writeFile({
       filePath,
-      data: xml,
-      encoding: 'utf8',
+      data: toArrayBuffer(bytes),
       success() {
         resolve(filePath)
       },
@@ -199,21 +377,10 @@ function openExcelFile(filePath) {
   return new Promise((resolve, reject) => {
     wx.openDocument({
       filePath,
-      fileType: 'xls',
+      fileType: 'xlsx',
       showMenu: true,
       success: resolve,
-      fail() {
-        if (typeof wx.shareFileMessage !== 'function') {
-          reject(new Error('openDocument failed'))
-          return
-        }
-        wx.shareFileMessage({
-          filePath,
-          fileName: '房贷计算结果.xls',
-          success: resolve,
-          fail: reject
-        })
-      }
+      fail: reject
     })
   })
 }
@@ -226,7 +393,7 @@ function shareExcelFile(filePath) {
     }
     wx.shareFileMessage({
       filePath,
-      fileName: '房贷计算结果.xls',
+      fileName: '房贷计算结果.xlsx',
       success: resolve,
       fail: reject
     })
@@ -234,7 +401,7 @@ function shareExcelFile(filePath) {
 }
 
 function exportResultToExcel(payload) {
-  return writeExcelFile(buildWorkbookXml(payload || {}))
+  return writeExcelFile(buildXlsxBytes(payload || {}))
 }
 
 module.exports = {

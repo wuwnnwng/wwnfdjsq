@@ -184,7 +184,18 @@ function sheetCell(col, rowIndex, value) {
   return `<c r="${ref}" t="str"><v>${escapeXml(value == null ? '' : value)}</v></c>`
 }
 
-function buildSheetXml(records) {
+function buildColsXml(widths) {
+  if (!widths || !widths.length) return ''
+  const cols = widths
+    .map((width, index) => {
+      if (!(width > 0)) return ''
+      return `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`
+    })
+    .join('')
+  return cols ? `<cols>${cols}</cols>` : ''
+}
+
+function buildSheetXml(records, colWidths) {
   const rowsXml = records
     .map((record, index) => {
       const r = index + 1
@@ -201,6 +212,7 @@ function buildSheetXml(records) {
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   <dimension ref="${dim}"/>
+  ${buildColsXml(colWidths)}
   <sheetData>${rowsXml}</sheetData>
 </worksheet>`
 }
@@ -306,7 +318,7 @@ function buildScheduleRecords(payload) {
 }
 
 function buildXlsxBytes(payload) {
-  const sheet1 = buildSheetXml(buildSummaryRecords(payload))
+  const sheet1 = buildSheetXml(buildSummaryRecords(payload), [16.86, 22])
   const sheet2 = buildSheetXml(buildScheduleRecords(payload))
 
   const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

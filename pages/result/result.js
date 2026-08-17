@@ -17,6 +17,7 @@ const {
   isPlanLimitReached,
   savePlan
 } = require('../../utils/plans')
+const { exportResultToExcel, openExcelFile, shareExcelFile } = require('../../utils/excel')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -94,6 +95,7 @@ Page({
     planNameMaxLen: NAME_MAX_LEN,
     rewardQrPath: getRewardQrPath(),
     fromShare: false,
+    canExport: false,
     splitDetail: {
       month: 0,
       providentPrincipal: '0.00',
@@ -163,7 +165,8 @@ Page({
       showAllSchedule: false,
       showEarlyInfo: false,
       fullSchedule: [],
-      visibleSchedule: []
+      visibleSchedule: [],
+      canExport: false
     })
   },
 
@@ -195,6 +198,7 @@ Page({
     }
 
     this.shareInput = result.shareInput || null
+    this.rawResult = result
     this.pieData = {
       principal: result.totalPrincipal,
       interest: result.totalInterest
@@ -236,7 +240,8 @@ Page({
       ),
       showAllSchedule: false,
       fullSchedule,
-      visibleSchedule: []
+      visibleSchedule: [],
+      canExport: fullSchedule.length > 0
     })
   },
 
@@ -277,6 +282,51 @@ Page({
       }
     }
     return getResultShareTimeline(this.getShareView())
+  },
+
+  onExportExcel() {
+    const result = this.rawResult
+    if (!result || !Array.isArray(result.schedule) || !result.schedule.length) {
+      wx.showToast({ title: '暂无可导出的还款计划', icon: 'none' })
+      return
+    }
+
+    wx.showLoading({ title: '正在导出', mask: true })
+    exportResultToExcel({
+      loanTypeLabel: this.data.loanTypeLabel,
+      methodLabel: this.data.methodLabel,
+      paymentLabel: this.data.paymentLabel,
+      summaryPayment: this.data.summaryPayment,
+      months: this.data.months,
+      method: this.data.method,
+      isRemaining: this.data.isRemaining,
+      isCombo: this.data.isCombo,
+      isEarlyRepayment: this.data.isEarlyRepayment,
+      isFullPrepay: this.data.isFullPrepay,
+      isPartialPrepay: this.data.isPartialPrepay,
+      display: this.data.display || {},
+      earlyInfo: this.data.earlyInfo || {},
+      commercialFirst: this.data.commercialFirst,
+      providentFirst: this.data.providentFirst,
+      shareInput: this.shareInput || result.shareInput || null,
+      schedule: result.schedule
+    })
+      .then((filePath) => {
+        wx.hideLoading()
+        wx.showActionSheet({
+          itemList: ['打开文件并保存到手机', '发送到微信（可转存）'],
+          success(res) {
+            const opener = res.tapIndex === 1 ? shareExcelFile : openExcelFile
+            opener(filePath).catch(() => {
+              wx.showToast({ title: '文件已生成，打开失败请重试', icon: 'none' })
+            })
+          }
+        })
+      })
+      .catch(() => {
+        wx.hideLoading()
+        wx.showToast({ title: '导出失败，请稍后重试', icon: 'none' })
+      })
   },
 
   onShowSavePlan() {

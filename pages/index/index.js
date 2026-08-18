@@ -42,6 +42,7 @@ Page({
     showFavoriteTip: false,
     favoriteTipStyle: '',
     favoriteArrowStyle: '',
+    favoriteTipCardStyle: '',
     showPlans: false,
     showRenamePlan: false,
     planList: [],
@@ -128,7 +129,7 @@ Page({
   },
 
   updateFavoriteTipLayout() {
-    this.setData(getFavoriteTipLayout())
+    this.setData(getFavoriteTipLayout(this.data.theme))
   },
 
   onReady() {
@@ -145,7 +146,11 @@ Page({
 
   applyTheme(themeId) {
     const theme = setThemeId(themeId)
-    this.setData({ theme })
+    this.setData({ theme }, () => {
+      if (this.data.showFavoriteTip) {
+        this.updateFavoriteTipLayout()
+      }
+    })
     applyThemeChrome(theme)
   },
 

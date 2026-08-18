@@ -193,7 +193,7 @@
     <view class="share-row">
       <button class="share-btn ghost" wx:if="{{canExport}}" bindtap="onExportExcel">导出 Excel</button>
       <button class="share-btn ghost" bindtap="onShowSavePlan">保留方案</button>
-      <button class="share-btn" open-type="share">分享好友</button>
+      <button class="share-btn ghost" open-type="share">分享好友</button>
     </view>
   </view>
 </view>

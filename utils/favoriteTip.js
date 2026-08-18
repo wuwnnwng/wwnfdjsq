@@ -1,6 +1,8 @@
 /**
  * 「添加到我的小程序」引导：叉掉或已添加后，本地记住，下次不再弹出。
  */
+const { getTheme } = require('./theme')
+
 const STORAGE_KEY = 'favorite_tip_dismissed_v1'
 
 function isFavoriteTipDismissed() {
@@ -66,17 +68,20 @@ function getWindowMetrics() {
 }
 
 /**
- * 按右上角胶囊按钮（··· / 分享朋友圈入口）计算提示位置。
- * 必须使用 rpx：view / cover-view 的内联 px 在部分机型上会被忽略，导致提示落在页面内容区。
+ * 按右上角胶囊按钮（··· / 分享入口）计算提示位置与主题色。
+ * position / top / right 必须写在内联 rpx 中，否则 fixed 易失效并落进页面内容流。
  */
-function getFavoriteTipLayout() {
+function getFavoriteTipLayout(themeId) {
   try {
+    const theme = getTheme(themeId)
+    const navBar = theme.navBar
     const sys = getWindowMetrics()
     const ww = sys && sys.windowWidth
     if (!ww) {
       return {
         favoriteTipStyle: '',
-        favoriteArrowStyle: ''
+        favoriteArrowStyle: '',
+        favoriteTipCardStyle: ''
       }
     }
 
@@ -91,18 +96,20 @@ function getFavoriteTipLayout() {
     const menuLeft = (rect && rect.left) || menuRight - 87
     const menuWidth = (rect && rect.width) || menuRight - menuLeft
 
-    const tipTopRpx = pxToRpx(menuBottom + 6, ww)
-    const tipRightRpx = pxToRpx(Math.max(10, ww - menuRight), ww)
-    const arrowRightRpx = pxToRpx(Math.max(12, menuWidth / 2 - 8), ww)
+    const tipTopRpx = pxToRpx(menuBottom + 8, ww)
+    const tipRightRpx = pxToRpx(Math.max(8, ww - menuRight), ww)
+    const arrowRightRpx = pxToRpx(Math.max(12, menuWidth / 2 - 10), ww)
 
     return {
-      favoriteTipStyle: `top:${tipTopRpx}rpx;right:${tipRightRpx}rpx;`,
-      favoriteArrowStyle: `margin-right:${arrowRightRpx}rpx;`
+      favoriteTipStyle: `position:fixed;top:${tipTopRpx}rpx;right:${tipRightRpx}rpx;z-index:10000;`,
+      favoriteArrowStyle: `margin-right:${arrowRightRpx}rpx;color:${navBar};`,
+      favoriteTipCardStyle: `background-color:${navBar};`
     }
   } catch (e) {
     return {
       favoriteTipStyle: '',
-      favoriteArrowStyle: ''
+      favoriteArrowStyle: '',
+      favoriteTipCardStyle: ''
     }
   }
 }

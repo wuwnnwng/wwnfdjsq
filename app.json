@@ -4,7 +4,7 @@
     "pages/result/result"
   ],
   "window": {
-    "navigationBarTitleText": "房贷计算器",
+    "navigationBarTitleText": "置居计算器",
     "navigationBarBackgroundColor": "#0B3D2E",
     "navigationBarTextStyle": "white",
     "backgroundColor": "#F3F6F4",

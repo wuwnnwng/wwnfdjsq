@@ -1,13 +1,19 @@
 <view class="page-root">
-  <root-portal wx:if="{{showFavoriteTip}}">
-    <view class="favorite-tip" style="{{favoriteTipStyle}}">
-      <view class="favorite-tip-arrow" style="{{favoriteArrowStyle}}">▲</view>
-      <view class="favorite-tip-card" style="{{favoriteTipCardStyle}}">
+  <view class="favorite-tip-layer" wx:if="{{showFavoriteTip}}">
+    <view
+      class="favorite-tip"
+      style="top: {{favoriteTipTop}}px; right: {{favoriteTipRight}}px;"
+    >
+      <view
+        class="favorite-tip-arrow"
+        style="margin-right: {{favoriteArrowRight}}px; color: {{favoriteTipColor}};"
+      >▲</view>
+      <view class="favorite-tip-card" style="background-color: {{favoriteTipColor}};">
         <view class="favorite-tip-text">添加到我的小程序，方便下次使用</view>
         <view class="favorite-tip-close" catchtap="onHideFavoriteTip">×</view>
       </view>
     </view>
-  </root-portal>
+  </view>
 
   <view class="page page-shell theme-{{theme}}">
   <view class="panel hero-panel">

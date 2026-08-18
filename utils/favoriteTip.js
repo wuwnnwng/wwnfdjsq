@@ -57,10 +57,6 @@ async function shouldShowFavoriteTip() {
   return true
 }
 
-function pxToRpx(px, windowWidth) {
-  return Math.round((px * 750) / windowWidth)
-}
-
 function getWindowMetrics() {
   if (wx.getWindowInfo) return wx.getWindowInfo()
   if (wx.getSystemInfoSync) return wx.getSystemInfoSync()
@@ -68,20 +64,22 @@ function getWindowMetrics() {
 }
 
 /**
- * 按右上角胶囊按钮（··· / 分享入口）计算提示位置与主题色。
- * position / top / right 必须写在内联 rpx 中，否则 fixed 易失效并落进页面内容流。
+ * 按右上角胶囊（··· / 分享到朋友圈）计算提示位置，单位 px（与 API 坐标系一致）。
+ * 外层用全屏 fixed 容器，内层 absolute + px，避免 fixed 内联 rpx 失效后落到页面内容区。
  */
 function getFavoriteTipLayout(themeId) {
+  const theme = getTheme(themeId)
+  const navBar = theme.navBar
+
   try {
-    const theme = getTheme(themeId)
-    const navBar = theme.navBar
     const sys = getWindowMetrics()
     const ww = sys && sys.windowWidth
     if (!ww) {
       return {
-        favoriteTipStyle: '',
-        favoriteArrowStyle: '',
-        favoriteTipCardStyle: ''
+        favoriteTipTop: 0,
+        favoriteTipRight: 0,
+        favoriteArrowRight: 0,
+        favoriteTipColor: navBar
       }
     }
 
@@ -96,20 +94,18 @@ function getFavoriteTipLayout(themeId) {
     const menuLeft = (rect && rect.left) || menuRight - 87
     const menuWidth = (rect && rect.width) || menuRight - menuLeft
 
-    const tipTopRpx = pxToRpx(menuBottom + 8, ww)
-    const tipRightRpx = pxToRpx(Math.max(8, ww - menuRight), ww)
-    const arrowRightRpx = pxToRpx(Math.max(12, menuWidth / 2 - 10), ww)
-
     return {
-      favoriteTipStyle: `position:fixed;top:${tipTopRpx}rpx;right:${tipRightRpx}rpx;z-index:10000;`,
-      favoriteArrowStyle: `margin-right:${arrowRightRpx}rpx;color:${navBar};`,
-      favoriteTipCardStyle: `background-color:${navBar};`
+      favoriteTipTop: Math.round(menuBottom + 8),
+      favoriteTipRight: Math.round(Math.max(8, ww - menuRight)),
+      favoriteArrowRight: Math.round(Math.max(12, menuWidth / 2 - 10)),
+      favoriteTipColor: navBar
     }
   } catch (e) {
     return {
-      favoriteTipStyle: '',
-      favoriteArrowStyle: '',
-      favoriteTipCardStyle: ''
+      favoriteTipTop: 0,
+      favoriteTipRight: 0,
+      favoriteArrowRight: 0,
+      favoriteTipColor: navBar
     }
   }
 }

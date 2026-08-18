@@ -40,9 +40,10 @@ Page({
     showRemainingTip: false,
     showLprTip: false,
     showFavoriteTip: false,
-    favoriteTipStyle: '',
-    favoriteArrowStyle: '',
-    favoriteTipCardStyle: '',
+    favoriteTipTop: 0,
+    favoriteTipRight: 0,
+    favoriteArrowRight: 0,
+    favoriteTipColor: '#0B3D2E',
     showPlans: false,
     showRenamePlan: false,
     planList: [],
@@ -120,8 +121,10 @@ Page({
         }
         return
       }
-      this.setData({ showFavoriteTip: true }, () => {
-        this.updateFavoriteTipLayout()
+      const layout = getFavoriteTipLayout(this.data.theme)
+      this.setData({
+        showFavoriteTip: true,
+        ...layout
       })
     } finally {
       this._favoriteTipChecking = false
@@ -133,10 +136,10 @@ Page({
   },
 
   onReady() {
-    if (this.data.showFavoriteTip) {
-      this.updateFavoriteTipLayout()
-      setTimeout(() => this.updateFavoriteTipLayout(), 100)
-    }
+    if (!this.data.showFavoriteTip) return
+    this.updateFavoriteTipLayout()
+    setTimeout(() => this.updateFavoriteTipLayout(), 80)
+    setTimeout(() => this.updateFavoriteTipLayout(), 300)
   },
 
   onHideFavoriteTip() {

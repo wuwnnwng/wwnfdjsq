@@ -1,21 +1,4 @@
-<view class="page-root">
-  <view class="favorite-tip-layer" wx:if="{{showFavoriteTip}}">
-    <view
-      class="favorite-tip"
-      style="top: {{favoriteTipTop}}px; right: {{favoriteTipRight}}px;"
-    >
-      <view
-        class="favorite-tip-arrow"
-        style="margin-right: {{favoriteArrowRight}}px; color: {{favoriteTipColor}};"
-      >▲</view>
-      <view class="favorite-tip-card" style="background-color: {{favoriteTipColor}};">
-        <view class="favorite-tip-text">添加到我的小程序，方便下次使用</view>
-        <view class="favorite-tip-close" catchtap="onHideFavoriteTip">×</view>
-      </view>
-    </view>
-  </view>
-
-  <view class="page page-shell theme-{{theme}}">
+<view class="page page-shell theme-{{theme}}">
   <view class="panel hero-panel">
     <view class="brand-wrap">
       <view class="brand">房贷计算器</view>
@@ -505,6 +488,5 @@
   <view class="footer-block">
     <button class="primary-btn" bindtap="onCalculate">开始计算</button>
     <view class="disclaimer">计算结果仅供参考，实际以银行审批为准</view>
-  </view>
   </view>
 </view>

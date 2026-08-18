@@ -4,7 +4,6 @@
  * 「我的方案」属于用户数据，升级时必须保留，不得列入清理列表。
  */
 const { STORAGE_KEY: PLANS_STORAGE_KEY } = require('./plans')
-const { STORAGE_KEY: FAVORITE_TIP_STORAGE_KEY } = require('./favoriteTip')
 
 const APP_VERSION = '1.0.5'
 const VERSION_STORAGE_KEY = 'app_version'
@@ -13,7 +12,7 @@ const VERSION_STORAGE_KEY = 'app_version'
 const CLEAR_KEYS_ON_UPGRADE = ['mortgageResult']
 
 /** 版本升级时必须保留的用户数据 */
-const KEEP_KEYS_ON_UPGRADE = [PLANS_STORAGE_KEY, FAVORITE_TIP_STORAGE_KEY]
+const KEEP_KEYS_ON_UPGRADE = [PLANS_STORAGE_KEY]
 
 function getStoredVersion() {
   try {

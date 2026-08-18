@@ -23,11 +23,6 @@ const {
   renamePlan,
   removePlan
 } = require('../../utils/plans')
-const {
-  shouldShowFavoriteTip,
-  markFavoriteTipDismissed,
-  getFavoriteTipLayout
-} = require('../../utils/favoriteTip')
 
 Page({
   data: {
@@ -39,11 +34,6 @@ Page({
     showMethodTip: false,
     showRemainingTip: false,
     showLprTip: false,
-    showFavoriteTip: false,
-    favoriteTipTop: 0,
-    favoriteTipRight: 0,
-    favoriteArrowRight: 0,
-    favoriteTipColor: '#0B3D2E',
     showPlans: false,
     showRenamePlan: false,
     planList: [],
@@ -91,7 +81,6 @@ Page({
     enableShareMenu()
     this.applyTheme(getThemeId())
     this.refreshLpr()
-    this.maybeShowFavoriteTip()
 
     const now = new Date()
     const mm = String(now.getMonth() + 1).padStart(2, '0')
@@ -106,54 +95,11 @@ Page({
 
   onShow() {
     this.applyTheme(getThemeId())
-    // 用户可能刚在菜单里添加了「我的小程序」，回来后不再展示
-    this.maybeShowFavoriteTip()
-  },
-
-  async maybeShowFavoriteTip() {
-    if (this._favoriteTipChecking) return
-    this._favoriteTipChecking = true
-    try {
-      const show = await shouldShowFavoriteTip()
-      if (!show) {
-        if (this.data.showFavoriteTip) {
-          this.setData({ showFavoriteTip: false })
-        }
-        return
-      }
-      const layout = getFavoriteTipLayout(this.data.theme)
-      this.setData({
-        showFavoriteTip: true,
-        ...layout
-      })
-    } finally {
-      this._favoriteTipChecking = false
-    }
-  },
-
-  updateFavoriteTipLayout() {
-    this.setData(getFavoriteTipLayout(this.data.theme))
-  },
-
-  onReady() {
-    if (!this.data.showFavoriteTip) return
-    this.updateFavoriteTipLayout()
-    setTimeout(() => this.updateFavoriteTipLayout(), 80)
-    setTimeout(() => this.updateFavoriteTipLayout(), 300)
-  },
-
-  onHideFavoriteTip() {
-    markFavoriteTipDismissed()
-    this.setData({ showFavoriteTip: false })
   },
 
   applyTheme(themeId) {
     const theme = setThemeId(themeId)
-    this.setData({ theme }, () => {
-      if (this.data.showFavoriteTip) {
-        this.updateFavoriteTipLayout()
-      }
-    })
+    this.setData({ theme })
     applyThemeChrome(theme)
   },
 

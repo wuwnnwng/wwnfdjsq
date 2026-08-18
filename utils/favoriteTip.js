@@ -55,8 +55,61 @@ async function shouldShowFavoriteTip() {
   return true
 }
 
+function pxToRpx(px, windowWidth) {
+  return Math.round((px * 750) / windowWidth)
+}
+
+function getWindowMetrics() {
+  if (wx.getWindowInfo) return wx.getWindowInfo()
+  if (wx.getSystemInfoSync) return wx.getSystemInfoSync()
+  return null
+}
+
+/**
+ * 按右上角胶囊按钮（··· / 分享朋友圈入口）计算提示位置。
+ * 必须使用 rpx：view / cover-view 的内联 px 在部分机型上会被忽略，导致提示落在页面内容区。
+ */
+function getFavoriteTipLayout() {
+  try {
+    const sys = getWindowMetrics()
+    const ww = sys && sys.windowWidth
+    if (!ww) {
+      return {
+        favoriteTipStyle: '',
+        favoriteArrowStyle: ''
+      }
+    }
+
+    const rect = wx.getMenuButtonBoundingClientRect
+      ? wx.getMenuButtonBoundingClientRect()
+      : null
+    const statusBar = (sys && sys.statusBarHeight) || 44
+    const menuTop = (rect && rect.top) || statusBar + 6
+    const menuHeight = (rect && rect.height) || 32
+    const menuBottom = (rect && rect.bottom) || menuTop + menuHeight
+    const menuRight = (rect && rect.right) || ww - 10
+    const menuLeft = (rect && rect.left) || menuRight - 87
+    const menuWidth = (rect && rect.width) || menuRight - menuLeft
+
+    const tipTopRpx = pxToRpx(menuBottom + 6, ww)
+    const tipRightRpx = pxToRpx(Math.max(10, ww - menuRight), ww)
+    const arrowRightRpx = pxToRpx(Math.max(12, menuWidth / 2 - 8), ww)
+
+    return {
+      favoriteTipStyle: `top:${tipTopRpx}rpx;right:${tipRightRpx}rpx;`,
+      favoriteArrowStyle: `margin-right:${arrowRightRpx}rpx;`
+    }
+  } catch (e) {
+    return {
+      favoriteTipStyle: '',
+      favoriteArrowStyle: ''
+    }
+  }
+}
+
 module.exports = {
   STORAGE_KEY,
   shouldShowFavoriteTip,
-  markFavoriteTipDismissed
+  markFavoriteTipDismissed,
+  getFavoriteTipLayout
 }

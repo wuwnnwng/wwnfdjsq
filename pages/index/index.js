@@ -25,7 +25,8 @@ const {
 } = require('../../utils/plans')
 const {
   shouldShowFavoriteTip,
-  markFavoriteTipDismissed
+  markFavoriteTipDismissed,
+  getFavoriteTipLayout
 } = require('../../utils/favoriteTip')
 
 Page({
@@ -119,46 +120,21 @@ Page({
         return
       }
       this.setData({ showFavoriteTip: true }, () => {
-        wx.nextTick(() => {
-          this.setData(this.getFavoriteTipLayout())
-        })
+        this.updateFavoriteTipLayout()
       })
     } finally {
       this._favoriteTipChecking = false
     }
   },
 
-  getFavoriteTipLayout() {
-    try {
-      const rect =
-        wx.getMenuButtonBoundingClientRect &&
-        wx.getMenuButtonBoundingClientRect()
-      const sys =
-        (wx.getWindowInfo && wx.getWindowInfo()) ||
-        (wx.getSystemInfoSync && wx.getSystemInfoSync()) ||
-        null
-      if (!rect || !rect.bottom || !sys || !sys.windowWidth) {
-        return {
-          favoriteTipStyle: '',
-          favoriteArrowStyle: ''
-        }
-      }
+  updateFavoriteTipLayout() {
+    this.setData(getFavoriteTipLayout())
+  },
 
-      const gap = 4
-      const tipTop = rect.bottom + gap
-      const tipRight = Math.max(8, sys.windowWidth - rect.right)
-      const menuCenterFromRight = sys.windowWidth - (rect.left + rect.width / 2)
-      const arrowRight = menuCenterFromRight - tipRight - 6
-
-      return {
-        favoriteTipStyle: `top:${tipTop}px;right:${tipRight}px;`,
-        favoriteArrowStyle: `margin-right:${Math.max(10, arrowRight)}px;`
-      }
-    } catch (e) {
-      return {
-        favoriteTipStyle: '',
-        favoriteArrowStyle: ''
-      }
+  onReady() {
+    if (this.data.showFavoriteTip) {
+      this.updateFavoriteTipLayout()
+      setTimeout(() => this.updateFavoriteTipLayout(), 100)
     }
   },
 

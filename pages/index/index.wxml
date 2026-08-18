@@ -1,16 +1,11 @@
 <view class="page-root">
-  <view class="favorite-tip" wx:if="{{showFavoriteTip}}" style="{{favoriteTipStyle}}">
-    <view class="favorite-tip-arrow" style="{{favoriteArrowStyle}}"></view>
-    <view class="favorite-tip-card">
-      <view class="favorite-tip-text">建议添加到我的小程序，方便下次使用</view>
-      <view
-        class="favorite-tip-close"
-        catchtap="onHideFavoriteTip"
-        aria-role="button"
-        aria-label="关闭"
-      >×</view>
-    </view>
-  </view>
+  <cover-view class="favorite-tip" wx:if="{{showFavoriteTip}}" style="{{favoriteTipStyle}}">
+    <cover-view class="favorite-tip-arrow" style="{{favoriteArrowStyle}}">▲</cover-view>
+    <cover-view class="favorite-tip-card">
+      <cover-view class="favorite-tip-text">添加到我的小程序，方便下次使用</cover-view>
+      <cover-view class="favorite-tip-close" bindtap="onHideFavoriteTip">×</cover-view>
+    </cover-view>
+  </cover-view>
 
   <view class="page page-shell theme-{{theme}}">
   <view class="panel hero-panel">

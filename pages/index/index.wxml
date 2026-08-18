@@ -1,4 +1,18 @@
-<view class="page page-shell theme-{{theme}}">
+<view class="page-root">
+  <view class="favorite-tip" wx:if="{{showFavoriteTip}}" style="{{favoriteTipStyle}}">
+    <view class="favorite-tip-arrow" style="{{favoriteArrowStyle}}"></view>
+    <view class="favorite-tip-card">
+      <view class="favorite-tip-text">建议添加到我的小程序，方便下次使用</view>
+      <view
+        class="favorite-tip-close"
+        catchtap="onHideFavoriteTip"
+        aria-role="button"
+        aria-label="关闭"
+      >×</view>
+    </view>
+  </view>
+
+  <view class="page page-shell theme-{{theme}}">
   <view class="panel hero-panel">
     <view class="brand-wrap">
       <view class="brand">房贷计算器</view>
@@ -37,19 +51,6 @@
         data-mode="remaining"
         bindtap="onCalcModeChange"
       >已有贷款</view>
-    </view>
-  </view>
-
-  <view class="favorite-tip" wx:if="{{showFavoriteTip}}" style="{{favoriteTipStyle}}">
-    <view class="favorite-tip-arrow" style="{{favoriteArrowStyle}}"></view>
-    <view class="favorite-tip-card">
-      <view class="favorite-tip-text">建议添加到我的小程序，方便下次使用</view>
-      <view
-        class="favorite-tip-close"
-        bindtap="onHideFavoriteTip"
-        aria-role="button"
-        aria-label="关闭"
-      >×</view>
     </view>
   </view>
 
@@ -501,5 +502,6 @@
   <view class="footer-block">
     <button class="primary-btn" bindtap="onCalculate">开始计算</button>
     <view class="disclaimer">计算结果仅供参考，实际以银行审批为准</view>
+  </view>
   </view>
 </view>

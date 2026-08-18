@@ -118,9 +118,10 @@ Page({
         }
         return
       }
-      this.setData({
-        showFavoriteTip: true,
-        ...this.getFavoriteTipLayout()
+      this.setData({ showFavoriteTip: true }, () => {
+        wx.nextTick(() => {
+          this.setData(this.getFavoriteTipLayout())
+        })
       })
     } finally {
       this._favoriteTipChecking = false
@@ -129,23 +130,29 @@ Page({
 
   getFavoriteTipLayout() {
     try {
-      const rect = wx.getMenuButtonBoundingClientRect
-        ? wx.getMenuButtonBoundingClientRect()
-        : null
-      const sys = wx.getSystemInfoSync ? wx.getSystemInfoSync() : null
-      if (!rect || !sys || !sys.windowWidth) {
+      const rect =
+        wx.getMenuButtonBoundingClientRect &&
+        wx.getMenuButtonBoundingClientRect()
+      const sys =
+        (wx.getWindowInfo && wx.getWindowInfo()) ||
+        (wx.getSystemInfoSync && wx.getSystemInfoSync()) ||
+        null
+      if (!rect || !rect.bottom || !sys || !sys.windowWidth) {
         return {
           favoriteTipStyle: '',
           favoriteArrowStyle: ''
         }
       }
-      const px2rpx = 750 / sys.windowWidth
-      const tipTop = Math.max(8, rect.bottom + 8) * px2rpx
-      const tipRight = Math.max(12, sys.windowWidth - rect.right) * px2rpx
-      const arrowRight = Math.max(12, (rect.width / 2 - 6) * px2rpx)
+
+      const gap = 4
+      const tipTop = rect.bottom + gap
+      const tipRight = Math.max(8, sys.windowWidth - rect.right)
+      const menuCenterFromRight = sys.windowWidth - (rect.left + rect.width / 2)
+      const arrowRight = menuCenterFromRight - tipRight - 6
+
       return {
-        favoriteTipStyle: `top:${tipTop}rpx;right:${tipRight}rpx;`,
-        favoriteArrowStyle: `margin-right:${arrowRight}rpx;`
+        favoriteTipStyle: `top:${tipTop}px;right:${tipRight}px;`,
+        favoriteArrowStyle: `margin-right:${Math.max(10, arrowRight)}px;`
       }
     } catch (e) {
       return {

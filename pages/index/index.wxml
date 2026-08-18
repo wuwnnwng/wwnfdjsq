@@ -40,6 +40,19 @@
     </view>
   </view>
 
+  <view class="favorite-tip" wx:if="{{showFavoriteTip}}" style="{{favoriteTipStyle}}">
+    <view class="favorite-tip-arrow" style="{{favoriteArrowStyle}}"></view>
+    <view class="favorite-tip-card">
+      <view class="favorite-tip-text">建议添加到我的小程序，方便下次使用</view>
+      <view
+        class="favorite-tip-close"
+        bindtap="onHideFavoriteTip"
+        aria-role="button"
+        aria-label="关闭"
+      >×</view>
+    </view>
+  </view>
+
   <view class="tip-mask" wx:if="{{showMethodTip}}" catchtouchmove="preventMove" bindtap="onHideMethodTip">
     <view class="tip-dialog" catchtap="preventMove">
       <view class="tip-title">还款方式说明</view>

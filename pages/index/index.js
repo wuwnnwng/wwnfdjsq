@@ -23,6 +23,10 @@ const {
   renamePlan,
   removePlan
 } = require('../../utils/plans')
+const {
+  shouldShowFavoriteTip,
+  markFavoriteTipDismissed
+} = require('../../utils/favoriteTip')
 
 Page({
   data: {
@@ -34,6 +38,9 @@ Page({
     showMethodTip: false,
     showRemainingTip: false,
     showLprTip: false,
+    showFavoriteTip: false,
+    favoriteTipStyle: '',
+    favoriteArrowStyle: '',
     showPlans: false,
     showRenamePlan: false,
     planList: [],
@@ -81,6 +88,7 @@ Page({
     enableShareMenu()
     this.applyTheme(getThemeId())
     this.refreshLpr()
+    this.maybeShowFavoriteTip()
 
     const now = new Date()
     const mm = String(now.getMonth() + 1).padStart(2, '0')
@@ -95,6 +103,61 @@ Page({
 
   onShow() {
     this.applyTheme(getThemeId())
+    // 用户可能刚在菜单里添加了「我的小程序」，回来后不再展示
+    this.maybeShowFavoriteTip()
+  },
+
+  async maybeShowFavoriteTip() {
+    if (this._favoriteTipChecking) return
+    this._favoriteTipChecking = true
+    try {
+      const show = await shouldShowFavoriteTip()
+      if (!show) {
+        if (this.data.showFavoriteTip) {
+          this.setData({ showFavoriteTip: false })
+        }
+        return
+      }
+      this.setData({
+        showFavoriteTip: true,
+        ...this.getFavoriteTipLayout()
+      })
+    } finally {
+      this._favoriteTipChecking = false
+    }
+  },
+
+  getFavoriteTipLayout() {
+    try {
+      const rect = wx.getMenuButtonBoundingClientRect
+        ? wx.getMenuButtonBoundingClientRect()
+        : null
+      const sys = wx.getSystemInfoSync ? wx.getSystemInfoSync() : null
+      if (!rect || !sys || !sys.windowWidth) {
+        return {
+          favoriteTipStyle: '',
+          favoriteArrowStyle: ''
+        }
+      }
+      const px2rpx = 750 / sys.windowWidth
+      const tipTop = Math.max(8, rect.bottom + 8) * px2rpx
+      const tipRight = Math.max(12, sys.windowWidth - rect.right) * px2rpx
+      const arrowRight = Math.max(12, (rect.width / 2 - 6) * px2rpx)
+      return {
+        favoriteTipStyle: `top:${tipTop}rpx;right:${tipRight}rpx;`,
+        favoriteArrowStyle: `margin-right:${arrowRight}rpx;`
+      }
+    } catch (e) {
+      return {
+        favoriteTipStyle: '',
+        favoriteArrowStyle: ''
+      }
+    }
+  },
+
+  onHideFavoriteTip() {
+    markFavoriteTipDismissed()
+    this.setData({ showFavoriteTip: false })
   },
 
   applyTheme(themeId) {

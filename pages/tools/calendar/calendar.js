@@ -215,8 +215,9 @@ Page({
       selectedInfo: {
         solarText: dayInfo.solarText,
         weekdayText: WEEKDAY_NAMES[new Date(selectedYear, selectedMonth - 1, selectedDay).getDay()],
+        weekText: dayInfo.weekText,
         lunarText: dayInfo.lunarText,
-        ganZhiText: `${dayInfo.ganZhiYear}年 · ${dayInfo.zodiac}年`,
+        ganZhiText: `${dayInfo.ganZhiYear}年 · ${dayInfo.ganZhiMonth}月 · ${dayInfo.zodiac}年`,
         ganZhiDay: `${dayInfo.ganZhiDay}日`,
         solarTerm: dayInfo.solarTerm || '—',
         yi: almanac.yi,

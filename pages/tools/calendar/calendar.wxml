@@ -57,7 +57,9 @@
       </view>
 
       <view class="panel detail-panel" wx:if="{{selectedInfo}}">
-        <view class="detail-solar">{{selectedInfo.solarText}} {{selectedInfo.weekdayText}}</view>
+        <view class="detail-solar">
+          {{selectedInfo.solarText}} {{selectedInfo.weekdayText}} · {{selectedInfo.weekText}}
+        </view>
         <view class="detail-lunar">{{selectedInfo.lunarText}}</view>
         <view class="detail-meta">{{selectedInfo.ganZhiText}} · {{selectedInfo.ganZhiDay}}</view>
         <view class="detail-term">节气：{{selectedInfo.solarTerm}}</view>
@@ -79,11 +81,11 @@
     <view wx:if="{{activeTab === 'almanac'}}">
       <view class="panel huangli-panel" wx:if="{{huangliDetail}}">
         <view class="huangli-title">老黄历</view>
-        <view class="huangli-date">{{huangliDetail.solarText}}</view>
+        <view class="huangli-date">{{huangliDetail.solarText}} · {{huangliDetail.weekText}}</view>
         <view class="huangli-lunar">{{huangliDetail.lunarText}} · 星期{{huangliDetail.weekday}}</view>
         <view class="huangli-meta">
-          {{huangliDetail.ganZhiYear}}年 {{huangliDetail.zodiac}}年 · {{huangliDetail.ganZhiDay}}日 ·
-          {{huangliDetail.jianChu}}日
+          {{huangliDetail.ganZhiYear}}年 {{huangliDetail.ganZhiMonth}}月 {{huangliDetail.zodiac}}年 ·
+          {{huangliDetail.ganZhiDay}}日
         </view>
         <view class="huangli-term" wx:if="{{huangliDetail.solarTerm}}">节气：{{huangliDetail.solarTerm}}</view>
 

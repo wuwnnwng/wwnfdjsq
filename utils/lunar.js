@@ -177,6 +177,17 @@ function getGanZhiYear(lunarYear) {
   return `${gan}${zhi}`
 }
 
+/** 月干支：以农历月份推算，正月建寅，五虎遁月 */
+function getGanZhiMonth(lunarYear, lunarMonth) {
+  const month = Number(lunarMonth)
+  if (!(month >= 1 && month <= 12)) return ''
+  const yearGanIndex = (lunarYear - 4) % 10
+  const firstMonthGanIndex = [2, 4, 6, 8, 0][yearGanIndex % 5]
+  const monthGanIndex = (firstMonthGanIndex + month - 1) % 10
+  const monthZhiIndex = (month + 1) % 12
+  return `${GAN[monthGanIndex]}${ZHI[monthZhiIndex]}`
+}
+
 function getZodiac(lunarYear) {
   return ZODIAC[(lunarYear - 4) % 12]
 }
@@ -193,6 +204,22 @@ function getGanZhiDay(year, month, day) {
 function getWeekday(year, month, day) {
   const names = ['日', '一', '二', '三', '四', '五', '六']
   return names[new Date(year, month - 1, day).getDay()]
+}
+
+/** ISO 周次：返回所属周年份与第几周 */
+function getWeekInfo(year, month, day) {
+  const date = new Date(year, month - 1, day)
+  date.setHours(0, 0, 0, 0)
+  const dayNum = date.getDay() || 7
+  date.setDate(date.getDate() + 4 - dayNum)
+  const weekYear = date.getFullYear()
+  const yearStart = new Date(weekYear, 0, 1)
+  const weekNumber = Math.ceil(((date - yearStart) / 86400000 + 1) / 7)
+  return {
+    weekYear,
+    weekNumber,
+    weekText: `${weekYear}年第${weekNumber}周`
+  }
 }
 
 function termDate(year, n) {
@@ -243,15 +270,20 @@ function getNearestSolarTerm(year, month, day) {
 function buildDayInfo(year, month, day) {
   const lunar = solarToLunar(year, month, day)
   const term = getSolarTerm(year, month, day)
+  const weekInfo = getWeekInfo(year, month, day)
   return {
     solarYear: year,
     solarMonth: month,
     solarDay: day,
     solarText: formatSolarDate(year, month, day),
     weekday: getWeekday(year, month, day),
+    weekNumber: weekInfo.weekNumber,
+    weekYear: weekInfo.weekYear,
+    weekText: weekInfo.weekText,
     lunar,
     lunarText: formatLunarDate(lunar),
     ganZhiYear: getGanZhiYear(lunar.lunarYear),
+    ganZhiMonth: getGanZhiMonth(lunar.lunarYear, lunar.lunarMonth),
     ganZhiDay: getGanZhiDay(year, month, day),
     zodiac: getZodiac(lunar.lunarYear),
     solarTerm: term || getNearestSolarTerm(year, month, day)
@@ -285,8 +317,10 @@ module.exports = {
   formatLunarDate,
   formatSolarDate,
   getGanZhiYear,
+  getGanZhiMonth,
   getGanZhiDay,
   getZodiac,
+  getWeekInfo,
   getSolarTerm,
   getNearestSolarTerm,
   buildDayInfo,

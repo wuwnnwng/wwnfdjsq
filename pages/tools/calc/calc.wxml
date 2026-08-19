@@ -1,0 +1,19 @@
+<view class="page page-shell theme-{{theme}} calc-page">
+  <view class="calc-display panel">
+    <view class="calc-expression" wx:if="{{expression && expression !== displayValue}}">{{expression}}</view>
+    <view class="calc-value">{{displayValue}}</view>
+    <view class="calc-error" wx:if="{{errorText}}">{{errorText}}</view>
+  </view>
+
+  <view class="calc-keyboard panel">
+    <view
+      class="calc-key {{item.wide ? 'wide' : ''}} {{item.action === 'equal' ? 'accent' : ''}}"
+      wx:for="{{keys}}"
+      wx:key="label"
+      bindtap="onKeyTap"
+      data-type="{{item.type}}"
+      data-value="{{item.value}}"
+      data-action="{{item.action}}"
+    >{{item.label}}</view>
+  </view>
+</view>

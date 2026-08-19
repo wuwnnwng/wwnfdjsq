@@ -164,6 +164,10 @@ Page({
     this.setData({ showLprTip: false })
   },
 
+  onGoTools() {
+    wx.navigateTo({ url: '/pages/tools/index' })
+  },
+
   onShowPlans() {
     this.setData({
       showPlans: true,

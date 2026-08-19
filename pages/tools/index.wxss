@@ -1,0 +1,30 @@
+@import "./tool-common.wxss";
+
+.tool-grid-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding-bottom: 20rpx;
+}
+
+.tool-card {
+  width: calc(50% - 8rpx);
+  padding: 24rpx 20rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1rpx solid var(--color-line);
+  box-sizing: border-box;
+}
+
+.tool-card-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.tool-card-desc {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}

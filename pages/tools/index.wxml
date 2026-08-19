@@ -1,0 +1,21 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel">
+      <view class="section-title">更多工具</view>
+      <view class="section-desc">常用单位换算与辅助计算</view>
+    </view>
+
+    <view class="panel tool-grid-panel">
+      <view
+        class="tool-card"
+        wx:for="{{tools}}"
+        wx:key="id"
+        bindtap="onOpenTool"
+        data-page="{{item.page}}"
+      >
+        <view class="tool-card-name">{{item.name}}</view>
+        <view class="tool-card-desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

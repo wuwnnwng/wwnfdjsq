@@ -271,7 +271,10 @@
             <text class="inline-label">LPR 基准利率</text>
             <view class="help-icon" catchtap="onShowLprTip" aria-role="button" aria-label="LPR 基准利率说明">!</view>
           </view>
-          <view class="plan-entry" bindtap="onShowPlans" aria-role="button" aria-label="我的方案">我的方案</view>
+          <view class="inline-actions">
+            <view class="plan-entry" bindtap="onGoTools" aria-role="button" aria-label="更多工具">更多工具</view>
+            <view class="plan-entry" bindtap="onShowPlans" aria-role="button" aria-label="我的方案">我的方案</view>
+          </view>
         </view>
       </view>
     </block>

@@ -1,6 +1,10 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/tools/index",
+    "pages/tools/converter/converter",
+    "pages/tools/base/base",
+    "pages/tools/calc/calc",
     "pages/result/result"
   ],
   "window": {

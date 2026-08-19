@@ -215,8 +215,15 @@
   white-space: nowrap;
 }
 
-.plan-entry {
+.inline-actions {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex-shrink: 0;
+}
+
+.plan-entry {
   flex-shrink: 0;
   padding: 10rpx 18rpx;
   font-size: 24rpx;

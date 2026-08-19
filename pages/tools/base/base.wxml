@@ -1,0 +1,53 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel">
+      <view class="section-title">进制换算</view>
+      <view class="tool-note">支持整数在 2 / 8 / 10 / 16 进制之间互转</view>
+
+      <view class="field">
+        <view class="field-label">输入进制</view>
+        <view class="field-control">
+          <picker mode="selector" range="{{baseLabels}}" value="{{baseIndex}}" bindchange="onBaseChange">
+            <view class="picker-value">{{baseLabels[baseIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="field">
+        <view class="field-label">输入数值</view>
+        <view class="field-control">
+          <input
+            class="field-input"
+            value="{{inputValue}}"
+            placeholder="请输入整数"
+            bindinput="onInputChange"
+          />
+        </view>
+      </view>
+
+      <view class="tool-note" wx:if="{{errorText}}">{{errorText}}</view>
+    </view>
+
+    <view class="panel result-panel">
+      <view class="result-title">换算结果</view>
+      <view class="result-list">
+        <view class="result-row">
+          <view class="result-row-label">二进制</view>
+          <view class="result-row-value">{{binary || '—'}}</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">八进制</view>
+          <view class="result-row-value">{{octal || '—'}}</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">十进制</view>
+          <view class="result-row-value">{{decimalText || '—'}}</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">十六进制</view>
+          <view class="result-row-value">{{hex || '—'}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

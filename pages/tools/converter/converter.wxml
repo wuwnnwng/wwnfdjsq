@@ -1,0 +1,57 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel">
+      <view class="section-title">{{title}}</view>
+      <view class="tool-note" wx:if="{{note}}">{{note}}</view>
+
+      <view class="field">
+        <view class="field-label">输入数值</view>
+        <view class="field-control">
+          <input
+            class="field-input"
+            type="digit"
+            value="{{inputValue}}"
+            placeholder="请输入"
+            bindinput="onInputChange"
+          />
+        </view>
+      </view>
+
+      <view class="field">
+        <view class="field-label">从</view>
+        <view class="field-control">
+          <picker mode="selector" range="{{unitLabels}}" value="{{fromIndex}}" bindchange="onFromUnitChange">
+            <view class="picker-value">{{unitLabels[fromIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="swap-btn" bindtap="onSwapUnits">⇅ 交换单位</view>
+
+      <view class="field">
+        <view class="field-label">到</view>
+        <view class="field-control">
+          <picker mode="selector" range="{{unitLabels}}" value="{{toIndex}}" bindchange="onToUnitChange">
+            <view class="picker-value">{{unitLabels[toIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel result-panel">
+      <view class="result-title">换算结果</view>
+      <view class="result-value">{{resultValue || '—'}}</view>
+      <view class="result-unit">{{resultLabel}}</view>
+    </view>
+
+    <view class="panel">
+      <view class="swap-btn" bindtap="onToggleAll">{{showAll ? '收起全部单位' : '查看全部单位'}}</view>
+      <view class="result-list" wx:if="{{showAll}}">
+        <view class="result-row" wx:for="{{allResults}}" wx:key="key">
+          <view class="result-row-label">{{item.label}}</view>
+          <view class="result-row-value">{{item.value}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

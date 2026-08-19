@@ -21,7 +21,15 @@ function formatDateKey(year, month, day) {
   return `${year}-${month}-${day}`
 }
 
-function buildMonthCells(viewYear, viewMonth, selected, today, auspiciousEvent, auspiciousDays) {
+function buildMonthCells(
+  viewYear,
+  viewMonth,
+  selected,
+  today,
+  auspiciousEvent,
+  auspiciousDays,
+  holidayDayMap
+) {
   const firstWeekday = new Date(viewYear, viewMonth - 1, 1).getDay()
   const daysInMonth = new Date(viewYear, viewMonth, 0).getDate()
   const prevMonthDays = new Date(viewYear, viewMonth - 1, 0).getDate()
@@ -54,7 +62,7 @@ function buildMonthCells(viewYear, viewMonth, selected, today, auspiciousEvent, 
     const lunar = solarToLunar(year, month, day)
     const lunarShort =
       lunar.lunarDay === 1 ? `${lunar.isLeap ? '闰' : ''}${['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'][lunar.lunarMonth - 1]}月` : ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'][lunar.lunarDay - 1]
-    const festival = inMonth && month === viewMonth ? getDayFestivalLabel(year, month, day) : ''
+    const festival = getDayFestivalLabel(year, month, day, holidayDayMap)
     const isToday = isSameDate({ year, month, day }, today)
     const isSelected = isSameDate({ year, month, day }, selected)
     const isAuspicious =
@@ -98,6 +106,14 @@ Page({
       legal: [],
       terms: [],
       popular: []
+    },
+    festivalLoading: false,
+    festivalError: '',
+    holidayDayMap: {},
+    festivalSectionOpen: {
+      legal: true,
+      terms: false,
+      popular: false
     }
   },
 
@@ -111,11 +127,53 @@ Page({
         viewMonth: today.month,
         selectedYear: today.year,
         selectedMonth: today.month,
-        selectedDay: today.day,
-        festivalGroups: buildFestivalGroups(today.year)
+        selectedDay: today.day
       },
-      () => this.refreshCalendarView()
+      () => {
+        this.loadFestivalData(today.year, () => this.refreshCalendarView())
+      }
     )
+  },
+
+  async loadFestivalData(year, callback) {
+    if (this._festivalLoading) return
+    this._festivalLoading = true
+    this.setData({ festivalLoading: true, festivalError: '' })
+    try {
+      const groups = await buildFestivalGroups(year)
+      this._holidayYear = year
+      this.setData(
+        {
+          festivalGroups: {
+            legal: groups.legal,
+            terms: groups.terms,
+            popular: groups.popular
+          },
+          holidayDayMap: groups.holidayDayMap || {},
+          festivalLoading: false,
+          festivalError: groups.holidayError || (groups.holidayStale ? '已使用缓存的放假安排' : '')
+        },
+        () => {
+          if (callback) callback()
+        }
+      )
+    } catch (e) {
+      this.setData({
+        festivalLoading: false,
+        festivalError: '节日数据加载失败'
+      })
+      if (callback) callback()
+    } finally {
+      this._festivalLoading = false
+    }
+  },
+
+  ensureFestivalYear(year, callback) {
+    if (this._holidayYear === year && this.data.holidayDayMap) {
+      if (callback) callback()
+      return
+    }
+    this.loadFestivalData(year, callback)
   },
 
   onShow() {
@@ -131,7 +189,8 @@ Page({
       selectedYear,
       selectedMonth,
       selectedDay,
-      auspiciousEvent
+      auspiciousEvent,
+      holidayDayMap
     } = this.data
     const today = this._today || todayParts()
     const selected = { year: selectedYear, month: selectedMonth, day: selectedDay }
@@ -141,7 +200,7 @@ Page({
     const dayInfo = buildDayInfo(selectedYear, selectedMonth, selectedDay)
     const almanac = getAlmanac(selectedYear, selectedMonth, selectedDay)
     const huangliDay = buildDayInfo(today.year, today.month, today.day)
-    const huangliDetail = buildHuangliDetail(huangliDay)
+    const huangliDetail = buildHuangliDetail(huangliDay, new Date())
 
     this.setData({
       monthCells: buildMonthCells(
@@ -150,7 +209,8 @@ Page({
         selected,
         today,
         auspiciousEvent,
-        auspiciousDays
+        auspiciousDays,
+        holidayDayMap
       ),
       selectedInfo: {
         solarText: dayInfo.solarText,
@@ -180,7 +240,9 @@ Page({
       viewMonth = 12
       viewYear -= 1
     }
-    this.setData({ viewYear, viewMonth }, () => this.refreshCalendarView())
+    this.setData({ viewYear, viewMonth }, () => {
+      this.ensureFestivalYear(viewYear, () => this.refreshCalendarView())
+    })
   },
 
   onNextMonth() {
@@ -190,7 +252,9 @@ Page({
       viewMonth = 1
       viewYear += 1
     }
-    this.setData({ viewYear, viewMonth }, () => this.refreshCalendarView())
+    this.setData({ viewYear, viewMonth }, () => {
+      this.ensureFestivalYear(viewYear, () => this.refreshCalendarView())
+    })
   },
 
   onBackToday() {
@@ -224,6 +288,15 @@ Page({
 
   onToggleAuspiciousPicker() {
     this.setData({ showAuspiciousPicker: !this.data.showAuspiciousPicker })
+  },
+
+  onToggleFestivalSection(e) {
+    const key = e.currentTarget.dataset.key
+    if (!key) return
+    const open = this.data.festivalSectionOpen[key]
+    this.setData({
+      [`festivalSectionOpen.${key}`]: !open
+    })
   },
 
   onSelectAuspiciousEvent(e) {

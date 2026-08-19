@@ -1,88 +1,30 @@
 /**
- * 节日：法定假日、二十四节气、热门节日
+ * 节日：法定假日（API）、二十四节气、热门节日
  */
-const { SOLAR_TERMS, buildDayInfo, pad2, solarToLunar, formatLunarDate } = require('./lunar')
+const { SOLAR_TERMS, buildDayInfo, solarToLunar, formatLunarDate } = require('./lunar')
+const { loadYearHolidays, getDayHolidayLabel } = require('./holidayApi')
 
 const POPULAR_FESTIVALS = [
-  { name: '情人节', month: 2, day: 14, tag: '热门' },
-  { name: '妇女节', month: 3, day: 8, tag: '热门' },
-  { name: '劳动节', month: 5, day: 1, tag: '热门' },
-  { name: '母亲节', month: 5, day: 11, tag: '热门', note: '五月第二个周日' },
-  { name: '儿童节', month: 6, day: 1, tag: '热门' },
-  { name: '父亲节', month: 6, day: 15, tag: '热门', note: '六月第三个周日' },
-  { name: '七夕', lunarMonth: 7, lunarDay: 7, tag: '热门' },
-  { name: '教师节', month: 9, day: 10, tag: '热门' },
-  { name: '国庆节', month: 10, day: 1, tag: '热门' },
-  { name: '万圣节', month: 10, day: 31, tag: '热门' },
-  { name: '双十一', month: 11, day: 11, tag: '热门' },
-  { name: '圣诞节', month: 12, day: 25, tag: '热门' },
-  { name: '元宵节', lunarMonth: 1, lunarDay: 15, tag: '热门' },
-  { name: '端午节', lunarMonth: 5, lunarDay: 5, tag: '热门' },
-  { name: '中秋节', lunarMonth: 8, lunarDay: 15, tag: '热门' },
-  { name: '重阳节', lunarMonth: 9, lunarDay: 9, tag: '热门' }
+  { name: '情人节', month: 2, day: 14 },
+  { name: '妇女节', month: 3, day: 8 },
+  { name: '儿童节', month: 6, day: 1 },
+  { name: '七夕', lunarMonth: 7, lunarDay: 7 },
+  { name: '教师节', month: 9, day: 10 },
+  { name: '万圣节', month: 10, day: 31 },
+  { name: '双十一', month: 11, day: 11 },
+  { name: '圣诞节', month: 12, day: 25 },
+  { name: '元宵节', lunarMonth: 1, lunarDay: 15 },
+  { name: '重阳节', lunarMonth: 9, lunarDay: 9 }
 ]
 
-const LEGAL_HOLIDAY_RULES = [
-  {
-    name: '元旦',
-    type: 'legal',
-    match(year, month, day) {
-      return month === 1 && day === 1
-    },
-    rangeText: '1月1日'
-  },
-  {
-    name: '春节',
-    type: 'legal',
-    match(year, month, day) {
-      const lunar = solarToLunar(year, month, day)
-      if (lunar.lunarMonth !== 1) return false
-      return lunar.lunarDay >= 1 && lunar.lunarDay <= 7
-    },
-    rangeText: '农历正月初一至初七'
-  },
-  {
-    name: '清明节',
-    type: 'legal',
-    match(year, month, day) {
-      return month === 4 && day >= 4 && day <= 6
-    },
-    rangeText: '4月4-6日'
-  },
-  {
-    name: '劳动节',
-    type: 'legal',
-    match(year, month, day) {
-      return month === 5 && day >= 1 && day <= 5
-    },
-    rangeText: '5月1-5日'
-  },
-  {
-    name: '端午节',
-    type: 'legal',
-    match(year, month, day) {
-      const lunar = solarToLunar(year, month, day)
-      return lunar.lunarMonth === 5 && lunar.lunarDay === 5
-    },
-    rangeText: '农历五月初五'
-  },
-  {
-    name: '中秋节',
-    type: 'legal',
-    match(year, month, day) {
-      const lunar = solarToLunar(year, month, day)
-      return lunar.lunarMonth === 8 && lunar.lunarDay === 15
-    },
-    rangeText: '农历八月十五'
-  },
-  {
-    name: '国庆节',
-    type: 'legal',
-    match(year, month, day) {
-      return month === 10 && day >= 1 && day <= 7
-    },
-    rangeText: '10月1-7日'
-  }
+const LEGAL_FALLBACK = [
+  { name: '元旦', desc: '1月1日放假（参考）', note: '请以国务院当年安排为准' },
+  { name: '春节', desc: '农历新年放假（参考）', note: '请以国务院当年安排为准' },
+  { name: '清明节', desc: '清明前后放假（参考）', note: '请以国务院当年安排为准' },
+  { name: '劳动节', desc: '5月1日放假（参考）', note: '请以国务院当年安排为准' },
+  { name: '端午节', desc: '农历五月初五（参考）', note: '请以国务院当年安排为准' },
+  { name: '中秋节', desc: '农历八月十五（参考）', note: '请以国务院当年安排为准' },
+  { name: '国庆节', desc: '10月1-7日放假（参考）', note: '请以国务院当年安排为准' }
 ]
 
 function termDate(year, n) {
@@ -120,14 +62,8 @@ function nthWeekdayOfMonth(year, month, weekday, nth) {
   return null
 }
 
-function buildFestivalGroups(year) {
-  const legal = LEGAL_HOLIDAY_RULES.map((item) => ({
-    name: item.name,
-    desc: item.rangeText,
-    type: 'legal'
-  }))
-
-  const terms = SOLAR_TERMS.map((name, index) => {
+function buildSolarTerms(year) {
+  return SOLAR_TERMS.map((name, index) => {
     const t = termDate(year, index)
     return {
       name,
@@ -137,26 +73,31 @@ function buildFestivalGroups(year) {
       day: t.day
     }
   })
+}
 
-  const popular = POPULAR_FESTIVALS.map((item) => {
-    if (item.name === '母亲节') {
-      const solar = nthWeekdayOfMonth(year, 5, 0, 2)
-      return {
-        name: item.name,
-        desc: solar ? `${year}年${solar.month}月${solar.day}日` : `${year}年5月`,
-        note: '五月第二个周日',
-        type: 'popular'
-      }
+function buildPopularFestivals(year) {
+  const extras = [
+    {
+      name: '母亲节',
+      desc: (() => {
+        const solar = nthWeekdayOfMonth(year, 5, 0, 2)
+        return solar ? `${year}年${solar.month}月${solar.day}日` : `${year}年5月`
+      })(),
+      note: '五月第二个周日',
+      type: 'popular'
+    },
+    {
+      name: '父亲节',
+      desc: (() => {
+        const solar = nthWeekdayOfMonth(year, 6, 0, 3)
+        return solar ? `${year}年${solar.month}月${solar.day}日` : `${year}年6月`
+      })(),
+      note: '六月第三个周日',
+      type: 'popular'
     }
-    if (item.name === '父亲节') {
-      const solar = nthWeekdayOfMonth(year, 6, 0, 3)
-      return {
-        name: item.name,
-        desc: solar ? `${year}年${solar.month}月${solar.day}日` : `${year}年6月`,
-        note: '六月第三个周日',
-        type: 'popular'
-      }
-    }
+  ]
+
+  const list = POPULAR_FESTIVALS.map((item) => {
     if (item.lunarMonth) {
       const solar = findSolarByLunar(year, item.lunarMonth, item.lunarDay)
       return {
@@ -166,26 +107,42 @@ function buildFestivalGroups(year) {
               solarToLunar(year, solar.month, solar.day)
             )}）`
           : `农历${item.lunarMonth}月${item.lunarDay}日`,
-        note: item.note || '',
         type: 'popular'
       }
     }
     return {
       name: item.name,
       desc: `${year}年${item.month}月${item.day}日`,
-      note: item.note || '',
       type: 'popular'
     }
   })
 
-  return { legal, terms, popular }
+  return extras.concat(list)
 }
 
-function getDayFestivalLabel(year, month, day) {
+async function buildFestivalGroups(year) {
+  const holidayData = await loadYearHolidays(year)
+  const legal =
+    holidayData.legal && holidayData.legal.length
+      ? holidayData.legal
+      : LEGAL_FALLBACK.map((item) => ({ ...item, type: 'legal', source: 'fallback' }))
+
+  return {
+    legal,
+    terms: buildSolarTerms(year),
+    popular: buildPopularFestivals(year),
+    holidayDayMap: holidayData.dayMap || {},
+    holidaySource: holidayData.source || 'fallback',
+    holidayError: holidayData.error || '',
+    holidayStale: !!holidayData.stale
+  }
+}
+
+function getDayFestivalLabel(year, month, day, holidayDayMap) {
   const labels = []
-  LEGAL_HOLIDAY_RULES.forEach((item) => {
-    if (item.match(year, month, day)) labels.push(item.name)
-  })
+  const official = getDayHolidayLabel(holidayDayMap, year, month, day)
+  if (official) labels.push(official)
+
   POPULAR_FESTIVALS.forEach((item) => {
     if (item.month && item.month === month && item.day === day) {
       labels.push(item.name)
@@ -197,12 +154,18 @@ function getDayFestivalLabel(year, month, day) {
       }
     }
   })
+
   const info = buildDayInfo(year, month, day)
-  if (info.solarTerm) labels.push(info.solarTerm)
+  if (info.solarTerm && labels.indexOf(info.solarTerm) < 0) {
+    labels.push(info.solarTerm)
+  }
+
   return labels.slice(0, 2).join(' ')
 }
 
 module.exports = {
   buildFestivalGroups,
-  getDayFestivalLabel
+  getDayFestivalLabel,
+  buildSolarTerms,
+  buildPopularFestivals
 }

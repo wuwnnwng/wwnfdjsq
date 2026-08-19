@@ -87,6 +87,20 @@
         </view>
         <view class="huangli-term" wx:if="{{huangliDetail.solarTerm}}">节气：{{huangliDetail.solarTerm}}</view>
 
+        <view class="huangli-section">
+          <view class="huangli-section-title">建除十二神</view>
+          <view class="huangli-section-sub">值神：{{huangliDetail.jianChu}} · {{huangliDetail.jianChuDesc}}</view>
+          <view class="jianchu-grid">
+            <view
+              class="jianchu-item {{item.active ? 'active' : ''}}"
+              wx:for="{{huangliDetail.jianChuList}}"
+              wx:key="name"
+            >
+              <view class="jianchu-name">{{item.name}}</view>
+            </view>
+          </view>
+        </view>
+
         <view class="yi-ji-block huangli-yiji">
           <view class="yi-ji-row">
             <view class="yi-ji-label yi">宜</view>
@@ -95,6 +109,26 @@
           <view class="yi-ji-row">
             <view class="yi-ji-label ji">忌</view>
             <view class="yi-ji-text">{{huangliDetail.ji}}</view>
+          </view>
+        </view>
+
+        <view class="huangli-section">
+          <view class="huangli-section-title">时辰吉凶</view>
+          <view class="huangli-section-sub">青龙、明堂、金匮、天德、玉堂、司命为吉，其余为凶</view>
+          <view class="hour-grid">
+            <view
+              class="hour-item {{item.lucky ? 'lucky' : 'unlucky'}} {{item.isNow ? 'now' : ''}}"
+              wx:for="{{huangliDetail.hourLuckList}}"
+              wx:key="zhi"
+            >
+              <view class="hour-top">
+                <view class="hour-label">{{item.label}}</view>
+                <view class="hour-luck">{{item.luckText}}</view>
+              </view>
+              <view class="hour-range">{{item.range}}</view>
+              <view class="hour-deity">{{item.deity}}</view>
+              <view class="hour-now-tag" wx:if="{{item.isNow}}">当前</view>
+            </view>
           </view>
         </view>
 
@@ -109,29 +143,48 @@
 
     <!-- 节日 -->
     <view wx:if="{{activeTab === 'festival'}}">
+      <view class="tool-note" wx:if="{{festivalLoading}}">正在加载官方放假安排…</view>
+      <view class="tool-note warn" wx:if="{{festivalError}}">{{festivalError}}</view>
       <view class="panel festival-panel">
-        <view class="festival-section-title">法定假日</view>
-        <view class="festival-item" wx:for="{{festivalGroups.legal}}" wx:key="name">
-          <view class="festival-name">{{item.name}}</view>
-          <view class="festival-desc">{{item.desc}}</view>
+        <view class="festival-section-head" bindtap="onToggleFestivalSection" data-key="legal">
+          <view class="festival-section-title">法定假日</view>
+          <text class="festival-section-arrow">{{festivalSectionOpen.legal ? '▲' : '▼'}}</text>
         </view>
+        <block wx:if="{{festivalSectionOpen.legal}}">
+          <view class="festival-source-note">数据来源：国务院放假安排（含调休）</view>
+          <view class="festival-item" wx:for="{{festivalGroups.legal}}" wx:key="name">
+            <view class="festival-name">{{item.name}}</view>
+            <view class="festival-desc">{{item.desc}}</view>
+            <view class="festival-note" wx:if="{{item.note}}">{{item.note}}</view>
+          </view>
+        </block>
       </view>
 
       <view class="panel festival-panel">
-        <view class="festival-section-title">二十四节气</view>
-        <view class="festival-item" wx:for="{{festivalGroups.terms}}" wx:key="name">
-          <view class="festival-name">{{item.name}}</view>
-          <view class="festival-desc">{{item.desc}}</view>
+        <view class="festival-section-head" bindtap="onToggleFestivalSection" data-key="terms">
+          <view class="festival-section-title">二十四节气</view>
+          <text class="festival-section-arrow">{{festivalSectionOpen.terms ? '▲' : '▼'}}</text>
         </view>
+        <block wx:if="{{festivalSectionOpen.terms}}">
+          <view class="festival-item" wx:for="{{festivalGroups.terms}}" wx:key="name">
+            <view class="festival-name">{{item.name}}</view>
+            <view class="festival-desc">{{item.desc}}</view>
+          </view>
+        </block>
       </view>
 
       <view class="panel festival-panel">
-        <view class="festival-section-title">热门节日</view>
-        <view class="festival-item" wx:for="{{festivalGroups.popular}}" wx:key="name">
-          <view class="festival-name">{{item.name}}</view>
-          <view class="festival-desc">{{item.desc}}</view>
-          <view class="festival-note" wx:if="{{item.note}}">{{item.note}}</view>
+        <view class="festival-section-head" bindtap="onToggleFestivalSection" data-key="popular">
+          <view class="festival-section-title">热门节日</view>
+          <text class="festival-section-arrow">{{festivalSectionOpen.popular ? '▲' : '▼'}}</text>
         </view>
+        <block wx:if="{{festivalSectionOpen.popular}}">
+          <view class="festival-item" wx:for="{{festivalGroups.popular}}" wx:key="name">
+            <view class="festival-name">{{item.name}}</view>
+            <view class="festival-desc">{{item.desc}}</view>
+            <view class="festival-note" wx:if="{{item.note}}">{{item.note}}</view>
+          </view>
+        </block>
       </view>
     </view>
 

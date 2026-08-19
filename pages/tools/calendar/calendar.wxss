@@ -254,6 +254,128 @@
   margin-top: 28rpx;
 }
 
+.huangli-section {
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.huangli-section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.huangli-section-sub {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.jianchu-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.jianchu-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72rpx;
+  border-radius: 14rpx;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1rpx solid var(--color-line);
+}
+
+.jianchu-item.active {
+  background: rgba(31, 107, 82, 0.16);
+  border-color: var(--color-brand-soft);
+}
+
+.jianchu-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.jianchu-item.active .jianchu-name {
+  color: var(--color-brand);
+}
+
+.hour-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.hour-item {
+  position: relative;
+  padding: 18rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid var(--color-line);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.hour-item.lucky {
+  border-color: rgba(31, 107, 82, 0.25);
+}
+
+.hour-item.unlucky {
+  border-color: rgba(196, 92, 38, 0.2);
+}
+
+.hour-item.now {
+  box-shadow: 0 0 0 2rpx var(--color-brand-soft);
+}
+
+.hour-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.hour-label {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.hour-luck {
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.hour-item.lucky .hour-luck {
+  color: var(--color-brand-soft);
+}
+
+.hour-item.unlucky .hour-luck {
+  color: var(--color-accent);
+}
+
+.hour-range,
+.hour-deity {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.hour-now-tag {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 999rpx;
+  font-size: 18rpx;
+  color: #fff;
+  background: var(--color-brand-soft);
+}
+
 .huangli-card {
   margin-top: 28rpx;
   padding: 24rpx;
@@ -274,11 +396,30 @@
   color: var(--color-muted);
 }
 
+.festival-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
 .festival-section-title {
   font-size: 30rpx;
   font-weight: 700;
   color: var(--color-brand);
-  margin-bottom: 8rpx;
+  margin-bottom: 0;
+}
+
+.festival-section-arrow {
+  font-size: 20rpx;
+  color: var(--color-brand-soft);
+}
+
+.festival-source-note {
+  margin-top: 12rpx;
+  margin-bottom: 12rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
 }
 
 .festival-item {

@@ -89,6 +89,10 @@
   background: linear-gradient(135deg, #ccfbf1, #5eead4);
 }
 
+.tool-icon-calendar {
+  background: linear-gradient(135deg, #ffe4e6, #fb7185);
+}
+
 .tool-card-name {
   font-size: 26rpx;
   font-weight: 600;

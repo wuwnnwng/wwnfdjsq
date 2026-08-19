@@ -3,6 +3,13 @@
  */
 const TOOLS = [
   {
+    id: 'calendar',
+    name: '我的日历',
+    icon: '📅',
+    iconType: 'calendar',
+    page: '/pages/tools/calendar/calendar'
+  },
+  {
     id: 'calc',
     name: '算术计算器',
     icon: '🧮',

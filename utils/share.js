@@ -73,6 +73,14 @@ function getBaseToolShare() {
   }
 }
 
+function getCalendarToolShare() {
+  const path = '/pages/tools/calendar/calendar'
+  return {
+    appMessage: buildToolShareAppMessage(path, '我的日历'),
+    timeline: buildToolShareTimeline(path, '我的日历')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
@@ -339,6 +347,7 @@ module.exports = {
   getConverterToolShare,
   getCalcToolShare,
   getBaseToolShare,
+  getCalendarToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

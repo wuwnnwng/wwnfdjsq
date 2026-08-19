@@ -1,0 +1,164 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="calendar-scroll" enhanced show-scrollbar="{{false}}">
+    <!-- 日历 -->
+    <view wx:if="{{activeTab === 'calendar'}}">
+      <view class="panel calendar-panel">
+        <view class="calendar-head">
+          <view class="month-nav" bindtap="onPrevMonth">‹</view>
+          <view class="month-title">{{viewYear}}年{{viewMonth}}月</view>
+          <view class="month-nav" bindtap="onNextMonth">›</view>
+        </view>
+        <view class="today-link" bindtap="onBackToday">回到今天</view>
+
+        <view class="week-row">
+          <view class="week-cell" wx:for="{{weekHeaders}}" wx:key="*this">{{item}}</view>
+        </view>
+
+        <view class="day-grid">
+          <view
+            class="day-cell {{item.inMonth ? '' : 'other-month'}} {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isAuspicious ? 'auspicious' : ''}}"
+            wx:for="{{monthCells}}"
+            wx:key="key"
+            bindtap="onSelectDay"
+            data-year="{{item.year}}"
+            data-month="{{item.month}}"
+            data-day="{{item.day}}"
+            data-inmonth="{{item.inMonth}}"
+          >
+            <view class="day-num">{{item.day}}</view>
+            <view class="day-lunar">{{item.lunarShort}}</view>
+            <view class="day-tag" wx:if="{{item.festivalShort}}">{{item.festivalShort}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="panel auspicious-panel">
+        <view class="auspicious-head" bindtap="onToggleAuspiciousPicker">
+          <view class="section-title section-title-inline">选择吉日</view>
+          <view class="auspicious-current">
+            {{auspiciousEventName || '未选择'}}
+            <text class="auspicious-arrow">{{showAuspiciousPicker ? '▲' : '▼'}}</text>
+          </view>
+        </view>
+        <view class="auspicious-tags" wx:if="{{showAuspiciousPicker}}">
+          <view
+            class="auspicious-tag {{auspiciousEvent === item.id ? 'active' : ''}}"
+            wx:for="{{auspiciousEvents}}"
+            wx:key="id"
+            bindtap="onSelectAuspiciousEvent"
+            data-id="{{item.id}}"
+          >
+            {{item.name}}
+          </view>
+        </view>
+        <view class="tool-note" wx:if="{{auspiciousEventName}}">
+          本月适合「{{auspiciousEventName}}」的日期已用绿色标注，仅供参考。
+        </view>
+      </view>
+
+      <view class="panel detail-panel" wx:if="{{selectedInfo}}">
+        <view class="detail-solar">{{selectedInfo.solarText}} {{selectedInfo.weekdayText}}</view>
+        <view class="detail-lunar">{{selectedInfo.lunarText}}</view>
+        <view class="detail-meta">{{selectedInfo.ganZhiText}} · {{selectedInfo.ganZhiDay}}</view>
+        <view class="detail-term">节气：{{selectedInfo.solarTerm}}</view>
+
+        <view class="yi-ji-block">
+          <view class="yi-ji-row">
+            <view class="yi-ji-label yi">宜</view>
+            <view class="yi-ji-text">{{selectedInfo.yi}}</view>
+          </view>
+          <view class="yi-ji-row">
+            <view class="yi-ji-label ji">忌</view>
+            <view class="yi-ji-text">{{selectedInfo.ji}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 黄历 -->
+    <view wx:if="{{activeTab === 'almanac'}}">
+      <view class="panel huangli-panel" wx:if="{{huangliDetail}}">
+        <view class="huangli-title">老黄历</view>
+        <view class="huangli-date">{{huangliDetail.solarText}}</view>
+        <view class="huangli-lunar">{{huangliDetail.lunarText}} · 星期{{huangliDetail.weekday}}</view>
+        <view class="huangli-meta">
+          {{huangliDetail.ganZhiYear}}年 {{huangliDetail.zodiac}}年 · {{huangliDetail.ganZhiDay}}日 ·
+          {{huangliDetail.jianChu}}日
+        </view>
+        <view class="huangli-term" wx:if="{{huangliDetail.solarTerm}}">节气：{{huangliDetail.solarTerm}}</view>
+
+        <view class="yi-ji-block huangli-yiji">
+          <view class="yi-ji-row">
+            <view class="yi-ji-label yi">宜</view>
+            <view class="yi-ji-text">{{huangliDetail.yi}}</view>
+          </view>
+          <view class="yi-ji-row">
+            <view class="yi-ji-label ji">忌</view>
+            <view class="yi-ji-text">{{huangliDetail.ji}}</view>
+          </view>
+        </view>
+
+        <view class="huangli-card">
+          <view class="huangli-card-title">今日黄历释义</view>
+          <view class="huangli-card-text">
+            建除值神为「{{huangliDetail.jianChu}}」，传统黄历以建除十二神配合日辰推断吉凶。以下内容根据民间通用历法规则整理，仅供生活参考，不作专业择日依据。
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 节日 -->
+    <view wx:if="{{activeTab === 'festival'}}">
+      <view class="panel festival-panel">
+        <view class="festival-section-title">法定假日</view>
+        <view class="festival-item" wx:for="{{festivalGroups.legal}}" wx:key="name">
+          <view class="festival-name">{{item.name}}</view>
+          <view class="festival-desc">{{item.desc}}</view>
+        </view>
+      </view>
+
+      <view class="panel festival-panel">
+        <view class="festival-section-title">二十四节气</view>
+        <view class="festival-item" wx:for="{{festivalGroups.terms}}" wx:key="name">
+          <view class="festival-name">{{item.name}}</view>
+          <view class="festival-desc">{{item.desc}}</view>
+        </view>
+      </view>
+
+      <view class="panel festival-panel">
+        <view class="festival-section-title">热门节日</view>
+        <view class="festival-item" wx:for="{{festivalGroups.popular}}" wx:key="name">
+          <view class="festival-name">{{item.name}}</view>
+          <view class="festival-desc">{{item.desc}}</view>
+          <view class="festival-note" wx:if="{{item.note}}">{{item.note}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="calendar-bottom-space"></view>
+  </scroll-view>
+
+  <view class="calendar-tabs">
+    <view
+      class="calendar-tab {{activeTab === 'calendar' ? 'active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="calendar"
+    >
+      日历
+    </view>
+    <view
+      class="calendar-tab {{activeTab === 'almanac' ? 'active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="almanac"
+    >
+      黄历
+    </view>
+    <view
+      class="calendar-tab {{activeTab === 'festival' ? 'active' : ''}}"
+      bindtap="onTabChange"
+      data-tab="festival"
+    >
+      节日
+    </view>
+  </view>
+</view>

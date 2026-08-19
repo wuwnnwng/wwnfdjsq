@@ -49,7 +49,7 @@ function fromCelsius(value, unit) {
 const CONVERTER_TYPES = {
   currency: {
     title: '汇率换算',
-    note: '数据来源于中国货币网人民币汇率中间价，仅供参考；实际交易以银行柜台为准',
+    note: '数据来源于 ExchangeRate-API，仅供参考；实际交易以银行柜台为准',
     digits: 4,
     units: []
   },

@@ -3,11 +3,11 @@
  */
 const TOOLS = [
   {
-    id: 'currency',
-    name: '汇率',
-    icon: '💱',
-    iconType: 'currency',
-    page: '/pages/tools/converter/converter?type=currency'
+    id: 'calc',
+    name: '算术计算器',
+    icon: '🧮',
+    iconType: 'calc',
+    page: '/pages/tools/calc/calc'
   },
   {
     id: 'length',
@@ -73,11 +73,11 @@ const TOOLS = [
     page: '/pages/tools/base/base'
   },
   {
-    id: 'calc',
-    name: '算术计算器',
-    icon: '🧮',
-    iconType: 'calc',
-    page: '/pages/tools/calc/calc'
+    id: 'currency',
+    name: '汇率',
+    icon: '💱',
+    iconType: 'currency',
+    page: '/pages/tools/converter/converter?type=currency'
   }
 ]
 

@@ -1,30 +1,98 @@
 @import "./tool-common.wxss";
 
+.tool-intro-panel {
+  margin-top: 0;
+}
+
 .tool-grid-panel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  padding-bottom: 20rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx 16rpx;
+  padding: 8rpx 4rpx 28rpx;
 }
 
 .tool-card {
-  width: calc(50% - 8rpx);
-  padding: 24rpx 20rpx;
-  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 196rpx;
+  padding: 24rpx 10rpx 20rpx;
+  border-radius: 20rpx;
   background: rgba(255, 255, 255, 0.55);
   border: 1rpx solid var(--color-line);
   box-sizing: border-box;
 }
 
-.tool-card-name {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: var(--color-ink);
+.tool-card:active {
+  transform: scale(0.98);
+  opacity: 0.92;
 }
 
-.tool-card-desc {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  line-height: 1.4;
-  color: var(--color-muted);
+.tool-icon-wrap {
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.tool-icon {
+  font-size: 44rpx;
+  line-height: 1;
+}
+
+.tool-icon-currency {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+}
+
+.tool-icon-length {
+  background: linear-gradient(135deg, #dbeafe, #93c5fd);
+}
+
+.tool-icon-area {
+  background: linear-gradient(135deg, #dcfce7, #86efac);
+}
+
+.tool-icon-volume {
+  background: linear-gradient(135deg, #e0f2fe, #7dd3fc);
+}
+
+.tool-icon-weight {
+  background: linear-gradient(135deg, #f3e8ff, #c4b5fd);
+}
+
+.tool-icon-temperature {
+  background: linear-gradient(135deg, #fee2e2, #fca5a5);
+}
+
+.tool-icon-speed {
+  background: linear-gradient(135deg, #ffedd5, #fdba74);
+}
+
+.tool-icon-pressure {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+}
+
+.tool-icon-power {
+  background: linear-gradient(135deg, #fef9c3, #facc15);
+}
+
+.tool-icon-base {
+  background: linear-gradient(135deg, #ede9fe, #a78bfa);
+}
+
+.tool-icon-calc {
+  background: linear-gradient(135deg, #ccfbf1, #5eead4);
+}
+
+.tool-card-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-align: center;
+  line-height: 1.35;
 }

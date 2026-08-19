@@ -1,18 +1,27 @@
 @import "../tool-common.wxss";
 
 .calc-page {
-  justify-content: space-between;
+  display: flex;
+  flex-direction: column;
 }
 
 .calc-display {
   margin-top: 0;
+  flex-shrink: 0;
   min-height: 180rpx;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
 }
 
+.calc-mode {
+  font-size: 22rpx;
+  color: var(--color-brand-soft);
+  text-align: right;
+}
+
 .calc-expression {
+  margin-top: 8rpx;
   font-size: 24rpx;
   color: var(--color-muted);
   text-align: right;
@@ -21,7 +30,7 @@
 
 .calc-value {
   margin-top: 12rpx;
-  font-size: 56rpx;
+  font-size: 52rpx;
   font-weight: 700;
   text-align: right;
   color: var(--color-ink);
@@ -35,20 +44,25 @@
   color: var(--color-accent);
 }
 
+.calc-scroll {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+}
+
 .calc-keyboard {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 12rpx;
   margin-bottom: 24rpx;
 }
 
 .calc-key {
-  width: calc(25% - 9rpx);
-  height: 96rpx;
-  line-height: 96rpx;
+  height: 88rpx;
+  line-height: 88rpx;
   text-align: center;
   border-radius: 16rpx;
-  font-size: 34rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: var(--color-ink);
   background: rgba(255, 255, 255, 0.55);
@@ -56,12 +70,25 @@
   box-sizing: border-box;
 }
 
-.calc-key.wide {
-  width: calc(50% - 6rpx);
+.calc-key.tone-fn {
+  font-size: 24rpx;
+  color: var(--color-brand);
+  background: rgba(255, 255, 255, 0.72);
 }
 
-.calc-key.accent {
+.calc-key.tone-soft {
+  color: var(--color-muted);
+}
+
+.calc-key.tone-mode {
+  font-size: 22rpx;
   color: #fff;
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+  border-color: transparent;
+}
+
+.calc-key.tone-accent {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #e07a42 100%);
   border-color: transparent;
 }

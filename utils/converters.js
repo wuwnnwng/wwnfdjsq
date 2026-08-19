@@ -49,18 +49,9 @@ function fromCelsius(value, unit) {
 const CONVERTER_TYPES = {
   currency: {
     title: '汇率换算',
-    note: '汇率为参考值，实际交易以银行柜台为准',
+    note: '数据来源于中国货币网人民币汇率中间价，仅供参考；实际交易以银行柜台为准',
     digits: 4,
-    units: [
-      { key: 'cny', label: '人民币 CNY', factor: 1 },
-      { key: 'usd', label: '美元 USD', factor: 7.25 },
-      { key: 'eur', label: '欧元 EUR', factor: 7.85 },
-      { key: 'gbp', label: '英镑 GBP', factor: 9.15 },
-      { key: 'jpy', label: '日元 JPY', factor: 0.048 },
-      { key: 'hkd', label: '港币 HKD', factor: 0.93 },
-      { key: 'krw', label: '韩元 KRW', factor: 0.0052 },
-      { key: 'aud', label: '澳元 AUD', factor: 4.72 }
-    ]
+    units: []
   },
   length: {
     title: '长度换算',
@@ -167,14 +158,39 @@ const CONVERTER_TYPES = {
   }
 }
 
-function getConverterType(type) {
-  return CONVERTER_TYPES[type] || null
+let dynamicCurrencyUnits = null
+
+function setCurrencyUnits(units) {
+  dynamicCurrencyUnits = Array.isArray(units) && units.length ? units : null
+}
+
+function getUnitsForType(type) {
+  if (type === 'currency' && dynamicCurrencyUnits) return dynamicCurrencyUnits
+  const config = CONVERTER_TYPES[type]
+  return config ? config.units : []
+}
+
+function getConverterType(type, overrides) {
+  const config = CONVERTER_TYPES[type]
+  if (!config) return null
+  const extra = overrides || {}
+  if (type === 'currency') {
+    const units =
+      extra.units ||
+      dynamicCurrencyUnits ||
+      require('./exchangeRate').getExchangeRateDisplay().units
+    return {
+      ...config,
+      ...extra,
+      units
+    }
+  }
+  return extra.units ? { ...config, ...extra } : { ...config, ...extra }
 }
 
 function getUnit(type, key) {
-  const config = getConverterType(type)
-  if (!config) return null
-  return config.units.find((item) => item.key === key) || config.units[0]
+  const units = getUnitsForType(type)
+  return units.find((item) => item.key === key) || units[0]
 }
 
 function convertValue(type, value, fromKey, toKey) {
@@ -193,9 +209,9 @@ function convertValue(type, value, fromKey, toKey) {
 }
 
 function convertAll(type, value, fromKey) {
-  const config = getConverterType(type)
-  if (!config) return []
-  return config.units.map((unit) => ({
+  const units = getUnitsForType(type)
+  if (!units.length) return []
+  return units.map((unit) => ({
     key: unit.key,
     label: unit.label,
     value: convertValue(type, value, fromKey, unit.key)
@@ -408,6 +424,8 @@ module.exports = {
   CONVERTER_TYPES,
   getConverterType,
   getUnit,
+  getUnitsForType,
+  setCurrencyUnits,
   convertValue,
   convertAll,
   formatNumber,

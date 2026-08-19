@@ -3,8 +3,13 @@ const {
   convertValue,
   convertAll,
   formatNumber,
-  parseInput
+  parseInput,
+  setCurrencyUnits
 } = require('../../../utils/converters')
+const {
+  loadExchangeRates,
+  getExchangeRateDisplay
+} = require('../../../utils/exchangeRate')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 
 Page({
@@ -13,6 +18,9 @@ Page({
     type: '',
     title: '',
     note: '',
+    publishedAt: '',
+    rateLoading: false,
+    rateError: '',
     digits: 6,
     units: [],
     unitLabels: [],
@@ -34,9 +42,60 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+    if (this.data.type === 'currency' && this._currencyShownOnce) {
+      this.refreshExchangeRates(false)
+    }
+    this._currencyShownOnce = true
+  },
+
+  applyConverterConfig(config, callback) {
+    if (!config) return
+    wx.setNavigationBarTitle({ title: config.title })
+    if (config.units && config.units.length) {
+      setCurrencyUnits(config.type === 'currency' ? config.units : null)
+    }
+    this.setData(
+      {
+        type: config.type || this.data.type,
+        title: config.title,
+        note: config.note || '',
+        publishedAt: config.publishedAt || '',
+        digits: config.digits || 6,
+        units: config.units,
+        unitLabels: config.units.map((item) => item.label),
+        fromIndex: 0,
+        toIndex: Math.min(1, config.units.length - 1),
+        showAll: this.data.showAll
+      },
+      () => {
+        if (callback) callback()
+        else this.recalculate()
+      }
+    )
   },
 
   initConverter(type) {
+    if (type === 'currency') {
+      const cached = getExchangeRateDisplay()
+      setCurrencyUnits(cached.units)
+      this.applyConverterConfig(
+        {
+          type,
+          ...getConverterType('currency', {
+            units: cached.units,
+            note: cached.note,
+            publishedAt: cached.publishedAt
+          }),
+          rateError: cached.error
+        },
+        () => {
+          this.recalculate()
+          this.refreshExchangeRates(false)
+        }
+      )
+      return
+    }
+
     const config = getConverterType(type)
     if (!config) {
       wx.showToast({ title: '工具不存在', icon: 'none' })
@@ -44,23 +103,46 @@ Page({
       return
     }
 
-    wx.setNavigationBarTitle({ title: config.title })
-
-    this.setData(
+    this.applyConverterConfig(
       {
         type,
-        title: config.title,
-        note: config.note || '',
-        digits: config.digits || 6,
-        units: config.units,
-        unitLabels: config.units.map((item) => item.label),
-        fromIndex: 0,
-        toIndex: Math.min(1, config.units.length - 1),
-        inputValue: '1',
-        showAll: false
+        ...config
       },
-      () => this.recalculate()
+      () => {
+        this.setData({ inputValue: '1', showAll: false }, () => this.recalculate())
+      }
     )
+  },
+
+  async refreshExchangeRates(force) {
+    if (this._rateLoading) return
+    this._rateLoading = true
+    this.setData({ rateLoading: true })
+    try {
+      const data = await loadExchangeRates({ force: !!force })
+      setCurrencyUnits(data.units)
+      this.setData({
+        note: data.note,
+        publishedAt: data.publishedAt,
+        rateError: data.error || '',
+        units: data.units,
+        unitLabels: data.units.map((item) => item.label),
+        rateLoading: false
+      })
+      this.recalculate()
+    } catch (e) {
+      this.setData({
+        rateLoading: false,
+        rateError: '汇率更新失败，请稍后重试'
+      })
+    } finally {
+      this._rateLoading = false
+    }
+  },
+
+  onRefreshRates() {
+    if (this.data.type !== 'currency') return
+    this.refreshExchangeRates(true)
   },
 
   recalculate() {
@@ -77,10 +159,19 @@ Page({
     const fromUnit = units[fromIndex]
     const toUnit = units[toIndex]
 
+    if (!fromUnit || !toUnit) {
+      this.setData({
+        resultValue: '',
+        resultLabel: '',
+        allResults: []
+      })
+      return
+    }
+
     if (value === null) {
       this.setData({
         resultValue: '',
-        resultLabel: toUnit ? toUnit.label : '',
+        resultLabel: toUnit.label,
         allResults: []
       })
       return
@@ -89,7 +180,7 @@ Page({
     if (!Number.isFinite(value)) {
       this.setData({
         resultValue: '无效',
-        resultLabel: toUnit ? toUnit.label : '',
+        resultLabel: toUnit.label,
         allResults: []
       })
       return

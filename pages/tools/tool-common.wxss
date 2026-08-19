@@ -23,6 +23,10 @@
   color: var(--color-muted);
 }
 
+.tool-note.warn {
+  color: var(--color-accent);
+}
+
 .result-panel {
   margin-top: 0;
 }

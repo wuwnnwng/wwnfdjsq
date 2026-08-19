@@ -1,5 +1,6 @@
 /**
- * 科学计算器表达式求值（四则运算 + 三角函数）
+ * 科学计算器表达式求值
+ * 四则运算、对数、三角函数（默认按角度°计算）
  */
 
 function round(value, digits) {
@@ -18,28 +19,48 @@ function formatNumber(value, digits) {
   return text
 }
 
-const FUNCTIONS = ['sin', 'cos', 'tan', 'asin', 'acos', 'atan']
+const FUNCTIONS = [
+  'sin',
+  'cos',
+  'tan',
+  'asin',
+  'acos',
+  'atan',
+  'log',
+  'ln',
+  'exp',
+  'pow10'
+]
+
 const CONSTANTS = {
   pi: Math.PI,
   e: Math.E
 }
 
-function toRadians(value, angleMode) {
-  return angleMode === 'deg' ? (value * Math.PI) / 180 : value
+function toRadians(value) {
+  return (value * Math.PI) / 180
 }
 
-function fromRadians(value, angleMode) {
-  return angleMode === 'deg' ? (value * 180) / Math.PI : value
+function fromRadians(value) {
+  return (value * 180) / Math.PI
 }
 
-function applyFunction(name, arg, angleMode) {
+function log10(value) {
+  return Math.log(value) / Math.LN10
+}
+
+function applyFunction(name, arg) {
   if (!Number.isFinite(arg)) return NaN
-  if (name === 'sin') return Math.sin(toRadians(arg, angleMode))
-  if (name === 'cos') return Math.cos(toRadians(arg, angleMode))
-  if (name === 'tan') return Math.tan(toRadians(arg, angleMode))
-  if (name === 'asin') return fromRadians(Math.asin(arg), angleMode)
-  if (name === 'acos') return fromRadians(Math.acos(arg), angleMode)
-  if (name === 'atan') return fromRadians(Math.atan(arg), angleMode)
+  if (name === 'sin') return Math.sin(toRadians(arg))
+  if (name === 'cos') return Math.cos(toRadians(arg))
+  if (name === 'tan') return Math.tan(toRadians(arg))
+  if (name === 'asin') return fromRadians(Math.asin(arg))
+  if (name === 'acos') return fromRadians(Math.acos(arg))
+  if (name === 'atan') return fromRadians(Math.atan(arg))
+  if (name === 'log') return log10(arg)
+  if (name === 'ln') return Math.log(arg)
+  if (name === 'exp') return Math.exp(arg)
+  if (name === 'pow10') return Math.pow(10, arg)
   return NaN
 }
 
@@ -71,14 +92,8 @@ function tokenizeExpression(expr) {
       let j = i + 1
       while (j < text.length) {
         const next = text[j]
-        if (
-          (next >= 'a' && next <= 'z') ||
-          (next >= 'A' && next <= 'Z')
-        ) {
-          j += 1
-        } else {
-          break
-        }
+        if ((next >= 'a' && next <= 'z') || (next >= 'A' && next <= 'Z')) j += 1
+        else break
       }
       const word = ch === 'π' ? 'pi' : text.slice(i, j).toLowerCase()
       tokens.push(word)
@@ -110,7 +125,6 @@ function toRpn(tokens) {
 
   for (let i = 0; i < tokens.length; i += 1) {
     const token = tokens[i]
-    const next = tokens[i + 1]
 
     if (isNumberToken(token)) {
       output.push(Number(token))
@@ -188,7 +202,7 @@ function toRpn(tokens) {
   return output
 }
 
-function evalRpn(rpn, angleMode) {
+function evalRpn(rpn) {
   const stack = []
   for (let i = 0; i < rpn.length; i += 1) {
     const token = rpn[i]
@@ -205,7 +219,7 @@ function evalRpn(rpn, angleMode) {
     if (isFunctionToken(token)) {
       const arg = stack.pop()
       if (arg === undefined) return NaN
-      stack.push(applyFunction(token, arg, angleMode))
+      stack.push(applyFunction(token, arg))
       continue
     }
     const right = stack.pop()
@@ -221,7 +235,7 @@ function evalRpn(rpn, angleMode) {
   return stack[0]
 }
 
-function evaluateScientificExpression(expr, angleMode) {
+function evaluateScientificExpression(expr) {
   const text = String(expr || '').trim()
   if (!text) return { ok: true, value: '0', error: '' }
   if (!/^[0-9a-zA-Z+\-*/%.(),\sπ]+$/.test(text)) {
@@ -236,7 +250,7 @@ function evaluateScientificExpression(expr, angleMode) {
   if (!rpn) {
     return { ok: false, value: '', error: '表达式有误' }
   }
-  const value = evalRpn(rpn, angleMode === 'rad' ? 'rad' : 'deg')
+  const value = evalRpn(rpn)
   if (!Number.isFinite(value)) {
     return { ok: false, value: '', error: '无法计算' }
   }

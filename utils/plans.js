@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'mortgagePlans'
+const BACKUP_STORAGE_KEY = 'mortgagePlans_backup_v1'
 const MAX_PLANS = 6
 const NAME_MAX_LEN = 20
 
@@ -14,17 +15,61 @@ const METHOD_LABEL = {
   interestFirst: '先息后本'
 }
 
-function readPlans() {
+function readRaw(key) {
   try {
-    const list = wx.getStorageSync(STORAGE_KEY)
-    return Array.isArray(list) ? list : []
+    return wx.getStorageSync(key)
   } catch (e) {
-    return []
+    return undefined
   }
 }
 
+function isValidPlanList(list) {
+  return Array.isArray(list)
+}
+
+function writePlansToKey(key, list) {
+  if (!isValidPlanList(list)) return false
+  try {
+    wx.setStorageSync(key, list)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+function backupPlans() {
+  const list = readRaw(STORAGE_KEY)
+  if (!isValidPlanList(list)) return 0
+  writePlansToKey(BACKUP_STORAGE_KEY, list)
+  return list.length
+}
+
+function restorePlansIfMissing() {
+  const current = readRaw(STORAGE_KEY)
+  if (isValidPlanList(current) && current.length > 0) {
+    writePlansToKey(BACKUP_STORAGE_KEY, current)
+    return current
+  }
+
+  const backup = readRaw(BACKUP_STORAGE_KEY)
+  if (isValidPlanList(backup) && backup.length > 0) {
+    writePlansToKey(STORAGE_KEY, backup)
+    return backup
+  }
+
+  return isValidPlanList(current) ? current : []
+}
+
+function readPlans() {
+  restorePlansIfMissing()
+  const list = readRaw(STORAGE_KEY)
+  return isValidPlanList(list) ? list : []
+}
+
 function writePlans(list) {
-  wx.setStorageSync(STORAGE_KEY, list)
+  const safe = isValidPlanList(list) ? list : []
+  writePlansToKey(STORAGE_KEY, safe)
+  writePlansToKey(BACKUP_STORAGE_KEY, safe)
 }
 
 function createId() {
@@ -157,8 +202,11 @@ function removePlan(id) {
 
 module.exports = {
   STORAGE_KEY,
+  BACKUP_STORAGE_KEY,
   MAX_PLANS,
   NAME_MAX_LEN,
+  backupPlans,
+  restorePlansIfMissing,
   defaultPlanName,
   listPlans,
   getPlan,

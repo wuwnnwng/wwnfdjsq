@@ -1,18 +1,23 @@
 /**
- * 本地版本号：结构或缓存规则有变更时，递增此版本即可自动清理旧数据。
+ * 本地版本号：仅当「计算缓存结构」变化时手动递增，与普通发版无关。
  * 注意：这与微信后台发布的小程序版本号不是同一个概念。
- * 「我的方案」属于用户数据，升级时必须保留，不得列入清理列表。
+ * 「我的方案」属于用户数据，任何情况下都不得清理。
  */
-const { STORAGE_KEY: PLANS_STORAGE_KEY } = require('./plans')
+const {
+  STORAGE_KEY: PLANS_STORAGE_KEY,
+  BACKUP_STORAGE_KEY,
+  backupPlans,
+  restorePlansIfMissing
+} = require('./plans')
 
 const APP_VERSION = '1.0.5'
 const VERSION_STORAGE_KEY = 'app_version'
 
-/** 版本升级时需要清理的本地缓存 key（计算缓存等，不含用户方案） */
+/** 版本升级时可清理的计算缓存（严禁包含用户方案） */
 const CLEAR_KEYS_ON_UPGRADE = ['mortgageResult']
 
-/** 版本升级时必须保留的用户数据 */
-const KEEP_KEYS_ON_UPGRADE = [PLANS_STORAGE_KEY]
+/** 永不允许 removeStorageSync 的 key */
+const PROTECTED_STORAGE_KEYS = [PLANS_STORAGE_KEY, BACKUP_STORAGE_KEY, VERSION_STORAGE_KEY]
 
 function getStoredVersion() {
   try {
@@ -30,51 +35,36 @@ function setStoredVersion(version) {
   }
 }
 
-function snapshotKeepKeys() {
-  const snapshot = {}
-  KEEP_KEYS_ON_UPGRADE.forEach((key) => {
-    try {
-      snapshot[key] = wx.getStorageSync(key)
-    } catch (e) {
-      // ignore
-    }
-  })
-  return snapshot
-}
-
-function restoreKeepKeys(snapshot) {
-  KEEP_KEYS_ON_UPGRADE.forEach((key) => {
-    const value = snapshot[key]
-    if (value === '' || value === undefined) return
-    try {
-      wx.setStorageSync(key, value)
-    } catch (e) {
-      // ignore
-    }
-  })
+function isProtectedKey(key) {
+  return PROTECTED_STORAGE_KEYS.indexOf(key) >= 0
 }
 
 function clearLegacyStorage() {
-  const preserved = snapshotKeepKeys()
+  backupPlans()
+
   CLEAR_KEYS_ON_UPGRADE.forEach((key) => {
-    if (KEEP_KEYS_ON_UPGRADE.indexOf(key) >= 0) return
+    if (isProtectedKey(key)) return
     try {
       wx.removeStorageSync(key)
     } catch (e) {
       // ignore
     }
   })
-  restoreKeepKeys(preserved)
+
+  restorePlansIfMissing()
 }
 
 /**
- * 对比本地版本：首次安装写入版本；版本变化时清理旧缓存。
+ * 对比本地版本：首次安装写入版本；版本变化时仅清理计算缓存。
  * @returns {{ upgraded: boolean, from: string, to: string }}
  */
 function checkLocalVersion() {
+  restorePlansIfMissing()
+
   const previous = getStoredVersion()
 
   if (!previous) {
+    backupPlans()
     setStoredVersion(APP_VERSION)
     return { upgraded: false, from: '', to: APP_VERSION }
   }
@@ -90,7 +80,6 @@ function checkLocalVersion() {
 
 /**
  * 检查微信小程序更新包：有新版本则下载，并提示用户重启应用。
- * 这样用户不必手动删除小程序再进入。
  */
 function checkMiniProgramUpdate() {
   if (!wx.canIUse || !wx.canIUse('getUpdateManager')) return
@@ -98,7 +87,6 @@ function checkMiniProgramUpdate() {
   const updateManager = wx.getUpdateManager()
 
   updateManager.onCheckForUpdate((res) => {
-    // res.hasUpdate 表示是否发现新版本
     if (res.hasUpdate) {
       console.log('[update] 发现新版本，开始下载')
     }
@@ -112,7 +100,7 @@ function checkMiniProgramUpdate() {
       cancelText: '稍后',
       success(res) {
         if (res.confirm) {
-          // 应用新版本并重启
+          backupPlans()
           updateManager.applyUpdate()
         }
       }
@@ -122,7 +110,8 @@ function checkMiniProgramUpdate() {
   updateManager.onUpdateFailed(() => {
     wx.showModal({
       title: '更新失败',
-      content: '新版本下载失败，请检查网络后重新打开，或稍后再试。请勿删除小程序，以免丢失已保存的方案。',
+      content:
+        '新版本下载失败，请检查网络后重新打开，或稍后再试。请勿删除小程序，以免丢失已保存的方案。',
       showCancel: false
     })
   })

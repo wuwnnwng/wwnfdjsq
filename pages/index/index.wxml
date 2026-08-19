@@ -1,7 +1,7 @@
 <view class="page page-shell theme-{{theme}}">
   <view class="panel hero-panel">
     <view class="brand-wrap">
-      <view class="brand">房贷计算器</view>
+      <view class="brand">置居计算器</view>
       <view class="theme-switch" aria-label="切换皮肤">
         <view
           class="theme-dot forest {{theme === 'forest' ? 'active' : ''}}"

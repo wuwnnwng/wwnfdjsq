@@ -16,14 +16,14 @@ function enableShareMenu() {
 
 function getShareAppMessage() {
   return {
-    title: '房贷计算器｜公积金、商贷、组合贷一键算清',
+    title: '置居计算器｜公积金、商贷、组合贷一键算清',
     path: '/pages/index/index'
   }
 }
 
 function getShareTimeline() {
   return {
-    title: '房贷计算器｜公积金、商贷、组合贷一键算清',
+    title: '置居计算器｜公积金、商贷、组合贷一键算清',
     query: ''
   }
 }
@@ -43,7 +43,7 @@ function buildResultShareTitle({
     .join(' ')
   if (typePart && payPart) return `${typePart}｜${payPart}`
   if (payPart) return `房贷计算结果｜${payPart}`
-  return '房贷计算器｜查看我的计算结果'
+  return '置居计算器｜查看我的计算结果'
 }
 
 /**

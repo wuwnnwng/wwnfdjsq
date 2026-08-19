@@ -76,17 +76,16 @@ Page({
 
   initConverter(type) {
     if (type === 'currency') {
-      const cached = getExchangeRateDisplay()
-      setCurrencyUnits(cached.units)
+      setCurrencyUnits(getExchangeRateDisplay().units)
       this.applyConverterConfig(
         {
           type,
-          ...getConverterType('currency', {
-            units: cached.units,
-            note: cached.note,
-            publishedAt: cached.publishedAt
-          }),
-          rateError: cached.error
+          title: '汇率换算',
+          note: '',
+          publishedAt: '',
+          digits: 4,
+          units: getExchangeRateDisplay().units,
+          rateError: ''
         },
         () => {
           this.recalculate()
@@ -124,7 +123,7 @@ Page({
       this.setData({
         note: data.note,
         publishedAt: data.publishedAt,
-        rateError: data.error || '',
+        rateError: data.source === 'fallback' ? data.error || data.note : data.error || '',
         units: data.units,
         unitLabels: data.units.map((item) => item.label),
         rateLoading: false

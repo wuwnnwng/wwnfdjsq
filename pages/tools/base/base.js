@@ -1,5 +1,6 @@
 const { convertBase, sanitizeBaseInput } = require('../../../utils/converters')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
+const { enableShareMenu, getBaseToolShare } = require('../../../utils/share')
 
 const BASE_OPTIONS = [
   { key: 2, label: '二进制' },
@@ -23,6 +24,7 @@ Page({
   },
 
   onLoad() {
+    enableShareMenu()
     this.recalculate()
   },
 
@@ -75,5 +77,13 @@ Page({
 
   onBaseChange(e) {
     this.setData({ baseIndex: Number(e.detail.value) }, () => this.recalculate())
+  },
+
+  onShareAppMessage() {
+    return getBaseToolShare().appMessage
+  },
+
+  onShareTimeline() {
+    return getBaseToolShare().timeline
   }
 })

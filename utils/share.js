@@ -2,6 +2,11 @@ const {
   calculateMortgage,
   calculateRemainingMortgage
 } = require('./mortgage')
+const { getToolById } = require('./toolsConfig')
+
+const APP_BRAND = '置居计算器'
+const TOOLS_HUB_PATH = '/pages/tools/index'
+const TOOLS_HUB_TITLE = `${APP_BRAND}｜更多实用工具`
 
 /**
  * 开启右上角「转发好友 / 分享朋友圈」菜单
@@ -14,16 +19,70 @@ function enableShareMenu() {
   })
 }
 
+function buildToolShareTitle(name) {
+  return `${APP_BRAND}｜${name}`
+}
+
+function buildToolShareAppMessage(path, name) {
+  return {
+    title: buildToolShareTitle(name),
+    path
+  }
+}
+
+function buildToolShareTimeline(path, name) {
+  const queryIndex = path.indexOf('?')
+  return {
+    title: buildToolShareTitle(name),
+    query: queryIndex >= 0 ? path.slice(queryIndex + 1) : ''
+  }
+}
+
+function getToolsHubShareAppMessage() {
+  return buildToolShareAppMessage(TOOLS_HUB_PATH, '更多实用工具')
+}
+
+function getToolsHubShareTimeline() {
+  return buildToolShareTimeline(TOOLS_HUB_PATH, '更多实用工具')
+}
+
+function getConverterToolShare(type) {
+  const toolType = type || 'length'
+  const tool = getToolById(toolType)
+  const name = (tool && tool.name) || '单位换算'
+  const path = `/pages/tools/converter/converter?type=${encodeURIComponent(toolType)}`
+  return {
+    appMessage: buildToolShareAppMessage(path, name),
+    timeline: buildToolShareTimeline(path, name)
+  }
+}
+
+function getCalcToolShare() {
+  const path = '/pages/tools/calc/calc'
+  return {
+    appMessage: buildToolShareAppMessage(path, '算术计算器'),
+    timeline: buildToolShareTimeline(path, '算术计算器')
+  }
+}
+
+function getBaseToolShare() {
+  const path = '/pages/tools/base/base'
+  return {
+    appMessage: buildToolShareAppMessage(path, '进制换算'),
+    timeline: buildToolShareTimeline(path, '进制换算')
+  }
+}
+
 function getShareAppMessage() {
   return {
-    title: '置居计算器｜公积金、商贷、组合贷一键算清',
+    title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
     path: '/pages/index/index'
   }
 }
 
 function getShareTimeline() {
   return {
-    title: '置居计算器｜公积金、商贷、组合贷一键算清',
+    title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
     query: ''
   }
 }
@@ -275,6 +334,11 @@ module.exports = {
   enableShareMenu,
   getShareAppMessage,
   getShareTimeline,
+  getToolsHubShareAppMessage,
+  getToolsHubShareTimeline,
+  getConverterToolShare,
+  getCalcToolShare,
+  getBaseToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

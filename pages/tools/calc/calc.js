@@ -1,5 +1,6 @@
 const { evaluateScientificExpression } = require('../../../utils/calcEngine')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
+const { enableShareMenu, getCalcToolShare } = require('../../../utils/share')
 
 function buildKeys(keyboardMode, invOn) {
   const switchKey =
@@ -119,6 +120,10 @@ Page({
     errorText: ''
   },
 
+  onLoad() {
+    enableShareMenu()
+  },
+
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
@@ -188,5 +193,13 @@ Page({
       displayValue: result.value,
       errorText: ''
     })
+  },
+
+  onShareAppMessage() {
+    return getCalcToolShare().appMessage
+  },
+
+  onShareTimeline() {
+    return getCalcToolShare().timeline
   }
 })

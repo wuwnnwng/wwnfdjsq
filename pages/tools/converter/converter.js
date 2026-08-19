@@ -12,6 +12,7 @@ const {
 } = require('../../../utils/exchangeRate')
 const { findUnitIndex } = require('../../../utils/currencyNames')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
+const { enableShareMenu, getConverterToolShare } = require('../../../utils/share')
 
 Page({
   data: {
@@ -38,6 +39,7 @@ Page({
   },
 
   onLoad(options) {
+    enableShareMenu()
     const type = options.type || 'length'
     this.initConverter(type)
   },
@@ -331,5 +333,13 @@ Page({
 
   onToggleAll() {
     this.setData({ showAll: !this.data.showAll }, () => this.recalculate())
+  },
+
+  onShareAppMessage() {
+    return getConverterToolShare(this.data.type).appMessage
+  },
+
+  onShareTimeline() {
+    return getConverterToolShare(this.data.type).timeline
   }
 })

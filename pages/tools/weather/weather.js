@@ -142,7 +142,7 @@ Page({
     const place = list[index]
     if (!place) return
     this.setData({ showCityPicker: false, cityKeyword: '', cityResults: [] })
-    this.refreshWeather(place, { force: true })
+    this.refreshWeather(place)
   },
 
   onLocate() {
@@ -169,7 +169,7 @@ Page({
 
     const success = (res) => {
       const place = placeFromLocation(res.latitude, res.longitude)
-      this.refreshWeather(place, { force: true })
+      this.refreshWeather(place)
     }
 
     const run = () => {

@@ -3,6 +3,7 @@
  * 数据源：Open-Meteo（无需密钥）
  * - 预报 https://api.open-meteo.com/v1/forecast
  * - 城市检索 https://geocoding-api.open-meteo.com/v1/search
+ * 仅缓存上次选择的城市；每次进入或切换城市都会重新拉取天气
  *
  * 小程序 request 合法域名：
  * - https://api.open-meteo.com
@@ -11,7 +12,6 @@
 
 const STORAGE_PLACE = 'weather_last_place_v1'
 const STORAGE_CACHE_PREFIX = 'weather_cache_v1_'
-const CACHE_TTL_MS = 30 * 60 * 1000
 
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast'
 const GEOCODE_URL = 'https://geocoding-api.open-meteo.com/v1/search'
@@ -95,10 +95,6 @@ function roundCoord(value) {
   return Math.round(Number(value) * 100) / 100
 }
 
-function cacheKey(latitude, longitude) {
-  return `${STORAGE_CACHE_PREFIX}${roundCoord(latitude)}_${roundCoord(longitude)}`
-}
-
 function weatherInfo(code, isDay) {
   const item = WEATHER_MAP[Number(code)] || { text: '未知', day: '🌡️', night: '🌡️' }
   return {
@@ -179,24 +175,14 @@ function nearestHotCity(latitude, longitude) {
   return buildPlace(best)
 }
 
-function readCache(latitude, longitude) {
+function clearWeatherDataCache() {
   try {
-    const cached = wx.getStorageSync(cacheKey(latitude, longitude))
-    if (!cached || !cached.data) return null
-    return {
-      data: cached.data,
-      fresh: Date.now() - Number(cached.ts || 0) < CACHE_TTL_MS
-    }
-  } catch (e) {
-    return null
-  }
-}
-
-function writeCache(latitude, longitude, data) {
-  try {
-    wx.setStorageSync(cacheKey(latitude, longitude), {
-      ts: Date.now(),
-      data
+    const info = wx.getStorageInfoSync()
+    const keys = (info && info.keys) || []
+    keys.forEach((key) => {
+      if (String(key).indexOf(STORAGE_CACHE_PREFIX) === 0) {
+        wx.removeStorageSync(key)
+      }
     })
   } catch (e) {
     // ignore
@@ -204,6 +190,7 @@ function writeCache(latitude, longitude, data) {
 }
 
 function getLastPlace() {
+  clearWeatherDataCache()
   try {
     return buildPlace(wx.getStorageSync(STORAGE_PLACE))
   } catch (e) {
@@ -337,25 +324,12 @@ async function fetchForecast(place) {
   return parsed
 }
 
-async function loadWeather(place, options) {
+async function loadWeather(place) {
   const nextPlace = buildPlace(place) || DEFAULT_PLACE
-  const force = !!(options && options.force)
-  const cached = readCache(nextPlace.latitude, nextPlace.longitude)
-
-  if (!force && cached && cached.fresh && cached.data) {
-    return {
-      ...cached.data,
-      place: nextPlace,
-      fromCache: true,
-      stale: false,
-      error: ''
-    }
-  }
+  saveLastPlace(nextPlace)
 
   try {
     const remote = await fetchForecast(nextPlace)
-    writeCache(nextPlace.latitude, nextPlace.longitude, remote)
-    saveLastPlace(nextPlace)
     return {
       ...remote,
       fromCache: false,
@@ -363,15 +337,6 @@ async function loadWeather(place, options) {
       error: ''
     }
   } catch (e) {
-    if (cached && cached.data) {
-      return {
-        ...cached.data,
-        place: nextPlace,
-        fromCache: true,
-        stale: true,
-        error: '天气更新失败，已显示缓存'
-      }
-    }
     return {
       place: nextPlace,
       icon: '🌡️',

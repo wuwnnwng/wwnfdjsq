@@ -109,13 +109,17 @@
         <view class="huangli-term" wx:if="{{huangliDetail.solarTerm}}">节气：{{huangliDetail.solarTerm}}</view>
 
         <view class="huangli-section">
-          <view class="huangli-section-title">建除十二神</view>
+          <view class="huangli-section-head" bindtap="onToggleHuangliSection" data-key="jianChu">
+            <view class="huangli-section-title">建除十二神</view>
+            <text class="festival-section-arrow">{{huangliSectionOpen.jianChu ? '收起' : '展开'}}</text>
+          </view>
           <view class="huangli-section-sub">值神：{{huangliDetail.jianChu}} · {{huangliDetail.jianChuDesc}}</view>
-          <view class="jianchu-grid">
+          <view class="jianchu-grid {{huangliSectionOpen.jianChu ? '' : 'collapsed'}}">
             <view
               class="jianchu-item {{item.active ? 'active' : ''}}"
               wx:for="{{huangliDetail.jianChuList}}"
               wx:key="name"
+              wx:if="{{huangliSectionOpen.jianChu || item.active}}"
             >
               <view class="jianchu-name">{{item.name}}</view>
             </view>
@@ -134,13 +138,17 @@
         </view>
 
         <view class="huangli-section">
-          <view class="huangli-section-title">时辰吉凶</view>
+          <view class="huangli-section-head" bindtap="onToggleHuangliSection" data-key="hourLuck">
+            <view class="huangli-section-title">时辰吉凶</view>
+            <text class="festival-section-arrow">{{huangliSectionOpen.hourLuck ? '收起' : '展开'}}</text>
+          </view>
           <view class="huangli-section-sub">青龙、明堂、金匮、天德、玉堂、司命为吉，其余为凶</view>
-          <view class="hour-grid">
+          <view class="hour-grid {{huangliSectionOpen.hourLuck ? '' : 'collapsed'}}">
             <view
               class="hour-item {{item.lucky ? 'lucky' : 'unlucky'}} {{item.isNow ? 'now' : ''}}"
               wx:for="{{huangliDetail.hourLuckList}}"
               wx:key="zhi"
+              wx:if="{{huangliSectionOpen.hourLuck || item.isNow}}"
             >
               <view class="hour-top">
                 <view class="hour-label">{{item.label}}</view>

@@ -125,6 +125,10 @@ Page({
       legal: true,
       terms: false,
       popular: false
+    },
+    huangliSectionOpen: {
+      jianChu: false,
+      hourLuck: false
     }
   },
 
@@ -346,6 +350,15 @@ Page({
     const open = this.data.festivalSectionOpen[key]
     this.setData({
       [`festivalSectionOpen.${key}`]: !open
+    })
+  },
+
+  onToggleHuangliSection(e) {
+    const key = e.currentTarget.dataset.key
+    if (!key) return
+    const open = this.data.huangliSectionOpen[key]
+    this.setData({
+      [`huangliSectionOpen.${key}`]: !open
     })
   },
 

@@ -297,10 +297,18 @@
   border-top: 1rpx solid var(--color-line);
 }
 
+.huangli-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
 .huangli-section-title {
   font-size: 28rpx;
   font-weight: 700;
   color: var(--color-brand);
+  margin-bottom: 0;
 }
 
 .huangli-section-sub {
@@ -315,6 +323,10 @@
   grid-template-columns: repeat(6, 1fr);
   gap: 12rpx;
   margin-top: 20rpx;
+}
+
+.jianchu-grid.collapsed {
+  grid-template-columns: 1fr;
 }
 
 .jianchu-item {
@@ -347,6 +359,10 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 16rpx;
   margin-top: 20rpx;
+}
+
+.hour-grid.collapsed {
+  grid-template-columns: 1fr;
 }
 
 .hour-item {

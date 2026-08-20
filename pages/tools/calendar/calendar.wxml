@@ -179,7 +179,7 @@
               <view class="festival-desc">{{item.desc}}</view>
               <view class="festival-note" wx:if="{{item.note}}">{{item.note}}</view>
             </view>
-            <view class="festival-countdown">{{item.countdownText}}</view>
+            <view class="festival-countdown {{item.countdownTone}}">{{item.countdownText}}</view>
           </view>
         </block>
       </view>
@@ -195,7 +195,7 @@
               <view class="festival-name">{{item.name}}</view>
               <view class="festival-desc">{{item.desc}}</view>
             </view>
-            <view class="festival-countdown">{{item.countdownText}}</view>
+            <view class="festival-countdown {{item.countdownTone}}">{{item.countdownText}}</view>
           </view>
         </block>
       </view>
@@ -212,7 +212,7 @@
               <view class="festival-desc">{{item.desc}}</view>
               <view class="festival-note" wx:if="{{item.note}}">{{item.note}}</view>
             </view>
-            <view class="festival-countdown">{{item.countdownText}}</view>
+            <view class="festival-countdown {{item.countdownTone}}">{{item.countdownText}}</view>
           </view>
         </block>
       </view>

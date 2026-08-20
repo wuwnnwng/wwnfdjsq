@@ -483,6 +483,15 @@
   line-height: 1.4;
 }
 
+.festival-countdown.past {
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.festival-countdown.now {
+  color: var(--color-accent);
+}
+
 .festival-item:last-child {
   border-bottom: none;
 }

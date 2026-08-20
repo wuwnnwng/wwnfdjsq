@@ -18,13 +18,13 @@ const POPULAR_FESTIVALS = [
 ]
 
 const LEGAL_FALLBACK = [
-  { name: '元旦', desc: '1月1日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 1, targetDay: 1 },
+  { name: '元旦', desc: '1月1日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 1, targetDay: 1, endMonth: 1, endDay: 1 },
   { name: '春节', desc: '农历新年放假（参考）', note: '请以国务院当年安排为准', lunarMonth: 1, lunarDay: 1 },
-  { name: '清明节', desc: '清明前后放假（参考）', note: '请以国务院当年安排为准', targetMonth: 4, targetDay: 4 },
-  { name: '劳动节', desc: '5月1日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 5, targetDay: 1 },
+  { name: '清明节', desc: '清明前后放假（参考）', note: '请以国务院当年安排为准', targetMonth: 4, targetDay: 4, endMonth: 4, endDay: 6 },
+  { name: '劳动节', desc: '5月1日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 5, targetDay: 1, endMonth: 5, endDay: 5 },
   { name: '端午节', desc: '农历五月初五（参考）', note: '请以国务院当年安排为准', lunarMonth: 5, lunarDay: 5 },
   { name: '中秋节', desc: '农历八月十五（参考）', note: '请以国务院当年安排为准', lunarMonth: 8, lunarDay: 15 },
-  { name: '国庆节', desc: '10月1-7日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 10, targetDay: 1 }
+  { name: '国庆节', desc: '10月1-7日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 10, targetDay: 1, endMonth: 10, endDay: 7 }
 ]
 
 function startOfDay(date) {
@@ -32,24 +32,30 @@ function startOfDay(date) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate())
 }
 
-function formatCountdown(days) {
-  if (days === 0) return '今天'
-  return `${days}天后`
+function daysUntil(year, month, day, fromDate) {
+  const y = Number(year)
+  const m = Number(month)
+  const d = Number(day)
+  if (!y || !m || !d) return null
+  const today = startOfDay(fromDate)
+  const target = new Date(y, m - 1, d)
+  return Math.round((target - today) / 86400000)
 }
 
-function calcDaysUntilTarget(targetYear, targetMonth, targetDay, fromDate) {
-  const today = startOfDay(fromDate)
-  let year = Number(targetYear)
-  const month = Number(targetMonth)
-  const day = Number(targetDay)
-  if (!year || !month || !day) return null
-
-  let target = new Date(year, month - 1, day)
-  if (target < today) {
-    year += 1
-    target = new Date(year, month - 1, day)
+function buildCountdown(startDays, endDays) {
+  if (endDays == null || startDays == null) {
+    return { countdownText: '', countdownTone: '' }
   }
-  return Math.round((target - today) / 86400000)
+  if (endDays < 0) {
+    return { countdownText: '已过', countdownTone: 'past' }
+  }
+  if (startDays > 0) {
+    return { countdownText: `${startDays}天后`, countdownTone: 'soon' }
+  }
+  if (startDays === 0 && endDays === 0) {
+    return { countdownText: '今天', countdownTone: 'now' }
+  }
+  return { countdownText: '进行中', countdownTone: 'now' }
 }
 
 function resolveTargetDate(item, baseYear) {
@@ -61,16 +67,8 @@ function resolveTargetDate(item, baseYear) {
     }
   }
   if (item.lunarMonth && item.lunarDay) {
-    let year = baseYear
-    let solar = findSolarByLunar(year, item.lunarMonth, item.lunarDay)
-    const today = startOfDay(new Date())
-    if (solar) {
-      let target = new Date(year, solar.month - 1, solar.day)
-      if (target < today) {
-        year += 1
-        solar = findSolarByLunar(year, item.lunarMonth, item.lunarDay)
-      }
-    }
+    const year = item.targetYear || baseYear
+    const solar = findSolarByLunar(year, item.lunarMonth, item.lunarDay)
     if (!solar) return null
     return {
       targetYear: year,
@@ -84,13 +82,17 @@ function resolveTargetDate(item, baseYear) {
 function withCountdown(item, baseYear, fromDate) {
   const target = resolveTargetDate(item, baseYear)
   if (!target) {
-    return { ...item, countdownText: '' }
+    return { ...item, countdownText: '', countdownTone: '' }
   }
-  const days = calcDaysUntilTarget(target.targetYear, target.targetMonth, target.targetDay, fromDate)
+  const startDays = daysUntil(target.targetYear, target.targetMonth, target.targetDay, fromDate)
+  const endYear = item.endYear || target.targetYear
+  const endMonth = item.endMonth || target.targetMonth
+  const endDay = item.endDay || target.targetDay
+  const endDays = daysUntil(endYear, endMonth, endDay, fromDate)
   return {
     ...item,
     ...target,
-    countdownText: days == null ? '' : formatCountdown(days)
+    ...buildCountdown(startDays, endDays)
   }
 }
 

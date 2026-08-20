@@ -12,7 +12,7 @@ const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const API_BASE = 'https://timor.tech/api/holiday/year'
 
 function cacheKey(year) {
-  return `holiday_cache_v1_${year}`
+  return `holiday_cache_v2_${year}`
 }
 
 function readCache(year) {
@@ -139,8 +139,16 @@ function parseHolidayPayload(year, payload) {
         source: 'timor',
         targetYear: Number(start.slice(0, 4)),
         targetMonth: Number(start.slice(5, 7)),
-        targetDay: Number(start.slice(8, 10))
+        targetDay: Number(start.slice(8, 10)),
+        endYear: Number(end.slice(0, 4)),
+        endMonth: Number(end.slice(5, 7)),
+        endDay: Number(end.slice(8, 10))
       }
+    })
+    .sort((a, b) => {
+      const left = `${a.targetYear}-${pad2(a.targetMonth)}-${pad2(a.targetDay)}`
+      const right = `${b.targetYear}-${pad2(b.targetMonth)}-${pad2(b.targetDay)}`
+      return left.localeCompare(right)
     })
 
   return {

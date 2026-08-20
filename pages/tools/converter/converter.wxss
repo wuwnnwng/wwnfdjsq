@@ -38,11 +38,14 @@
 
 .currency-picker-search {
   margin-top: 20rpx;
-  padding: 18rpx 24rpx;
+  height: 96rpx;
+  min-height: 96rpx;
+  padding: 0 28rpx;
+  line-height: 96rpx;
   border-radius: 16rpx;
   background: rgba(255, 255, 255, 0.72);
   border: 1rpx solid var(--color-line);
-  font-size: 28rpx;
+  font-size: 32rpx;
   color: var(--color-ink);
 }
 

@@ -2,7 +2,9 @@ const {
   buildDayInfo,
   isSameDate,
   todayParts,
-  pad2
+  pad2,
+  solarToLunar,
+  formatLunarCell
 } = require('../../../utils/lunar')
 const {
   AUSPICIOUS_EVENTS,
@@ -13,6 +15,7 @@ const {
 const { buildFestivalGroups, getDayFestivalLabel, attachCountdownList } = require('../../../utils/festivals')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCalendarToolShare } = require('../../../utils/share')
+const { createPickerTick } = require('../../../utils/pickerTick')
 
 const WEEK_HEADERS = ['日', '一', '二', '三', '四', '五', '六']
 const WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
@@ -25,14 +28,38 @@ function formatDateKey(year, month, day) {
   return formatPickerDate(year, month, day)
 }
 
-function parsePickerDate(value) {
-  const parts = String(value || '').split('-')
-  if (parts.length !== 3) return null
-  const year = Number(parts[0])
-  const month = Number(parts[1])
-  const day = Number(parts[2])
-  if (!year || !month || !day) return null
-  return { year, month, day }
+const PICKER_YEAR_START = 1900
+const PICKER_YEAR_END = 2100
+const PICKER_YEARS = []
+for (let year = PICKER_YEAR_START; year <= PICKER_YEAR_END; year += 1) {
+  PICKER_YEARS.push(year)
+}
+const PICKER_MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate()
+}
+
+function buildPickerDays(year, month) {
+  const last = daysInMonth(year, month)
+  const days = []
+  for (let day = 1; day <= last; day += 1) {
+    days.push(day)
+  }
+  return days
+}
+
+function clampPickerDate(year, month, day) {
+  const y = Math.min(PICKER_YEAR_END, Math.max(PICKER_YEAR_START, Number(year) || PICKER_YEAR_START))
+  const m = Math.min(12, Math.max(1, Number(month) || 1))
+  const last = daysInMonth(y, m)
+  const d = Math.min(last, Math.max(1, Number(day) || 1))
+  return { year: y, month: m, day: d }
+}
+
+function pickerValueFromDate(year, month, day) {
+  const picked = clampPickerDate(year, month, day)
+  return [picked.year - PICKER_YEAR_START, picked.month - 1, picked.day - 1]
 }
 
 function buildMonthCells(
@@ -74,6 +101,8 @@ function buildMonthCells(
     }
 
     const festival = getDayFestivalLabel(year, month, day, holidayDayMap)
+    const festivalShort = festival ? festival.split(' ')[0] : ''
+    const lunarShort = formatLunarCell(solarToLunar(year, month, day))
     const isToday = isSameDate({ year, month, day }, today)
     const isSelected = isSameDate({ year, month, day }, selected)
     const isAuspicious =
@@ -88,7 +117,9 @@ function buildMonthCells(
       isToday,
       isSelected,
       isAuspicious,
-      festivalShort: festival ? festival.split(' ')[0] : ''
+      festivalShort,
+      lunarShort,
+      daySub: festivalShort || lunarShort
     })
   }
 
@@ -106,6 +137,11 @@ Page({
     selectedMonth: 0,
     selectedDay: 0,
     pickerDate: '',
+    showDatePicker: false,
+    pickerYears: PICKER_YEARS,
+    pickerMonths: PICKER_MONTHS,
+    pickerDays: [],
+    datePickerValue: [0, 0, 0],
     monthCells: [],
     selectedInfo: null,
     huangliDetail: null,
@@ -129,11 +165,13 @@ Page({
     huangliSectionOpen: {
       jianChu: false,
       hourLuck: false
-    }
+    },
+    showHuangliTip: false
   },
 
   onLoad() {
     enableShareMenu()
+    this._pickerTick = createPickerTick()
     const today = todayParts()
     this._today = today
     this.setData(
@@ -270,8 +308,7 @@ Page({
     })
   },
 
-  onPickDate(e) {
-    const picked = parsePickerDate(e.detail.value)
+  applyPickedDate(picked) {
     if (!picked) return
     this.setData(
       {
@@ -279,13 +316,83 @@ Page({
         viewMonth: picked.month,
         selectedYear: picked.year,
         selectedMonth: picked.month,
-        selectedDay: picked.day
+        selectedDay: picked.day,
+        showDatePicker: false
       },
       () => {
         this.ensureFestivalYear(picked.year, () => this.refreshCalendarView())
       }
     )
   },
+
+  onOpenDatePicker() {
+    const year = Number(this.data.selectedYear) || Number(this.data.viewYear)
+    const month = Number(this.data.selectedMonth) || Number(this.data.viewMonth)
+    const day = Number(this.data.selectedDay) || 1
+    const picked = clampPickerDate(year, month, day)
+    this._pendingPickerDate = picked
+    this._datePickerReady = false
+    if (this._pickerTick) this._pickerTick.prepare()
+    this.setData(
+      {
+        showDatePicker: true,
+        pickerDays: buildPickerDays(picked.year, picked.month),
+        datePickerValue: pickerValueFromDate(picked.year, picked.month, picked.day)
+      },
+      () => {
+        setTimeout(() => {
+          this._datePickerReady = true
+        }, 180)
+      }
+    )
+  },
+
+  onDatePickerChange(e) {
+    const value = (e.detail && e.detail.value) || []
+    const year = PICKER_YEARS[value[0]] || PICKER_YEAR_START
+    const month = PICKER_MONTHS[value[1]] || 1
+    const currentDays = this.data.pickerDays && this.data.pickerDays.length
+      ? this.data.pickerDays
+      : buildPickerDays(year, month)
+    const nextDays = buildPickerDays(year, month)
+    let day = currentDays[value[2]] || value[2] + 1
+    if (day > nextDays.length) day = nextDays.length
+    const picked = clampPickerDate(year, month, day)
+    this._pendingPickerDate = picked
+    if (this._syncingPicker) return
+    if (this._datePickerReady && this._pickerTick) {
+      this._pickerTick.play()
+    }
+    if (nextDays.length !== currentDays.length) {
+      this._syncingPicker = true
+      this.setData(
+        {
+          pickerDays: nextDays,
+          datePickerValue: pickerValueFromDate(picked.year, picked.month, picked.day)
+        },
+        () => {
+          this._syncingPicker = false
+        }
+      )
+    }
+  },
+
+  onConfirmDatePicker() {
+    const picked = this._pendingPickerDate || {
+      year: this.data.selectedYear,
+      month: this.data.selectedMonth,
+      day: this.data.selectedDay
+    }
+    this.applyPickedDate(picked)
+  },
+
+  onCancelDatePicker() {
+    this.setData({ showDatePicker: false })
+  },
+
+  onDatePickerSheetTap() {},
+
+  preventMove() {},
 
   onTabChange(e) {
     const tab = e.currentTarget.dataset.tab
@@ -411,6 +518,14 @@ Page({
     })
   },
 
+  onShowHuangliTip() {
+    this.setData({ showHuangliTip: true })
+  },
+
+  onHideHuangliTip() {
+    this.setData({ showHuangliTip: false })
+  },
+
   onSelectAuspiciousEvent(e) {
     const id = e.currentTarget.dataset.id
     const item = AUSPICIOUS_EVENTS.find((row) => row.id === id)
@@ -433,5 +548,12 @@ Page({
 
   onShareTimeline() {
     return getCalendarToolShare().timeline
+  },
+
+  onUnload() {
+    if (this._pickerTick) {
+      this._pickerTick.destroy()
+      this._pickerTick = null
+    }
   }
 })

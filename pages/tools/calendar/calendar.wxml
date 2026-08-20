@@ -5,18 +5,9 @@
       <view class="panel calendar-panel">
         <view class="calendar-head">
           <view class="month-nav" catchtap="onPrevMonth" hover-class="month-nav-hover">‹</view>
-          <view class="month-title-wrap">
+          <view class="month-title-wrap" catchtap="onOpenDatePicker">
             <view class="month-title">{{viewYear}}年{{viewMonth}}月</view>
-            <picker
-              class="month-picker"
-              mode="date"
-              value="{{pickerDate}}"
-              start="1900-01-01"
-              end="2100-12-31"
-              bindchange="onPickDate"
-            >
-              <view class="month-sub" wx:if="{{selectedInfo}}">{{selectedDay}}日 · {{selectedInfo.weekdayText}}</view>
-            </picker>
+            <view class="month-sub" wx:if="{{selectedInfo}}">{{selectedDay}}日 · {{selectedInfo.weekdayText}} · {{selectedInfo.weekText}}</view>
           </view>
           <view class="month-nav" catchtap="onNextMonth" hover-class="month-nav-hover">›</view>
         </view>
@@ -79,7 +70,7 @@
               data-inmonth="{{item.inMonth}}"
             >
               <view class="day-num">{{item.day}}</view>
-              <view class="day-tag" wx:if="{{item.festivalShort}}">{{item.festivalShort}}</view>
+              <view class="day-tag {{item.festivalShort ? 'festival' : ''}}">{{item.daySub}}</view>
             </view>
           </view>
         </view>
@@ -106,7 +97,10 @@
     <!-- 黄历 -->
     <view wx:if="{{activeTab === 'almanac'}}">
       <view class="panel huangli-panel" wx:if="{{huangliDetail}}">
-        <view class="huangli-title">老黄历</view>
+        <view class="huangli-title-row">
+          <view class="huangli-title">老黄历</view>
+          <view class="help-icon" catchtap="onShowHuangliTip" aria-role="button" aria-label="今日黄历释义">!</view>
+        </view>
         <view class="huangli-date">{{huangliDetail.solarText}} · {{huangliDetail.weekText}}</view>
         <view class="huangli-lunar">{{huangliDetail.lunarText}} · 星期{{huangliDetail.weekday}}</view>
         <view class="huangli-meta">
@@ -165,13 +159,6 @@
               <view class="hour-deity">{{item.deity}}</view>
               <view class="hour-now-tag" wx:if="{{item.isNow}}">当前</view>
             </view>
-          </view>
-        </view>
-
-        <view class="huangli-card">
-          <view class="huangli-card-title">今日黄历释义</view>
-          <view class="huangli-card-text">
-            建除值神为「{{huangliDetail.jianChu}}」，传统黄历以建除十二神配合日辰推断吉凶。以下内容根据民间通用历法规则整理，仅供生活参考，不作专业择日依据。
           </view>
         </view>
       </view>
@@ -235,6 +222,44 @@
 
     <view class="calendar-bottom-space"></view>
   </scroll-view>
+
+  <view wx:if="{{showDatePicker}}" class="date-picker-mask" catchtap="onCancelDatePicker" catchtouchmove="preventMove">
+    <view class="date-picker-sheet" catchtap="onDatePickerSheetTap">
+      <view class="date-picker-head">
+        <view class="date-picker-action" catchtap="onCancelDatePicker">取消</view>
+        <view class="date-picker-title">选择日期</view>
+        <view class="date-picker-action confirm" catchtap="onConfirmDatePicker">确定</view>
+      </view>
+      <picker-view
+        class="date-picker-view"
+        value="{{datePickerValue}}"
+        immediate-change="{{true}}"
+        bindchange="onDatePickerChange"
+        indicator-style="height: 72rpx;"
+        indicator-class="date-picker-indicator"
+      >
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{pickerYears}}" wx:key="*this">{{item}}年</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{pickerMonths}}" wx:key="*this">{{item}}月</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{pickerDays}}" wx:key="*this">{{item}}日</view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+  </view>
+
+  <view class="tip-mask" wx:if="{{showHuangliTip}}" catchtouchmove="preventMove" bindtap="onHideHuangliTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">今日黄历释义</view>
+      <view class="tip-text tip-single">
+        建除值神为「{{huangliDetail.jianChu}}」，传统黄历以建除十二神配合日辰推断吉凶。以下内容根据民间通用历法规则整理，仅供生活参考，不作专业择日依据。
+      </view>
+      <view class="tip-confirm" bindtap="onHideHuangliTip">我知道了</view>
+    </view>
+  </view>
 
   <view class="calendar-tabs">
     <view

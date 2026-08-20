@@ -171,6 +171,15 @@ function formatLunarDate(lunar) {
   return `${monthText}${dayText}`
 }
 
+/** 日历格子用短农历：初一显示月份，其余显示初二、十五等 */
+function formatLunarCell(lunar) {
+  if (!lunar) return ''
+  if (lunar.lunarDay === 1) {
+    return `${lunar.isLeap ? '闰' : ''}${LUNAR_MONTHS[lunar.lunarMonth - 1]}月`
+  }
+  return LUNAR_DAYS[lunar.lunarDay - 1] || ''
+}
+
 function getGanZhiYear(lunarYear) {
   const gan = GAN[(lunarYear - 4) % 10]
   const zhi = ZHI[(lunarYear - 4) % 12]
@@ -315,6 +324,7 @@ module.exports = {
   SOLAR_TERMS,
   solarToLunar,
   formatLunarDate,
+  formatLunarCell,
   formatSolarDate,
   getGanZhiYear,
   getGanZhiMonth,

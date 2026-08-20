@@ -1,4 +1,4 @@
-const { TOOLS } = require('../../utils/toolsConfig')
+const { TOOLS, markToolsHubSeen } = require('../../utils/toolsConfig')
 const { getThemeId, applyThemeChrome } = require('../../utils/theme')
 const {
   enableShareMenu,
@@ -17,6 +17,7 @@ Page({
   },
 
   onShow() {
+    markToolsHubSeen()
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)

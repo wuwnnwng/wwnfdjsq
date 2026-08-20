@@ -23,6 +23,11 @@ const {
   renamePlan,
   removePlan
 } = require('../../utils/plans')
+const {
+  getFeaturedTools,
+  hasSeenToolsHub,
+  markToolsHubSeen
+} = require('../../utils/toolsConfig')
 
 Page({
   data: {
@@ -74,7 +79,10 @@ Page({
     derivedRemainingYears: '--',
     derivedRemainingYearsText: '--',
     derivedRemainingMonths: '--',
-    derivedMessage: ''
+    derivedMessage: '',
+
+    featuredTools: getFeaturedTools(),
+    showToolsNew: !hasSeenToolsHub()
   },
 
   onLoad() {
@@ -95,6 +103,9 @@ Page({
 
   onShow() {
     this.applyTheme(getThemeId())
+    this.setData({
+      showToolsNew: !hasSeenToolsHub()
+    })
   },
 
   applyTheme(themeId) {
@@ -165,7 +176,15 @@ Page({
   },
 
   onGoTools() {
+    markToolsHubSeen()
+    this.setData({ showToolsNew: false })
     wx.navigateTo({ url: '/pages/tools/index' })
+  },
+
+  onOpenFeaturedTool(e) {
+    const page = e.currentTarget.dataset.page
+    if (!page) return
+    wx.navigateTo({ url: page })
   },
 
   onShowPlans() {

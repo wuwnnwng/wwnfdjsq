@@ -1,10 +1,14 @@
 /**
  * 更多工具：入口列表与路由
  */
+const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
+const FEATURED_IDS = ['calendar', 'currency', 'area']
+
 const TOOLS = [
   {
     id: 'calendar',
     name: '我的日历',
+    shortName: '日历',
     icon: '📅',
     iconType: 'calendar',
     page: '/pages/tools/calendar/calendar'
@@ -12,6 +16,7 @@ const TOOLS = [
   {
     id: 'calc',
     name: '算术计算器',
+    shortName: '计算',
     icon: '🧮',
     iconType: 'calc',
     page: '/pages/tools/calc/calc'
@@ -19,6 +24,7 @@ const TOOLS = [
   {
     id: 'currency',
     name: '汇率',
+    shortName: '汇率',
     icon: '💱',
     iconType: 'currency',
     page: '/pages/tools/converter/converter?type=currency'
@@ -26,6 +32,7 @@ const TOOLS = [
   {
     id: 'area',
     name: '面积',
+    shortName: '面积',
     icon: '📐',
     iconType: 'area',
     page: '/pages/tools/converter/converter?type=area'
@@ -92,7 +99,39 @@ function getToolById(id) {
   return TOOLS.find((item) => item.id === id) || null
 }
 
+function getFeaturedTools() {
+  return FEATURED_IDS.map((id) => {
+    const item = getToolById(id)
+    if (!item) return null
+    return {
+      id: item.id,
+      name: item.name,
+      shortName: item.shortName || item.name,
+      icon: item.icon,
+      iconType: item.iconType,
+      page: item.page
+    }
+  }).filter(Boolean)
+}
+
+function hasSeenToolsHub() {
+  try {
+    return !!wx.getStorageSync(TOOLS_HUB_SEEN_KEY)
+  } catch (e) {
+    return false
+  }
+}
+
+function markToolsHubSeen() {
+  try {
+    wx.setStorageSync(TOOLS_HUB_SEEN_KEY, 1)
+  } catch (e) {}
+}
+
 module.exports = {
   TOOLS,
-  getToolById
+  getToolById,
+  getFeaturedTools,
+  hasSeenToolsHub,
+  markToolsHubSeen
 }

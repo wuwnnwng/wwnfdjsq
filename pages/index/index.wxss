@@ -1,9 +1,105 @@
 .hero-panel {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20rpx;
+  animation: rise-in 0.55s ease both;
+}
+
+.hero-top {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20rpx;
-  animation: rise-in 0.55s ease both;
+}
+
+.tools-entry {
+  display: flex;
+  align-items: stretch;
+  gap: 12rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.tools-chip {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+  padding: 4rpx 0 0;
+}
+
+.tools-chip:active {
+  opacity: 0.82;
+  transform: scale(0.96);
+}
+
+.tools-chip-icon {
+  position: relative;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 22rpx;
+  border: 2rpx solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 18rpx rgba(0, 0, 0, 0.06);
+}
+
+.tools-chip-emoji {
+  font-size: 36rpx;
+  line-height: 1;
+}
+
+.tools-chip-more {
+  background: rgba(255, 255, 255, 0.62);
+  border: 2rpx dashed var(--color-brand-soft);
+  box-shadow: none;
+}
+
+.tools-chip-more-mark {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+  letter-spacing: 1rpx;
+}
+
+.tools-chip-name {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.2;
+}
+
+.tools-new-badge {
+  position: absolute;
+  top: -10rpx;
+  right: -14rpx;
+  min-width: 32rpx;
+  height: 28rpx;
+  padding: 0 8rpx;
+  border-radius: 999rpx;
+  font-size: 16rpx;
+  font-weight: 700;
+  line-height: 28rpx;
+  text-align: center;
+  color: #fff;
+  background: var(--color-accent);
+  box-shadow: 0 4rpx 10rpx rgba(196, 92, 38, 0.35);
+}
+
+.tool-icon-calendar {
+  background: linear-gradient(135deg, #ffe4e6, #fb7185);
+}
+
+.tool-icon-currency {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+}
+
+.tool-icon-area {
+  background: linear-gradient(135deg, #dcfce7, #86efac);
 }
 
 .theme-switch {

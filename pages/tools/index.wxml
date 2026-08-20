@@ -1,8 +1,8 @@
 <view class="page page-shell theme-{{theme}}">
   <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
     <view class="panel tool-intro-panel">
-      <view class="section-title">更多工具</view>
-      <view class="section-desc">常用单位换算、日历黄历与辅助计算</view>
+      <view class="section-title">工具箱</view>
+      <view class="section-desc">日历黄历、实时汇率、买房算面积，还有更多换算</view>
     </view>
 
     <view class="panel tool-grid-panel">

@@ -17,11 +17,11 @@ const TOOLS = [
     page: '/pages/tools/calc/calc'
   },
   {
-    id: 'length',
-    name: '长度',
-    icon: '📏',
-    iconType: 'length',
-    page: '/pages/tools/converter/converter?type=length'
+    id: 'currency',
+    name: '汇率',
+    icon: '💱',
+    iconType: 'currency',
+    page: '/pages/tools/converter/converter?type=currency'
   },
   {
     id: 'area',
@@ -80,11 +80,11 @@ const TOOLS = [
     page: '/pages/tools/base/base'
   },
   {
-    id: 'currency',
-    name: '汇率',
-    icon: '💱',
-    iconType: 'currency',
-    page: '/pages/tools/converter/converter?type=currency'
+    id: 'length',
+    name: '长度',
+    icon: '📏',
+    iconType: 'length',
+    page: '/pages/tools/converter/converter?type=length'
   }
 ]
 

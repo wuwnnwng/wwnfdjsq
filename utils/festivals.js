@@ -1,7 +1,7 @@
 /**
  * 节日：法定假日（API）、二十四节气、热门节日
  */
-const { SOLAR_TERMS, buildDayInfo, solarToLunar, formatLunarDate } = require('./lunar')
+const { SOLAR_TERMS, solarToLunar, formatLunarDate, getSolarTerm } = require('./lunar')
 const { loadYearHolidays, getDayHolidayLabel } = require('./holidayApi')
 
 const POPULAR_FESTIVALS = [
@@ -18,14 +18,85 @@ const POPULAR_FESTIVALS = [
 ]
 
 const LEGAL_FALLBACK = [
-  { name: '元旦', desc: '1月1日放假（参考）', note: '请以国务院当年安排为准' },
-  { name: '春节', desc: '农历新年放假（参考）', note: '请以国务院当年安排为准' },
-  { name: '清明节', desc: '清明前后放假（参考）', note: '请以国务院当年安排为准' },
-  { name: '劳动节', desc: '5月1日放假（参考）', note: '请以国务院当年安排为准' },
-  { name: '端午节', desc: '农历五月初五（参考）', note: '请以国务院当年安排为准' },
-  { name: '中秋节', desc: '农历八月十五（参考）', note: '请以国务院当年安排为准' },
-  { name: '国庆节', desc: '10月1-7日放假（参考）', note: '请以国务院当年安排为准' }
+  { name: '元旦', desc: '1月1日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 1, targetDay: 1 },
+  { name: '春节', desc: '农历新年放假（参考）', note: '请以国务院当年安排为准', lunarMonth: 1, lunarDay: 1 },
+  { name: '清明节', desc: '清明前后放假（参考）', note: '请以国务院当年安排为准', targetMonth: 4, targetDay: 4 },
+  { name: '劳动节', desc: '5月1日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 5, targetDay: 1 },
+  { name: '端午节', desc: '农历五月初五（参考）', note: '请以国务院当年安排为准', lunarMonth: 5, lunarDay: 5 },
+  { name: '中秋节', desc: '农历八月十五（参考）', note: '请以国务院当年安排为准', lunarMonth: 8, lunarDay: 15 },
+  { name: '国庆节', desc: '10月1-7日放假（参考）', note: '请以国务院当年安排为准', targetMonth: 10, targetDay: 1 }
 ]
+
+function startOfDay(date) {
+  const d = date || new Date()
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+}
+
+function formatCountdown(days) {
+  if (days === 0) return '今天'
+  return `${days}天后`
+}
+
+function calcDaysUntilTarget(targetYear, targetMonth, targetDay, fromDate) {
+  const today = startOfDay(fromDate)
+  let year = Number(targetYear)
+  const month = Number(targetMonth)
+  const day = Number(targetDay)
+  if (!year || !month || !day) return null
+
+  let target = new Date(year, month - 1, day)
+  if (target < today) {
+    year += 1
+    target = new Date(year, month - 1, day)
+  }
+  return Math.round((target - today) / 86400000)
+}
+
+function resolveTargetDate(item, baseYear) {
+  if (item.targetMonth && item.targetDay) {
+    return {
+      targetYear: item.targetYear || baseYear,
+      targetMonth: item.targetMonth,
+      targetDay: item.targetDay
+    }
+  }
+  if (item.lunarMonth && item.lunarDay) {
+    let year = baseYear
+    let solar = findSolarByLunar(year, item.lunarMonth, item.lunarDay)
+    const today = startOfDay(new Date())
+    if (solar) {
+      let target = new Date(year, solar.month - 1, solar.day)
+      if (target < today) {
+        year += 1
+        solar = findSolarByLunar(year, item.lunarMonth, item.lunarDay)
+      }
+    }
+    if (!solar) return null
+    return {
+      targetYear: year,
+      targetMonth: solar.month,
+      targetDay: solar.day
+    }
+  }
+  return null
+}
+
+function withCountdown(item, baseYear, fromDate) {
+  const target = resolveTargetDate(item, baseYear)
+  if (!target) {
+    return { ...item, countdownText: '' }
+  }
+  const days = calcDaysUntilTarget(target.targetYear, target.targetMonth, target.targetDay, fromDate)
+  return {
+    ...item,
+    ...target,
+    countdownText: days == null ? '' : formatCountdown(days)
+  }
+}
+
+function attachCountdownList(list, baseYear, fromDate) {
+  return (list || []).map((item) => withCountdown(item, baseYear, fromDate))
+}
 
 function termDate(year, n) {
   const off = [
@@ -69,31 +140,34 @@ function buildSolarTerms(year) {
       name,
       desc: `${year}年${t.month}月${t.day}日`,
       type: 'term',
-      month: t.month,
-      day: t.day
+      targetYear: year,
+      targetMonth: t.month,
+      targetDay: t.day
     }
   })
 }
 
 function buildPopularFestivals(year) {
+  const motherSolar = nthWeekdayOfMonth(year, 5, 0, 2)
+  const fatherSolar = nthWeekdayOfMonth(year, 6, 0, 3)
   const extras = [
     {
       name: '母亲节',
-      desc: (() => {
-        const solar = nthWeekdayOfMonth(year, 5, 0, 2)
-        return solar ? `${year}年${solar.month}月${solar.day}日` : `${year}年5月`
-      })(),
+      desc: motherSolar ? `${year}年${motherSolar.month}月${motherSolar.day}日` : `${year}年5月`,
       note: '五月第二个周日',
-      type: 'popular'
+      type: 'popular',
+      targetYear: year,
+      targetMonth: motherSolar ? motherSolar.month : 0,
+      targetDay: motherSolar ? motherSolar.day : 0
     },
     {
       name: '父亲节',
-      desc: (() => {
-        const solar = nthWeekdayOfMonth(year, 6, 0, 3)
-        return solar ? `${year}年${solar.month}月${solar.day}日` : `${year}年6月`
-      })(),
+      desc: fatherSolar ? `${year}年${fatherSolar.month}月${fatherSolar.day}日` : `${year}年6月`,
       note: '六月第三个周日',
-      type: 'popular'
+      type: 'popular',
+      targetYear: year,
+      targetMonth: fatherSolar ? fatherSolar.month : 0,
+      targetDay: fatherSolar ? fatherSolar.day : 0
     }
   ]
 
@@ -107,30 +181,39 @@ function buildPopularFestivals(year) {
               solarToLunar(year, solar.month, solar.day)
             )}）`
           : `农历${item.lunarMonth}月${item.lunarDay}日`,
-        type: 'popular'
+        type: 'popular',
+        targetYear: year,
+        targetMonth: solar ? solar.month : 0,
+        targetDay: solar ? solar.day : 0,
+        lunarMonth: item.lunarMonth,
+        lunarDay: item.lunarDay
       }
     }
     return {
       name: item.name,
       desc: `${year}年${item.month}月${item.day}日`,
-      type: 'popular'
+      type: 'popular',
+      targetYear: year,
+      targetMonth: item.month,
+      targetDay: item.day
     }
   })
 
   return extras.concat(list)
 }
 
-async function buildFestivalGroups(year) {
+async function buildFestivalGroups(year, fromDate) {
   const holidayData = await loadYearHolidays(year)
-  const legal =
+  const refDate = fromDate || new Date()
+  const legalRaw =
     holidayData.legal && holidayData.legal.length
       ? holidayData.legal
       : LEGAL_FALLBACK.map((item) => ({ ...item, type: 'legal', source: 'fallback' }))
 
   return {
-    legal,
-    terms: buildSolarTerms(year),
-    popular: buildPopularFestivals(year),
+    legal: attachCountdownList(legalRaw, year, refDate),
+    terms: attachCountdownList(buildSolarTerms(year), year, refDate),
+    popular: attachCountdownList(buildPopularFestivals(year), year, refDate),
     holidayDayMap: holidayData.dayMap || {},
     holidaySource: holidayData.source || 'fallback',
     holidayError: holidayData.error || '',
@@ -155,9 +238,9 @@ function getDayFestivalLabel(year, month, day, holidayDayMap) {
     }
   })
 
-  const info = buildDayInfo(year, month, day)
-  if (info.solarTerm && labels.indexOf(info.solarTerm) < 0) {
-    labels.push(info.solarTerm)
+  const term = getSolarTerm(year, month, day)
+  if (term && labels.indexOf(term) < 0) {
+    labels.push(term)
   }
 
   return labels.slice(0, 2).join(' ')
@@ -167,5 +250,6 @@ module.exports = {
   buildFestivalGroups,
   getDayFestivalLabel,
   buildSolarTerms,
-  buildPopularFestivals
+  buildPopularFestivals,
+  attachCountdownList
 }

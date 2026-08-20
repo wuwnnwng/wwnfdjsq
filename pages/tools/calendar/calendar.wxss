@@ -18,6 +18,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8rpx;
 }
 
 .month-nav {
@@ -33,6 +34,16 @@
   font-size: 34rpx;
   font-weight: 700;
   color: var(--color-ink);
+  text-align: center;
+}
+
+.month-picker {
+  flex: 1;
+  min-width: 0;
+}
+
+.month-title:active {
+  opacity: 0.75;
 }
 
 .today-link {
@@ -64,8 +75,8 @@
 }
 
 .day-cell {
-  min-height: 108rpx;
-  padding: 8rpx 4rpx;
+  min-height: 80rpx;
+  padding: 10rpx 4rpx;
   border-radius: 16rpx;
   background: rgba(255, 255, 255, 0.45);
   border: 1rpx solid transparent;
@@ -95,16 +106,6 @@
   font-size: 28rpx;
   font-weight: 700;
   color: var(--color-ink);
-}
-
-.day-lunar {
-  margin-top: 4rpx;
-  text-align: center;
-  font-size: 18rpx;
-  color: var(--color-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .day-tag {
@@ -423,8 +424,27 @@
 }
 
 .festival-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
   padding: 18rpx 0;
   border-bottom: 1rpx solid var(--color-line);
+}
+
+.festival-item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.festival-countdown {
+  flex-shrink: 0;
+  min-width: 96rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-brand-soft);
+  text-align: center;
+  line-height: 1.4;
 }
 
 .festival-item:last-child {

@@ -136,7 +136,10 @@ function parseHolidayPayload(year, payload) {
         desc: `${year}年 ${rangeText} 放假`,
         note: makeup ? `补班：${makeup}` : '',
         type: 'legal',
-        source: 'timor'
+        source: 'timor',
+        targetYear: Number(start.slice(0, 4)),
+        targetMonth: Number(start.slice(5, 7)),
+        targetDay: Number(start.slice(8, 10))
       }
     })
 

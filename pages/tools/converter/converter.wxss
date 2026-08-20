@@ -1,1 +1,82 @@
 @import "../tool-common.wxss";
+
+.currency-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.currency-picker-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: var(--color-mask);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.currency-picker-sheet {
+  width: 100%;
+  max-height: 78vh;
+  border-radius: 24rpx 24rpx 0 0;
+  background: var(--color-dialog);
+  padding: 28rpx 28rpx calc(28rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.currency-picker-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+  text-align: center;
+}
+
+.currency-picker-search {
+  margin-top: 20rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1rpx solid var(--color-line);
+  font-size: 28rpx;
+  color: var(--color-ink);
+}
+
+.currency-picker-list {
+  margin-top: 16rpx;
+  max-height: 52vh;
+}
+
+.currency-picker-item {
+  padding: 22rpx 8rpx;
+  border-bottom: 1rpx solid var(--color-line);
+  font-size: 28rpx;
+  color: var(--color-ink);
+}
+
+.currency-picker-item.active {
+  color: var(--color-brand);
+  font-weight: 700;
+}
+
+.currency-picker-item:last-child {
+  border-bottom: none;
+}
+
+.currency-picker-empty {
+  padding: 40rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-muted);
+}
+
+.currency-picker-close {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--color-brand-soft);
+}

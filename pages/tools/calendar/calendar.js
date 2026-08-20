@@ -2,7 +2,7 @@ const {
   buildDayInfo,
   isSameDate,
   todayParts,
-  solarToLunar
+  pad2
 } = require('../../../utils/lunar')
 const {
   AUSPICIOUS_EVENTS,
@@ -10,15 +10,29 @@ const {
   getAuspiciousDaysInMonth,
   buildHuangliDetail
 } = require('../../../utils/almanac')
-const { buildFestivalGroups, getDayFestivalLabel } = require('../../../utils/festivals')
+const { buildFestivalGroups, getDayFestivalLabel, attachCountdownList } = require('../../../utils/festivals')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCalendarToolShare } = require('../../../utils/share')
 
 const WEEK_HEADERS = ['日', '一', '二', '三', '四', '五', '六']
 const WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
 
+function formatPickerDate(year, month, day) {
+  return `${year}-${pad2(month)}-${pad2(day)}`
+}
+
 function formatDateKey(year, month, day) {
-  return `${year}-${month}-${day}`
+  return formatPickerDate(year, month, day)
+}
+
+function parsePickerDate(value) {
+  const parts = String(value || '').split('-')
+  if (parts.length !== 3) return null
+  const year = Number(parts[0])
+  const month = Number(parts[1])
+  const day = Number(parts[2])
+  if (!year || !month || !day) return null
+  return { year, month, day }
 }
 
 function buildMonthCells(
@@ -59,9 +73,6 @@ function buildMonthCells(
       inMonth = false
     }
 
-    const lunar = solarToLunar(year, month, day)
-    const lunarShort =
-      lunar.lunarDay === 1 ? `${lunar.isLeap ? '闰' : ''}${['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'][lunar.lunarMonth - 1]}月` : ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'][lunar.lunarDay - 1]
     const festival = getDayFestivalLabel(year, month, day, holidayDayMap)
     const isToday = isSameDate({ year, month, day }, today)
     const isSelected = isSameDate({ year, month, day }, selected)
@@ -77,7 +88,6 @@ function buildMonthCells(
       isToday,
       isSelected,
       isAuspicious,
-      lunarShort,
       festivalShort: festival ? festival.split(' ')[0] : ''
     })
   }
@@ -95,6 +105,7 @@ Page({
     selectedYear: 0,
     selectedMonth: 0,
     selectedDay: 0,
+    pickerDate: '',
     monthCells: [],
     selectedInfo: null,
     huangliDetail: null,
@@ -140,7 +151,7 @@ Page({
     this._festivalLoading = true
     this.setData({ festivalLoading: true, festivalError: '' })
     try {
-      const groups = await buildFestivalGroups(year)
+      const groups = await buildFestivalGroups(year, new Date())
       this._holidayYear = year
       this.setData(
         {
@@ -180,6 +191,22 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+    if (this.data.activeTab === 'festival' && this.data.festivalGroups) {
+      this.refreshFestivalCountdown()
+    }
+  },
+
+  refreshFestivalCountdown() {
+    const { festivalGroups, viewYear } = this.data
+    if (!festivalGroups) return
+    const now = new Date()
+    this.setData({
+      festivalGroups: {
+        legal: attachCountdownList(festivalGroups.legal, viewYear, now),
+        terms: attachCountdownList(festivalGroups.terms, viewYear, now),
+        popular: attachCountdownList(festivalGroups.popular, viewYear, now)
+      }
+    })
   },
 
   refreshCalendarView() {
@@ -212,6 +239,7 @@ Page({
         auspiciousDays,
         holidayDayMap
       ),
+      pickerDate: formatPickerDate(selectedYear, selectedMonth, selectedDay),
       selectedInfo: {
         solarText: dayInfo.solarText,
         weekdayText: WEEKDAY_NAMES[new Date(selectedYear, selectedMonth - 1, selectedDay).getDay()],
@@ -228,10 +256,31 @@ Page({
     })
   },
 
+  onPickDate(e) {
+    const picked = parsePickerDate(e.detail.value)
+    if (!picked) return
+    this.setData(
+      {
+        viewYear: picked.year,
+        viewMonth: picked.month,
+        selectedYear: picked.year,
+        selectedMonth: picked.month,
+        selectedDay: picked.day
+      },
+      () => {
+        this.ensureFestivalYear(picked.year, () => this.refreshCalendarView())
+      }
+    )
+  },
+
   onTabChange(e) {
     const tab = e.currentTarget.dataset.tab
     if (!tab || tab === this.data.activeTab) return
-    this.setData({ activeTab: tab })
+    this.setData({ activeTab: tab }, () => {
+      if (tab === 'festival') {
+        this.refreshFestivalCountdown()
+      }
+    })
   },
 
   onPrevMonth() {

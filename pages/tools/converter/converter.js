@@ -24,10 +24,8 @@ Page({
     unitCount: 0,
     rateLoading: false,
     rateError: '',
-    currencySearch: '',
     digits: 6,
     units: [],
-    pickerUnits: [],
     unitLabels: [],
     fromIndex: 0,
     toIndex: 1,
@@ -35,7 +33,12 @@ Page({
     resultValue: '',
     resultLabel: '',
     showAll: false,
-    allResults: []
+    allResults: [],
+    showCurrencyPicker: false,
+    currencyPickerTarget: 'from',
+    currencyPickerSearch: '',
+    currencyPickerUnits: [],
+    currencyPickerActiveKey: ''
   },
 
   onLoad(options) {
@@ -53,6 +56,8 @@ Page({
     }
     this._currencyShownOnce = true
   },
+
+  preventMove() {},
 
   getDefaultCurrencyIndices(units) {
     const fromIndex = findUnitIndex(units, 'cny')
@@ -95,15 +100,6 @@ Page({
     })
   },
 
-  applyPickerUnits(units, keyword) {
-    const pickerUnits =
-      this.data.type === 'currency' ? this.filterCurrencyUnits(units, keyword) : units
-    return {
-      pickerUnits,
-      unitLabels: pickerUnits.map((item) => item.label)
-    }
-  },
-
   applyConverterConfig(config, callback) {
     if (!config) return
     wx.setNavigationBarTitle({ title: config.title })
@@ -113,11 +109,10 @@ Page({
       setCurrencyUnits(units.length ? units : null)
     }
 
-    const pickerPatch = this.applyPickerUnits(units, this.data.currencySearch)
     let fromIndex = config.fromIndex
     let toIndex = config.toIndex
     if (fromIndex == null || toIndex == null) {
-      const defaults = this.getDefaultCurrencyIndices(pickerPatch.pickerUnits)
+      const defaults = this.getDefaultCurrencyIndices(units)
       fromIndex = defaults.fromIndex
       toIndex = defaults.toIndex
     }
@@ -131,8 +126,7 @@ Page({
         unitCount: config.unitCount || units.length,
         digits: config.digits || 6,
         units,
-        pickerUnits: pickerPatch.pickerUnits,
-        unitLabels: pickerPatch.unitLabels,
+        unitLabels: units.map((item) => item.label),
         fromIndex,
         toIndex,
         showAll: config.resetShowAll ? false : this.data.showAll
@@ -153,7 +147,7 @@ Page({
           type,
           title: '汇率换算',
           note: '',
-          publishedAt: '',
+          publishedAt: cached.publishedAt || '',
           unitCount: cached.unitCount,
           digits: 4,
           units: cached.units,
@@ -182,7 +176,7 @@ Page({
         resetShowAll: true
       },
       () => {
-        this.setData({ inputValue: '1', currencySearch: '' }, () => this.recalculate())
+        this.setData({ inputValue: '1' }, () => this.recalculate())
       }
     )
   },
@@ -203,20 +197,16 @@ Page({
         prevFromIndex,
         prevToIndex
       )
-      const pickerPatch = this.applyPickerUnits(data.units, this.data.currencySearch)
-      const fromIndex = findUnitIndex(pickerPatch.pickerUnits, data.units[indices.fromIndex].key)
-      const toIndex = findUnitIndex(pickerPatch.pickerUnits, data.units[indices.toIndex].key)
 
       this.setData({
-        note: data.note,
+        note: '',
         publishedAt: data.publishedAt,
         unitCount: data.unitCount,
         rateError: data.source === 'fallback' ? data.error || '' : data.error || '',
         units: data.units,
-        pickerUnits: pickerPatch.pickerUnits,
-        unitLabels: pickerPatch.unitLabels,
-        fromIndex: fromIndex >= 0 ? fromIndex : 0,
-        toIndex: toIndex >= 0 ? toIndex : Math.min(1, pickerPatch.pickerUnits.length - 1),
+        unitLabels: data.units.map((item) => item.label),
+        fromIndex: indices.fromIndex,
+        toIndex: indices.toIndex,
         rateLoading: false
       })
       this.recalculate()
@@ -235,34 +225,56 @@ Page({
     this.refreshExchangeRates(true)
   },
 
-  onCurrencySearch(e) {
-    const currencySearch = e.detail.value
-    const pickerPatch = this.applyPickerUnits(this.data.units, currencySearch)
-    const fromKey = this.data.pickerUnits[this.data.fromIndex]?.key
-    const toKey = this.data.pickerUnits[this.data.toIndex]?.key
-    let fromIndex = findUnitIndex(pickerPatch.pickerUnits, fromKey)
-    let toIndex = findUnitIndex(pickerPatch.pickerUnits, toKey)
-    if (fromIndex < 0) fromIndex = 0
-    if (toIndex < 0) toIndex = pickerPatch.pickerUnits.length > 1 ? 1 : 0
+  onOpenCurrencyPicker(e) {
+    const target = e.currentTarget.dataset.target
+    if (!target || this.data.type !== 'currency') return
+    const activeKey =
+      target === 'from'
+        ? this.data.units[this.data.fromIndex]?.key
+        : this.data.units[this.data.toIndex]?.key
+    this.setData({
+      showCurrencyPicker: true,
+      currencyPickerTarget: target,
+      currencyPickerSearch: '',
+      currencyPickerUnits: this.data.units,
+      currencyPickerActiveKey: activeKey || ''
+    })
+  },
 
-    this.setData(
-      {
-        currencySearch,
-        pickerUnits: pickerPatch.pickerUnits,
-        unitLabels: pickerPatch.unitLabels,
-        fromIndex,
-        toIndex
-      },
-      () => this.recalculate()
-    )
+  onCloseCurrencyPicker() {
+    this.setData({
+      showCurrencyPicker: false,
+      currencyPickerSearch: '',
+      currencyPickerUnits: []
+    })
+  },
+
+  onCurrencyPickerSearch(e) {
+    const currencyPickerSearch = e.detail.value
+    this.setData({
+      currencyPickerSearch,
+      currencyPickerUnits: this.filterCurrencyUnits(this.data.units, currencyPickerSearch)
+    })
+  },
+
+  onPickCurrency(e) {
+    const key = e.currentTarget.dataset.key
+    const index = findUnitIndex(this.data.units, key)
+    if (index < 0) return
+    const patch = { showCurrencyPicker: false, currencyPickerSearch: '' }
+    if (this.data.currencyPickerTarget === 'from') {
+      patch.fromIndex = index
+    } else {
+      patch.toIndex = index
+    }
+    this.setData(patch, () => this.recalculate())
   },
 
   recalculate() {
-    const { type, pickerUnits, fromIndex, toIndex, inputValue, digits, showAll, units } =
-      this.data
+    const { type, units, fromIndex, toIndex, inputValue, digits, showAll } = this.data
     const value = parseInput(inputValue)
-    const fromUnit = pickerUnits[fromIndex]
-    const toUnit = pickerUnits[toIndex]
+    const fromUnit = units[fromIndex]
+    const toUnit = units[toIndex]
 
     if (!fromUnit || !toUnit) {
       this.setData({

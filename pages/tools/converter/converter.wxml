@@ -2,24 +2,15 @@
   <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
     <view class="panel">
       <view class="section-title">{{title}}</view>
-      <view class="tool-note" wx:if="{{note}}">{{note}}</view>
-      <view class="tool-note" wx:if="{{publishedAt}}">汇率日期：{{publishedAt}}</view>
-      <view class="tool-note" wx:if="{{type === 'currency' && unitCount}}">共 {{unitCount}} 种货币</view>
-      <view class="tool-note" wx:if="{{rateLoading}}">正在获取最新汇率…</view>
-      <view class="tool-note warn" wx:if="{{rateError}}">{{rateError}}</view>
-      <view class="swap-btn" wx:if="{{type === 'currency'}}" bindtap="onRefreshRates">刷新汇率</view>
-
-      <view class="field" wx:if="{{type === 'currency'}}">
-        <view class="field-label">搜索货币</view>
-        <view class="field-control">
-          <input
-            class="field-input currency-search-input"
-            value="{{currencySearch}}"
-            placeholder="代码或中文名，如 USD、日元"
-            bindinput="onCurrencySearch"
-          />
-        </view>
+      <view class="tool-note" wx:if="{{note && type !== 'currency'}}">{{note}}</view>
+      <view class="tool-note currency-meta" wx:if="{{type === 'currency'}}">
+        <text wx:if="{{publishedAt}}">汇率日期：{{publishedAt}}</text>
+        <text wx:if="{{publishedAt && unitCount}}"> · </text>
+        <text wx:if="{{unitCount}}">共 {{unitCount}} 种货币</text>
       </view>
+      <view class="tool-note" wx:if="{{type === 'currency' && rateLoading}}">正在获取最新汇率…</view>
+      <view class="tool-note warn" wx:if="{{type === 'currency' && rateError}}">{{rateError}}</view>
+      <view class="swap-btn" wx:if="{{type === 'currency'}}" bindtap="onRefreshRates">刷新汇率</view>
 
       <view class="field">
         <view class="field-label">输入数值</view>
@@ -37,7 +28,21 @@
       <view class="field">
         <view class="field-label">从</view>
         <view class="field-control">
-          <picker mode="selector" range="{{unitLabels}}" value="{{fromIndex}}" bindchange="onFromUnitChange">
+          <view
+            wx:if="{{type === 'currency'}}"
+            class="picker-value"
+            bindtap="onOpenCurrencyPicker"
+            data-target="from"
+          >
+            {{units[fromIndex].label}}
+          </view>
+          <picker
+            wx:else
+            mode="selector"
+            range="{{unitLabels}}"
+            value="{{fromIndex}}"
+            bindchange="onFromUnitChange"
+          >
             <view class="picker-value">{{unitLabels[fromIndex]}}</view>
           </picker>
         </view>
@@ -48,7 +53,21 @@
       <view class="field">
         <view class="field-label">到</view>
         <view class="field-control">
-          <picker mode="selector" range="{{unitLabels}}" value="{{toIndex}}" bindchange="onToUnitChange">
+          <view
+            wx:if="{{type === 'currency'}}"
+            class="picker-value"
+            bindtap="onOpenCurrencyPicker"
+            data-target="to"
+          >
+            {{units[toIndex].label}}
+          </view>
+          <picker
+            wx:else
+            mode="selector"
+            range="{{unitLabels}}"
+            value="{{toIndex}}"
+            bindchange="onToUnitChange"
+          >
             <view class="picker-value">{{unitLabels[toIndex]}}</view>
           </picker>
         </view>
@@ -71,4 +90,35 @@
       </view>
     </view>
   </scroll-view>
+
+  <view
+    class="currency-picker-mask"
+    wx:if="{{showCurrencyPicker}}"
+    catchtouchmove="preventMove"
+    bindtap="onCloseCurrencyPicker"
+  >
+    <view class="currency-picker-sheet" catchtap="preventMove">
+      <view class="currency-picker-title">选择{{currencyPickerTarget === 'from' ? '源' : '目标'}}货币</view>
+      <input
+        class="currency-picker-search"
+        value="{{currencyPickerSearch}}"
+        placeholder="搜索代码或中文名，如 USD、日元"
+        bindinput="onCurrencyPickerSearch"
+        focus="{{showCurrencyPicker}}"
+      />
+      <scroll-view scroll-y class="currency-picker-list" enhanced show-scrollbar="{{false}}">
+        <view
+          class="currency-picker-item {{item.key === currencyPickerActiveKey ? 'active' : ''}}"
+          wx:for="{{currencyPickerUnits}}"
+          wx:key="key"
+          bindtap="onPickCurrency"
+          data-key="{{item.key}}"
+        >
+          {{item.label}}
+        </view>
+        <view class="currency-picker-empty" wx:if="{{!currencyPickerUnits.length}}">未找到匹配货币</view>
+      </scroll-view>
+      <view class="currency-picker-close" bindtap="onCloseCurrencyPicker">取消</view>
+    </view>
+  </view>
 </view>

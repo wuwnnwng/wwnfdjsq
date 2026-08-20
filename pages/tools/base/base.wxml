@@ -26,7 +26,7 @@
             bindtap="onSelectBase"
             data-index="{{index}}"
           >
-            {{item.short}}
+            {{item.label}}
           </view>
         </view>
         <input

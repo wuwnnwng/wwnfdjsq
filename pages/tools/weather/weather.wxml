@@ -65,10 +65,6 @@
         </view>
       </view>
     </view>
-
-    <view class="panel">
-      <view class="tool-note">天气数据来自 Open-Meteo，仅供参考。</view>
-    </view>
   </scroll-view>
 
   <view

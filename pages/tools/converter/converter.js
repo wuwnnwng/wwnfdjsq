@@ -1,7 +1,6 @@
 const {
   getConverterType,
   convertValue,
-  convertAll,
   formatNumber,
   parseInput,
   setCurrencyUnits
@@ -13,17 +12,62 @@ const {
 const { findUnitIndex } = require('../../../utils/currencyNames')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getConverterToolShare } = require('../../../utils/share')
+const { getToolById } = require('../../../utils/toolsConfig')
 const {
   calcPickerSheetLayout,
   listenKeyboardHeight,
   unlistenKeyboardHeight
 } = require('../../../utils/pickerKeyboard')
 
+function parseUnitLabel(label) {
+  const text = String(label || '').trim()
+  const idx = text.lastIndexOf(' ')
+  if (idx > 0) {
+    const symbol = text.slice(idx + 1)
+    if (symbol && symbol.length <= 8 && /[A-Za-z0-9μ℃℉°²³\/]/.test(symbol)) {
+      return { name: text.slice(0, idx), symbol }
+    }
+  }
+  return { name: text, symbol: '' }
+}
+
+function decorateUnits(units) {
+  return (units || []).map((item, index) => {
+    const parts = parseUnitLabel(item.label)
+    return {
+      ...item,
+      index,
+      name: parts.name,
+      symbol: parts.symbol,
+      chip: parts.symbol || parts.name
+    }
+  })
+}
+
+function toolMeta(type) {
+  const tool = getToolById(type) || {}
+  return {
+    icon: tool.icon || '🔄',
+    iconType: tool.iconType || type || 'length',
+    kicker: tool.shortName || tool.name || '单位换算'
+  }
+}
+
 Page({
   data: {
     theme: getThemeId(),
     type: '',
     title: '',
+    kicker: '',
+    icon: '🔄',
+    iconType: 'length',
+    fromName: '',
+    fromSymbol: '',
+    fromLabel: '',
+    toName: '',
+    toSymbol: '',
+    toLabel: '',
+    formulaText: '',
     note: '',
     publishedAt: '',
     unitCount: 0,
@@ -113,8 +157,9 @@ Page({
     if (!config) return
     wx.setNavigationBarTitle({ title: config.title })
 
-    const units = config.units || []
-    if (config.type === 'currency') {
+    const type = config.type || this.data.type
+    const units = decorateUnits(config.units || [])
+    if (type === 'currency') {
       setCurrencyUnits(units.length ? units : null)
     }
 
@@ -126,10 +171,14 @@ Page({
       toIndex = defaults.toIndex
     }
 
+    const meta = toolMeta(type)
     this.setData(
       {
-        type: config.type || this.data.type,
+        type,
         title: config.title,
+        kicker: meta.kicker,
+        icon: meta.icon,
+        iconType: meta.iconType,
         note: config.note || '',
         publishedAt: config.publishedAt || '',
         unitCount: config.unitCount || units.length,
@@ -138,7 +187,7 @@ Page({
         unitLabels: units.map((item) => item.label),
         fromIndex,
         toIndex,
-        showAll: config.resetShowAll ? false : this.data.showAll
+        showAll: type === 'currency' ? (config.resetShowAll ? false : this.data.showAll) : true
       },
       () => {
         if (callback) callback()
@@ -199,9 +248,10 @@ Page({
       const prevFromIndex = this.data.fromIndex
       const prevToIndex = this.data.toIndex
       const data = await loadExchangeRates({ force: !!force })
-      setCurrencyUnits(data.units)
+      const units = decorateUnits(data.units)
+      setCurrencyUnits(units)
       const indices = this.resolveCurrencyIndices(
-        data.units,
+        units,
         prevUnits,
         prevFromIndex,
         prevToIndex
@@ -212,8 +262,8 @@ Page({
         publishedAt: data.publishedAt,
         unitCount: data.unitCount,
         rateError: data.source === 'fallback' ? data.error || '' : data.error || '',
-        units: data.units,
-        unitLabels: data.units.map((item) => item.label),
+        units,
+        unitLabels: units.map((item) => item.label),
         fromIndex: indices.fromIndex,
         toIndex: indices.toIndex,
         rateLoading: false
@@ -333,55 +383,83 @@ Page({
     const value = parseInput(inputValue)
     const fromUnit = units[fromIndex]
     const toUnit = units[toIndex]
+    const fromView = fromUnit || {}
+    const toView = toUnit || {}
+    const display = {
+      fromName: fromView.name || '',
+      fromSymbol: fromView.symbol || '',
+      fromLabel: fromView.label || '',
+      toName: toView.name || '',
+      toSymbol: toView.symbol || '',
+      toLabel: toView.label || ''
+    }
 
     if (!fromUnit || !toUnit) {
       this.setData({
+        ...display,
         resultValue: '',
         resultLabel: '',
+        formulaText: '',
         allResults: []
       })
       return
     }
 
+    const shouldList = type !== 'currency' || showAll
+    const makeRows = (text) =>
+      shouldList
+        ? units.map((item, index) => ({
+            key: item.key,
+            index,
+            name: item.name,
+            symbol: item.symbol,
+            label: item.label,
+            value: text,
+            active: item.key === toUnit.key
+          }))
+        : []
+
     if (value === null) {
       this.setData({
+        ...display,
         resultValue: '',
         resultLabel: toUnit.label,
-        allResults: []
+        formulaText: `${fromView.name} → ${toView.name}`,
+        allResults: makeRows('—')
       })
       return
     }
 
     if (!Number.isFinite(value)) {
       this.setData({
+        ...display,
         resultValue: '无效',
         resultLabel: toUnit.label,
-        allResults: []
+        formulaText: '',
+        allResults: makeRows('无效')
       })
       return
     }
 
     const converted = convertValue(type, value, fromUnit.key, toUnit.key)
-    const patch = {
-      resultValue: formatNumber(converted, digits),
-      resultLabel: toUnit.label
-    }
-
-    if (showAll && type === 'currency') {
-      patch.allResults = units.map((item) => ({
-        key: item.key,
-        label: item.label,
-        value: formatNumber(convertValue(type, value, fromUnit.key, item.key), digits)
-      }))
-    } else if (showAll) {
-      patch.allResults = convertAll(type, value, fromUnit.key).map((item) => ({
-        key: item.key,
-        label: item.label,
-        value: formatNumber(item.value, digits)
-      }))
-    }
-
-    this.setData(patch)
+    const resultValue = formatNumber(converted, digits)
+    this.setData({
+      ...display,
+      resultValue,
+      resultLabel: toUnit.label,
+      formulaText: `${inputValue} ${fromView.name} = ${resultValue} ${toView.name}`,
+      allResults: shouldList
+        ? units.map((item, index) => ({
+            key: item.key,
+            index,
+            name: item.name,
+            symbol: item.symbol,
+            label: item.label,
+            value: formatNumber(convertValue(type, value, fromUnit.key, item.key), digits),
+            active: item.key === toUnit.key
+          }))
+        : []
+    })
   },
 
   onInputChange(e) {
@@ -394,6 +472,13 @@ Page({
 
   onToUnitChange(e) {
     this.setData({ toIndex: Number(e.detail.value) }, () => this.recalculate())
+  },
+
+  onSelectToUnit(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (!Number.isFinite(index) || index < 0) return
+    if (index === this.data.toIndex) return
+    this.setData({ toIndex: index }, () => this.recalculate())
   },
 
   onSwapUnits() {

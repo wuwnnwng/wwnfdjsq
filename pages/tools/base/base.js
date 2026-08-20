@@ -3,10 +3,10 @@ const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getBaseToolShare } = require('../../../utils/share')
 
 const BASE_OPTIONS = [
-  { key: 2, label: '二进制' },
-  { key: 8, label: '八进制' },
-  { key: 10, label: '十进制' },
-  { key: 16, label: '十六进制' }
+  { key: 2, label: '二进制', short: 'BIN' },
+  { key: 8, label: '八进制', short: 'OCT' },
+  { key: 10, label: '十进制', short: 'DEC' },
+  { key: 16, label: '十六进制', short: 'HEX' }
 ]
 
 Page({
@@ -77,6 +77,20 @@ Page({
 
   onBaseChange(e) {
     this.setData({ baseIndex: Number(e.detail.value) }, () => this.recalculate())
+  },
+
+  onSelectBase(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (!Number.isFinite(index) || index === this.data.baseIndex) return
+    const base = BASE_OPTIONS[index].key
+    const inputValue = sanitizeBaseInput(this.data.inputValue, base)
+    this.setData({ baseIndex: index, inputValue }, () => this.recalculate())
+  },
+
+  onCopyResult(e) {
+    const value = String(e.currentTarget.dataset.value || '')
+    if (!value || value === '—' || value === '无效') return
+    wx.setClipboardData({ data: value })
   },
 
   onShareAppMessage() {

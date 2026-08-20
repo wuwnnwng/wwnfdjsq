@@ -16,7 +16,7 @@
 
       <view class="conv-eq" wx:if="{{formulaText}}">{{formulaText}}</view>
       <view class="conv-result">{{resultValue || '—'}}</view>
-      <view class="conv-result-unit">{{toLabel || '选择单位'}}</view>
+      <view class="conv-result-unit">{{toName || '选择单位'}}</view>
 
       <view class="conv-meta" wx:if="{{type === 'currency'}}">
         <text wx:if="{{publishedAt}}">汇率日期 {{publishedAt}}</text>
@@ -29,32 +29,29 @@
 
     <view class="panel conv-board">
       <view class="conv-card">
-        <view class="conv-card-head">
-          <view class="conv-card-label">从</view>
-          <view
-            wx:if="{{type === 'currency'}}"
-            class="conv-unit-btn"
-            bindtap="onOpenCurrencyPicker"
-            data-target="from"
-          >
-            <view class="conv-unit-name">{{fromName}}</view>
-            <view class="conv-unit-symbol" wx:if="{{fromSymbol}}">{{fromSymbol}}</view>
+        <view class="conv-card-label">从</view>
+        <view
+          wx:if="{{type === 'currency'}}"
+          class="conv-unit-btn"
+          bindtap="onOpenCurrencyPicker"
+          data-target="from"
+        >
+          <view class="conv-unit-text">{{fromName}}</view>
+          <text class="conv-unit-caret">▾</text>
+        </view>
+        <picker
+          wx:else
+          class="conv-unit-picker"
+          mode="selector"
+          range="{{unitLabels}}"
+          value="{{fromIndex}}"
+          bindchange="onFromUnitChange"
+        >
+          <view class="conv-unit-btn">
+            <view class="conv-unit-text">{{fromName}}</view>
             <text class="conv-unit-caret">▾</text>
           </view>
-          <picker
-            wx:else
-            mode="selector"
-            range="{{unitLabels}}"
-            value="{{fromIndex}}"
-            bindchange="onFromUnitChange"
-          >
-            <view class="conv-unit-btn">
-              <view class="conv-unit-name">{{fromName}}</view>
-              <view class="conv-unit-symbol" wx:if="{{fromSymbol}}">{{fromSymbol}}</view>
-              <text class="conv-unit-caret">▾</text>
-            </view>
-          </picker>
-        </view>
+        </picker>
         <input
           class="conv-input"
           type="digit"
@@ -67,32 +64,29 @@
       <view class="conv-swap" bindtap="onSwapUnits" aria-role="button" aria-label="交换单位">⇅</view>
 
       <view class="conv-card conv-card-to">
-        <view class="conv-card-head">
-          <view class="conv-card-label">到</view>
-          <view
-            wx:if="{{type === 'currency'}}"
-            class="conv-unit-btn"
-            bindtap="onOpenCurrencyPicker"
-            data-target="to"
-          >
-            <view class="conv-unit-name">{{toName}}</view>
-            <view class="conv-unit-symbol" wx:if="{{toSymbol}}">{{toSymbol}}</view>
+        <view class="conv-card-label">到</view>
+        <view
+          wx:if="{{type === 'currency'}}"
+          class="conv-unit-btn"
+          bindtap="onOpenCurrencyPicker"
+          data-target="to"
+        >
+          <view class="conv-unit-text">{{toName}}</view>
+          <text class="conv-unit-caret">▾</text>
+        </view>
+        <picker
+          wx:else
+          class="conv-unit-picker"
+          mode="selector"
+          range="{{unitLabels}}"
+          value="{{toIndex}}"
+          bindchange="onToUnitChange"
+        >
+          <view class="conv-unit-btn">
+            <view class="conv-unit-text">{{toName}}</view>
             <text class="conv-unit-caret">▾</text>
           </view>
-          <picker
-            wx:else
-            mode="selector"
-            range="{{unitLabels}}"
-            value="{{toIndex}}"
-            bindchange="onToUnitChange"
-          >
-            <view class="conv-unit-btn">
-              <view class="conv-unit-name">{{toName}}</view>
-              <view class="conv-unit-symbol" wx:if="{{toSymbol}}">{{toSymbol}}</view>
-              <text class="conv-unit-caret">▾</text>
-            </view>
-          </picker>
-        </view>
+        </picker>
         <view class="conv-output">{{resultValue || '—'}}</view>
       </view>
     </view>
@@ -112,7 +106,7 @@
           bindtap="onSelectToUnit"
           data-index="{{index}}"
         >
-          {{item.chip}}
+          {{item.name}}
         </view>
       </view>
     </scroll-view>
@@ -132,7 +126,6 @@
         >
           <view class="conv-row-label">
             <view class="conv-row-name">{{item.name}}</view>
-            <view class="conv-row-symbol" wx:if="{{item.symbol}}">{{item.symbol}}</view>
           </view>
           <view class="conv-row-value">{{item.value}}</view>
         </view>

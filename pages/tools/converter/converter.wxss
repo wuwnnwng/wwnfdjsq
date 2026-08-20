@@ -154,13 +154,6 @@
   border-color: rgba(255, 255, 255, 0.55);
 }
 
-.conv-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-}
-
 .conv-card-label {
   font-size: 22rpx;
   font-weight: 700;
@@ -168,36 +161,45 @@
   letter-spacing: 2rpx;
 }
 
+.conv-unit-picker {
+  display: block;
+  width: 100%;
+  margin-top: 14rpx;
+}
+
 .conv-unit-btn {
   display: flex;
   align-items: center;
-  max-width: 72%;
-  min-height: 56rpx;
-  padding: 8rpx 16rpx 8rpx 18rpx;
-  border-radius: 999rpx;
+  justify-content: space-between;
+  gap: 16rpx;
+  width: 100%;
+  min-height: 88rpx;
+  margin-top: 14rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 18rpx;
   background: rgba(255, 255, 255, 0.92);
   border: 1rpx solid var(--color-line);
+  box-sizing: border-box;
 }
 
-.conv-unit-name {
+.conv-unit-picker .conv-unit-btn {
+  margin-top: 0;
+}
+
+.conv-unit-text {
+  flex: 1;
   min-width: 0;
-  font-size: 24rpx;
+  font-size: 30rpx;
   font-weight: 700;
   color: var(--color-ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.conv-unit-symbol {
-  margin-left: 8rpx;
-  font-size: 20rpx;
-  color: var(--color-muted);
+  line-height: 1.45;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .conv-unit-caret {
-  margin-left: 8rpx;
-  font-size: 20rpx;
+  flex-shrink: 0;
+  font-size: 24rpx;
   color: var(--color-brand-soft);
 }
 

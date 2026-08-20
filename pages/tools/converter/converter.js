@@ -39,7 +39,7 @@ function decorateUnits(units) {
       index,
       name: parts.name,
       symbol: parts.symbol,
-      chip: parts.symbol || parts.name
+      chip: parts.name
     }
   })
 }
@@ -184,7 +184,7 @@ Page({
         unitCount: config.unitCount || units.length,
         digits: config.digits || 6,
         units,
-        unitLabels: units.map((item) => item.label),
+        unitLabels: units.map((item) => item.name || item.label),
         fromIndex,
         toIndex,
         showAll: type === 'currency' ? (config.resetShowAll ? false : this.data.showAll) : true
@@ -263,7 +263,7 @@ Page({
         unitCount: data.unitCount,
         rateError: data.source === 'fallback' ? data.error || '' : data.error || '',
         units,
-        unitLabels: units.map((item) => item.label),
+        unitLabels: units.map((item) => item.name || item.label),
         fromIndex: indices.fromIndex,
         toIndex: indices.toIndex,
         rateLoading: false

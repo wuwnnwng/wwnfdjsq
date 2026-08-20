@@ -151,7 +151,10 @@ Page({
   },
 
   async loadFestivalData(year, callback) {
-    if (this._festivalLoading) return
+    if (this._festivalLoading) {
+      this._festivalPending = { year, callback }
+      return
+    }
     this._festivalLoading = true
     this.setData({ festivalLoading: true, festivalError: '' })
     try {
@@ -180,11 +183,18 @@ Page({
       if (callback) callback()
     } finally {
       this._festivalLoading = false
+      const pending = this._festivalPending
+      this._festivalPending = null
+      if (pending && pending.year !== this._holidayYear) {
+        this.loadFestivalData(pending.year, pending.callback)
+      } else if (pending && pending.callback) {
+        pending.callback()
+      }
     }
   },
 
   ensureFestivalYear(year, callback) {
-    if (this._holidayYear === year && this.data.holidayDayMap) {
+    if (this._holidayYear === year) {
       if (callback) callback()
       return
     }
@@ -287,28 +297,63 @@ Page({
     })
   },
 
-  onPrevMonth() {
-    let { viewYear, viewMonth } = this.data
-    viewMonth -= 1
-    if (viewMonth < 1) {
-      viewMonth = 12
-      viewYear -= 1
+  shiftMonth(delta) {
+    let year = Number(this.data.viewYear)
+    let month = Number(this.data.viewMonth) + Number(delta)
+    if (month < 1) {
+      month = 12
+      year -= 1
+    } else if (month > 12) {
+      month = 1
+      year += 1
     }
-    this.setData({ viewYear, viewMonth }, () => {
-      this.ensureFestivalYear(viewYear, () => this.refreshCalendarView())
-    })
+    const daysInMonth = new Date(year, month, 0).getDate()
+    const selectedDay = Math.min(Number(this.data.selectedDay) || 1, daysInMonth)
+    this.setData(
+      {
+        viewYear: year,
+        viewMonth: month,
+        selectedYear: year,
+        selectedMonth: month,
+        selectedDay
+      },
+      () => {
+        this.refreshCalendarView()
+        this.ensureFestivalYear(year, () => this.refreshCalendarView())
+      }
+    )
+  },
+
+  onPrevMonth() {
+    this.shiftMonth(-1)
   },
 
   onNextMonth() {
-    let { viewYear, viewMonth } = this.data
-    viewMonth += 1
-    if (viewMonth > 12) {
-      viewMonth = 1
-      viewYear += 1
+    this.shiftMonth(1)
+  },
+
+  onCalendarTouchStart(e) {
+    const touch = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0])
+    if (!touch) return
+    this._monthTouch = {
+      x: touch.clientX,
+      y: touch.clientY
     }
-    this.setData({ viewYear, viewMonth }, () => {
-      this.ensureFestivalYear(viewYear, () => this.refreshCalendarView())
-    })
+    this._didSwipeMonth = false
+  },
+
+  onCalendarTouchEnd(e) {
+    const start = this._monthTouch
+    this._monthTouch = null
+    if (!start) return
+    const touch = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0])
+    if (!touch) return
+    const dx = touch.clientX - start.x
+    const dy = touch.clientY - start.y
+    if (Math.abs(dx) < 56) return
+    if (Math.abs(dx) <= Math.abs(dy) * 1.15) return
+    this._didSwipeMonth = true
+    this.shiftMonth(dx < 0 ? 1 : -1)
   },
 
   onBackToday() {
@@ -326,6 +371,10 @@ Page({
   },
 
   onSelectDay(e) {
+    if (this._didSwipeMonth) {
+      this._didSwipeMonth = false
+      return
+    }
     const { year, month, day, inmonth } = e.currentTarget.dataset
     if (!year || !month || !day) return
     const patch = {

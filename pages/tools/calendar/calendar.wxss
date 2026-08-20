@@ -22,15 +22,24 @@
 }
 
 .month-nav {
-  width: 64rpx;
-  height: 64rpx;
-  line-height: 64rpx;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+  width: 88rpx;
+  height: 88rpx;
+  line-height: 88rpx;
   text-align: center;
-  font-size: 40rpx;
-  color: var(--color-brand-soft);
+  font-size: 48rpx;
+  color: var(--color-brand);
+}
+
+.month-nav-hover {
+  opacity: 0.55;
 }
 
 .month-title-wrap {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,8 +63,7 @@
 }
 
 .month-picker {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
 }
 
 .month-title-wrap:active {
@@ -134,7 +142,7 @@
   gap: 8rpx;
 }
 
-.week-row {
+.calendar-swipe {
   margin-top: 24rpx;
 }
 
@@ -383,6 +391,18 @@
 
 .hour-item.now {
   box-shadow: 0 0 0 2rpx var(--color-brand-soft);
+  padding-bottom: 48rpx;
+}
+
+.hour-now-tag {
+  position: absolute;
+  right: 12rpx;
+  bottom: 12rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 999rpx;
+  font-size: 18rpx;
+  color: #fff;
+  background: var(--color-brand-soft);
 }
 
 .hour-top {
@@ -416,17 +436,6 @@
   margin-top: 6rpx;
   font-size: 22rpx;
   color: var(--color-muted);
-}
-
-.hour-now-tag {
-  position: absolute;
-  top: 12rpx;
-  right: 12rpx;
-  padding: 2rpx 10rpx;
-  border-radius: 999rpx;
-  font-size: 18rpx;
-  color: #fff;
-  background: var(--color-brand-soft);
 }
 
 .huangli-card {

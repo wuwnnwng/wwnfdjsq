@@ -2,21 +2,29 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FEATURED_IDS = ['calendar', 'currency', 'area']
+const FEATURED_IDS = ['calendar', 'weather', 'calc']
 
 const TOOLS = [
   {
     id: 'calendar',
     name: '我的日历',
-    shortName: '日历',
+    shortName: '日期',
     icon: '📅',
     iconType: 'calendar',
     page: '/pages/tools/calendar/calendar'
   },
   {
+    id: 'weather',
+    name: '天气',
+    shortName: '天气',
+    icon: '🌤️',
+    iconType: 'weather',
+    page: '/pages/tools/weather/weather'
+  },
+  {
     id: 'calc',
     name: '算术计算器',
-    shortName: '计算',
+    shortName: '计算器',
     icon: '🧮',
     iconType: 'calc',
     page: '/pages/tools/calc/calc'

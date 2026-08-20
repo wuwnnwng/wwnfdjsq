@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/tools/index",
     "pages/tools/calendar/calendar",
+    "pages/tools/weather/weather",
     "pages/tools/converter/converter",
     "pages/tools/base/base",
     "pages/tools/calc/calc",
@@ -15,6 +16,12 @@
     "backgroundColor": "#F3F6F4",
     "backgroundTextStyle": "dark"
   },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于获取你所在城市的天气"
+    }
+  },
+  "requiredPrivateInfos": ["getLocation"],
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"

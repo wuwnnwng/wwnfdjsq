@@ -13,11 +13,49 @@
             end="2100-12-31"
             bindchange="onPickDate"
           >
-            <view class="month-title">{{selectedYear}}年{{selectedMonth}}月{{selectedDay}}日</view>
+            <view class="month-title-wrap">
+              <view class="month-title">{{selectedYear}}年{{selectedMonth}}月{{selectedDay}}日</view>
+              <view class="month-sub" wx:if="{{selectedInfo}}">{{selectedInfo.weekdayText}} · {{selectedInfo.weekText}}</view>
+            </view>
           </picker>
           <view class="month-nav" bindtap="onNextMonth">›</view>
         </view>
-        <view class="today-link" bindtap="onBackToday">回到今天</view>
+        <view class="calendar-toolbar">
+          <view class="today-link" bindtap="onBackToday">回到今天</view>
+          <view
+            class="auspicious-link {{auspiciousEvent ? 'active' : ''}}"
+            bindtap="onToggleAuspiciousPicker"
+            aria-role="button"
+            aria-label="选择吉日"
+          >
+            {{auspiciousEventName || '选择吉日'}}
+            <text class="auspicious-arrow">{{showAuspiciousPicker ? '▲' : '▼'}}</text>
+          </view>
+        </view>
+
+        <scroll-view
+          wx:if="{{showAuspiciousPicker}}"
+          scroll-x
+          enhanced
+          enable-flex
+          show-scrollbar="{{false}}"
+          class="auspicious-scroll"
+        >
+          <view class="auspicious-tags">
+            <view
+              class="auspicious-tag {{auspiciousEvent === item.id ? 'active' : ''}}"
+              wx:for="{{auspiciousEvents}}"
+              wx:key="id"
+              bindtap="onSelectAuspiciousEvent"
+              data-id="{{item.id}}"
+            >
+              {{item.name}}
+            </view>
+          </view>
+        </scroll-view>
+        <view class="tool-note auspicious-note" wx:if="{{auspiciousEventName}}">
+          本月适合「{{auspiciousEventName}}」的日期已用绿色标注，仅供参考。
+        </view>
 
         <view class="week-row">
           <view class="week-cell" wx:for="{{weekHeaders}}" wx:key="*this">{{item}}</view>
@@ -40,34 +78,7 @@
         </view>
       </view>
 
-      <view class="panel auspicious-panel">
-        <view class="auspicious-head" bindtap="onToggleAuspiciousPicker">
-          <view class="section-title section-title-inline">选择吉日</view>
-          <view class="auspicious-current">
-            {{auspiciousEventName || '未选择'}}
-            <text class="auspicious-arrow">{{showAuspiciousPicker ? '▲' : '▼'}}</text>
-          </view>
-        </view>
-        <view class="auspicious-tags" wx:if="{{showAuspiciousPicker}}">
-          <view
-            class="auspicious-tag {{auspiciousEvent === item.id ? 'active' : ''}}"
-            wx:for="{{auspiciousEvents}}"
-            wx:key="id"
-            bindtap="onSelectAuspiciousEvent"
-            data-id="{{item.id}}"
-          >
-            {{item.name}}
-          </view>
-        </view>
-        <view class="tool-note" wx:if="{{auspiciousEventName}}">
-          本月适合「{{auspiciousEventName}}」的日期已用绿色标注，仅供参考。
-        </view>
-      </view>
-
       <view class="panel detail-panel" wx:if="{{selectedInfo}}">
-        <view class="detail-solar">
-          {{selectedInfo.solarText}} {{selectedInfo.weekdayText}} · {{selectedInfo.weekText}}
-        </view>
         <view class="detail-lunar">{{selectedInfo.lunarText}}</view>
         <view class="detail-meta">{{selectedInfo.ganZhiText}} · {{selectedInfo.ganZhiDay}}</view>
         <view class="detail-term">节气：{{selectedInfo.solarTerm}}</view>

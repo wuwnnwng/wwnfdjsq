@@ -81,6 +81,14 @@ function getCalendarToolShare() {
   }
 }
 
+function getWeatherToolShare() {
+  const path = '/pages/tools/weather/weather'
+  return {
+    appMessage: buildToolShareAppMessage(path, '天气'),
+    timeline: buildToolShareTimeline(path, '天气')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
@@ -348,6 +356,7 @@ module.exports = {
   getCalcToolShare,
   getBaseToolShare,
   getCalendarToolShare,
+  getWeatherToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

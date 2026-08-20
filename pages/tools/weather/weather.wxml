@@ -1,0 +1,123 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel weather-hero">
+      <view class="weather-head">
+        <view class="weather-place" bindtap="onOpenCityPicker" aria-role="button" aria-label="切换城市">
+          <view class="weather-city">{{place.displayName || place.name}}</view>
+          <view class="weather-updated">{{updatedAt || (loading ? '正在获取天气…' : '点此切换城市')}}</view>
+        </view>
+        <view class="weather-actions">
+          <view class="weather-action" bindtap="onLocate">定位</view>
+          <view class="weather-action" bindtap="onRefresh">刷新</view>
+        </view>
+      </view>
+
+      <view class="weather-now">
+        <text class="weather-icon">{{icon}}</text>
+        <view class="weather-temp-wrap">
+          <view class="weather-temp">{{temperature}}<text class="weather-temp-unit">°</text></view>
+          <view class="weather-summary">{{text}} · 体感 {{apparent}}°</view>
+          <view class="weather-range">{{todayMin}}° / {{todayMax}}°</view>
+        </view>
+      </view>
+
+      <view class="weather-metrics">
+        <view class="weather-metric">
+          <view class="weather-metric-label">湿度</view>
+          <view class="weather-metric-value">{{humidity}}%</view>
+        </view>
+        <view class="weather-metric">
+          <view class="weather-metric-label">风力</view>
+          <view class="weather-metric-value">{{wind}}</view>
+        </view>
+        <view class="weather-metric">
+          <view class="weather-metric-label">日出 / 日落</view>
+          <view class="weather-metric-value">{{sunrise}} / {{sunset}}</view>
+        </view>
+      </view>
+
+      <view class="tool-note warn" wx:if="{{error}}">{{error}}</view>
+    </view>
+
+    <view class="panel" wx:if="{{hourly.length}}">
+      <view class="section-title">逐时预报</view>
+      <scroll-view scroll-x class="hourly-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="hourly-row">
+          <view class="hourly-item" wx:for="{{hourly}}" wx:key="key">
+            <view class="hourly-label">{{item.label}}</view>
+            <view class="hourly-icon">{{item.icon}}</view>
+            <view class="hourly-temp">{{item.temp}}°</view>
+            <view class="hourly-pop" wx:if="{{item.showPop}}">{{item.pop}}%</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="panel" wx:if="{{daily.length}}">
+      <view class="section-title">七日预报</view>
+      <view class="daily-list">
+        <view class="daily-row" wx:for="{{daily}}" wx:key="key">
+          <view class="daily-label">{{item.label}}</view>
+          <view class="daily-icon">{{item.icon}}</view>
+          <view class="daily-text">{{item.text}}</view>
+          <view class="daily-pop" wx:if="{{item.showPop}}">{{item.pop}}%</view>
+          <view class="daily-range">{{item.min}}° / {{item.max}}°</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel">
+      <view class="tool-note">天气数据来自 Open-Meteo，仅供参考。</view>
+    </view>
+  </scroll-view>
+
+  <view
+    class="city-picker-mask"
+    wx:if="{{showCityPicker}}"
+    catchtouchmove="preventMove"
+    bindtap="onCloseCityPicker"
+  >
+    <view class="city-picker-sheet" catchtap="preventMove">
+      <view class="city-picker-title">选择城市</view>
+      <input
+        class="city-picker-search"
+        value="{{cityKeyword}}"
+        placeholder="搜索城市，如 杭州、深圳"
+        bindinput="onCitySearchInput"
+        focus="{{showCityPicker}}"
+      />
+      <scroll-view scroll-y class="city-picker-list" enhanced show-scrollbar="{{false}}">
+        <block wx:if="{{cityKeyword}}">
+          <view class="city-picker-empty" wx:if="{{citySearching}}">正在搜索…</view>
+          <view class="city-picker-empty" wx:elif="{{!cityResults.length}}">未找到匹配城市</view>
+          <view
+            class="city-picker-item"
+            wx:for="{{cityResults}}"
+            wx:key="id"
+            bindtap="onSelectCity"
+            data-source="search"
+            data-index="{{index}}"
+          >
+            <view class="city-picker-name">{{item.name}}</view>
+            <view class="city-picker-region" wx:if="{{item.region}}">{{item.region}}</view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="city-picker-group">热门城市</view>
+          <view
+            class="city-picker-item {{item.id === place.id ? 'active' : ''}}"
+            wx:for="{{hotCities}}"
+            wx:key="id"
+            bindtap="onSelectCity"
+            data-source="hot"
+            data-index="{{index}}"
+          >
+            <view class="city-picker-name">{{item.name}}</view>
+            <view class="city-picker-region" wx:if="{{item.region}}">{{item.region}}</view>
+          </view>
+        </block>
+      </scroll-view>
+      <view class="city-picker-close" bindtap="onCloseCityPicker">取消</view>
+    </view>
+  </view>
+</view>

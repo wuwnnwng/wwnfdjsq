@@ -102,6 +102,14 @@
   background: linear-gradient(135deg, #dcfce7, #86efac);
 }
 
+.tool-icon-weather {
+  background: linear-gradient(135deg, #dbeafe, #60a5fa);
+}
+
+.tool-icon-calc {
+  background: linear-gradient(135deg, #ccfbf1, #5eead4);
+}
+
 .theme-switch {
   display: flex;
   align-items: center;

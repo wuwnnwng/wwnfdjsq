@@ -72,21 +72,36 @@
   </scroll-view>
 
   <view
-    class="city-picker-mask"
+    class="city-picker-mask {{pickerKeyboardOpen ? 'keyboard-open' : ''}}"
     wx:if="{{showCityPicker}}"
     catchtouchmove="preventMove"
     bindtap="onCloseCityPicker"
+    style="{{pickerKeyboardOffset ? 'padding-bottom:' + pickerKeyboardOffset + 'px;' : ''}}"
   >
-    <view class="city-picker-sheet" catchtap="preventMove">
+    <view
+      class="city-picker-sheet"
+      catchtap="preventMove"
+      style="{{pickerSheetMaxHeight ? 'max-height:' + pickerSheetMaxHeight + 'px;' : ''}}"
+    >
       <view class="city-picker-title">选择城市</view>
       <input
         class="city-picker-search"
         value="{{cityKeyword}}"
         placeholder="搜索城市，如 杭州、深圳"
+        adjust-position="{{false}}"
+        hold-keyboard="{{true}}"
+        confirm-type="search"
         bindinput="onCitySearchInput"
+        bindkeyboardheightchange="onPickerKeyboardHeight"
         focus="{{showCityPicker}}"
       />
-      <scroll-view scroll-y class="city-picker-list" enhanced show-scrollbar="{{false}}">
+      <scroll-view
+        scroll-y
+        class="city-picker-list"
+        enhanced
+        show-scrollbar="{{false}}"
+        style="{{pickerListHeight ? 'height:' + pickerListHeight + 'px;max-height:' + pickerListHeight + 'px;' : ''}}"
+      >
         <block wx:if="{{cityKeyword}}">
           <view class="city-picker-empty" wx:if="{{citySearching}}">正在搜索…</view>
           <view class="city-picker-empty" wx:elif="{{!cityResults.length}}">未找到匹配城市</view>
@@ -103,7 +118,28 @@
           </view>
         </block>
         <block wx:else>
-          <view class="city-picker-group">热门城市</view>
+          <block wx:if="{{savedCities.length}}">
+            <view class="city-picker-group">我的城市</view>
+            <view
+              class="city-picker-item {{item.id === place.id ? 'active' : ''}}"
+              wx:for="{{savedCities}}"
+              wx:key="id"
+              bindtap="onSelectCity"
+              data-source="saved"
+              data-index="{{index}}"
+            >
+              <view class="city-picker-item-main">
+                <view class="city-picker-name">{{item.name}}</view>
+                <view class="city-picker-region" wx:if="{{item.region}}">{{item.region}}</view>
+              </view>
+              <view
+                class="city-picker-remove"
+                catchtap="onRemoveSavedCity"
+                data-id="{{item.id}}"
+              >删除</view>
+            </view>
+          </block>
+          <view class="city-picker-group" wx:if="{{hotCities.length}}">热门城市</view>
           <view
             class="city-picker-item {{item.id === place.id ? 'active' : ''}}"
             wx:for="{{hotCities}}"

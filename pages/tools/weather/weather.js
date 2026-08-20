@@ -2,6 +2,9 @@ const {
   HOT_CITIES,
   DEFAULT_PLACE,
   getLastPlace,
+  getSavedPlaces,
+  rememberPlace,
+  forgetPlace,
   loadWeather,
   searchCities,
   placeFromLocation,
@@ -9,6 +12,11 @@ const {
 } = require('../../../utils/weatherApi')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getWeatherToolShare } = require('../../../utils/share')
+const {
+  calcPickerSheetLayout,
+  listenKeyboardHeight,
+  unlistenKeyboardHeight
+} = require('../../../utils/pickerKeyboard')
 
 Page({
   data: {
@@ -34,11 +42,17 @@ Page({
     cityKeyword: '',
     citySearching: false,
     cityResults: [],
-    hotCities: HOT_CITIES.map(buildPlace)
+    pickerKeyboardOffset: 0,
+    pickerKeyboardOpen: false,
+    pickerSheetMaxHeight: 0,
+    pickerListHeight: 0,
+    savedCities: [],
+    hotCities: []
   },
 
   onLoad() {
     enableShareMenu()
+    this.syncSavedCities()
     const saved = getLastPlace()
     if (saved) {
       this.refreshWeather(saved)
@@ -46,6 +60,18 @@ Page({
     }
     this.refreshWeather(DEFAULT_PLACE)
     this.locate(true)
+  },
+
+  syncSavedCities(list) {
+    const savedCities = list || getSavedPlaces()
+    const savedIds = {}
+    savedCities.forEach((item) => {
+      savedIds[item.id] = true
+    })
+    this.setData({
+      savedCities,
+      hotCities: HOT_CITIES.map(buildPlace).filter((item) => item && !savedIds[item.id])
+    })
   },
 
   onShow() {
@@ -93,22 +119,71 @@ Page({
     this.refreshWeather(this.data.place, { force: true })
   },
 
-  onOpenCityPicker() {
+  applyPickerKeyboardLayout(height) {
+    const layout = calcPickerSheetLayout(height)
     this.setData({
-      showCityPicker: true,
-      cityKeyword: '',
-      citySearching: false,
-      cityResults: []
+      pickerKeyboardOffset: layout.offset,
+      pickerKeyboardOpen: layout.keyboardOpen,
+      pickerSheetMaxHeight: layout.sheetMaxHeight,
+      pickerListHeight: layout.listHeight
     })
   },
 
-  onCloseCityPicker() {
+  listenPickerKeyboard() {
+    if (this._onPickerKeyboardHeight) return
+    this._onPickerKeyboardHeight = (res) => {
+      if (!this.data.showCityPicker) return
+      this.applyPickerKeyboardLayout(res && res.height)
+    }
+    listenKeyboardHeight(this._onPickerKeyboardHeight)
+  },
+
+  unlistenPickerKeyboard() {
+    unlistenKeyboardHeight(this._onPickerKeyboardHeight)
+    this._onPickerKeyboardHeight = null
+  },
+
+  onPickerKeyboardHeight(e) {
+    if (!this.data.showCityPicker) return
+    this.applyPickerKeyboardLayout(e.detail && e.detail.height)
+  },
+
+  resetCityPicker() {
+    this.unlistenPickerKeyboard()
     this.setData({
       showCityPicker: false,
       cityKeyword: '',
       citySearching: false,
-      cityResults: []
+      cityResults: [],
+      pickerKeyboardOffset: 0,
+      pickerKeyboardOpen: false,
+      pickerSheetMaxHeight: 0,
+      pickerListHeight: 0
     })
+  },
+
+  onOpenCityPicker() {
+    const layout = calcPickerSheetLayout(0)
+    this.listenPickerKeyboard()
+    this.syncSavedCities()
+    this.setData({
+      showCityPicker: true,
+      cityKeyword: '',
+      citySearching: false,
+      cityResults: [],
+      pickerKeyboardOffset: layout.offset,
+      pickerKeyboardOpen: layout.keyboardOpen,
+      pickerSheetMaxHeight: layout.sheetMaxHeight,
+      pickerListHeight: layout.listHeight
+    })
+  },
+
+  onCloseCityPicker() {
+    this.resetCityPicker()
+  },
+
+  onUnload() {
+    this.unlistenPickerKeyboard()
   },
 
   onCitySearchInput(e) {
@@ -137,12 +212,24 @@ Page({
 
   onSelectCity(e) {
     const index = Number(e.currentTarget.dataset.index)
-    const fromSearch = e.currentTarget.dataset.source === 'search'
-    const list = fromSearch ? this.data.cityResults : this.data.hotCities
+    const source = e.currentTarget.dataset.source
+    const list =
+      source === 'search'
+        ? this.data.cityResults
+        : source === 'saved'
+          ? this.data.savedCities
+          : this.data.hotCities
     const place = list[index]
     if (!place) return
-    this.setData({ showCityPicker: false, cityKeyword: '', cityResults: [] })
+    this.syncSavedCities(rememberPlace(place))
+    this.resetCityPicker()
     this.refreshWeather(place)
+  },
+
+  onRemoveSavedCity(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+    this.syncSavedCities(forgetPlace(id))
   },
 
   onLocate() {
@@ -169,6 +256,9 @@ Page({
 
     const success = (res) => {
       const place = placeFromLocation(res.latitude, res.longitude)
+      if (!silent) {
+        this.syncSavedCities(rememberPlace(place))
+      }
       this.refreshWeather(place)
     }
 

@@ -92,21 +92,36 @@
   </scroll-view>
 
   <view
-    class="currency-picker-mask"
+    class="currency-picker-mask {{pickerKeyboardOpen ? 'keyboard-open' : ''}}"
     wx:if="{{showCurrencyPicker}}"
     catchtouchmove="preventMove"
     bindtap="onCloseCurrencyPicker"
+    style="{{pickerKeyboardOffset ? 'padding-bottom:' + pickerKeyboardOffset + 'px;' : ''}}"
   >
-    <view class="currency-picker-sheet" catchtap="preventMove">
+    <view
+      class="currency-picker-sheet"
+      catchtap="preventMove"
+      style="{{pickerSheetMaxHeight ? 'max-height:' + pickerSheetMaxHeight + 'px;' : ''}}"
+    >
       <view class="currency-picker-title">选择{{currencyPickerTarget === 'from' ? '源' : '目标'}}货币</view>
       <input
         class="currency-picker-search"
         value="{{currencyPickerSearch}}"
         placeholder="搜索代码或中文名，如 USD、日元"
+        adjust-position="{{false}}"
+        hold-keyboard="{{true}}"
+        confirm-type="search"
         bindinput="onCurrencyPickerSearch"
+        bindkeyboardheightchange="onPickerKeyboardHeight"
         focus="{{showCurrencyPicker}}"
       />
-      <scroll-view scroll-y class="currency-picker-list" enhanced show-scrollbar="{{false}}">
+      <scroll-view
+        scroll-y
+        class="currency-picker-list"
+        enhanced
+        show-scrollbar="{{false}}"
+        style="{{pickerListHeight ? 'height:' + pickerListHeight + 'px;max-height:' + pickerListHeight + 'px;' : ''}}"
+      >
         <view
           class="currency-picker-item {{item.key === currencyPickerActiveKey ? 'active' : ''}}"
           wx:for="{{currencyPickerUnits}}"

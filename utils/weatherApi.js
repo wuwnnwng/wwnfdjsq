@@ -3,7 +3,8 @@
  * 数据源：Open-Meteo（无需密钥）
  * - 预报 https://api.open-meteo.com/v1/forecast
  * - 城市检索 https://geocoding-api.open-meteo.com/v1/search
- * 仅缓存上次选择的城市；每次进入或切换城市都会重新拉取天气
+ * 会记住点选过的城市（我的城市），以及上次查看的城市；
+ * 每次进入或切换城市都会重新拉取天气
  *
  * 小程序 request 合法域名：
  * - https://api.open-meteo.com
@@ -11,7 +12,9 @@
  */
 
 const STORAGE_PLACE = 'weather_last_place_v1'
+const STORAGE_SAVED = 'weather_saved_places_v1'
 const STORAGE_CACHE_PREFIX = 'weather_cache_v1_'
+const MAX_SAVED_PLACES = 12
 
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast'
 const GEOCODE_URL = 'https://geocoding-api.open-meteo.com/v1/search'
@@ -208,6 +211,51 @@ function saveLastPlace(place) {
   }
 }
 
+function writeSavedPlaces(list) {
+  try {
+    wx.setStorageSync(STORAGE_SAVED, (list || []).slice(0, MAX_SAVED_PLACES))
+  } catch (e) {
+    // ignore
+  }
+}
+
+function getSavedPlaces() {
+  try {
+    const raw = wx.getStorageSync(STORAGE_SAVED)
+    if (Array.isArray(raw)) {
+      return raw.map(buildPlace).filter(Boolean)
+    }
+  } catch (e) {
+    // ignore
+  }
+  let last = null
+  try {
+    last = buildPlace(wx.getStorageSync(STORAGE_PLACE))
+  } catch (e) {
+    last = null
+  }
+  const seeded = last ? [last] : []
+  writeSavedPlaces(seeded)
+  return seeded
+}
+
+function rememberPlace(place) {
+  const next = buildPlace(place)
+  if (!next) return getSavedPlaces()
+  const rest = getSavedPlaces().filter((item) => item.id !== next.id)
+  const list = [next].concat(rest).slice(0, MAX_SAVED_PLACES)
+  writeSavedPlaces(list)
+  saveLastPlace(next)
+  return list
+}
+
+function forgetPlace(placeId) {
+  const id = String(placeId || '')
+  const list = getSavedPlaces().filter((item) => item.id !== id)
+  writeSavedPlaces(list)
+  return list
+}
+
 function requestJson(url) {
   return new Promise((resolve, reject) => {
     wx.request({
@@ -383,7 +431,8 @@ function parseGeoResults(payload) {
 async function searchCities(keyword) {
   const q = String(keyword || '').trim()
   if (!q) return []
-  const local = HOT_CITIES.filter((city) => city.name.indexOf(q) >= 0 || city.region.indexOf(q) >= 0)
+  const local = HOT_CITIES.concat(getSavedPlaces())
+    .filter((city) => city.name.indexOf(q) >= 0 || (city.region && city.region.indexOf(q) >= 0))
     .map(buildPlace)
   try {
     const payload = await requestJson(
@@ -418,6 +467,9 @@ module.exports = {
   DEFAULT_PLACE,
   getLastPlace,
   saveLastPlace,
+  getSavedPlaces,
+  rememberPlace,
+  forgetPlace,
   loadWeather,
   searchCities,
   placeFromLocation,

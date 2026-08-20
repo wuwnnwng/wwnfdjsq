@@ -13,6 +13,11 @@ const {
 const { findUnitIndex } = require('../../../utils/currencyNames')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getConverterToolShare } = require('../../../utils/share')
+const {
+  calcPickerSheetLayout,
+  listenKeyboardHeight,
+  unlistenKeyboardHeight
+} = require('../../../utils/pickerKeyboard')
 
 Page({
   data: {
@@ -38,7 +43,11 @@ Page({
     currencyPickerTarget: 'from',
     currencyPickerSearch: '',
     currencyPickerUnits: [],
-    currencyPickerActiveKey: ''
+    currencyPickerActiveKey: '',
+    pickerKeyboardOffset: 0,
+    pickerKeyboardOpen: false,
+    pickerSheetMaxHeight: 0,
+    pickerListHeight: 0
   },
 
   onLoad(options) {
@@ -225,6 +234,48 @@ Page({
     this.refreshExchangeRates(true)
   },
 
+  applyPickerKeyboardLayout(height) {
+    const layout = calcPickerSheetLayout(height)
+    this.setData({
+      pickerKeyboardOffset: layout.offset,
+      pickerKeyboardOpen: layout.keyboardOpen,
+      pickerSheetMaxHeight: layout.sheetMaxHeight,
+      pickerListHeight: layout.listHeight
+    })
+  },
+
+  listenPickerKeyboard() {
+    if (this._onPickerKeyboardHeight) return
+    this._onPickerKeyboardHeight = (res) => {
+      if (!this.data.showCurrencyPicker) return
+      this.applyPickerKeyboardLayout(res && res.height)
+    }
+    listenKeyboardHeight(this._onPickerKeyboardHeight)
+  },
+
+  unlistenPickerKeyboard() {
+    unlistenKeyboardHeight(this._onPickerKeyboardHeight)
+    this._onPickerKeyboardHeight = null
+  },
+
+  onPickerKeyboardHeight(e) {
+    if (!this.data.showCurrencyPicker) return
+    this.applyPickerKeyboardLayout(e.detail && e.detail.height)
+  },
+
+  resetCurrencyPicker() {
+    this.unlistenPickerKeyboard()
+    this.setData({
+      showCurrencyPicker: false,
+      currencyPickerSearch: '',
+      currencyPickerUnits: [],
+      pickerKeyboardOffset: 0,
+      pickerKeyboardOpen: false,
+      pickerSheetMaxHeight: 0,
+      pickerListHeight: 0
+    })
+  },
+
   onOpenCurrencyPicker(e) {
     const target = e.currentTarget.dataset.target
     if (!target || this.data.type !== 'currency') return
@@ -232,21 +283,27 @@ Page({
       target === 'from'
         ? this.data.units[this.data.fromIndex]?.key
         : this.data.units[this.data.toIndex]?.key
+    const layout = calcPickerSheetLayout(0)
+    this.listenPickerKeyboard()
     this.setData({
       showCurrencyPicker: true,
       currencyPickerTarget: target,
       currencyPickerSearch: '',
       currencyPickerUnits: this.data.units,
-      currencyPickerActiveKey: activeKey || ''
+      currencyPickerActiveKey: activeKey || '',
+      pickerKeyboardOffset: layout.offset,
+      pickerKeyboardOpen: layout.keyboardOpen,
+      pickerSheetMaxHeight: layout.sheetMaxHeight,
+      pickerListHeight: layout.listHeight
     })
   },
 
   onCloseCurrencyPicker() {
-    this.setData({
-      showCurrencyPicker: false,
-      currencyPickerSearch: '',
-      currencyPickerUnits: []
-    })
+    this.resetCurrencyPicker()
+  },
+
+  onUnload() {
+    this.unlistenPickerKeyboard()
   },
 
   onCurrencyPickerSearch(e) {
@@ -261,7 +318,8 @@ Page({
     const key = e.currentTarget.dataset.key
     const index = findUnitIndex(this.data.units, key)
     if (index < 0) return
-    const patch = { showCurrencyPicker: false, currencyPickerSearch: '' }
+    this.resetCurrencyPicker()
+    const patch = {}
     if (this.data.currencyPickerTarget === 'from') {
       patch.fromIndex = index
     } else {

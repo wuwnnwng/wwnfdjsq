@@ -7,6 +7,8 @@
     "pages/tools/converter/converter",
     "pages/tools/base/base",
     "pages/tools/calc/calc",
+    "pages/tools/tax/tax",
+    "pages/tools/fitout/fitout",
     "pages/result/result"
   ],
   "window": {

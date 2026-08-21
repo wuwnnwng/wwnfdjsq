@@ -1,0 +1,140 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-tax">
+            <text class="tool-icon">🧾</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">综合所得</view>
+            <view class="section-title-row">
+              <view class="conv-title">工资个税</view>
+              <view class="help-icon" catchtap="onShowTip" aria-role="button" aria-label="计税说明">!</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <block wx:if="{{tab === 'salary' && result && result.valid}}">
+        <view class="conv-eq">本期应预扣预缴</view>
+        <view class="conv-result">{{result.thisMonthTaxText}}</view>
+        <view class="conv-result-unit">税后实发 {{result.netPayText}} 元</view>
+      </block>
+      <block wx:elif="{{tab === 'bonus' && bonusCompare && bonusCompare.valid}}">
+        <view class="conv-eq">更省税方式：{{bonusCompare.betterLabel}}</view>
+        <view class="conv-result">{{bonusCompare.better === 'merged' ? bonusCompare.merged.taxText : bonusCompare.separate.taxText}}</view>
+        <view class="conv-result-unit">两种算法相差 {{bonusCompare.savingText}} 元</view>
+      </block>
+      <view class="tool-note warn" wx:elif="{{tab === 'salary' && result && !result.valid}}">{{result.message}}</view>
+      <view class="tool-note warn" wx:elif="{{tab === 'bonus' && bonusCompare && !bonusCompare.valid}}">{{bonusCompare.message}}</view>
+    </view>
+
+    <view class="panel">
+      <view class="seg-row">
+        <view class="seg-item {{tab === 'salary' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="salary">工资薪金</view>
+        <view class="seg-item {{tab === 'bonus' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="bonus">年终奖</view>
+      </view>
+
+      <view class="field">
+        <text class="field-label">税前应发工资</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{gross}}" data-field="gross" bindinput="onInput" placeholder="含津贴、补贴、奖金" />
+          <text class="field-unit">元/月</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">三险一金（个人）</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{insurance}}" data-field="insurance" bindinput="onInput" placeholder="养老医疗失业+公积金" />
+          <text class="field-unit">元/月</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">专项附加扣除</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{additional}}" data-field="additional" bindinput="onInput" placeholder="子女、住房、赡养等" />
+          <text class="field-unit">元/月</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{tab === 'salary'}}">
+        <text class="field-label">任职月份</text>
+        <view class="field-control">
+          <picker mode="selector" range="{{monthOptions}}" value="{{monthIndex}}" bindchange="onMonthChange">
+            <view class="picker-value">{{monthOptions[monthIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="field" wx:if="{{tab === 'bonus'}}">
+        <text class="field-label">全年一次性奖金</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{bonus}}" data-field="bonus" bindinput="onInput" placeholder="不含工资" />
+          <text class="field-unit">元</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel" wx:if="{{tab === 'salary' && result && result.valid}}">
+      <view class="section-title">计税明细</view>
+      <view class="result-row">
+        <view class="result-row-label">适用预扣率</view>
+        <view class="result-row-value">{{result.rateText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">速算扣除数</view>
+        <view class="result-row-value">{{result.quick}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">累计应纳税所得额</view>
+        <view class="result-row-value">{{result.cumulativeTaxableText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">累计减除费用</view>
+        <view class="result-row-value">{{result.cumulativeDeduction}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">累计专项扣除</view>
+        <view class="result-row-value">{{result.cumulativeInsurance}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">累计专项附加扣除</view>
+        <view class="result-row-value">{{result.cumulativeAdditional}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">累计已预扣税额</view>
+        <view class="result-row-value">{{result.alreadyPaid}}</view>
+      </view>
+      <view class="tool-note">按本月收入水平向前复原 1–{{result.monthIndex}} 月。若年中调薪或补税，请以工资条累计数为准。</view>
+    </view>
+
+    <view class="panel" wx:if="{{tab === 'bonus' && bonusCompare && bonusCompare.valid}}">
+      <view class="section-title">两种计税比较</view>
+      <view class="result-row">
+        <view class="result-row-label">单独计税</view>
+        <view class="result-row-value">{{bonusCompare.separate.taxText}} · {{bonusCompare.separate.rateText}}</view>
+      </view>
+      <view class="result-row" wx:if="{{bonusCompare.merged.valid}}">
+        <view class="result-row-label">并入综合所得</view>
+        <view class="result-row-value">{{bonusCompare.merged.taxText}} · {{bonusCompare.merged.rateText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">单独计税税后</view>
+        <view class="result-row-value">{{bonusCompare.separate.netText}}</view>
+      </view>
+      <view class="tool-note warn" wx:if="{{bonusCompare.separate.boundaryHint}}">
+        奖金刚过 3.6 万元临界点时，单独计税可能「多发少得」，可对照并入综合所得。
+      </view>
+      <view class="tool-note">单独计税：奖金÷12 找月度税率。并入综合：按全年工资+奖金适用综合所得税率表。申报时只能选一种。</view>
+    </view>
+  </scroll-view>
+
+  <view class="tip-mask" wx:if="{{showTip}}" catchtouchmove="preventMove" bindtap="onHideTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">计税规则说明</view>
+      <view class="tip-text tip-single">
+        工资薪金采用累计预扣法：累计收入 − 5000元/月×任职月数 − 三险一金 − 专项附加扣除后，对照综合所得税率表，再减去累计已预扣税额，得出本期应缴个税。专项附加扣除包括子女教育、继续教育、住房贷款利息或租金、赡养老人、3岁以下婴幼儿照护、个人养老金等，以税务 App 填报为准。结果仅供测算，不以本工具作为申报依据。
+      </view>
+      <view class="tip-confirm" bindtap="onHideTip">我知道了</view>
+    </view>
+  </view>
+</view>

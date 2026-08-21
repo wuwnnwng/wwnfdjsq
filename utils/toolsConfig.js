@@ -30,6 +30,22 @@ const TOOLS = [
     page: '/pages/tools/calc/calc'
   },
   {
+    id: 'tax',
+    name: '工资个税',
+    shortName: '个税',
+    icon: '🧾',
+    iconType: 'tax',
+    page: '/pages/tools/tax/tax'
+  },
+  {
+    id: 'fitout',
+    name: '装修材料',
+    shortName: '装修',
+    icon: '🧱',
+    iconType: 'fitout',
+    page: '/pages/tools/fitout/fitout'
+  },
+  {
     id: 'currency',
     name: '汇率',
     shortName: '汇率',

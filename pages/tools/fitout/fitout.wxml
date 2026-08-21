@@ -1,0 +1,209 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-id">
+        <view class="tool-icon-wrap tool-icon-fitout">
+          <text class="tool-icon">🧱</text>
+        </view>
+        <view class="conv-hero-copy">
+          <view class="conv-kicker">工程量备料</view>
+          <view class="section-title-row">
+            <view class="conv-title">装修材料</view>
+            <view class="help-icon" catchtap="onShowTip" aria-role="button" aria-label="计算说明">!</view>
+          </view>
+        </view>
+      </view>
+      <block wx:if="{{result && result.valid}}">
+        <view class="conv-eq">{{result.formula}}</view>
+        <view class="conv-result">{{result.summary}}</view>
+        <view class="conv-result-unit">{{result.unit}}{{result.costText ? ' · ' + result.costText : ''}}</view>
+      </block>
+      <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
+    </view>
+
+    <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="chip-scroll">
+      <view class="chips">
+        <view
+          class="chip {{type === item.id ? 'active' : ''}}"
+          wx:for="{{materials}}"
+          wx:key="id"
+          bindtap="onSelectType"
+          data-id="{{item.id}}"
+        >
+          {{item.name}}
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="panel">
+      <view class="field">
+        <text class="field-label">房间长度</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.length}}" data-field="length" bindinput="onInput" placeholder="轴线净长" />
+          <text class="field-unit">米</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">房间宽度</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.width}}" data-field="width" bindinput="onInput" placeholder="轴线净宽" />
+          <text class="field-unit">米</text>
+        </view>
+      </view>
+
+      <view class="field" wx:if="{{type === 'paint' || type === 'wallpaper'}}">
+        <text class="field-label">层高</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.height}}" data-field="height" bindinput="onInput" placeholder="完成面高度" />
+          <text class="field-unit">米</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'paint' || type === 'wallpaper'}}">
+        <text class="field-label">门窗洞口</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.openings}}" data-field="openings" bindinput="onInput" placeholder="门窗面积合计" />
+          <text class="field-unit">㎡</text>
+        </view>
+      </view>
+
+      <view class="field" wx:if="{{type === 'tile' || type === 'grout'}}">
+        <text class="field-label">砖长</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.tileW}}" data-field="tileW" bindinput="onInput" placeholder="如 800" />
+          <text class="field-unit">毫米</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'tile' || type === 'grout'}}">
+        <text class="field-label">砖宽</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.tileH}}" data-field="tileH" bindinput="onInput" placeholder="如 800" />
+          <text class="field-unit">毫米</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'tile'}}">
+        <text class="field-label">每箱片数</text>
+        <view class="field-control">
+          <input class="field-input" type="number" value="{{form.perBox}}" data-field="perBox" bindinput="onInput" placeholder="选填" />
+          <text class="field-unit">片</text>
+        </view>
+      </view>
+
+      <view class="field" wx:if="{{type === 'paint'}}">
+        <text class="field-label">涂刷遍数</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.coats}}" data-field="coats" bindinput="onInput" placeholder="一底两面填 3" />
+          <text class="field-unit">遍</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'paint'}}">
+        <text class="field-label">涂布率</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.coverage}}" data-field="coverage" bindinput="onInput" placeholder="产品标注" />
+          <text class="field-unit">㎡/升</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'paint'}}">
+        <text class="field-label">单桶容量</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.bucket}}" data-field="bucket" bindinput="onInput" placeholder="常见 15–18" />
+          <text class="field-unit">升</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'paint'}}">
+        <text class="field-label">计入顶面</text>
+        <view class="field-control">
+          <view class="mini-seg">
+            <view class="mini-seg-item {{includeCeiling ? 'active' : ''}}" bindtap="onSetCeiling" data-on="1">计入</view>
+            <view class="mini-seg-item {{includeCeiling ? '' : 'active'}}" bindtap="onSetCeiling" data-on="0">仅墙面</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="field" wx:if="{{type === 'wallpaper'}}">
+        <text class="field-label">幅宽</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.rollW}}" data-field="rollW" bindinput="onInput" placeholder="常见 0.53" />
+          <text class="field-unit">米</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'wallpaper'}}">
+        <text class="field-label">卷长</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.rollL}}" data-field="rollL" bindinput="onInput" placeholder="常见 10" />
+          <text class="field-unit">米</text>
+        </view>
+      </view>
+
+      <view class="field" wx:if="{{type === 'skirting'}}">
+        <text class="field-label">门口宽度</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.doorW}}" data-field="doorW" bindinput="onInput" placeholder="可多门合计" />
+          <text class="field-unit">米</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'skirting'}}">
+        <text class="field-label">单根长度</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.pieceLen}}" data-field="pieceLen" bindinput="onInput" placeholder="选填，如 2.4" />
+          <text class="field-unit">米</text>
+        </view>
+      </view>
+
+      <view class="field" wx:if="{{type === 'grout'}}">
+        <text class="field-label">缝宽</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.jointW}}" data-field="jointW" bindinput="onInput" placeholder="常见 2" />
+          <text class="field-unit">毫米</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{type === 'grout'}}">
+        <text class="field-label">缝深</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.jointD}}" data-field="jointD" bindinput="onInput" placeholder="约为砖厚" />
+          <text class="field-unit">毫米</text>
+        </view>
+      </view>
+
+      <view class="field" wx:if="{{type === 'mortar'}}">
+        <text class="field-label">结合层厚度</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.thickness}}" data-field="thickness" bindinput="onInput" placeholder="地砖常见 20" />
+          <text class="field-unit">毫米</text>
+        </view>
+      </view>
+
+      <view class="field">
+        <text class="field-label">施工损耗</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.loss}}" data-field="loss" bindinput="onInput" placeholder="可按现场调整" />
+          <text class="field-unit">%</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">预算单价</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{form.price}}" data-field="price" bindinput="onInput" placeholder="选填，按采购单位" />
+          <text class="field-unit">元</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">工程量明细</view>
+      <view class="result-row" wx:for="{{result.rows}}" wx:key="label">
+        <view class="result-row-label">{{item.label}}</view>
+        <view class="result-row-value">{{item.value}}</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="tip-mask" wx:if="{{showTip}}" catchtouchmove="preventMove" bindtap="onHideTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">备料计算说明</view>
+      <view class="tip-text tip-single">
+        按装饰工程量常用面积法、周长法估算。瓷砖按单片面积倒推块数；乳胶漆按墙面净面积（周长×层高−门窗）与涂布率；美缝剂按缝长×缝宽×缝深×密度。损耗率为施工裁切备料，默认取行业常见值，复杂拼花、斜铺应提高。结果用于备料，不以本工具作为结算依据。
+      </view>
+      <view class="tip-confirm" bindtap="onHideTip">我知道了</view>
+    </view>
+  </view>
+</view>

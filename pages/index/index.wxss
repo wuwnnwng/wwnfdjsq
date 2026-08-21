@@ -541,6 +541,11 @@
   border-top: 1rpx solid var(--color-line);
 }
 
+.remaining-form-panel .field + .derived-block {
+  margin-top: 0;
+  border-top: none;
+}
+
 .derived-block .derived-row,
 .derived-panel .derived-row {
   display: flex;

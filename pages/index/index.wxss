@@ -529,6 +529,12 @@
   border-top: 1rpx solid var(--color-line);
 }
 
+.remaining-form-panel .field + .inline-row {
+  margin-top: 0;
+  padding-top: 24rpx;
+  border-top: none;
+}
+
 .remaining-form-panel .derived-block {
   margin-top: 12rpx;
   padding-top: 28rpx;

@@ -505,8 +505,6 @@
         </block>
 
         <view class="derived-block">
-          <view class="section-title">自动推算结果</view>
-
           <view class="derived-row" wx:if="{{!hasManualRate}}">
             <text class="derived-label">当前执行利率</text>
             <text class="derived-value">{{derivedReady ? derivedAnnualRate + '%' : '--'}}</text>

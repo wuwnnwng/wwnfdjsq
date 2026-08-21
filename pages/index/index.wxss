@@ -118,6 +118,14 @@
   background: linear-gradient(135deg, #ffe4e6, #fb7185);
 }
 
+.tool-icon-fitout {
+  background: linear-gradient(135deg, #ffedd5, #fb923c);
+}
+
+.tool-icon-tax {
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+}
+
 .tool-icon-currency {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
 }

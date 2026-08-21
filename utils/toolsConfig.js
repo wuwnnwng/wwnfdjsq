@@ -2,13 +2,13 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FEATURED_IDS = ['calendar', 'weather', 'calc']
+const FEATURED_IDS = ['calendar', 'fitout', 'tax']
 
 const TOOLS = [
   {
     id: 'calendar',
     name: '我的日历',
-    shortName: '日期',
+    shortName: '日历',
     icon: '📅',
     iconType: 'calendar',
     page: '/pages/tools/calendar/calendar'
@@ -32,7 +32,7 @@ const TOOLS = [
   {
     id: 'tax',
     name: '工资个税',
-    shortName: '个税',
+    shortName: '工资个税',
     icon: '🧾',
     iconType: 'tax',
     page: '/pages/tools/tax/tax'
@@ -40,7 +40,7 @@ const TOOLS = [
   {
     id: 'fitout',
     name: '装修材料',
-    shortName: '装修',
+    shortName: '装修材料',
     icon: '🧱',
     iconType: 'fitout',
     page: '/pages/tools/fitout/fitout'

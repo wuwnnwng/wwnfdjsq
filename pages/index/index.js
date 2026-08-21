@@ -29,6 +29,24 @@ const {
   markToolsHubSeen
 } = require('../../utils/toolsConfig')
 
+const FEATURED_TOOLS_OPEN_KEY = 'featuredToolsOpen'
+
+function readFeaturedToolsOpen() {
+  try {
+    const value = wx.getStorageSync(FEATURED_TOOLS_OPEN_KEY)
+    if (value === 0 || value === '0' || value === false) return false
+    return true
+  } catch (e) {
+    return true
+  }
+}
+
+function writeFeaturedToolsOpen(open) {
+  try {
+    wx.setStorageSync(FEATURED_TOOLS_OPEN_KEY, open ? 1 : 0)
+  } catch (e) {}
+}
+
 Page({
   data: {
     calcMode: 'new',
@@ -82,6 +100,7 @@ Page({
     derivedMessage: '',
 
     featuredTools: getFeaturedTools(),
+    featuredToolsOpen: readFeaturedToolsOpen(),
     showToolsNew: !hasSeenToolsHub()
   },
 
@@ -179,6 +198,12 @@ Page({
     markToolsHubSeen()
     this.setData({ showToolsNew: false })
     wx.navigateTo({ url: '/pages/tools/index' })
+  },
+
+  onToggleFeaturedTools() {
+    const featuredToolsOpen = !this.data.featuredToolsOpen
+    writeFeaturedToolsOpen(featuredToolsOpen)
+    this.setData({ featuredToolsOpen })
   },
 
   onOpenFeaturedTool(e) {

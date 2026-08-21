@@ -41,9 +41,10 @@
       </view>
     </view>
 
-    <view class="tools-entry">
+    <view class="tools-entry {{featuredToolsOpen ? '' : 'collapsed'}}">
       <view
         class="tools-chip"
+        wx:if="{{featuredToolsOpen}}"
         wx:for="{{featuredTools}}"
         wx:key="id"
         bindtap="onOpenFeaturedTool"
@@ -56,17 +57,25 @@
         </view>
         <text class="tools-chip-name">{{item.shortName}}</text>
       </view>
-      <view
-        class="tools-chip"
-        bindtap="onGoTools"
-        aria-role="button"
-        aria-label="全部工具"
-      >
-        <view class="tools-chip-icon tools-chip-more">
-          <text class="tools-chip-more-mark">全</text>
-          <view class="tools-new-badge" wx:if="{{showToolsNew}}">新</view>
+      <view class="tools-all-col">
+        <view
+          class="tools-fold"
+          catchtap="onToggleFeaturedTools"
+          aria-role="button"
+          aria-label="{{featuredToolsOpen ? '收起常用工具' : '展开常用工具'}}"
+        >{{featuredToolsOpen ? '▼' : '▲'}}</view>
+        <view
+          class="tools-chip"
+          bindtap="onGoTools"
+          aria-role="button"
+          aria-label="全部工具"
+        >
+          <view class="tools-chip-icon tools-chip-more">
+            <text class="tools-chip-more-mark">全</text>
+            <view class="tools-new-badge" wx:if="{{showToolsNew}}">新</view>
+          </view>
+          <text class="tools-chip-name">全部</text>
         </view>
-        <text class="tools-chip-name">全部</text>
       </view>
     </view>
   </view>
@@ -309,9 +318,9 @@
       </view>
     </block>
 
-    <!-- 已有贷款：还款方式固定在滚动区顶部，参数与推算结果一起滑动 -->
+    <!-- 已有贷款：还款方式与剩余贷款参数放在同一容器 -->
     <block wx:else>
-      <view class="panel">
+      <view class="panel remaining-form-panel">
         <view class="inline-row first">
           <view class="inline-label-wrap">
             <text class="inline-label">还款方式</text>
@@ -335,12 +344,12 @@
             >先息后本</view>
           </view>
         </view>
-      </view>
 
-      <view class="panel remaining-form-panel">
         <view class="section-title-row">
           <view class="section-title">剩余贷款参数</view>
           <view class="help-icon" catchtap="onShowRemainingTip" aria-role="button" aria-label="剩余贷款参数说明">!</view>
+        </view>
+        <view class="plan-entry-row">
           <view class="plan-entry" bindtap="onShowPlans" aria-role="button" aria-label="我的方案">我的方案</view>
         </view>
 

@@ -57,27 +57,25 @@
         </view>
         <text class="tools-chip-name">{{item.shortName}}</text>
       </view>
-      <view class="tools-all-col">
-        <view
-          class="tools-fold"
-          catchtap="onToggleFeaturedTools"
-          aria-role="button"
-          aria-label="{{featuredToolsOpen ? '收起常用工具' : '展开常用工具'}}"
-        >{{featuredToolsOpen ? '▼' : '▲'}}</view>
-        <view
-          class="tools-chip"
-          wx:if="{{featuredToolsOpen}}"
-          bindtap="onGoTools"
-          aria-role="button"
-          aria-label="全部工具"
-        >
-          <view class="tools-chip-icon tools-chip-more">
-            <text class="tools-chip-more-mark">全</text>
-            <view class="tools-new-badge" wx:if="{{showToolsNew}}">新</view>
-          </view>
-          <text class="tools-chip-name">全部</text>
+      <view
+        class="tools-chip"
+        wx:if="{{featuredToolsOpen}}"
+        bindtap="onGoTools"
+        aria-role="button"
+        aria-label="全部工具"
+      >
+        <view class="tools-chip-icon tools-chip-more">
+          <text class="tools-chip-more-mark">全</text>
+          <view class="tools-new-badge" wx:if="{{showToolsNew}}">新</view>
         </view>
+        <text class="tools-chip-name">全部</text>
       </view>
+      <view
+        class="tools-fold"
+        catchtap="onToggleFeaturedTools"
+        aria-role="button"
+        aria-label="{{featuredToolsOpen ? '收起常用工具' : '展开常用工具'}}"
+      >{{featuredToolsOpen ? '▼' : '▲'}}</view>
     </view>
   </view>
 

@@ -23,6 +23,7 @@
 
 .tools-entry.collapsed {
   justify-content: flex-end;
+  padding-top: 4rpx;
 }
 
 .tools-all-col {
@@ -34,7 +35,8 @@
 }
 
 .tools-entry.collapsed .tools-all-col {
-  flex: 0 0 22%;
+  flex: 0 0 auto;
+  width: 72rpx;
 }
 
 .tools-fold {
@@ -220,6 +222,7 @@
 .section-title-row {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 12rpx;
 }
 
@@ -227,12 +230,8 @@
   flex-shrink: 0;
 }
 
-.plan-entry-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-top: 12rpx;
-  margin-bottom: 8rpx;
+.section-title-row .plan-entry {
+  margin-left: auto;
 }
 
 .help-icon {

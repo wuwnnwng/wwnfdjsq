@@ -66,6 +66,7 @@
         >{{featuredToolsOpen ? '▼' : '▲'}}</view>
         <view
           class="tools-chip"
+          wx:if="{{featuredToolsOpen}}"
           bindtap="onGoTools"
           aria-role="button"
           aria-label="全部工具"
@@ -348,8 +349,6 @@
         <view class="section-title-row">
           <view class="section-title">剩余贷款参数</view>
           <view class="help-icon" catchtap="onShowRemainingTip" aria-role="button" aria-label="剩余贷款参数说明">!</view>
-        </view>
-        <view class="plan-entry-row">
           <view class="plan-entry" bindtap="onShowPlans" aria-role="button" aria-label="我的方案">我的方案</view>
         </view>
 

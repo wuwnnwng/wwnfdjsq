@@ -1,0 +1,188 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-datetime">
+            <text class="tool-icon">⏳</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">时间 · 天数 · 推算</view>
+            <view class="conv-title">日期时间</view>
+          </view>
+        </view>
+      </view>
+
+      <block wx:if="{{tab === 'convert' && convertResult && convertResult.valid}}">
+        <view class="conv-eq">{{convertResult.formulaText}}</view>
+        <view class="conv-result">{{convertResult.valueText}}</view>
+        <view class="conv-result-unit">{{convertResult.toName}}</view>
+      </block>
+      <block wx:elif="{{tab === 'diff' && diffResult && diffResult.valid}}">
+        <view class="conv-eq">{{diffResult.directionText}}</view>
+        <view class="conv-result">{{diffResult.heroText}}</view>
+        <view class="conv-result-unit">{{diffResult.heroSub}}</view>
+      </block>
+      <block wx:elif="{{tab === 'offset' && offsetResult && offsetResult.valid}}">
+        <view class="conv-eq">{{offsetResult.formulaText}}</view>
+        <view class="conv-result">{{offsetResult.heroText}}</view>
+        <view class="conv-result-unit">{{offsetResult.heroSub}}</view>
+      </block>
+      <view class="tool-note warn" wx:elif="{{tab === 'convert' && convertResult && !convertResult.valid}}">{{convertResult.message}}</view>
+      <view class="tool-note warn" wx:elif="{{tab === 'diff' && diffResult && !diffResult.valid}}">{{diffResult.message}}</view>
+      <view class="tool-note warn" wx:elif="{{tab === 'offset' && offsetResult && !offsetResult.valid}}">{{offsetResult.message}}</view>
+    </view>
+
+    <view class="panel">
+      <view class="seg-row cols-3">
+        <view class="seg-item {{tab === 'convert' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="convert">时间换算</view>
+        <view class="seg-item {{tab === 'diff' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="diff">日期相差</view>
+        <view class="seg-item {{tab === 'offset' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="offset">日期推算</view>
+      </view>
+
+      <block wx:if="{{tab === 'convert'}}">
+        <view class="conv-board">
+          <view class="conv-card">
+            <view class="conv-card-label">从</view>
+            <picker mode="selector" range="{{timeLabels}}" value="{{fromIndex}}" bindchange="onFromUnitChange">
+              <view class="conv-unit-btn">
+                <view class="conv-unit-text">{{fromName}}</view>
+                <text class="conv-unit-caret">▾</text>
+              </view>
+            </picker>
+            <input class="conv-input" type="digit" value="{{inputValue}}" placeholder="输入数值" bindinput="onInputValue" />
+          </view>
+          <view class="conv-swap" bindtap="onSwapUnits" aria-role="button" aria-label="交换单位">⇅</view>
+          <view class="conv-card conv-card-to">
+            <view class="conv-card-label">到</view>
+            <picker mode="selector" range="{{timeLabels}}" value="{{toIndex}}" bindchange="onToUnitChange">
+              <view class="conv-unit-btn">
+                <view class="conv-unit-text">{{toName}}</view>
+                <text class="conv-unit-caret">▾</text>
+              </view>
+            </picker>
+            <view class="conv-output">{{convertResult && convertResult.valid ? convertResult.valueText : '—'}}</view>
+          </view>
+        </view>
+      </block>
+
+      <block wx:elif="{{tab === 'diff'}}">
+        <view class="field">
+          <text class="field-label">开始日期</text>
+          <view class="field-control">
+            <picker mode="date" value="{{startDate}}" start="1900-01-01" end="2100-12-31" bindchange="onStartDateChange">
+              <view class="picker-value">{{startDate}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">结束日期</text>
+          <view class="field-control">
+            <picker mode="date" value="{{endDate}}" start="1900-01-01" end="2100-12-31" bindchange="onEndDateChange">
+              <view class="picker-value">{{endDate}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="swap-link" bindtap="onSwapDates">交换起止日期</view>
+      </block>
+
+      <block wx:else>
+        <view class="field">
+          <text class="field-label">起始日期</text>
+          <view class="field-control">
+            <picker mode="date" value="{{baseDate}}" start="1900-01-01" end="2100-12-31" bindchange="onBaseDateChange">
+              <view class="picker-value">{{baseDate}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">间隔数量</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{offsetValue}}" bindinput="onOffsetValue" placeholder="例如 30" />
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">间隔单位</text>
+          <view class="field-control">
+            <picker mode="selector" range="{{offsetLabels}}" value="{{offsetUnitIndex}}" bindchange="onOffsetUnitChange">
+              <view class="picker-value">{{offsetLabels[offsetUnitIndex]}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">推算方向</text>
+          <view class="field-control">
+            <view class="mini-seg">
+              <view class="mini-seg-item {{offsetDirection === 'after' ? 'active' : ''}}" bindtap="onOffsetDirection" data-dir="after">之后</view>
+              <view class="mini-seg-item {{offsetDirection === 'before' ? 'active' : ''}}" bindtap="onOffsetDirection" data-dir="before">之前</view>
+            </view>
+          </view>
+        </view>
+        <view class="quick-row">
+          <view class="quick-chip" bindtap="onQuickOffset" data-value="7" data-unit="d">7天</view>
+          <view class="quick-chip" bindtap="onQuickOffset" data-value="30" data-unit="d">30天</view>
+          <view class="quick-chip" bindtap="onQuickOffset" data-value="100" data-unit="d">100天</view>
+          <view class="quick-chip" bindtap="onQuickOffset" data-value="1" data-unit="y">1年</view>
+        </view>
+      </block>
+    </view>
+
+    <view class="panel" wx:if="{{tab === 'convert' && convertResult && convertResult.valid}}">
+      <view class="section-title">全部单位</view>
+      <view class="result-row" wx:for="{{convertResult.list}}" wx:key="key">
+        <view class="result-row-label">{{item.name}}</view>
+        <view class="result-row-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <view class="panel" wx:if="{{tab === 'diff' && diffResult && diffResult.valid}}">
+      <view class="section-title">相差明细</view>
+      <view class="result-row">
+        <view class="result-row-label">开始</view>
+        <view class="result-row-value">{{diffResult.fromText}} {{diffResult.fromWeekday}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">结束</view>
+        <view class="result-row-value">{{diffResult.toText}} {{diffResult.toWeekday}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">相差天数</view>
+        <view class="result-row-value">{{diffResult.daysText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">相差周数</view>
+        <view class="result-row-value">{{diffResult.weekText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">约合月份</view>
+        <view class="result-row-value">{{diffResult.monthText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">约合年份</view>
+        <view class="result-row-value">{{diffResult.yearText}}</view>
+      </view>
+      <view class="tool-note">月份按日历月滚动计算，不含当天结束的时刻差。</view>
+    </view>
+
+    <view class="panel" wx:if="{{tab === 'offset' && offsetResult && offsetResult.valid}}">
+      <view class="section-title">推算结果</view>
+      <view class="result-row">
+        <view class="result-row-label">目标日期</view>
+        <view class="result-row-value">{{offsetResult.dateText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">星期</view>
+        <view class="result-row-value">{{offsetResult.weekday}}</view>
+      </view>
+      <view class="result-row" wx:if="{{offsetResult.lunarText}}">
+        <view class="result-row-label">农历</view>
+        <view class="result-row-value">{{offsetResult.lunarText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">间隔天数</view>
+        <view class="result-row-value">{{offsetResult.absDays}} 天</view>
+      </view>
+      <view class="tool-note">按月、年推算时跟随日历滚动，例如 1 月 31 日加一个月会落到 3 月初。</view>
+    </view>
+  </scroll-view>
+</view>

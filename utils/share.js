@@ -105,6 +105,22 @@ function getFitoutToolShare() {
   }
 }
 
+function getDatetimeToolShare() {
+  const path = '/pages/tools/datetime/datetime'
+  return {
+    appMessage: buildToolShareAppMessage(path, '日期时间'),
+    timeline: buildToolShareTimeline(path, '日期时间')
+  }
+}
+
+function getQrcodeToolShare() {
+  const path = '/pages/tools/qrcode/qrcode'
+  return {
+    appMessage: buildToolShareAppMessage(path, '二维码'),
+    timeline: buildToolShareTimeline(path, '二维码')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
@@ -375,6 +391,8 @@ module.exports = {
   getWeatherToolShare,
   getTaxToolShare,
   getFitoutToolShare,
+  getDatetimeToolShare,
+  getQrcodeToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

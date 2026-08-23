@@ -46,6 +46,22 @@ const TOOLS = [
     page: '/pages/tools/fitout/fitout'
   },
   {
+    id: 'datetime',
+    name: '日期时间',
+    shortName: '日期时间',
+    icon: '⏳',
+    iconType: 'datetime',
+    page: '/pages/tools/datetime/datetime'
+  },
+  {
+    id: 'qrcode',
+    name: '二维码',
+    shortName: '二维码',
+    icon: '🔳',
+    iconType: 'qrcode',
+    page: '/pages/tools/qrcode/qrcode'
+  },
+  {
     id: 'currency',
     name: '汇率',
     shortName: '汇率',

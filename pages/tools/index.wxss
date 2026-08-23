@@ -105,6 +105,14 @@
   background: linear-gradient(135deg, #dbeafe, #60a5fa);
 }
 
+.tool-icon-datetime {
+  background: linear-gradient(135deg, #e0e7ff, #818cf8);
+}
+
+.tool-icon-qrcode {
+  background: linear-gradient(135deg, #e2e8f0, #64748b);
+}
+
 .tool-card-name {
   font-size: 26rpx;
   font-weight: 600;

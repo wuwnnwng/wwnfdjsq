@@ -79,7 +79,9 @@
       <view class="panel detail-panel" wx:if="{{selectedInfo}}">
         <view class="detail-lunar">{{selectedInfo.lunarText}}</view>
         <view class="detail-meta">{{selectedInfo.ganZhiText}} · {{selectedInfo.ganZhiDay}}</view>
+        <view class="detail-term" wx:if="{{selectedInfo.festival}}">节日：{{selectedInfo.festival}}</view>
         <view class="detail-term">节气：{{selectedInfo.solarTerm}}</view>
+        <view class="detail-term" wx:if="{{selectedInfo.constellation}}">星座：{{selectedInfo.constellation}}</view>
 
         <view class="yi-ji-block">
           <view class="yi-ji-row">

@@ -201,6 +201,36 @@ function getZodiac(lunarYear) {
   return ZODIAC[(lunarYear - 4) % 12]
 }
 
+/** 西历星座，常用日期分界 */
+const CONSTELLATION_BOUNDS = [
+  { name: '摩羯座', month: 1, day: 19 },
+  { name: '水瓶座', month: 2, day: 18 },
+  { name: '双鱼座', month: 3, day: 20 },
+  { name: '白羊座', month: 4, day: 19 },
+  { name: '金牛座', month: 5, day: 20 },
+  { name: '双子座', month: 6, day: 21 },
+  { name: '巨蟹座', month: 7, day: 22 },
+  { name: '狮子座', month: 8, day: 22 },
+  { name: '处女座', month: 9, day: 22 },
+  { name: '天秤座', month: 10, day: 23 },
+  { name: '天蝎座', month: 11, day: 22 },
+  { name: '射手座', month: 12, day: 21 },
+  { name: '摩羯座', month: 12, day: 31 }
+]
+
+function getConstellation(month, day) {
+  const m = Number(month)
+  const d = Number(day)
+  if (!(m >= 1 && m <= 12) || !(d >= 1 && d <= 31)) return ''
+  for (let i = 0; i < CONSTELLATION_BOUNDS.length; i += 1) {
+    const item = CONSTELLATION_BOUNDS[i]
+    if (m < item.month || (m === item.month && d <= item.day)) {
+      return item.name
+    }
+  }
+  return '摩羯座'
+}
+
 function getGanZhiDay(year, month, day) {
   const base = new Date(1900, 0, 1)
   const cur = new Date(year, month - 1, day)
@@ -295,6 +325,7 @@ function buildDayInfo(year, month, day) {
     ganZhiMonth: getGanZhiMonth(lunar.lunarYear, lunar.lunarMonth),
     ganZhiDay: getGanZhiDay(year, month, day),
     zodiac: getZodiac(lunar.lunarYear),
+    constellation: getConstellation(month, day),
     solarTerm: term || getNearestSolarTerm(year, month, day)
   }
 }
@@ -330,6 +361,7 @@ module.exports = {
   getGanZhiMonth,
   getGanZhiDay,
   getZodiac,
+  getConstellation,
   getWeekInfo,
   getSolarTerm,
   getNearestSolarTerm,

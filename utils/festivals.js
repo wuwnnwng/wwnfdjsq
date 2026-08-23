@@ -4,6 +4,18 @@
 const { SOLAR_TERMS, solarToLunar, formatLunarDate, getSolarTerm } = require('./lunar')
 const { loadYearHolidays, getDayHolidayLabel } = require('./holidayApi')
 
+const TRADITIONAL_FESTIVALS = [
+  { name: '元旦', month: 1, day: 1 },
+  { name: '劳动节', month: 5, day: 1 },
+  { name: '国庆节', month: 10, day: 1 },
+  { name: '春节', lunarMonth: 1, lunarDay: 1 },
+  { name: '元宵节', lunarMonth: 1, lunarDay: 15 },
+  { name: '端午节', lunarMonth: 5, lunarDay: 5 },
+  { name: '七夕', lunarMonth: 7, lunarDay: 7 },
+  { name: '中秋节', lunarMonth: 8, lunarDay: 15 },
+  { name: '重阳节', lunarMonth: 9, lunarDay: 9 }
+]
+
 const POPULAR_FESTIVALS = [
   { name: '情人节', month: 2, day: 14 },
   { name: '妇女节', month: 3, day: 8 },
@@ -223,26 +235,54 @@ async function buildFestivalGroups(year, fromDate) {
   }
 }
 
-function getDayFestivalLabel(year, month, day, holidayDayMap) {
-  const labels = []
-  const official = getDayHolidayLabel(holidayDayMap, year, month, day)
-  if (official) labels.push(official)
+function pushUniqueLabel(labels, name) {
+  if (name && labels.indexOf(name) < 0) labels.push(name)
+}
 
-  POPULAR_FESTIVALS.forEach((item) => {
+function isSpringFestivalEve(year, month, day) {
+  const next = new Date(year, month - 1, day + 1)
+  const lunar = solarToLunar(next.getFullYear(), next.getMonth() + 1, next.getDate())
+  return lunar.lunarMonth === 1 && lunar.lunarDay === 1 && !lunar.isLeap
+}
+
+function matchFestivalList(list, year, month, day, lunar) {
+  const names = []
+  list.forEach((item) => {
     if (item.month && item.month === month && item.day === day) {
-      labels.push(item.name)
+      names.push(item.name)
     }
-    if (item.lunarMonth) {
-      const lunar = solarToLunar(year, month, day)
-      if (lunar.lunarMonth === item.lunarMonth && lunar.lunarDay === item.lunarDay) {
-        labels.push(item.name)
-      }
+    if (
+      item.lunarMonth &&
+      lunar.lunarMonth === item.lunarMonth &&
+      lunar.lunarDay === item.lunarDay &&
+      !lunar.isLeap
+    ) {
+      names.push(item.name)
     }
   })
+  return names
+}
 
-  const term = getSolarTerm(year, month, day)
-  if (term && labels.indexOf(term) < 0) {
-    labels.push(term)
+function getDayFestivalLabel(year, month, day, holidayDayMap, options) {
+  const labels = []
+  const lunar = solarToLunar(year, month, day)
+
+  if (isSpringFestivalEve(year, month, day)) {
+    pushUniqueLabel(labels, '除夕')
+  }
+  matchFestivalList(TRADITIONAL_FESTIVALS, year, month, day, lunar).forEach((name) => {
+    pushUniqueLabel(labels, name)
+  })
+
+  const official = getDayHolidayLabel(holidayDayMap, year, month, day)
+  pushUniqueLabel(labels, official)
+
+  matchFestivalList(POPULAR_FESTIVALS, year, month, day, lunar).forEach((name) => {
+    pushUniqueLabel(labels, name)
+  })
+
+  if (!options || options.includeTerm !== false) {
+    pushUniqueLabel(labels, getSolarTerm(year, month, day))
   }
 
   return labels.slice(0, 2).join(' ')

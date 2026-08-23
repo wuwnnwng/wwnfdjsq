@@ -277,6 +277,9 @@ Page({
       ? getAuspiciousDaysInMonth(viewYear, viewMonth, auspiciousEvent)
       : []
     const dayInfo = buildDayInfo(selectedYear, selectedMonth, selectedDay)
+    const festival = getDayFestivalLabel(selectedYear, selectedMonth, selectedDay, holidayDayMap, {
+      includeTerm: false
+    })
     const almanac = getAlmanac(selectedYear, selectedMonth, selectedDay)
     const huangliDay = buildDayInfo(today.year, today.month, today.day)
     const huangliDetail = buildHuangliDetail(huangliDay, new Date())
@@ -299,7 +302,9 @@ Page({
         lunarText: dayInfo.lunarText,
         ganZhiText: `${dayInfo.ganZhiYear}年 · ${dayInfo.ganZhiMonth}月 · ${dayInfo.zodiac}年`,
         ganZhiDay: `${dayInfo.ganZhiDay}日`,
+        festival: festival || '',
         solarTerm: dayInfo.solarTerm || '—',
+        constellation: dayInfo.constellation || '',
         yi: almanac.yi,
         ji: almanac.ji,
         jianChu: almanac.jianChu

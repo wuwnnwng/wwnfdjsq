@@ -139,6 +139,45 @@ function getToolById(id) {
   return TOOLS.find((item) => item.id === id) || null
 }
 
+function normalizeSearch(text) {
+  return String(text || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '')
+}
+
+function fuzzyScore(text, query) {
+  const source = normalizeSearch(text)
+  const needle = normalizeSearch(query)
+  if (!source || !needle) return 0
+  if (source === needle) return 100
+  const index = source.indexOf(needle)
+  if (index >= 0) return 80 - index
+  let cursor = 0
+  for (let i = 0; i < needle.length; i += 1) {
+    const found = source.indexOf(needle[i], cursor)
+    if (found < 0) return 0
+    cursor = found + 1
+  }
+  return Math.max(10, 40 - (source.length - needle.length))
+}
+
+function searchTools(keyword) {
+  const query = normalizeSearch(keyword)
+  if (!query) return TOOLS.slice()
+  return TOOLS.map((item) => {
+    const score = Math.max(
+      fuzzyScore(item.name, query),
+      fuzzyScore(item.shortName || '', query),
+      fuzzyScore(item.id, query)
+    )
+    return { item, score }
+  })
+    .filter((row) => row.score > 0)
+    .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name, 'zh-CN'))
+    .map((row) => row.item)
+}
+
 function getFeaturedTools() {
   return FEATURED_IDS.map((id) => {
     const item = getToolById(id)
@@ -171,6 +210,7 @@ function markToolsHubSeen() {
 module.exports = {
   TOOLS,
   getToolById,
+  searchTools,
   getFeaturedTools,
   hasSeenToolsHub,
   markToolsHubSeen

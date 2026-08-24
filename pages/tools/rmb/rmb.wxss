@@ -1,0 +1,12 @@
+@import "../tool-common.wxss";
+@import "../calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(245, 158, 11, 0.16) 0%, rgba(255, 255, 255, 0.55) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-rmb {
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+}

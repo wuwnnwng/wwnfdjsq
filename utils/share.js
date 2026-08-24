@@ -121,6 +121,38 @@ function getQrcodeToolShare() {
   }
 }
 
+function getRmbToolShare() {
+  const path = '/pages/tools/rmb/rmb'
+  return {
+    appMessage: buildToolShareAppMessage(path, '人民币大写'),
+    timeline: buildToolShareTimeline(path, '人民币大写')
+  }
+}
+
+function getPercentToolShare() {
+  const path = '/pages/tools/percent/percent'
+  return {
+    appMessage: buildToolShareAppMessage(path, '百分比'),
+    timeline: buildToolShareTimeline(path, '百分比')
+  }
+}
+
+function getAgeToolShare() {
+  const path = '/pages/tools/age/age'
+  return {
+    appMessage: buildToolShareAppMessage(path, '年龄'),
+    timeline: buildToolShareTimeline(path, '年龄')
+  }
+}
+
+function getBmiToolShare() {
+  const path = '/pages/tools/bmi/bmi'
+  return {
+    appMessage: buildToolShareAppMessage(path, 'BMI体重'),
+    timeline: buildToolShareTimeline(path, 'BMI体重')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
@@ -393,6 +425,10 @@ module.exports = {
   getFitoutToolShare,
   getDatetimeToolShare,
   getQrcodeToolShare,
+  getRmbToolShare,
+  getPercentToolShare,
+  getAgeToolShare,
+  getBmiToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

@@ -165,6 +165,22 @@
   background: linear-gradient(135deg, #e2e8f0, #64748b);
 }
 
+.tool-icon-rmb {
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+}
+
+.tool-icon-percent {
+  background: linear-gradient(135deg, #e0e7ff, #818cf8);
+}
+
+.tool-icon-age {
+  background: linear-gradient(135deg, #fce7f3, #f472b6);
+}
+
+.tool-icon-bmi {
+  background: linear-gradient(135deg, #d1fae5, #34d399);
+}
+
 .tool-card-name {
   font-size: 26rpx;
   font-weight: 600;

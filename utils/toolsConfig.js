@@ -62,6 +62,42 @@ const TOOLS = [
     page: '/pages/tools/qrcode/qrcode'
   },
   {
+    id: 'rmb',
+    name: '人民币大写',
+    shortName: '人民币大写',
+    icon: '¥',
+    iconType: 'rmb',
+    keywords: '人民币大写金额收据合同壹贰',
+    page: '/pages/tools/rmb/rmb'
+  },
+  {
+    id: 'percent',
+    name: '百分比',
+    shortName: '百分比',
+    icon: '％',
+    iconType: 'percent',
+    keywords: '百分比折扣增减占比税率',
+    page: '/pages/tools/percent/percent'
+  },
+  {
+    id: 'age',
+    name: '年龄',
+    shortName: '年龄',
+    icon: '🎂',
+    iconType: 'age',
+    keywords: '年龄周岁虚岁生日天数生肖星座',
+    page: '/pages/tools/age/age'
+  },
+  {
+    id: 'bmi',
+    name: 'BMI体重',
+    shortName: 'BMI',
+    icon: '🧍',
+    iconType: 'bmi',
+    keywords: 'BMI体重身高肥胖超重健康',
+    page: '/pages/tools/bmi/bmi'
+  },
+  {
     id: 'currency',
     name: '汇率',
     shortName: '汇率',
@@ -169,7 +205,8 @@ function searchTools(keyword) {
     const score = Math.max(
       fuzzyScore(item.name, query),
       fuzzyScore(item.shortName || '', query),
-      fuzzyScore(item.id, query)
+      fuzzyScore(item.id, query),
+      fuzzyScore(item.keywords || '', query)
     )
     return { item, score }
   })

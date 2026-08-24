@@ -11,6 +11,10 @@
     "pages/tools/fitout/fitout",
     "pages/tools/datetime/datetime",
     "pages/tools/qrcode/qrcode",
+    "pages/tools/rmb/rmb",
+    "pages/tools/percent/percent",
+    "pages/tools/age/age",
+    "pages/tools/bmi/bmi",
     "pages/result/result"
   ],
   "window": {

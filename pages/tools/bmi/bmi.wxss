@@ -1,0 +1,28 @@
+@import "../tool-common.wxss";
+@import "../calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(52, 211, 153, 0.16) 0%, rgba(255, 255, 255, 0.55) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-bmi {
+  background: linear-gradient(135deg, #d1fae5, #34d399);
+}
+
+.level-under {
+  color: #2563eb;
+}
+
+.level-normal {
+  color: #059669;
+}
+
+.level-over {
+  color: #d97706;
+}
+
+.level-obese {
+  color: #dc2626;
+}

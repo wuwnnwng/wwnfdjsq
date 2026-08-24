@@ -61,52 +61,121 @@ const LUCKY_HOUR_DEITIES = {
 
 const JIAN_CHU_YI_JI = {
   建: {
-    yi: '出行 上任 会友 求职 签约',
-    ji: '动土 开仓 嫁娶 开市'
+    yi: '祭祀 祈福 求嗣 开光 出行 上任 会亲友 求职 签约 开市 交易 立券 纳财 栽种 牧养 入学',
+    ji: '动土 破土 开仓 乘船 安门 开渠 掘井 安葬 行丧 盖屋 嫁娶'
   },
   除: {
-    yi: '除旧 沐浴 求医 扫舍 解除',
-    ji: '嫁娶 搬家 开市 入宅'
+    yi: '解除 沐浴 整容 剃头 理发 整手足甲 求医 治病 扫舍 破屋 坏垣 拆卸 修饰垣墙 平治道涂 斋醮',
+    ji: '嫁娶 入宅 开市 出行 栽种 牧养 安葬 破土 搬家 开业 移徙 立券'
   },
   满: {
-    yi: '祈福 祭祀 结亲 开市 纳财',
-    ji: '服药 出行 赴任 栽种'
+    yi: '祭祀 祈福 斋醮 开光 求嗣 进人口 结婚姻 纳采 开市 立券 交易 纳财 栽种 牧养 开业 会亲友',
+    ji: '服药 针灸 出行 赴任 词讼 安葬 行丧 破土 求医 盖屋'
   },
   平: {
-    yi: '修造 装修 平整 补垣',
-    ji: '开市 交易 嫁娶 破土'
+    yi: '修饰垣墙 平治道涂 修造 装修 补垣 塞穴 祭祀 扫舍 拆卸 开池 筑堤 栽种',
+    ji: '开市 交易 嫁娶 破土 安葬 出行 开业 入宅 立券 搬家'
   },
   定: {
-    yi: '订婚 订盟 纳采 开业 签约',
-    ji: '诉讼 出行 求医 安葬'
+    yi: '订盟 纳采 嫁娶 祭祀 祈福 求嗣 开光 开市 立券 交易 纳财 栽种 牧养 开业 签约 安床 会亲友',
+    ji: '词讼 诉讼 出行 求医 安葬 行丧 破土 开仓 乘船'
   },
   执: {
-    yi: '捕捉 渔猎 纳财 执行 订盟',
-    ji: '搬家 远行 开市 破土'
+    yi: '捕捉 畋猎 取鱼 结网 纳财 栽种 牧养 订盟 纳采 开仓 纳畜 进人口 会亲友',
+    ji: '搬家 远行 开市 破土 安葬 出行 入宅 开业 嫁娶 移徙'
   },
   破: {
-    yi: '破屋 坏垣 求医 解除',
-    ji: '嫁娶 签约 出行 开市'
+    yi: '破屋 坏垣 求医 治病 解除 拆卸 扫舍 修饰垣墙 平治道涂 沐浴',
+    ji: '嫁娶 签约 出行 开市 开业 入宅 安葬 立券 交易 栽种 搬家 求嗣'
   },
   危: {
-    yi: '安床 入殓 移柩 祭祀',
-    ji: '登高 行船 嫁娶 开市'
+    yi: '祭祀 祈福 安床 入殓 移柩 成服 除服 开生坟 合寿木 进人口 纳畜',
+    ji: '登高 行船 嫁娶 开市 出行 开业 入宅 栽种 立券 搬家'
   },
   成: {
-    yi: '结婚 开业 入学 交易 求嗣',
-    ji: '诉讼 词讼 破土 安葬'
+    yi: '嫁娶 开业 入学 交易 求嗣 出行 入宅 移徙 开市 立券 纳财 栽种 牧养 订盟 纳采 祭祀 祈福 搬家',
+    ji: '诉讼 词讼 破土 安葬 行丧 开仓 掘井 乘船'
   },
   收: {
-    yi: '收财 纳畜 进人口 入学',
-    ji: '开业 求医 出行 安葬'
+    yi: '收财 纳畜 进人口 入学 开仓 纳财 捕捉 畋猎 取鱼 结网 牧养 栽种 祭祀 祈福',
+    ji: '开业 求医 出行 安葬 开市 嫁娶 入宅 破土 搬家 立券'
   },
   开: {
-    yi: '开业 出行 嫁娶 搬家 求嗣',
-    ji: '安葬 破土 伐木 行丧'
+    yi: '开业 出行 嫁娶 搬家 求嗣 入宅 移徙 开市 立券 交易 纳财 祭祀 祈福 开光 上任 入学 会亲友',
+    ji: '安葬 破土 伐木 行丧 开生坟 合寿木 入殓 乘船'
   },
   闭: {
-    yi: '筑堤 补穴 收纳 安葬',
-    ji: '开业 出行 嫁娶 开市'
+    yi: '筑堤 补垣 塞穴 收纳 安葬 破土 入殓 移柩 成服 除服 开生坟 合寿木 纳畜',
+    ji: '开业 出行 嫁娶 开市 入宅 开光 上任 求嗣 搬家 立券 交易'
+  }
+}
+
+const GAN_YI_JI = {
+  甲: { yi: '开市 立券 交易 栽种 牧养 会亲友 纳财', ji: '盖屋 动土 安门' },
+  乙: { yi: '嫁娶 开市 立券 祭祀 祈福 出行', ji: '栽种 进人口 开仓' },
+  丙: { yi: '祭祀 祈福 嫁娶 开市 出行 会亲友', ji: '开仓 出货 掘井' },
+  丁: { yi: '祭祀 祈福 求嗣 开光 安床 斋醮', ji: '开市 动土 破土' },
+  戊: { yi: '开市 交易 立券 栽种 修造 纳财', ji: '嫁娶 出行 乘船' },
+  己: { yi: '祭祀 祈福 嫁娶 安床 扫舍 解除', ji: '开仓 远行 开渠' },
+  庚: { yi: '祭祀 出行 开市 上任 求职 签约', ji: '动土 破土 安葬' },
+  辛: { yi: '祭祀 嫁娶 开市 订盟 纳采 会亲友', ji: '栽种 开仓 伐木' },
+  壬: { yi: '祭祀 祈福 出行 求嗣 开光 入学', ji: '开仓 动土 盖屋' },
+  癸: { yi: '祭祀 祈福 嫁娶 沐浴 治病 求医', ji: '开市 栽种 修造' }
+}
+
+const ZHI_YI_JI = {
+  子: { yi: '祭祀 祈福 求嗣 安床 入殓 开光', ji: '开仓 动土 破土' },
+  丑: { yi: '祭祀 开市 立券 修造 纳财 牧养', ji: '出行 嫁娶 乘船' },
+  寅: { yi: '祭祀 出行 开市 上任 会亲友 求职', ji: '动土 安葬 行丧' },
+  卯: { yi: '祭祀 嫁娶 开市 订盟 纳采 开光', ji: '开仓 出货 伐木' },
+  辰: { yi: '祭祀 开市 修造 装修 栽种 纳财', ji: '出行 嫁娶 行船' },
+  巳: { yi: '祭祀 开市 立券 交易 求嗣 入学', ji: '嫁娶 安葬 破土' },
+  午: { yi: '祭祀 祈福 出行 上任 开光 会亲友', ji: '开仓 动土 安门' },
+  未: { yi: '祭祀 开市 嫁娶 入宅 移徙 牧养', ji: '出行 动土 掘井' },
+  申: { yi: '祭祀 出行 开市 签约 求职 交易', ji: '动土 安葬 开生坟' },
+  酉: { yi: '祭祀 嫁娶 开市 安床 订盟 纳财', ji: '开仓 栽种 伐木' },
+  戌: { yi: '祭祀 开市 修造 补垣 塞穴 扫舍', ji: '出行 嫁娶 乘船' },
+  亥: { yi: '祭祀 祈福 嫁娶 求嗣 沐浴 治病', ji: '开市 动土 开渠' }
+}
+
+function splitYiJiItems(text) {
+  if (Array.isArray(text)) return text.filter(Boolean)
+  return String(text || '')
+    .split(/[\s、,，]+/)
+    .filter(Boolean)
+}
+
+function uniqueYiJiItems(list) {
+  const seen = {}
+  const out = []
+  list.forEach((item) => {
+    if (!item || seen[item]) return
+    seen[item] = true
+    out.push(item)
+  })
+  return out
+}
+
+function mergeYiJi(parts) {
+  let yi = []
+  let ji = []
+  parts.forEach((part) => {
+    if (!part) return
+    yi = yi.concat(splitYiJiItems(part.yi))
+    ji = ji.concat(splitYiJiItems(part.ji))
+  })
+  yi = uniqueYiJiItems(yi)
+  ji = uniqueYiJiItems(ji)
+  const jiSet = {}
+  ji.forEach((item) => {
+    jiSet[item] = true
+  })
+  yi = yi.filter((item) => !jiSet[item])
+  return {
+    yi,
+    ji,
+    yiText: yi.join('、'),
+    jiText: ji.join('、')
   }
 }
 
@@ -188,14 +257,21 @@ function buildHourLuckList(year, month, day, now) {
 
 function getAlmanac(year, month, day) {
   const jianChu = getJianChu(year, month, day)
-  const pair = JIAN_CHU_YI_JI[jianChu] || { yi: '诸事皆宜', ji: '诸事不宜' }
+  const ganZhi = getGanZhiDay(year, month, day)
+  const gan = ganZhi.charAt(0)
+  const zhi = ganZhi.charAt(1)
+  const merged = mergeYiJi([
+    JIAN_CHU_YI_JI[jianChu],
+    GAN_YI_JI[gan],
+    ZHI_YI_JI[zhi]
+  ])
   const lunar = solarToLunar(year, month, day)
   return {
     jianChu,
-    yi: pair.yi,
-    ji: pair.ji,
-    yiList: pair.yi.split(/\s+/).filter(Boolean),
-    jiList: pair.ji.split(/\s+/).filter(Boolean),
+    yi: merged.yiText || '诸事皆宜',
+    ji: merged.jiText || '诸事不宜',
+    yiList: merged.yi,
+    jiList: merged.ji,
     lunar
   }
 }
@@ -205,7 +281,7 @@ function isAuspiciousDay(year, month, day, eventId) {
   if (!event) return false
   const jianChu = getJianChu(year, month, day)
   if (event.jianChu.indexOf(jianChu) < 0) return false
-  const ji = (JIAN_CHU_YI_JI[jianChu] && JIAN_CHU_YI_JI[jianChu].ji) || ''
+  const ji = getAlmanac(year, month, day).ji || ''
   const conflict = {
     marriage: '嫁娶',
     travel: '出行',

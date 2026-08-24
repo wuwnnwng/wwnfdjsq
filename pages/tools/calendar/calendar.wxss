@@ -299,7 +299,7 @@
   line-height: 1.6;
 }
 
-.detail-panel .yi-ji-text {
+.detail-panel .yi-ji-item {
   font-weight: 700;
 }
 
@@ -342,8 +342,20 @@
 
 .yi-ji-text {
   flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12rpx 20rpx;
+  min-width: 0;
+}
+
+.yi-ji-item {
   font-size: 26rpx;
-  line-height: 1.7;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+.yi-ji-item.ji {
   color: var(--color-ink);
 }
 

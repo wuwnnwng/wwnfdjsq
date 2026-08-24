@@ -86,11 +86,15 @@
         <view class="yi-ji-block">
           <view class="yi-ji-row">
             <view class="yi-ji-label yi">宜</view>
-            <view class="yi-ji-text">{{selectedInfo.yi}}</view>
+            <view class="yi-ji-text">
+              <text class="yi-ji-item" wx:for="{{selectedInfo.yiList}}" wx:key="*this">{{item}}</text>
+            </view>
           </view>
           <view class="yi-ji-row">
             <view class="yi-ji-label ji">忌</view>
-            <view class="yi-ji-text">{{selectedInfo.ji}}</view>
+            <view class="yi-ji-text">
+              <text class="yi-ji-item ji" wx:for="{{selectedInfo.jiList}}" wx:key="*this">{{item}}</text>
+            </view>
           </view>
         </view>
       </view>
@@ -132,11 +136,15 @@
         <view class="yi-ji-block huangli-yiji">
           <view class="yi-ji-row">
             <view class="yi-ji-label yi">宜</view>
-            <view class="yi-ji-text">{{huangliDetail.yi}}</view>
+            <view class="yi-ji-text">
+              <text class="yi-ji-item" wx:for="{{huangliDetail.yiList}}" wx:key="*this">{{item}}</text>
+            </view>
           </view>
           <view class="yi-ji-row">
             <view class="yi-ji-label ji">忌</view>
-            <view class="yi-ji-text">{{huangliDetail.ji}}</view>
+            <view class="yi-ji-text">
+              <text class="yi-ji-item ji" wx:for="{{huangliDetail.jiList}}" wx:key="*this">{{item}}</text>
+            </view>
           </view>
         </view>
 

@@ -307,6 +307,8 @@ Page({
         constellation: dayInfo.constellation || '',
         yi: almanac.yi,
         ji: almanac.ji,
+        yiList: almanac.yiList,
+        jiList: almanac.jiList,
         jianChu: almanac.jianChu
       },
       huangliDetail

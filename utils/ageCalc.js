@@ -2,7 +2,17 @@
  * 年龄：周岁、虚岁、已活天数
  */
 const { parseYMD, formatDateText, formatWeekday, todayYMD } = require('./datetimeCalc')
-const { solarToLunar, formatLunarDate, formatSolarDate, getZodiac, getConstellation } = require('./lunar')
+const {
+  solarToLunar,
+  lunarToSolar,
+  formatLunarDate,
+  formatSolarDate,
+  getZodiac,
+  getConstellation,
+  leapMonth,
+  leapDays,
+  monthDays
+} = require('./lunar')
 
 function daysInMonth(year, month) {
   return new Date(year, month, 0).getDate()
@@ -39,6 +49,36 @@ function nextBirthday(birth, asOf) {
   return clampLeapBirthday(year, birth.month, birth.day)
 }
 
+function lunarBirthdaySolar(lunarYear, birthLunar) {
+  const hasLeap = leapMonth(lunarYear) === birthLunar.lunarMonth
+  const useLeap = !!birthLunar.isLeap && hasLeap
+  const maxDay = useLeap ? leapDays(lunarYear) : monthDays(lunarYear, birthLunar.lunarMonth)
+  const day = Math.min(birthLunar.lunarDay, maxDay || 1)
+  return lunarToSolar(lunarYear, birthLunar.lunarMonth, day, useLeap)
+}
+
+function sameLunarBirthday(asOfLunar, birthLunar) {
+  if (asOfLunar.lunarMonth !== birthLunar.lunarMonth || asOfLunar.lunarDay !== birthLunar.lunarDay) {
+    return false
+  }
+  if (!birthLunar.isLeap) return !asOfLunar.isLeap
+  return !!asOfLunar.isLeap || leapMonth(asOfLunar.lunarYear) !== birthLunar.lunarMonth
+}
+
+function nextLunarBirthday(birthLunar, asOf) {
+  const asOfLunar = solarToLunar(asOf.year, asOf.month, asOf.day)
+  let lunarYear = asOfLunar.lunarYear
+  let solar = lunarBirthdaySolar(lunarYear, birthLunar)
+  if (
+    solar.year < asOf.year ||
+    (solar.year === asOf.year &&
+      (solar.month < asOf.month || (solar.month === asOf.month && solar.day <= asOf.day)))
+  ) {
+    solar = lunarBirthdaySolar(lunarYear + 1, birthLunar)
+  }
+  return solar
+}
+
 function dateParts(date) {
   return {
     year: date.getFullYear(),
@@ -51,7 +91,7 @@ function toUtcDays(date) {
   return Math.round(date.getTime() / 86400000)
 }
 
-function calculateAge(birthdayText, asOfText) {
+function calculateAge(birthdayText, asOfText, options) {
   const birthDate = parseYMD(birthdayText)
   const asOfDate = parseYMD(asOfText || todayYMD())
   if (!birthDate) {
@@ -68,14 +108,16 @@ function calculateAge(birthdayText, asOfText) {
   const asOf = dateParts(asOfDate)
   const lived = calendarDiff(birth, asOf)
   const livedDays = toUtcDays(asOfDate) - toUtcDays(birthDate)
-  const next = nextBirthday(birth, asOf)
+  const birthLunar = solarToLunar(birth.year, birth.month, birth.day)
+  const asOfLunar = solarToLunar(asOf.year, asOf.month, asOf.day)
+  const useLunarBirthday = options && options.birthdayCalendar === 'lunar'
+  const next = useLunarBirthday ? nextLunarBirthday(birthLunar, asOf) : nextBirthday(birth, asOf)
   const nextDate = new Date(next.year, next.month - 1, next.day)
   nextDate.setHours(0, 0, 0, 0)
   const nextDays = Math.max(0, toUtcDays(nextDate) - toUtcDays(asOfDate))
-  const isBirthday = asOf.month === birth.month && asOf.day === birth.day
-
-  const birthLunar = solarToLunar(birth.year, birth.month, birth.day)
-  const asOfLunar = solarToLunar(asOf.year, asOf.month, asOf.day)
+  const isBirthday = useLunarBirthday
+    ? sameLunarBirthday(asOfLunar, birthLunar)
+    : asOf.month === birth.month && asOf.day === birth.day
   const nominalAge = asOfLunar.lunarYear - birthLunar.lunarYear + 1
 
   const yearText = `${lived.years}岁`

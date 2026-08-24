@@ -21,13 +21,40 @@
     </view>
 
     <view class="panel">
+      <view class="seg-row">
+        <view
+          class="seg-item {{birthCalendar === 'solar' ? 'active' : ''}}"
+          bindtap="onSwitchBirthCalendar"
+          data-cal="solar"
+        >
+          公历
+        </view>
+        <view
+          class="seg-item {{birthCalendar === 'lunar' ? 'active' : ''}}"
+          bindtap="onSwitchBirthCalendar"
+          data-cal="lunar"
+        >
+          农历
+        </view>
+      </view>
       <view class="field">
         <text class="field-label">出生日期</text>
         <view class="field-control">
-          <picker mode="date" value="{{birthday}}" start="1900-01-01" end="{{today}}" bindchange="onBirthdayChange">
-            <view class="picker-value">{{birthday}}</view>
+          <picker
+            wx:if="{{birthCalendar === 'solar'}}"
+            mode="date"
+            value="{{birthday}}"
+            start="1900-01-01"
+            end="{{today}}"
+            bindchange="onBirthdayChange"
+          >
+            <view class="picker-value">{{birthdayDisplay}}</view>
           </picker>
+          <view wx:else class="picker-value" bindtap="onOpenLunarPicker">{{lunarBirthdayText}}</view>
         </view>
+      </view>
+      <view class="tool-note" wx:if="{{birthCalendar === 'lunar' && result && result.valid}}">
+        对应公历 {{result.birthdayText}}
       </view>
       <view class="field">
         <text class="field-label">计算到</text>
@@ -77,7 +104,37 @@
         <view class="result-row-label">距下次生日</view>
         <view class="result-row-value">{{result.nextDaysText}}</view>
       </view>
-      <view class="tool-note">周岁按公历生日计算；虚岁出生为 1 岁，每过一个春节加 1 岁。已活天数为出生日到计算日的间隔天数，出生日当天为 0 天。</view>
+      <view class="tool-note">
+        周岁按公历满一周年计算。选择农历时，下次生日按农历生日换算。虚岁出生为 1 岁，每过一个春节加 1 岁。已活天数为出生日到计算日的间隔天数，出生日当天为 0 天。
+      </view>
     </view>
   </scroll-view>
+
+  <view wx:if="{{showLunarPicker}}" class="date-picker-mask" catchtap="onCancelLunarPicker" catchtouchmove="preventMove">
+    <view class="date-picker-sheet" catchtap="onLunarPickerSheetTap">
+      <view class="date-picker-head">
+        <view class="date-picker-action" catchtap="onCancelLunarPicker">取消</view>
+        <view class="date-picker-title">选择农历生日</view>
+        <view class="date-picker-action confirm" catchtap="onConfirmLunarPicker">确定</view>
+      </view>
+      <picker-view
+        class="date-picker-view"
+        value="{{lunarPickerValue}}"
+        immediate-change="{{true}}"
+        bindchange="onLunarPickerChange"
+        indicator-style="height: 72rpx;"
+        indicator-class="date-picker-indicator"
+      >
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{lunarYears}}" wx:key="*this">{{item}}年</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{lunarMonths}}" wx:key="label">{{item.label}}</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{lunarDays}}" wx:key="*this">{{item}}</view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+  </view>
 </view>

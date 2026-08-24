@@ -1,7 +1,7 @@
 /**
  * 节日：法定假日（API）、二十四节气、热门节日
  */
-const { SOLAR_TERMS, solarToLunar, formatLunarDate, getSolarTerm } = require('./lunar')
+const { SOLAR_TERMS, solarToLunar, formatLunarDate, getSolarTerm, getSolarTermDate } = require('./lunar')
 const { loadYearHolidays, getDayHolidayLabel } = require('./holidayApi')
 
 const TRADITIONAL_FESTIVALS = [
@@ -112,16 +112,6 @@ function attachCountdownList(list, baseYear, fromDate) {
   return (list || []).map((item) => withCountdown(item, baseYear, fromDate))
 }
 
-function termDate(year, n) {
-  const off = [
-    5.4055, 20.12, 3.87, 18.73, 5.63, 20.646, 4.81, 20.1, 5.52, 21.04, 5.678, 21.37, 7.108,
-    22.83, 7.5, 23.13, 7.646, 23.042, 8.318, 23.438, 7.438, 22.36, 7.18, 21.94
-  ]
-  const month = Math.floor(n / 2) + 1
-  const day = Math.floor(off[n] + 0.5 + (year - 2000) * 0.2422 - Math.floor((year - 2000) / 4))
-  return { month, day }
-}
-
 function findSolarByLunar(year, lunarMonth, lunarDay) {
   for (let m = 1; m <= 12; m += 1) {
     const last = new Date(year, m, 0).getDate()
@@ -149,7 +139,7 @@ function nthWeekdayOfMonth(year, month, weekday, nth) {
 
 function buildSolarTerms(year) {
   return SOLAR_TERMS.map((name, index) => {
-    const t = termDate(year, index)
+    const t = getSolarTermDate(year, index)
     return {
       name,
       desc: `${year}年${t.month}月${t.day}日`,

@@ -100,7 +100,13 @@ function buildMonthCells(
       inMonth = false
     }
 
-    const festival = getDayFestivalLabel(year, month, day, holidayDayMap)
+    const festival = (() => {
+      try {
+        return getDayFestivalLabel(year, month, day, holidayDayMap)
+      } catch (e) {
+        return ''
+      }
+    })()
     const festivalShort = festival ? festival.split(' ')[0] : ''
     const lunarShort = formatLunarCell(solarToLunar(year, month, day))
     const isToday = isSameDate({ year, month, day }, today)
@@ -327,6 +333,7 @@ Page({
         showDatePicker: false
       },
       () => {
+        this.refreshCalendarView()
         this.ensureFestivalYear(picked.year, () => this.refreshCalendarView())
       }
     )

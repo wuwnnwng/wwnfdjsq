@@ -10,6 +10,7 @@ const { pad2 } = require('./lunar')
 
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const API_BASE = 'https://timor.tech/api/holiday/year'
+const HOLIDAY_API_MIN_YEAR = 2013
 
 function cacheKey(year) {
   return `holiday_cache_v2_${year}`
@@ -171,7 +172,26 @@ async function fetchYearHolidays(year) {
   return parsed
 }
 
+function emptyHolidayData(year, extra) {
+  return {
+    year,
+    dayMap: {},
+    legal: [],
+    source: 'fallback',
+    fromCache: false,
+    stale: false,
+    error: '',
+    ...(extra || {})
+  }
+}
+
 async function loadYearHolidays(year) {
+  const y = Number(year)
+  const maxYear = new Date().getFullYear() + 1
+  if (!(y >= HOLIDAY_API_MIN_YEAR && y <= maxYear)) {
+    return emptyHolidayData(y)
+  }
+
   const cached = readCache(year)
   if (cached && cached.fresh) {
     return { ...cached.data, fromCache: true, stale: false }
@@ -185,15 +205,9 @@ async function loadYearHolidays(year) {
     if (cached && cached.data) {
       return { ...cached.data, fromCache: true, stale: true, error: '节日数据更新失败，已显示缓存' }
     }
-    return {
-      year,
-      dayMap: {},
-      legal: [],
-      source: 'fallback',
-      fromCache: false,
-      stale: false,
+    return emptyHolidayData(year, {
       error: '暂未获取官方放假安排，请检查网络并配置合法域名 timor.tech'
-    }
+    })
   }
 }
 

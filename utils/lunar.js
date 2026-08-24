@@ -90,9 +90,14 @@ const lunarInfo = [
   0x0d520
 ]
 
+function lunarData(y) {
+  const info = lunarInfo[y - 1900]
+  return info == null ? 0 : info
+}
+
 function lunarYearDays(y) {
   let sum = 348
-  const info = lunarInfo[y - 1900]
+  const info = lunarData(y)
   for (let i = 0x8000; i > 0x8; i >>= 1) {
     sum += info & i ? 1 : 0
   }
@@ -100,24 +105,34 @@ function lunarYearDays(y) {
 }
 
 function leapMonth(y) {
-  return lunarInfo[y - 1900] & 0xf
+  return lunarData(y) & 0xf
 }
 
 function leapDays(y) {
   if (leapMonth(y)) {
-    return lunarInfo[y - 1900] & 0x10000 ? 30 : 29
+    return lunarData(y) & 0x10000 ? 30 : 29
   }
   return 0
 }
 
 function monthDays(y, m) {
-  return lunarInfo[y - 1900] & (0x10000 >> m) ? 30 : 29
+  return lunarData(y) & (0x10000 >> m) ? 30 : 29
+}
+
+function utcDateParts(utcMs) {
+  const date = new Date(utcMs)
+  return {
+    year: date.getUTCFullYear(),
+    month: date.getUTCMonth() + 1,
+    day: date.getUTCDate()
+  }
 }
 
 function solarToLunar(year, month, day) {
-  const base = new Date(1900, 0, 31)
-  const obj = new Date(year, month - 1, day)
-  let offset = Math.floor((obj - base) / 86400000)
+  let offset = Math.round((Date.UTC(year, month - 1, day) - Date.UTC(1900, 0, 31)) / 86400000)
+  if (offset < 0) {
+    return { lunarYear: 1899, lunarMonth: 12, lunarDay: 30, isLeap: false }
+  }
 
   let lunarYear = 1900
   let daysInYear = lunarYearDays(lunarYear)
@@ -166,9 +181,65 @@ function formatSolarDate(year, month, day) {
 
 function formatLunarDate(lunar) {
   if (!lunar) return ''
-  const monthText = `${lunar.isLeap ? '闰' : ''}${LUNAR_MONTHS[lunar.lunarMonth - 1]}月`
+  const monthText = `${lunar.isLeap ? '闰' : ''}${LUNAR_MONTHS[lunar.lunarMonth - 1] || ''}月`
   const dayText = LUNAR_DAYS[lunar.lunarDay - 1] || ''
   return `${monthText}${dayText}`
+}
+
+function formatLunarYearDate(lunar) {
+  if (!lunar) return ''
+  return `${lunar.lunarYear}年${formatLunarDate(lunar)}`
+}
+
+function lunarToSolar(lunarYear, lunarMonth, lunarDay, isLeap) {
+  const year = Math.min(2100, Math.max(1900, Number(lunarYear) || 1900))
+  const month = Math.min(12, Math.max(1, Number(lunarMonth) || 1))
+  const leap = leapMonth(year)
+  const leapThis = !!isLeap && leap === month
+  let offset = 0
+  for (let y = 1900; y < year; y += 1) {
+    offset += lunarYearDays(y)
+  }
+  for (let m = 1; m < month; m += 1) {
+    offset += monthDays(year, m)
+    if (leap === m) offset += leapDays(year)
+  }
+  if (leapThis) offset += monthDays(year, month)
+  const maxDay = leapThis ? leapDays(year) : monthDays(year, month)
+  const day = Math.min(maxDay || 1, Math.max(1, Number(lunarDay) || 1))
+  offset += day - 1
+  return utcDateParts(Date.UTC(1900, 0, 31) + offset * 86400000)
+}
+
+function getLunarMonthOptions(year) {
+  const y = Math.min(2100, Math.max(1900, Number(year) || 1900))
+  const leap = leapMonth(y)
+  const months = []
+  for (let m = 1; m <= 12; m += 1) {
+    months.push({
+      month: m,
+      isLeap: false,
+      days: monthDays(y, m),
+      label: `${LUNAR_MONTHS[m - 1]}月`
+    })
+    if (leap === m) {
+      months.push({
+        month: m,
+        isLeap: true,
+        days: leapDays(y),
+        label: `闰${LUNAR_MONTHS[m - 1]}月`
+      })
+    }
+  }
+  return months
+}
+
+function getLunarDayOptions(year, month, isLeap) {
+  const y = Math.min(2100, Math.max(1900, Number(year) || 1900))
+  const m = Math.min(12, Math.max(1, Number(month) || 1))
+  const leapThis = !!isLeap && leapMonth(y) === m
+  const count = leapThis ? leapDays(y) : monthDays(y, m)
+  return LUNAR_DAYS.slice(0, count || 29)
 }
 
 /** 日历格子用短农历：初一显示月份，其余显示初二、十五等 */
@@ -261,49 +332,56 @@ function getWeekInfo(year, month, day) {
   }
 }
 
+// 1900 起节气毫秒表，覆盖 1900–2100，避免旧实现按 2000 年起算时出现负索引
+const TERM_INFO = [
+  0, 21208, 42467, 63836, 85337, 107014, 128867, 150921, 173149, 195551, 218072, 240693,
+  263343, 285989, 308563, 331033, 353350, 375494, 397447, 419210, 440795, 462224, 483532, 504758
+]
+
 function termDate(year, n) {
-  const off = [
-    5.4055, 20.12, 3.87, 18.73, 5.63, 20.646, 4.81, 20.1, 5.52, 21.04, 5.678, 21.37, 7.108,
-    22.83, 7.5, 23.13, 7.646, 23.042, 8.318, 23.438, 7.438, 22.36, 7.18, 21.94
-  ]
-  const cal = [
-    [6.11, 20.84, 4.15, 19.04, 6.04, 20.73, 4.81, 20.1, 5.52, 21.35, 6.06, 21.94],
-    [6.11, 20.84, 4.629, 19.459, 6.382, 21.256, 5.59, 20.888, 6.318, 21.86, 6.5, 22.2],
-    [5.4055, 20.12, 3.87, 18.73, 5.63, 20.646, 4.81, 20.1, 5.52, 21.04, 5.678, 21.37],
-    [7.108, 22.83, 7.5, 23.13, 7.646, 23.042, 8.318, 23.438, 7.438, 22.36, 7.18, 21.94]
-  ]
-  const idx = Math.floor((year - 2000) / 4)
-  const table = cal[Math.min(idx, cal.length - 1)]
-  const day = Math.floor(off[n] + 0.5 + (year - 2000) * 0.2422 - Math.floor((year - 2000) / 4))
-  const month = Math.floor(n / 2) + 1
-  const d = Math.floor(table[n % 12] || day)
-  return { month, day: d }
+  const y = Number(year) || 1900
+  const idx = Math.max(0, Math.min(TERM_INFO.length - 1, Number(n) || 0))
+  const utc = Date.UTC(1900, 0, 6, 2, 5) + 31556925974.7 * (y - 1900) + TERM_INFO[idx] * 60000
+  const parts = utcDateParts(utc)
+  return { month: parts.month, day: parts.day }
+}
+
+function getSolarTermDate(year, n) {
+  return termDate(year, n)
 }
 
 function getSolarTerm(year, month, day) {
-  for (let i = 0; i < 24; i += 1) {
-    const t = termDate(year, i)
-    if (t.month === month && t.day === day) {
-      return SOLAR_TERMS[i]
+  try {
+    for (let i = 0; i < 24; i += 1) {
+      const t = termDate(year, i)
+      if (t.month === month && t.day === day) {
+        return SOLAR_TERMS[i]
+      }
     }
+  } catch (e) {
+    return ''
   }
   return ''
 }
 
 function getNearestSolarTerm(year, month, day) {
-  const cur = new Date(year, month - 1, day).getTime()
-  let best = null
-  for (let y = year - 1; y <= year + 1; y += 1) {
-    for (let i = 0; i < 24; i += 1) {
-      const t = termDate(y, i)
-      const ts = new Date(y, t.month - 1, t.day).getTime()
-      const diff = Math.abs(ts - cur)
-      if (!best || diff < best.diff) {
-        best = { name: SOLAR_TERMS[i], diff, date: `${y}-${pad2(t.month)}-${pad2(t.day)}` }
+  try {
+    const cur = Date.UTC(year, month - 1, day)
+    let best = null
+    for (let y = year - 1; y <= year + 1; y += 1) {
+      for (let i = 0; i < 24; i += 1) {
+        const t = termDate(y, i)
+        const ts = Date.UTC(y, t.month - 1, t.day)
+        const diff = Math.abs(ts - cur)
+        if (!best || diff < best.diff) {
+          best = { name: SOLAR_TERMS[i], diff }
+        }
       }
     }
+    return best ? best.name : ''
+  } catch (e) {
+    return ''
   }
-  return best ? best.name : ''
 }
 
 function buildDayInfo(year, month, day) {
@@ -353,10 +431,19 @@ module.exports = {
   GAN,
   ZHI,
   SOLAR_TERMS,
+  LUNAR_MONTHS,
+  LUNAR_DAYS,
   solarToLunar,
+  lunarToSolar,
   formatLunarDate,
+  formatLunarYearDate,
   formatLunarCell,
   formatSolarDate,
+  getLunarMonthOptions,
+  getLunarDayOptions,
+  leapMonth,
+  leapDays,
+  monthDays,
   getGanZhiYear,
   getGanZhiMonth,
   getGanZhiDay,
@@ -364,6 +451,7 @@ module.exports = {
   getConstellation,
   getWeekInfo,
   getSolarTerm,
+  getSolarTermDate,
   getNearestSolarTerm,
   buildDayInfo,
   compareDate,

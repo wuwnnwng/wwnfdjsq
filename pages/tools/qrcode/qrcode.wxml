@@ -49,7 +49,7 @@
       <view class="qr-empty" wx:else>二维码将显示在这里</view>
       <view class="qr-caption" wx:if="{{encodedText}}">{{encodedText}}</view>
       <view class="primary-btn" wx:if="{{qrImage}}" bindtap="onSave">保存到相册</view>
-      <view class="tool-note">长按图片也可转发。网站默认补 https://，也可改成 http://。</view>
+      <view class="tool-note">长按图片也可转发。网站默认补 https://，也可改成 http://。中文按微信扫一扫常用的 GBK 方式生成。</view>
     </view>
   </scroll-view>
 

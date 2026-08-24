@@ -85,6 +85,16 @@
   border-color: transparent;
 }
 
+.protocol-row {
+  margin-bottom: 8rpx;
+}
+
+.protocol-row .seg-item {
+  height: 64rpx;
+  line-height: 64rpx;
+  font-size: 24rpx;
+}
+
 .qr-input {
   width: 100%;
   min-height: 160rpx;

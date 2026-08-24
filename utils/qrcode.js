@@ -1,5 +1,8 @@
 /**
  * QR Code 生成（UTF-8 字节模式，纠错等级 M，版本 1–15）
+ *
+ * 微信扫一扫不认 ECI。中文若带 ECI-26，会被当成物品码并提示「未找到物品信息」。
+ * 非 ASCII 的纯文本改为 UTF-8 + BOM、不写 ECI，微信才能当文本识别。
  */
 
 const ALIGN_POS = [
@@ -140,8 +143,12 @@ function dataCodewords(version) {
   return total
 }
 
-function needsEci(bytes) {
-  return bytes.some((item) => item > 127)
+function hasNonAscii(text) {
+  return /[^\x00-\x7F]/.test(String(text || ''))
+}
+
+function looksLikeUrl(text) {
+  return /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(String(text || '').trim())
 }
 
 function maxBytesForVersion(version, withEci) {
@@ -524,14 +531,15 @@ function encodeQr(text) {
   if (!content.trim()) {
     return { ok: false, message: '请输入文字或网址' }
   }
-  const bytes = toUtf8Bytes(content)
-  const withEci = needsEci(bytes)
-  const version = chooseVersion(bytes.length, withEci)
+  // 网址开头必须是协议，不能加 BOM；中文文本加 BOM 便于微信按 UTF-8 解码
+  const payload = hasNonAscii(content) && !looksLikeUrl(content) ? `\uFEFF${content}` : content
+  const bytes = toUtf8Bytes(payload)
+  const version = chooseVersion(bytes.length, false)
   if (!version) {
     return { ok: false, message: '内容过长，请缩短后再生成（约 200 个英文或 130 个汉字以内）' }
   }
 
-  const data = buildDataCodewords(bytes, version, withEci)
+  const data = buildDataCodewords(bytes, version, false)
   const codewords = interleaveBlocks(data, version)
   const size = matrixSize(version)
 
@@ -558,12 +566,16 @@ function encodeQr(text) {
   }
 }
 
-function normalizeWebsite(text) {
+function normalizeWebsite(text, scheme) {
   const value = String(text || '').trim()
   if (!value) return ''
+  const protocol = scheme === 'http' ? 'http' : 'https'
+  if (/^https?:\/\//i.test(value)) {
+    return value.replace(/^https?:\/\//i, `${protocol}://`)
+  }
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) return value
-  if (/^\/\//.test(value)) return `https:${value}`
-  return `https://${value}`
+  if (/^\/\//.test(value)) return `${protocol}:${value}`
+  return `${protocol}://${value}`
 }
 
 module.exports = {

@@ -5,16 +5,17 @@ const { enableShareMenu, getQrcodeToolShare } = require('../../../utils/share')
 const CANVAS_CSS = 280
 const SAVE_FILE = 'qrcode-save.png'
 
-function contentFromInput(mode, text) {
+function contentFromInput(mode, text, scheme) {
   const raw = String(text || '').trim()
   if (!raw) return ''
-  return mode === 'url' ? normalizeWebsite(raw) : raw
+  return mode === 'url' ? normalizeWebsite(raw, scheme) : raw
 }
 
 Page({
   data: {
     theme: getThemeId(),
     mode: 'text',
+    urlScheme: 'https',
     inputValue: '',
     encodedText: '',
     qrImage: '',
@@ -58,6 +59,12 @@ Page({
     this.setData({ mode }, () => this.scheduleGenerate())
   },
 
+  onSwitchScheme(e) {
+    const urlScheme = e.currentTarget.dataset.scheme
+    if (!urlScheme || urlScheme === this.data.urlScheme) return
+    this.setData({ urlScheme }, () => this.scheduleGenerate())
+  },
+
   onInput(e) {
     this.setData({ inputValue: e.detail.value }, () => this.scheduleGenerate())
   },
@@ -80,7 +87,7 @@ Page({
   },
 
   generate() {
-    const encodedText = contentFromInput(this.data.mode, this.data.inputValue)
+    const encodedText = contentFromInput(this.data.mode, this.data.inputValue, this.data.urlScheme)
     if (!encodedText) {
       this.setData({
         encodedText: '',

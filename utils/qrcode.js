@@ -1,8 +1,9 @@
 /**
  * QR Code 生成（字节模式，纠错等级 M，版本 1–15）
  *
- * 微信扫一扫不认 ECI，也不把 UTF-8 中文当普通文本，常会走「识物」并提示未找到物品信息。
- * 非 ASCII 且不是网址时改为 GBK 字节、不写 ECI；网址与英文仍用 UTF-8。
+ * 微信扫一扫对纯中文会走「识物」。普通文字会写成
+ * data:text/plain;charset=utf-8,...（百分号编码，整段为 ASCII，不写 ECI）。
+ * 网址与电话保持原内容。
  */
 
 const { toGbkBytes } = require('./gbk')
@@ -161,41 +162,23 @@ function looksLikePhone(text) {
   return false
 }
 
-function toQueryValue(text) {
-  const str = String(text || '')
-  let out = ''
-  for (let i = 0; i < str.length; i += 1) {
-    const ch = str.charAt(i)
-    const code = str.charCodeAt(i)
-    if (ch === ' ') {
-      out += '+'
-    } else if (code < 0x80) {
-      out += /[a-zA-Z0-9._~-]/.test(ch) ? ch : encodeURIComponent(ch)
-    } else {
-      out += ch
-    }
-  }
-  return out
+function wrapTextAsDataUri(text) {
+  return `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`
 }
 
-function wrapTextForWechat(text) {
-  return `https://m.baidu.com/s?ie=utf-8&wd=${toQueryValue(text)}`
-}
-
-function buildScanPayload(mode, text, scheme, wechatFriendly) {
+function buildScanPayload(mode, text, scheme) {
   const raw = String(text || '').trim()
-  if (!raw) return { payload: '', display: '', wrapped: false }
+  if (!raw) return { payload: '', display: '' }
   if (mode === 'url') {
     const payload = normalizeWebsite(raw, scheme)
-    return { payload, display: payload, wrapped: false }
+    return { payload, display: payload }
   }
-  if (!wechatFriendly || looksLikeUrl(raw) || looksLikePhone(raw)) {
-    return { payload: raw, display: raw, wrapped: false }
+  if (looksLikeUrl(raw) || looksLikePhone(raw)) {
+    return { payload: raw, display: raw }
   }
   return {
-    payload: wrapTextForWechat(raw),
-    display: raw,
-    wrapped: true
+    payload: wrapTextAsDataUri(raw),
+    display: raw
   }
 }
 

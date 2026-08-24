@@ -1,4 +1,4 @@
-const { encodeQr, buildQrContent } = require('../../../utils/qrcode')
+const { encodeQr, resolveQrPayload } = require('../../../utils/qrcode')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getQrcodeToolShare } = require('../../../utils/share')
 
@@ -82,8 +82,8 @@ Page({
   },
 
   generate() {
-    const content = buildQrContent(this.data.mode, this.data.inputValue, this.data.urlScheme)
-    if (!content) {
+    const payload = resolveQrPayload(this.data.mode, this.data.inputValue, this.data.urlScheme)
+    if (!payload.content) {
       this._encoded = null
       this.setData({
         qrContent: '',
@@ -93,7 +93,7 @@ Page({
       })
       return
     }
-    const encoded = encodeQr(content)
+    const encoded = encodeQr(payload.content)
     if (!encoded.ok) {
       this._encoded = null
       this.setData({
@@ -106,7 +106,7 @@ Page({
     }
     this._encoded = encoded
     this.setData({
-      qrContent: content,
+      qrContent: payload.copyValue,
       errorText: '',
       generating: true
     })

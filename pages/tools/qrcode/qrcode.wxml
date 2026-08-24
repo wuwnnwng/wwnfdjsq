@@ -12,7 +12,7 @@
           </view>
         </view>
       </view>
-      <view class="conv-eq" wx:if="{{mode === 'url'}}">扫码打开网站；微信打不开时可复制网址到浏览器</view>
+      <view class="conv-eq" wx:if="{{mode === 'url'}}">微信扫一扫会看到复制提示，用浏览器打开网址</view>
       <view class="conv-eq" wx:else>扫码不打开页面，可复制文字</view>
     </view>
 
@@ -47,13 +47,15 @@
       <view class="qr-empty" wx:elif="{{errorText}}">{{errorText}}</view>
       <view class="qr-empty" wx:elif="{{generating}}">正在生成二维码…</view>
       <view class="qr-empty" wx:else>二维码将显示在这里</view>
-      <view class="qr-caption" wx:if="{{mode === 'url' && qrContent}}" bindtap="onCopy">{{qrContent}}</view>
+      <view class="qr-scan-card" wx:if="{{mode === 'url' && qrContent}}">
+        <view class="qr-scan-kicker">微信扫一扫将看到</view>
+        <view class="qr-scan-text">该网址不在微信白名单，无法直接打开。</view>
+        <view class="qr-scan-text">请复制下面网址，到系统浏览器打开：</view>
+        <view class="qr-caption" bindtap="onCopy">{{qrContent}}</view>
+      </view>
       <view class="primary-btn" wx:if="{{qrImage}}" bindtap="onSave">保存到相册</view>
       <view class="tool-note" wx:if="{{mode === 'text'}}">微信扫一扫遇到文字时不会打开页面，可点「复制内容」拿到原文。</view>
-      <block wx:else>
-        <view class="tool-note warn">微信扫一扫打不开时，说明网址不在白名单。可点「复制网址」粘贴到系统浏览器打开。</view>
-        <view class="tool-note">网站默认补 https://，需要明文传输时改成 http://。长按图片也可转发。</view>
-      </block>
+      <view class="tool-note" wx:else>网站默认补 https://。二维码写入的是提示文案和网址，微信不会直接跳转网页。</view>
     </view>
   </scroll-view>
 

@@ -1,6 +1,7 @@
 /**
  * QR Code 生成：字节模式、纠错等级 M、版本 1–15、UTF-8、不写 ECI。
- * 文字按原文写入；网站补 http:// 或 https://。
+ * 文字按原文写入；网站不写纯链接（微信会直接打开网页，不在白名单时没有复制入口），
+ * 改为写入提示文案 + 网址，扫码后可复制到系统浏览器打开。
  */
 
 const ALIGN_POS = [
@@ -560,16 +561,39 @@ function normalizeWebsite(text, scheme) {
   return `${protocol}://${value}`
 }
 
-function buildQrContent(mode, text, scheme) {
+function buildUrlScanText(url) {
+  return [
+    '该网址不在微信白名单，无法直接打开。',
+    '请复制下面网址，到系统浏览器打开：',
+    url
+  ].join('\n')
+}
+
+function resolveQrPayload(mode, text, scheme) {
   const raw = String(text || '').trim()
-  if (!raw) return ''
-  if (mode === 'url') return normalizeWebsite(raw, scheme)
-  return raw
+  if (!raw) {
+    return { content: '', copyValue: '', url: '' }
+  }
+  if (mode === 'url') {
+    const url = normalizeWebsite(raw, scheme)
+    return {
+      content: buildUrlScanText(url),
+      copyValue: url,
+      url
+    }
+  }
+  return { content: raw, copyValue: raw, url: '' }
+}
+
+function buildQrContent(mode, text, scheme) {
+  return resolveQrPayload(mode, text, scheme).content
 }
 
 module.exports = {
   encodeQr,
   normalizeWebsite,
+  buildUrlScanText,
+  resolveQrPayload,
   buildQrContent,
   toUtf8Bytes
 }

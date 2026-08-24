@@ -161,13 +161,41 @@
 }
 
 .qr-caption {
-  margin-top: 20rpx;
+  margin-top: 12rpx;
   max-width: 100%;
   font-size: 24rpx;
   color: var(--color-brand);
   text-align: center;
   word-break: break-all;
   line-height: 1.5;
+}
+
+.qr-scan-card {
+  width: 100%;
+  margin-top: 24rpx;
+  padding: 24rpx 22rpx 20rpx;
+  box-sizing: border-box;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1rpx solid var(--color-line);
+}
+
+.qr-scan-kicker {
+  font-size: 22rpx;
+  color: var(--color-muted);
+  letter-spacing: 1rpx;
+  margin-bottom: 12rpx;
+}
+
+.qr-scan-text {
+  font-size: 26rpx;
+  color: var(--color-ink);
+  line-height: 1.55;
+}
+
+.qr-scan-card .qr-caption {
+  margin-top: 16rpx;
+  text-align: left;
 }
 
 .primary-btn {

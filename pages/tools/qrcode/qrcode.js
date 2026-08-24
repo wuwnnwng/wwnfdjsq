@@ -3,6 +3,7 @@ const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getQrcodeToolShare } = require('../../../utils/share')
 
 const CANVAS_CSS = 280
+const SAVE_FILE = 'qrcode-save.png'
 
 function contentFromInput(mode, text) {
   const raw = String(text || '').trim()
@@ -169,31 +170,216 @@ Page({
     }
   },
 
+  errorMessage(err) {
+    return (err && (err.errMsg || err.message)) || ''
+  },
+
+  isPrivacyError(err) {
+    return /privacy|隐私|not declared|privacy permission/i.test(this.errorMessage(err))
+  },
+
+  isAuthError(err) {
+    const msg = this.errorMessage(err)
+    if (this.isPrivacyError(err)) return false
+    return /auth deny|authorize|permission|auth denied/i.test(msg)
+  },
+
+  requirePrivacy() {
+    return new Promise((resolve, reject) => {
+      if (typeof wx.requirePrivacyAuthorize !== 'function') {
+        resolve()
+        return
+      }
+      wx.requirePrivacyAuthorize({
+        success: resolve,
+        fail: reject
+      })
+    })
+  },
+
+  ensureAlbumAuth() {
+    return new Promise((resolve, reject) => {
+      wx.getSetting({
+        success: (setting) => {
+          const auth = setting.authSetting['scope.writePhotosAlbum']
+          if (auth) {
+            resolve()
+            return
+          }
+          if (auth === false) {
+            wx.showModal({
+              title: '需要相册权限',
+              content: '保存二维码需要访问相册，请在设置中允许。',
+              confirmText: '去设置',
+              success: (res) => {
+                if (!res.confirm) {
+                  reject({ errMsg: 'auth denied' })
+                  return
+                }
+                wx.openSetting({
+                  success: (openRes) => {
+                    if (openRes.authSetting['scope.writePhotosAlbum']) resolve()
+                    else reject({ errMsg: 'auth denied' })
+                  },
+                  fail: reject
+                })
+              }
+            })
+            return
+          }
+          resolve()
+        },
+        fail: reject
+      })
+    })
+  },
+
+  persistSaveFile(tempFilePath) {
+    return new Promise((resolve, reject) => {
+      const dest = `${wx.env.USER_DATA_PATH}/${SAVE_FILE}`
+      const fs = wx.getFileSystemManager()
+      const done = (path) => resolve(path || dest)
+      if (typeof fs.saveFile === 'function') {
+        fs.saveFile({
+          tempFilePath,
+          filePath: dest,
+          success: () => done(dest),
+          fail: () => {
+            fs.copyFile({
+              srcPath: tempFilePath,
+              destPath: dest,
+              success: () => done(dest),
+              fail: () => done(tempFilePath)
+            })
+          }
+        })
+        return
+      }
+      done(tempFilePath)
+    })
+  },
+
+  exportCanvasFile() {
+    return new Promise((resolve, reject) => {
+      const dest = `${wx.env.USER_DATA_PATH}/${SAVE_FILE}`
+      const canvas = this._canvas
+      const writeBase64 = () => {
+        try {
+          if (canvas && typeof canvas.toDataURL === 'function') {
+            const dataUrl = canvas.toDataURL('image/png')
+            const base64 = String(dataUrl || '').replace(/^data:image\/\w+;base64,/, '')
+            if (base64.length > 80) {
+              wx.getFileSystemManager().writeFile({
+                filePath: dest,
+                data: base64,
+                encoding: 'base64',
+                success: () => resolve(dest),
+                fail: exportTemp
+              })
+              return
+            }
+          }
+        } catch (e) {
+          // fallback below
+        }
+        exportTemp()
+      }
+      const exportTemp = () => {
+        if (!canvas) {
+          resolveImage()
+          return
+        }
+        wx.canvasToTempFilePath(
+          {
+            canvas,
+            fileType: 'png',
+            success: (res) => {
+              this.persistSaveFile(res.tempFilePath).then(resolve).catch(resolveImage)
+            },
+            fail: resolveImage
+          },
+          this
+        )
+      }
+      const resolveImage = () => {
+        const src = this.data.qrImage
+        if (!src) {
+          reject({ errMsg: 'no image' })
+          return
+        }
+        wx.getImageInfo({
+          src,
+          success: (info) => {
+            if (!info || !info.path) {
+              reject({ errMsg: 'no image' })
+              return
+            }
+            this.persistSaveFile(info.path).then(resolve).catch(() => resolve(info.path))
+          },
+          fail: reject
+        })
+      }
+      writeBase64()
+    })
+  },
+
+  saveFileToAlbum(filePath) {
+    return new Promise((resolve, reject) => {
+      wx.saveImageToPhotosAlbum({
+        filePath,
+        success: resolve,
+        fail: reject
+      })
+    })
+  },
+
+  handleSaveFail(err) {
+    if (this.isPrivacyError(err)) {
+      wx.showModal({
+        title: '无法保存到相册',
+        content: '正式版需在微信公众平台「设置 → 服务内容声明 → 用户隐私保护指引」中声明「将文件保存到相册」。也可先长按二维码保存。',
+        showCancel: false,
+        confirmText: '知道了'
+      })
+      return
+    }
+    if (this.isAuthError(err)) {
+      wx.showModal({
+        title: '需要相册权限',
+        content: '保存二维码需要访问相册，请在设置中允许。',
+        confirmText: '去设置',
+        success: (res) => {
+          if (res.confirm) wx.openSetting()
+        }
+      })
+      return
+    }
+    wx.showToast({ title: '保存失败，请长按图片保存', icon: 'none' })
+  },
+
   onSave() {
-    if (!this.data.qrImage) {
+    if (!this.data.qrImage && !this._encoded) {
       wx.showToast({ title: '请先生成二维码', icon: 'none' })
       return
     }
-    wx.saveImageToPhotosAlbum({
-      filePath: this.data.qrImage,
-      success: () => {
+    if (this._saving) return
+    this._saving = true
+    wx.showLoading({ title: '正在保存', mask: true })
+    this.requirePrivacy()
+      .then(() => this.ensureAlbumAuth())
+      .then(() => this.exportCanvasFile())
+      .then((filePath) => this.saveFileToAlbum(filePath))
+      .then(() => {
+        wx.hideLoading()
         wx.showToast({ title: '已保存到相册', icon: 'success' })
-      },
-      fail: (err) => {
-        if (err && err.errMsg && /auth deny|authorize/i.test(err.errMsg)) {
-          wx.showModal({
-            title: '需要相册权限',
-            content: '保存二维码需要访问相册，请在设置中允许。',
-            confirmText: '去设置',
-            success: (res) => {
-              if (res.confirm) wx.openSetting()
-            }
-          })
-          return
-        }
-        wx.showToast({ title: '保存失败', icon: 'none' })
-      }
-    })
+      })
+      .catch((err) => {
+        wx.hideLoading()
+        this.handleSaveFail(err)
+      })
+      .then(() => {
+        this._saving = false
+      })
   },
 
   onCopy() {

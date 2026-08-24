@@ -164,7 +164,7 @@
   margin-top: 20rpx;
   max-width: 100%;
   font-size: 24rpx;
-  color: var(--color-muted);
+  color: var(--color-brand);
   text-align: center;
   word-break: break-all;
   line-height: 1.5;

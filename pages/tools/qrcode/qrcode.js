@@ -392,9 +392,15 @@ Page({
       wx.showToast({ title: '暂无可复制内容', icon: 'none' })
       return
     }
+    const isUrl = this.data.mode === 'url'
     wx.setClipboardData({
       data: text,
-      success: () => wx.showToast({ title: '已复制内容', icon: 'success' })
+      success: () => {
+        wx.showToast({
+          title: isUrl ? '已复制网址，可粘贴到浏览器打开' : '已复制内容',
+          icon: 'none'
+        })
+      }
     })
   },
 

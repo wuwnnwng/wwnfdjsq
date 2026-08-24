@@ -12,7 +12,7 @@
           </view>
         </view>
       </view>
-      <view class="conv-eq" wx:if="{{mode === 'url'}}">扫码打开网站，可选 http 或 https</view>
+      <view class="conv-eq" wx:if="{{mode === 'url'}}">扫码打开网站；微信打不开时可复制网址到浏览器</view>
       <view class="conv-eq" wx:else>扫码不打开页面，可复制文字</view>
     </view>
 
@@ -36,7 +36,7 @@
       />
       <view class="qr-actions">
         <view class="qr-action" bindtap="onClear">清空</view>
-        <view class="qr-action" wx:if="{{qrContent}}" bindtap="onCopy">复制内容</view>
+        <view class="qr-action" wx:if="{{qrContent}}" bindtap="onCopy">{{mode === 'url' ? '复制网址' : '复制内容'}}</view>
       </view>
     </view>
 
@@ -47,10 +47,13 @@
       <view class="qr-empty" wx:elif="{{errorText}}">{{errorText}}</view>
       <view class="qr-empty" wx:elif="{{generating}}">正在生成二维码…</view>
       <view class="qr-empty" wx:else>二维码将显示在这里</view>
-      <view class="qr-caption" wx:if="{{mode === 'url' && qrContent}}">{{qrContent}}</view>
+      <view class="qr-caption" wx:if="{{mode === 'url' && qrContent}}" bindtap="onCopy">{{qrContent}}</view>
       <view class="primary-btn" wx:if="{{qrImage}}" bindtap="onSave">保存到相册</view>
       <view class="tool-note" wx:if="{{mode === 'text'}}">微信扫一扫遇到文字时不会打开页面，可点「复制内容」拿到原文。</view>
-      <view class="tool-note" wx:else>网站默认补 https://，需要明文传输时改成 http://。长按图片也可转发。</view>
+      <block wx:else>
+        <view class="tool-note warn">微信扫一扫打不开时，说明网址不在白名单。可点「复制网址」粘贴到系统浏览器打开。</view>
+        <view class="tool-note">网站默认补 https://，需要明文传输时改成 http://。长按图片也可转发。</view>
+      </block>
     </view>
   </scroll-view>
 

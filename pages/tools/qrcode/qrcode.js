@@ -1,4 +1,4 @@
-const { encodeQr, resolveQrPayload } = require('../../../utils/qrcode')
+const { encodeQr, buildQrContent } = require('../../../utils/qrcode')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getQrcodeToolShare } = require('../../../utils/share')
 
@@ -82,8 +82,8 @@ Page({
   },
 
   generate() {
-    const payload = resolveQrPayload(this.data.mode, this.data.inputValue, this.data.urlScheme)
-    if (!payload.content) {
+    const content = buildQrContent(this.data.mode, this.data.inputValue, this.data.urlScheme)
+    if (!content) {
       this._encoded = null
       this.setData({
         qrContent: '',
@@ -93,7 +93,7 @@ Page({
       })
       return
     }
-    const encoded = encodeQr(payload.content)
+    const encoded = encodeQr(content)
     if (!encoded.ok) {
       this._encoded = null
       this.setData({
@@ -106,7 +106,7 @@ Page({
     }
     this._encoded = encoded
     this.setData({
-      qrContent: payload.copyValue,
+      qrContent: content,
       errorText: '',
       generating: true
     })
@@ -392,15 +392,9 @@ Page({
       wx.showToast({ title: '暂无可复制内容', icon: 'none' })
       return
     }
-    const isUrl = this.data.mode === 'url'
     wx.setClipboardData({
       data: text,
-      success: () => {
-        wx.showToast({
-          title: isUrl ? '已复制网址，可粘贴到浏览器打开' : '已复制内容',
-          icon: 'none'
-        })
-      }
+      success: () => wx.showToast({ title: '已复制内容', icon: 'success' })
     })
   },
 

@@ -1,12 +1,7 @@
 /**
- * QR Code 生成（字节模式，纠错等级 M，版本 1–15）
- *
- * 微信扫一扫对纯中文会走「识物」。普通文字会写成
- * data:text/plain;charset=utf-8,...（百分号编码，整段为 ASCII，不写 ECI）。
- * 网址与电话保持原内容。
+ * QR Code 生成：字节模式、纠错等级 M、版本 1–15、UTF-8、不写 ECI。
+ * 文字按原文写入；网站补 http:// 或 https://。
  */
-
-const { toGbkBytes } = require('./gbk')
 
 const ALIGN_POS = [
   [],
@@ -146,51 +141,14 @@ function dataCodewords(version) {
   return total
 }
 
-function hasNonAscii(text) {
-  return /[^\x00-\x7F]/.test(String(text || ''))
-}
-
-function looksLikeUrl(text) {
-  return /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(String(text || '').trim())
-}
-
-function looksLikePhone(text) {
-  const v = String(text || '').trim().replace(/[\s-]/g, '')
-  if (!v) return false
-  if (/^(?:\+?86)?1[3-9]\d{9}$/.test(v)) return true
-  if (/^0\d{9,11}$/.test(v)) return true
-  return false
-}
-
-function wrapTextAsDataUri(text) {
-  return `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`
-}
-
-function buildScanPayload(mode, text, scheme) {
-  const raw = String(text || '').trim()
-  if (!raw) return { payload: '', display: '' }
-  if (mode === 'url') {
-    const payload = normalizeWebsite(raw, scheme)
-    return { payload, display: payload }
-  }
-  if (looksLikeUrl(raw) || looksLikePhone(raw)) {
-    return { payload: raw, display: raw }
-  }
-  return {
-    payload: wrapTextAsDataUri(raw),
-    display: raw
-  }
-}
-
-function maxBytesForVersion(version, withEci) {
+function maxBytesForVersion(version) {
   const countBits = version <= 9 ? 8 : 16
-  const eciBits = withEci ? 12 : 0
-  return Math.floor((dataCodewords(version) * 8 - 4 - countBits - eciBits) / 8)
+  return Math.floor((dataCodewords(version) * 8 - 4 - countBits) / 8)
 }
 
-function chooseVersion(byteLength, withEci) {
+function chooseVersion(byteLength) {
   for (let version = 1; version <= 15; version += 1) {
-    if (byteLength <= maxBytesForVersion(version, withEci)) return version
+    if (byteLength <= maxBytesForVersion(version)) return version
   }
   return 0
 }
@@ -213,14 +171,10 @@ BitBuffer.prototype.putBit = function putBit(bit) {
   this.bitLength += 1
 }
 
-function buildDataCodewords(bytes, version, withEci) {
+function buildDataCodewords(bytes, version) {
   const capacity = dataCodewords(version)
   const countBits = version <= 9 ? 8 : 16
   const buf = new BitBuffer()
-  if (withEci) {
-    buf.put(0x7, 4)
-    buf.put(26, 8)
-  }
   buf.put(0x4, 4)
   buf.put(bytes.length, countBits)
   bytes.forEach((item) => buf.put(item, 8))
@@ -562,15 +516,13 @@ function encodeQr(text) {
   if (!content.trim()) {
     return { ok: false, message: '请输入文字或网址' }
   }
-  const useGbk = hasNonAscii(content) && !looksLikeUrl(content)
-  const gbkBytes = useGbk ? toGbkBytes(content) : null
-  const bytes = gbkBytes || toUtf8Bytes(content)
-  const version = chooseVersion(bytes.length, false)
+  const bytes = toUtf8Bytes(content)
+  const version = chooseVersion(bytes.length)
   if (!version) {
     return { ok: false, message: '内容过长，请缩短后再生成（约 200 个英文或 130 个汉字以内）' }
   }
 
-  const data = buildDataCodewords(bytes, version, false)
+  const data = buildDataCodewords(bytes, version)
   const codewords = interleaveBlocks(data, version)
   const size = matrixSize(version)
 
@@ -604,15 +556,20 @@ function normalizeWebsite(text, scheme) {
   if (/^https?:\/\//i.test(value)) {
     return value.replace(/^https?:\/\//i, `${protocol}://`)
   }
-  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) return value
   if (/^\/\//.test(value)) return `${protocol}:${value}`
   return `${protocol}://${value}`
+}
+
+function buildQrContent(mode, text, scheme) {
+  const raw = String(text || '').trim()
+  if (!raw) return ''
+  if (mode === 'url') return normalizeWebsite(raw, scheme)
+  return raw
 }
 
 module.exports = {
   encodeQr,
   normalizeWebsite,
-  toUtf8Bytes,
-  looksLikePhone,
-  buildScanPayload
+  buildQrContent,
+  toUtf8Bytes
 }

@@ -1,4 +1,4 @@
-const { encodeQr, buildScanPayload } = require('../../../utils/qrcode')
+const { encodeQr, buildQrContent } = require('../../../utils/qrcode')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getQrcodeToolShare } = require('../../../utils/share')
 
@@ -11,7 +11,7 @@ Page({
     mode: 'text',
     urlScheme: 'https',
     inputValue: '',
-    encodedText: '',
+    qrContent: '',
     qrImage: '',
     errorText: '',
     generating: false
@@ -66,11 +66,12 @@ Page({
   onClear() {
     this.setData({
       inputValue: '',
-      encodedText: '',
+      qrContent: '',
       qrImage: '',
       errorText: '',
       generating: false
     })
+    this._encoded = null
   },
 
   scheduleGenerate() {
@@ -81,20 +82,22 @@ Page({
   },
 
   generate() {
-    const built = buildScanPayload(this.data.mode, this.data.inputValue, this.data.urlScheme)
-    if (!built.payload) {
+    const content = buildQrContent(this.data.mode, this.data.inputValue, this.data.urlScheme)
+    if (!content) {
+      this._encoded = null
       this.setData({
-        encodedText: '',
+        qrContent: '',
         qrImage: '',
         errorText: '',
         generating: false
       })
       return
     }
-    const encoded = encodeQr(built.payload)
+    const encoded = encodeQr(content)
     if (!encoded.ok) {
+      this._encoded = null
       this.setData({
-        encodedText: '',
+        qrContent: '',
         qrImage: '',
         errorText: encoded.message,
         generating: false
@@ -103,7 +106,7 @@ Page({
     }
     this._encoded = encoded
     this.setData({
-      encodedText: built.display,
+      qrContent: content,
       errorText: '',
       generating: true
     })
@@ -236,7 +239,7 @@ Page({
   },
 
   persistSaveFile(tempFilePath) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const dest = `${wx.env.USER_DATA_PATH}/${SAVE_FILE}`
       const fs = wx.getFileSystemManager()
       const done = (path) => resolve(path || dest)
@@ -384,7 +387,7 @@ Page({
   },
 
   onCopy() {
-    const text = this.data.encodedText
+    const text = this.data.qrContent
     if (!text) {
       wx.showToast({ title: '暂无可复制内容', icon: 'none' })
       return

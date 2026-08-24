@@ -12,7 +12,8 @@
           </view>
         </view>
       </view>
-      <view class="conv-eq" wx:if="{{encodedText}}">扫码打开或识别下方内容</view>
+      <view class="conv-eq" wx:if="{{scanWrapped}}">微信扫一扫可打开并查看下方文字</view>
+      <view class="conv-eq" wx:elif="{{encodedText}}">扫码打开或识别下方内容</view>
       <view class="conv-eq" wx:else>输入文字或网站，即时生成二维码</view>
     </view>
 
@@ -20,6 +21,10 @@
       <view class="seg-row">
         <view class="seg-item {{mode === 'text' ? 'active' : ''}}" bindtap="onSwitchMode" data-mode="text">文字</view>
         <view class="seg-item {{mode === 'url' ? 'active' : ''}}" bindtap="onSwitchMode" data-mode="url">网站</view>
+      </view>
+      <view class="seg-row protocol-row" wx:if="{{mode === 'text'}}">
+        <view class="seg-item {{scanStyle !== 'raw' ? 'active' : ''}}" bindtap="onSwitchScanStyle" data-style="wechat">微信可扫</view>
+        <view class="seg-item {{scanStyle === 'raw' ? 'active' : ''}}" bindtap="onSwitchScanStyle" data-style="raw">原始内容</view>
       </view>
       <view class="seg-row protocol-row" wx:if="{{mode === 'url'}}">
         <view class="seg-item {{urlScheme === 'https' ? 'active' : ''}}" bindtap="onSwitchScheme" data-scheme="https">https://</view>
@@ -49,7 +54,13 @@
       <view class="qr-empty" wx:else>二维码将显示在这里</view>
       <view class="qr-caption" wx:if="{{encodedText}}">{{encodedText}}</view>
       <view class="primary-btn" wx:if="{{qrImage}}" bindtap="onSave">保存到相册</view>
-      <view class="tool-note">长按图片也可转发。网站默认补 https://，也可改成 http://。中文按微信扫一扫常用的 GBK 方式生成。</view>
+      <view class="tool-note" wx:if="{{mode === 'text' && scanStyle !== 'raw'}}">
+        微信扫一扫对纯文字会提示「未找到物品信息」，所以默认生成可打开的页面，扫码即可看到文字。电话号码仍按号码生成。兑换码等需要原始内容时，请改选「原始内容」。
+      </view>
+      <view class="tool-note" wx:elif="{{mode === 'text'}}">
+        原始内容适合支付宝或系统相机。微信扫一扫对纯文字可能提示「未找到物品信息」。
+      </view>
+      <view class="tool-note" wx:else>长按图片也可转发。网站默认补 https://，也可改成 http://。</view>
     </view>
   </scroll-view>
 

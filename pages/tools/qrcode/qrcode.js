@@ -1,23 +1,23 @@
-const { encodeQr, normalizeWebsite } = require('../../../utils/qrcode')
+const { encodeQr, buildScanPayload } = require('../../../utils/qrcode')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getQrcodeToolShare } = require('../../../utils/share')
 
 const CANVAS_CSS = 280
 const SAVE_FILE = 'qrcode-save.png'
 
-function contentFromInput(mode, text, scheme) {
-  const raw = String(text || '').trim()
-  if (!raw) return ''
-  return mode === 'url' ? normalizeWebsite(raw, scheme) : raw
+function contentFromInput(mode, text, scheme, scanStyle) {
+  return buildScanPayload(mode, text, scheme, mode === 'text' && scanStyle !== 'raw')
 }
 
 Page({
   data: {
     theme: getThemeId(),
     mode: 'text',
+    scanStyle: 'wechat',
     urlScheme: 'https',
     inputValue: '',
     encodedText: '',
+    scanWrapped: false,
     qrImage: '',
     errorText: '',
     generating: false
@@ -59,6 +59,12 @@ Page({
     this.setData({ mode }, () => this.scheduleGenerate())
   },
 
+  onSwitchScanStyle(e) {
+    const scanStyle = e.currentTarget.dataset.style
+    if (!scanStyle || scanStyle === this.data.scanStyle) return
+    this.setData({ scanStyle }, () => this.scheduleGenerate())
+  },
+
   onSwitchScheme(e) {
     const urlScheme = e.currentTarget.dataset.scheme
     if (!urlScheme || urlScheme === this.data.urlScheme) return
@@ -73,6 +79,7 @@ Page({
     this.setData({
       inputValue: '',
       encodedText: '',
+      scanWrapped: false,
       qrImage: '',
       errorText: '',
       generating: false
@@ -87,20 +94,27 @@ Page({
   },
 
   generate() {
-    const encodedText = contentFromInput(this.data.mode, this.data.inputValue, this.data.urlScheme)
-    if (!encodedText) {
+    const built = contentFromInput(
+      this.data.mode,
+      this.data.inputValue,
+      this.data.urlScheme,
+      this.data.scanStyle
+    )
+    if (!built.payload) {
       this.setData({
         encodedText: '',
+        scanWrapped: false,
         qrImage: '',
         errorText: '',
         generating: false
       })
       return
     }
-    const encoded = encodeQr(encodedText)
+    const encoded = encodeQr(built.payload)
     if (!encoded.ok) {
       this.setData({
         encodedText: '',
+        scanWrapped: false,
         qrImage: '',
         errorText: encoded.message,
         generating: false
@@ -109,7 +123,8 @@ Page({
     }
     this._encoded = encoded
     this.setData({
-      encodedText,
+      encodedText: built.display,
+      scanWrapped: built.wrapped,
       errorText: '',
       generating: true
     })

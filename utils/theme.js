@@ -1,6 +1,6 @@
 /**
  * 皮肤主题
- * forest 青绿（默认）/ ocean 商务蓝 / amber 琥珀金
+ * forest 青绿（默认）/ ocean 商务蓝 / amber 琥珀金 / crimson 中国红
  */
 
 const STORAGE_KEY = 'app_theme_v1'
@@ -36,13 +36,24 @@ const THEMES = {
     interest: '#C05621',
     dialog: '#FBF7F0',
     ink: '#2B2116'
+  },
+  crimson: {
+    id: 'crimson',
+    name: '中国红',
+    navBar: '#7A1520',
+    pageBg: '#F7F1F1',
+    principal: '#C41E3A',
+    interest: '#C9A227',
+    dialog: '#FBF6F6',
+    ink: '#2A1418'
   }
 }
 
 const THEME_LIST = [
   { id: 'forest', name: '青绿' },
   { id: 'ocean', name: '商务蓝' },
-  { id: 'amber', name: '琥珀金' }
+  { id: 'amber', name: '琥珀金' },
+  { id: 'crimson', name: '中国红' }
 ]
 
 function normalizeThemeId(id) {

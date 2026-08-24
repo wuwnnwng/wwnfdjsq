@@ -173,6 +173,10 @@
   background: linear-gradient(135deg, #7a4a12, #b7791f);
 }
 
+.theme-dot.crimson {
+  background: linear-gradient(135deg, #7a1520, #c41e3a);
+}
+
 .brand-wrap {
   flex-shrink: 0;
   display: flex;

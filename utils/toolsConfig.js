@@ -2,9 +2,33 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FEATURED_IDS = ['calendar', 'fitout', 'tax']
+const FEATURED_IDS = ['fitout', 'tax', 'datetime']
 
 const TOOLS = [
+  {
+    id: 'fitout',
+    name: '装修材料',
+    shortName: '装修材料',
+    icon: '🧱',
+    iconType: 'fitout',
+    page: '/pages/tools/fitout/fitout'
+  },
+  {
+    id: 'tax',
+    name: '工资个税',
+    shortName: '工资个税',
+    icon: '🧾',
+    iconType: 'tax',
+    page: '/pages/tools/tax/tax'
+  },
+  {
+    id: 'datetime',
+    name: '日期时间',
+    shortName: '日期时间',
+    icon: '⏳',
+    iconType: 'datetime',
+    page: '/pages/tools/datetime/datetime'
+  },
   {
     id: 'calendar',
     name: '我的日历',
@@ -28,30 +52,6 @@ const TOOLS = [
     icon: '🧮',
     iconType: 'calc',
     page: '/pages/tools/calc/calc'
-  },
-  {
-    id: 'tax',
-    name: '工资个税',
-    shortName: '工资个税',
-    icon: '🧾',
-    iconType: 'tax',
-    page: '/pages/tools/tax/tax'
-  },
-  {
-    id: 'fitout',
-    name: '装修材料',
-    shortName: '装修材料',
-    icon: '🧱',
-    iconType: 'fitout',
-    page: '/pages/tools/fitout/fitout'
-  },
-  {
-    id: 'datetime',
-    name: '日期时间',
-    shortName: '日期时间',
-    icon: '⏳',
-    iconType: 'datetime',
-    page: '/pages/tools/datetime/datetime'
   },
   {
     id: 'qrcode',

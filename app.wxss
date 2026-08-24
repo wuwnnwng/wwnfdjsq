@@ -96,6 +96,28 @@ page {
   --bg-grad-3: #f3ebe2;
 }
 
+.theme-crimson {
+  --color-ink: #2a1418;
+  --color-muted: #7a5a60;
+  --color-brand: #7a1520;
+  --color-brand-soft: #c41e3a;
+  --color-accent: #c9a227;
+  --color-principal: #c41e3a;
+  --color-interest: #c9a227;
+  --color-surface: rgba(255, 255, 255, 0.82);
+  --color-line: rgba(42, 20, 24, 0.1);
+  --color-footer: #f7f1f1;
+  --color-dialog: #fbf6f6;
+  --color-mask: rgba(42, 20, 24, 0.45);
+  --color-shadow: rgba(122, 21, 32, 0.18);
+  --color-shadow-strong: rgba(122, 21, 32, 0.22);
+  --bg-glow-1: rgba(196, 30, 58, 0.14);
+  --bg-glow-2: rgba(201, 162, 39, 0.14);
+  --bg-grad-1: #f6eaea;
+  --bg-grad-2: #f7f1f1;
+  --bg-grad-3: #f4eee6;
+}
+
 view,
 text,
 input,

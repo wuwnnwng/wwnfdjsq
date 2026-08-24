@@ -25,6 +25,13 @@
             aria-role="button"
             aria-label="琥珀金皮肤"
           ></view>
+          <view
+            class="theme-dot crimson {{theme === 'crimson' ? 'active' : ''}}"
+            data-theme="crimson"
+            bindtap="onThemeChange"
+            aria-role="button"
+            aria-label="中国红皮肤"
+          ></view>
         </view>
       </view>
       <view class="segment segment-row mode-segment">

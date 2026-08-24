@@ -153,6 +153,52 @@ function looksLikeUrl(text) {
   return /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(String(text || '').trim())
 }
 
+function looksLikePhone(text) {
+  const v = String(text || '').trim().replace(/[\s-]/g, '')
+  if (!v) return false
+  if (/^(?:\+?86)?1[3-9]\d{9}$/.test(v)) return true
+  if (/^0\d{9,11}$/.test(v)) return true
+  return false
+}
+
+function toQueryValue(text) {
+  const str = String(text || '')
+  let out = ''
+  for (let i = 0; i < str.length; i += 1) {
+    const ch = str.charAt(i)
+    const code = str.charCodeAt(i)
+    if (ch === ' ') {
+      out += '+'
+    } else if (code < 0x80) {
+      out += /[a-zA-Z0-9._~-]/.test(ch) ? ch : encodeURIComponent(ch)
+    } else {
+      out += ch
+    }
+  }
+  return out
+}
+
+function wrapTextForWechat(text) {
+  return `https://m.baidu.com/s?ie=utf-8&wd=${toQueryValue(text)}`
+}
+
+function buildScanPayload(mode, text, scheme, wechatFriendly) {
+  const raw = String(text || '').trim()
+  if (!raw) return { payload: '', display: '', wrapped: false }
+  if (mode === 'url') {
+    const payload = normalizeWebsite(raw, scheme)
+    return { payload, display: payload, wrapped: false }
+  }
+  if (!wechatFriendly || looksLikeUrl(raw) || looksLikePhone(raw)) {
+    return { payload: raw, display: raw, wrapped: false }
+  }
+  return {
+    payload: wrapTextForWechat(raw),
+    display: raw,
+    wrapped: true
+  }
+}
+
 function maxBytesForVersion(version, withEci) {
   const countBits = version <= 9 ? 8 : 16
   const eciBits = withEci ? 12 : 0
@@ -583,5 +629,7 @@ function normalizeWebsite(text, scheme) {
 module.exports = {
   encodeQr,
   normalizeWebsite,
-  toUtf8Bytes
+  toUtf8Bytes,
+  looksLikePhone,
+  buildScanPayload
 }

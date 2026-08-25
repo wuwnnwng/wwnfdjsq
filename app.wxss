@@ -118,6 +118,28 @@ page {
   --bg-grad-3: #f4eee6;
 }
 
+.theme-rose {
+  --color-ink: #2a171c;
+  --color-muted: #7a5a64;
+  --color-brand: #8e3b55;
+  --color-brand-soft: #c45c7a;
+  --color-accent: #b7791f;
+  --color-principal: #c45c7a;
+  --color-interest: #b7791f;
+  --color-surface: rgba(255, 255, 255, 0.82);
+  --color-line: rgba(42, 23, 28, 0.1);
+  --color-footer: #f7f1f3;
+  --color-dialog: #fbf6f7;
+  --color-mask: rgba(42, 23, 28, 0.45);
+  --color-shadow: rgba(142, 59, 85, 0.18);
+  --color-shadow-strong: rgba(142, 59, 85, 0.22);
+  --bg-glow-1: rgba(196, 92, 122, 0.16);
+  --bg-glow-2: rgba(183, 121, 31, 0.12);
+  --bg-grad-1: #f6eaee;
+  --bg-grad-2: #f7f1f3;
+  --bg-grad-3: #f4eee8;
+}
+
 view,
 text,
 input,

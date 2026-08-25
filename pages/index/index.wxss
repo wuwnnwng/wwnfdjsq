@@ -153,7 +153,8 @@
 .theme-switch {
   display: flex;
   align-items: center;
-  gap: 14rpx;
+  flex-wrap: wrap;
+  gap: 10rpx;
   margin-left: 8rpx;
 }
 
@@ -183,6 +184,10 @@
 
 .theme-dot.crimson {
   background: linear-gradient(135deg, #7a1520, #c41e3a);
+}
+
+.theme-dot.rose {
+  background: linear-gradient(135deg, #8e3b55, #c45c7a);
 }
 
 .brand-wrap {

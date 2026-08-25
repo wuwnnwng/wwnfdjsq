@@ -5,32 +5,13 @@
         <view class="brand">置居计算器</view>
         <view class="theme-switch" aria-label="切换皮肤">
           <view
-            class="theme-dot forest {{theme === 'forest' ? 'active' : ''}}"
-            data-theme="forest"
+            wx:for="{{themeList}}"
+            wx:key="id"
+            class="theme-dot {{item.id}} {{theme === item.id ? 'active' : ''}}"
+            data-theme="{{item.id}}"
             bindtap="onThemeChange"
             aria-role="button"
-            aria-label="青绿皮肤"
-          ></view>
-          <view
-            class="theme-dot ocean {{theme === 'ocean' ? 'active' : ''}}"
-            data-theme="ocean"
-            bindtap="onThemeChange"
-            aria-role="button"
-            aria-label="商务蓝皮肤"
-          ></view>
-          <view
-            class="theme-dot amber {{theme === 'amber' ? 'active' : ''}}"
-            data-theme="amber"
-            bindtap="onThemeChange"
-            aria-role="button"
-            aria-label="琥珀金皮肤"
-          ></view>
-          <view
-            class="theme-dot crimson {{theme === 'crimson' ? 'active' : ''}}"
-            data-theme="crimson"
-            bindtap="onThemeChange"
-            aria-role="button"
-            aria-label="中国红皮肤"
+            aria-label="{{item.name}}皮肤"
           ></view>
         </view>
       </view>

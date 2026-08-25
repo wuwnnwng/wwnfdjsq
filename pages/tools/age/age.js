@@ -50,6 +50,54 @@ function lunarYears() {
 
 const PICKER_LUNAR_YEARS = lunarYears()
 
+const CONFETTI_COLORS = ['#f472b6', '#fb7185', '#fbbf24', '#34d399', '#60a5fa', '#c084fc', '#fb923c', '#f9a8d4']
+const CONFETTI_FLOWERS = ['🌸', '🌺', '🌼', '💮', '🌷', '🌹', '✨']
+
+function rand(min, max) {
+  return min + Math.random() * (max - min)
+}
+
+function createConfettiPieces() {
+  const pieces = []
+  let id = 0
+  for (let i = 0; i < 20; i += 1) {
+    const size = Math.round(rand(28, 46))
+    pieces.push({
+      id: id++,
+      mode: 'burst',
+      fall: i % 8,
+      kind: 'flower',
+      left: 50,
+      top: '44%',
+      delay: Math.round(rand(0, 0.22) * 100) / 100,
+      duration: Math.round(rand(1.35, 2.15) * 100) / 100,
+      color: 'transparent',
+      size,
+      height: size,
+      emoji: CONFETTI_FLOWERS[i % CONFETTI_FLOWERS.length]
+    })
+  }
+  for (let i = 0; i < 36; i += 1) {
+    const isFlower = i % 4 === 0
+    const size = Math.round(isFlower ? rand(24, 40) : rand(10, 18))
+    pieces.push({
+      id: id++,
+      mode: 'rain',
+      fall: i % 3,
+      kind: isFlower ? 'flower' : i % 2 === 0 ? 'rect' : 'dot',
+      left: Math.round(rand(2, 98)),
+      top: '-48rpx',
+      delay: Math.round(rand(0, 1.5) * 100) / 100,
+      duration: Math.round(rand(2.3, 4.1) * 100) / 100,
+      color: isFlower ? 'transparent' : CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+      size,
+      height: isFlower ? size : Math.round(size * (i % 2 === 0 ? 1.7 : 1)),
+      emoji: isFlower ? CONFETTI_FLOWERS[i % CONFETTI_FLOWERS.length] : ''
+    })
+  }
+  return pieces
+}
+
 function clampSolarToToday(parts, today) {
   if (!parts) return parseYMDParts(today)
   if (
@@ -99,7 +147,9 @@ Page({
     lunarMonths: [],
     lunarDays: [],
     lunarPickerValue: [0, 0, 0],
-    result: null
+    result: null,
+    showLivedPopup: false,
+    confettiPieces: []
   },
 
   onLoad() {
@@ -141,12 +191,12 @@ Page({
   onBirthdayChange(e) {
     this.setData({ birthday: e.detail.value }, () => {
       this.syncBirthdayDisplay()
-      this.recalculate()
+      this.recalculate({ celebrate: true })
     })
   },
 
   onAsOfChange(e) {
-    this.setData({ asOf: e.detail.value }, () => this.recalculate())
+    this.setData({ asOf: e.detail.value }, () => this.recalculate({ celebrate: true }))
   },
 
   onOpenLunarPicker() {
@@ -240,7 +290,7 @@ Page({
       },
       () => {
         this.syncBirthdayDisplay()
-        this.recalculate()
+        this.recalculate({ celebrate: true, delay: 180 })
       }
     )
   },
@@ -251,13 +301,42 @@ Page({
 
   onLunarPickerSheetTap() {},
 
+  onLivedDialogTap() {},
+
+  onCloseLivedPopup() {
+    this.setData({ showLivedPopup: false, confettiPieces: [] })
+  },
+
+  openLivedDaysPopup() {
+    const result = this.data.result
+    if (!result || !result.valid) return
+    this.setData({
+      showLivedPopup: true,
+      confettiPieces: createConfettiPieces()
+    })
+  },
+
   preventMove() {},
 
-  recalculate() {
-    this.setData({
-      result: calculateAge(this.data.birthday, this.data.asOf, {
-        birthdayCalendar: this.data.birthCalendar
-      })
+  recalculate(options) {
+    const result = calculateAge(this.data.birthday, this.data.asOf, {
+      birthdayCalendar: this.data.birthCalendar
+    })
+    this.setData({ result }, () => {
+      if (!options || !options.celebrate) return
+      if (this._livedPopupTimer) {
+        clearTimeout(this._livedPopupTimer)
+        this._livedPopupTimer = null
+      }
+      const delay = Number(options.delay) || 0
+      if (delay > 0) {
+        this._livedPopupTimer = setTimeout(() => {
+          this._livedPopupTimer = null
+          this.openLivedDaysPopup()
+        }, delay)
+        return
+      }
+      this.openLivedDaysPopup()
     })
   },
 
@@ -270,6 +349,10 @@ Page({
   },
 
   onUnload() {
+    if (this._livedPopupTimer) {
+      clearTimeout(this._livedPopupTimer)
+      this._livedPopupTimer = null
+    }
     if (this._pickerTick) {
       this._pickerTick.destroy()
       this._pickerTick = null

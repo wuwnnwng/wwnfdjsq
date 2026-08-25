@@ -13,8 +13,16 @@
         </view>
       </view>
       <block wx:if="{{result && result.valid}}">
-        <view class="conv-eq">周岁</view>
-        <view class="conv-result">{{result.yearText}}</view>
+        <view class="conv-stats">
+          <view class="conv-stat">
+            <view class="conv-eq">周岁</view>
+            <view class="conv-result">{{result.yearText}}</view>
+          </view>
+          <view class="conv-stat">
+            <view class="conv-eq">已活天数</view>
+            <view class="conv-result">{{result.livedDaysText}}<text class="conv-result-suffix">天</text></view>
+          </view>
+        </view>
         <view class="conv-result-unit">{{result.detailText}}</view>
       </block>
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
@@ -109,6 +117,27 @@
       </view>
     </view>
   </scroll-view>
+
+  <view wx:if="{{showLivedPopup}}" class="lived-mask" catchtap="onCloseLivedPopup" catchtouchmove="preventMove">
+    <view class="lived-confetti">
+      <view
+        wx:for="{{confettiPieces}}"
+        wx:key="id"
+        class="lived-piece lived-piece-{{item.kind}} lived-{{item.mode}}-{{item.fall}}"
+        style="left: {{item.left}}%; top: {{item.top}}; animation-delay: {{item.delay}}s; animation-duration: {{item.duration}}s; background: {{item.color}}; width: {{item.size}}rpx; height: {{item.height}}rpx;"
+      >
+        <text wx:if="{{item.emoji}}" class="lived-emoji" style="font-size: {{item.size}}rpx;">{{item.emoji}}</text>
+      </view>
+    </view>
+    <view class="lived-dialog" catchtap="onLivedDialogTap">
+      <view class="lived-kicker">🎂</view>
+      <view class="lived-title">已经活了</view>
+      <view class="lived-days">{{result.livedDaysText}}</view>
+      <view class="lived-unit">天</view>
+      <view class="lived-sub" wx:if="{{result}}">周岁 {{result.yearText}} · 人生第 {{result.lifeDayNumberText}} 天</view>
+      <view class="lived-confirm" catchtap="onCloseLivedPopup">知道了</view>
+    </view>
+  </view>
 
   <view wx:if="{{showLunarPicker}}" class="date-picker-mask" catchtap="onCancelLunarPicker" catchtouchmove="preventMove">
     <view class="date-picker-sheet" catchtap="onLunarPickerSheetTap">

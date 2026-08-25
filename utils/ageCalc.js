@@ -91,6 +91,12 @@ function toUtcDays(date) {
   return Math.round(date.getTime() / 86400000)
 }
 
+function formatCount(n) {
+  const num = Math.trunc(Number(n) || 0)
+  const sign = num < 0 ? '-' : ''
+  return sign + String(Math.abs(num)).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
 function calculateAge(birthdayText, asOfText, options) {
   const birthDate = parseYMD(birthdayText)
   const asOfDate = parseYMD(asOfText || todayYMD())
@@ -137,8 +143,9 @@ function calculateAge(birthdayText, asOfText, options) {
     nominalAge,
     nominalText: `${nominalAge}岁`,
     livedDays,
-    livedDaysText: `${livedDays}`,
+    livedDaysText: formatCount(livedDays),
     lifeDayNumber: livedDays + 1,
+    lifeDayNumberText: formatCount(livedDays + 1),
     isBirthday,
     nextBirthdayText: formatSolarDate(next.year, next.month, next.day),
     nextDays,

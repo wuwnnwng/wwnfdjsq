@@ -2,7 +2,7 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FEATURED_IDS = ['fitout', 'tax', 'datetime']
+const FEATURED_IDS = ['fitout', 'tax', 'age']
 
 const TOOLS = [
   {

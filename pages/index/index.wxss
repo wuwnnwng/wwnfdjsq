@@ -126,6 +126,10 @@
   background: linear-gradient(135deg, #fef3c7, #f59e0b);
 }
 
+.tool-icon-age {
+  background: linear-gradient(135deg, #fce7f3, #f472b6);
+}
+
 .tool-icon-currency {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
 }

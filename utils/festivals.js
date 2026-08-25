@@ -10,23 +10,33 @@ const TRADITIONAL_FESTIVALS = [
   { name: '国庆节', month: 10, day: 1 },
   { name: '春节', lunarMonth: 1, lunarDay: 1 },
   { name: '元宵节', lunarMonth: 1, lunarDay: 15 },
+  { name: '龙抬头', lunarMonth: 2, lunarDay: 2 },
   { name: '端午节', lunarMonth: 5, lunarDay: 5 },
   { name: '七夕', lunarMonth: 7, lunarDay: 7 },
+  { name: '中元节', lunarMonth: 7, lunarDay: 15 },
   { name: '中秋节', lunarMonth: 8, lunarDay: 15 },
-  { name: '重阳节', lunarMonth: 9, lunarDay: 9 }
+  { name: '重阳节', lunarMonth: 9, lunarDay: 9 },
+  { name: '寒衣节', lunarMonth: 10, lunarDay: 1 },
+  { name: '下元节', lunarMonth: 10, lunarDay: 15 },
+  { name: '腊八节', lunarMonth: 12, lunarDay: 8 },
+  { name: '小年', lunarMonth: 12, lunarDay: 23 }
 ]
 
 const POPULAR_FESTIVALS = [
   { name: '情人节', month: 2, day: 14 },
   { name: '妇女节', month: 3, day: 8 },
   { name: '儿童节', month: 6, day: 1 },
-  { name: '七夕', lunarMonth: 7, lunarDay: 7 },
   { name: '教师节', month: 9, day: 10 },
   { name: '万圣节', month: 10, day: 31 },
   { name: '双十一', month: 11, day: 11 },
   { name: '圣诞节', month: 12, day: 25 },
   { name: '元宵节', lunarMonth: 1, lunarDay: 15 },
-  { name: '重阳节', lunarMonth: 9, lunarDay: 9 }
+  { name: '龙抬头', lunarMonth: 2, lunarDay: 2 },
+  { name: '七夕', lunarMonth: 7, lunarDay: 7 },
+  { name: '中元节', lunarMonth: 7, lunarDay: 15 },
+  { name: '重阳节', lunarMonth: 9, lunarDay: 9 },
+  { name: '腊八节', lunarMonth: 12, lunarDay: 8 },
+  { name: '小年', lunarMonth: 12, lunarDay: 23 }
 ]
 
 const LEGAL_FALLBACK = [

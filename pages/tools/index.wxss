@@ -145,6 +145,10 @@
   background: linear-gradient(135deg, #fef3c7, #f59e0b);
 }
 
+.tool-icon-housetax {
+  background: linear-gradient(135deg, #e0f2fe, #38bdf8);
+}
+
 .tool-icon-fitout {
   background: linear-gradient(135deg, #ffedd5, #fb923c);
 }

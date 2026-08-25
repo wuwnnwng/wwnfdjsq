@@ -2,7 +2,7 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FEATURED_IDS = ['fitout', 'tax', 'age']
+const FEATURED_IDS = ['fitout', 'housetax', 'age']
 
 const TOOLS = [
   {
@@ -20,6 +20,15 @@ const TOOLS = [
     icon: '🧾',
     iconType: 'tax',
     page: '/pages/tools/tax/tax'
+  },
+  {
+    id: 'housetax',
+    name: '房产交易税',
+    shortName: '房产交易税',
+    icon: '🏡',
+    iconType: 'housetax',
+    keywords: '房产交易税契税增值税个税买房卖房税费满五唯一印花税购房',
+    page: '/pages/tools/housetax/housetax'
   },
   {
     id: 'datetime',

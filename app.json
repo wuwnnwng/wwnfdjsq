@@ -8,6 +8,7 @@
     "pages/tools/base/base",
     "pages/tools/calc/calc",
     "pages/tools/tax/tax",
+    "pages/tools/housetax/housetax",
     "pages/tools/fitout/fitout",
     "pages/tools/datetime/datetime",
     "pages/tools/qrcode/qrcode",

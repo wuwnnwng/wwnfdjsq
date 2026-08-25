@@ -101,8 +101,17 @@
         <view class="result-row-label">距下次生日</view>
         <view class="result-row-value">{{result.nextDaysText}}</view>
       </view>
+      <view class="life-progress life-progress-panel">
+        <view class="life-progress-head">
+          <text class="life-progress-label">生命进度</text>
+          <text class="life-progress-value">{{result.lifeProgressText}}</text>
+        </view>
+        <view class="life-bar">
+          <view class="life-bar-fill" style="width: {{result.lifeProgressBar}}%;"></view>
+        </view>
+      </view>
       <view class="tool-note">
-        周岁按公历满一周年计算。选择农历时，下次生日按农历生日换算。虚岁出生为 1 岁，每过一个春节加 1 岁。已活天数为出生日到计算日的间隔天数，出生日当天为 0 天。
+        依据国家统计局公布的人均年龄79.25 进行科学趣味计算，不代表个人实际寿命，理性看待，好好生活
       </view>
     </view>
   </scroll-view>
@@ -124,6 +133,16 @@
       <view class="lived-days">{{result.livedDaysText}}</view>
       <view class="lived-unit">天</view>
       <view class="lived-sub" wx:if="{{result}}">周岁 {{result.yearText}} · 人生第 {{result.lifeDayNumberText}} 天</view>
+      <view class="life-progress" wx:if="{{result}}">
+        <view class="life-progress-head">
+          <text class="life-progress-label">生命进度</text>
+          <text class="life-progress-value">{{result.lifeProgressText}}</text>
+        </view>
+        <view class="life-bar">
+          <view class="life-bar-fill" style="width: {{result.lifeProgressBar}}%;"></view>
+        </view>
+        <view class="life-progress-hint">{{result.lifeProgressHint}}</view>
+      </view>
       <view class="lived-confirm" catchtap="onCloseLivedPopup">知道了</view>
     </view>
   </view>

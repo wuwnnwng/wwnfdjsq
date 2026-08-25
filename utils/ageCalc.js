@@ -97,6 +97,34 @@ function formatCount(n) {
   return sign + String(Math.abs(num)).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
+/** 国家统计局公布的人均预期寿命（岁），用于趣味生命进度 */
+const AVERAGE_LIFE_YEARS = 79.25
+const DAYS_PER_YEAR = 365.25
+
+function formatOneDecimal(n) {
+  return (Math.round(Number(n) * 10) / 10).toFixed(1)
+}
+
+function buildLifeProgress(livedDays) {
+  const days = Math.max(0, Number(livedDays) || 0)
+  const expectedDays = AVERAGE_LIFE_YEARS * DAYS_PER_YEAR
+  const percent = expectedDays > 0 ? (days / expectedDays) * 100 : 0
+  const bar = Math.max(0, Math.min(100, percent))
+  const remainingYears = Math.max(0, (expectedDays - days) / DAYS_PER_YEAR)
+  const over = percent > 100
+  return {
+    averageLifeYears: AVERAGE_LIFE_YEARS,
+    lifeProgressPercent: percent,
+    lifeProgressBar: bar,
+    lifeProgressText: `${formatOneDecimal(percent)}%`,
+    lifeRemainingYearsText: `${formatOneDecimal(remainingYears)} 年`,
+    lifeOver: over,
+    lifeProgressHint: over
+      ? '已超过参考人均寿命，愿余生悠长'
+      : `参考人均寿命 ${AVERAGE_LIFE_YEARS} 岁，大约还剩 ${formatOneDecimal(remainingYears)} 年`
+  }
+}
+
 function calculateAge(birthdayText, asOfText, options) {
   const birthDate = parseYMD(birthdayText)
   const asOfDate = parseYMD(asOfText || todayYMD())
@@ -149,10 +177,12 @@ function calculateAge(birthdayText, asOfText, options) {
     isBirthday,
     nextBirthdayText: formatSolarDate(next.year, next.month, next.day),
     nextDays,
-    nextDaysText: isBirthday ? '今天就是生日' : `还有 ${nextDays} 天`
+    nextDaysText: isBirthday ? '今天就是生日' : `还有 ${nextDays} 天`,
+    ...buildLifeProgress(livedDays)
   }
 }
 
 module.exports = {
+  AVERAGE_LIFE_YEARS,
   calculateAge
 }

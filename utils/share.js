@@ -97,6 +97,14 @@ function getTaxToolShare() {
   }
 }
 
+function getHouseTaxToolShare() {
+  const path = '/pages/tools/housetax/housetax'
+  return {
+    appMessage: buildToolShareAppMessage(path, '房产交易税'),
+    timeline: buildToolShareTimeline(path, '房产交易税')
+  }
+}
+
 function getFitoutToolShare() {
   const path = '/pages/tools/fitout/fitout'
   return {
@@ -422,6 +430,7 @@ module.exports = {
   getCalendarToolShare,
   getWeatherToolShare,
   getTaxToolShare,
+  getHouseTaxToolShare,
   getFitoutToolShare,
   getDatetimeToolShare,
   getQrcodeToolShare,

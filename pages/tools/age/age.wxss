@@ -168,7 +168,7 @@
 .life-progress {
   margin-top: 28rpx;
   padding-top: 24rpx;
-  border-top: 1rpx solid rgba(244, 114, 182, 0.28);
+  border-top: 1rpx solid rgba(52, 211, 153, 0.28);
   text-align: left;
 }
 
@@ -189,7 +189,7 @@
   font-family: var(--font-display);
   font-size: 28rpx;
   font-weight: 800;
-  color: #db2777;
+  color: #059669;
 }
 
 .life-bar {
@@ -197,13 +197,13 @@
   height: 18rpx;
   border-radius: 999rpx;
   overflow: hidden;
-  background: rgba(244, 114, 182, 0.18);
+  background: rgba(52, 211, 153, 0.18);
 }
 
 .life-bar-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #f9a8d4 0%, #f472b6 48%, #db2777 100%);
+  background: linear-gradient(90deg, #86efac 0%, #34d399 48%, #059669 100%);
   transform-origin: left center;
 }
 

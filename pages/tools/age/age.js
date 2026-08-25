@@ -10,6 +10,7 @@ const {
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getAgeToolShare } = require('../../../utils/share')
 const { createPickerTick } = require('../../../utils/pickerTick')
+const { createConfettiPieces } = require('../../../utils/confetti')
 
 const LUNAR_YEAR_START = 1900
 const LUNAR_YEAR_END = 2100
@@ -126,54 +127,6 @@ function solarPickerValue(parts, years, months, days) {
 function formatDisplayYMD(parts) {
   if (!parts) return ''
   return `${parts.year}年${parts.month}月${parts.day}日`
-}
-
-const CONFETTI_COLORS = ['#f472b6', '#fb7185', '#fbbf24', '#34d399', '#60a5fa', '#c084fc', '#fb923c', '#f9a8d4']
-const CONFETTI_FLOWERS = ['🌸', '🌺', '🌼', '💮', '🌷', '🌹', '✨']
-
-function rand(min, max) {
-  return min + Math.random() * (max - min)
-}
-
-function createConfettiPieces() {
-  const pieces = []
-  let id = 0
-  for (let i = 0; i < 20; i += 1) {
-    const size = Math.round(rand(28, 46))
-    pieces.push({
-      id: id++,
-      mode: 'burst',
-      fall: i % 8,
-      kind: 'flower',
-      left: 50,
-      top: '44%',
-      delay: Math.round(rand(0, 0.22) * 100) / 100,
-      duration: Math.round(rand(1.35, 2.15) * 100) / 100,
-      color: 'transparent',
-      size,
-      height: size,
-      emoji: CONFETTI_FLOWERS[i % CONFETTI_FLOWERS.length]
-    })
-  }
-  for (let i = 0; i < 36; i += 1) {
-    const isFlower = i % 4 === 0
-    const size = Math.round(isFlower ? rand(24, 40) : rand(10, 18))
-    pieces.push({
-      id: id++,
-      mode: 'rain',
-      fall: i % 3,
-      kind: isFlower ? 'flower' : i % 2 === 0 ? 'rect' : 'dot',
-      left: Math.round(rand(2, 98)),
-      top: '-48rpx',
-      delay: Math.round(rand(0, 1.5) * 100) / 100,
-      duration: Math.round(rand(2.3, 4.1) * 100) / 100,
-      color: isFlower ? 'transparent' : CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-      size,
-      height: isFlower ? size : Math.round(size * (i % 2 === 0 ? 1.7 : 1)),
-      emoji: isFlower ? CONFETTI_FLOWERS[i % CONFETTI_FLOWERS.length] : ''
-    })
-  }
-  return pieces
 }
 
 function clampSolarToToday(parts, today) {

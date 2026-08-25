@@ -116,15 +116,15 @@
     </view>
   </scroll-view>
 
-  <view wx:if="{{showLivedPopup}}" class="lived-mask" catchtap="onCloseLivedPopup" catchtouchmove="preventMove">
-    <view class="lived-confetti">
+  <view wx:if="{{showLivedPopup}}" class="confetti-mask" catchtap="onCloseLivedPopup" catchtouchmove="preventMove">
+    <view class="confetti-layer">
       <view
         wx:for="{{confettiPieces}}"
         wx:key="id"
-        class="lived-piece lived-piece-{{item.kind}} lived-{{item.mode}}-{{item.fall}}"
+        class="confetti-piece confetti-piece-{{item.kind}} confetti-{{item.mode}}-{{item.fall}}"
         style="left: {{item.left}}%; top: {{item.top}}; animation-delay: {{item.delay}}s; animation-duration: {{item.duration}}s; background: {{item.color}}; width: {{item.size}}rpx; height: {{item.height}}rpx;"
       >
-        <text wx:if="{{item.emoji}}" class="lived-emoji" style="font-size: {{item.size}}rpx;">{{item.emoji}}</text>
+        <text wx:if="{{item.emoji}}" class="confetti-emoji" style="font-size: {{item.size}}rpx;">{{item.emoji}}</text>
       </view>
     </view>
     <view class="lived-dialog" catchtap="onLivedDialogTap">

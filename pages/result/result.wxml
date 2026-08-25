@@ -189,6 +189,27 @@
     </view>
   </view>
 
+  <view wx:if="{{showEarlySavedPopup}}" class="confetti-mask" catchtap="onCloseEarlySavedPopup" catchtouchmove="preventMove">
+    <view class="confetti-layer">
+      <view
+        wx:for="{{confettiPieces}}"
+        wx:key="id"
+        class="confetti-piece confetti-piece-{{item.kind}} confetti-{{item.mode}}-{{item.fall}}"
+        style="left: {{item.left}}%; top: {{item.top}}; animation-delay: {{item.delay}}s; animation-duration: {{item.duration}}s; background: {{item.color}}; width: {{item.size}}rpx; height: {{item.height}}rpx;"
+      >
+        <text wx:if="{{item.emoji}}" class="confetti-emoji" style="font-size: {{item.size}}rpx;">{{item.emoji}}</text>
+      </view>
+    </view>
+    <view class="save-dialog" catchtap="onEarlySavedDialogTap">
+      <view class="save-kicker">🎉</view>
+      <view class="save-title">提前还款预计节省</view>
+      <view class="save-amount">{{earlyInfo.interestSaved}}</view>
+      <view class="save-unit">元利息</view>
+      <view class="save-sub" wx:if="{{earlyInfo.typeLabel}}">{{earlyInfo.typeLabel}}</view>
+      <view class="save-confirm" catchtap="onCloseEarlySavedPopup">太好了</view>
+    </view>
+  </view>
+
   <view class="footer-block">
     <view class="share-row">
       <button class="share-btn ghost" wx:if="{{canExport}}" bindtap="onExportExcel">导出 Excel</button>

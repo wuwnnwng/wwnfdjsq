@@ -1,0 +1,209 @@
+.confetti-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx;
+  background: var(--color-mask);
+  overflow: hidden;
+}
+
+.confetti-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.confetti-piece {
+  position: absolute;
+  pointer-events: none;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.confetti-piece-rect {
+  border-radius: 4rpx;
+}
+
+.confetti-piece-dot {
+  border-radius: 50%;
+}
+
+.confetti-piece-flower {
+  background: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confetti-emoji {
+  line-height: 1;
+}
+
+.confetti-rain-0 {
+  animation-name: confetti-rain-0;
+  animation-iteration-count: infinite;
+}
+
+.confetti-rain-1 {
+  animation-name: confetti-rain-1;
+  animation-iteration-count: infinite;
+}
+
+.confetti-rain-2 {
+  animation-name: confetti-rain-2;
+  animation-iteration-count: infinite;
+}
+
+.confetti-burst-0,
+.confetti-burst-1,
+.confetti-burst-2,
+.confetti-burst-3,
+.confetti-burst-4,
+.confetti-burst-5,
+.confetti-burst-6,
+.confetti-burst-7 {
+  margin-left: -20rpx;
+  animation-iteration-count: 1;
+  animation-timing-function: cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+
+.confetti-burst-0 { animation-name: confetti-burst-0; }
+.confetti-burst-1 { animation-name: confetti-burst-1; }
+.confetti-burst-2 { animation-name: confetti-burst-2; }
+.confetti-burst-3 { animation-name: confetti-burst-3; }
+.confetti-burst-4 { animation-name: confetti-burst-4; }
+.confetti-burst-5 { animation-name: confetti-burst-5; }
+.confetti-burst-6 { animation-name: confetti-burst-6; }
+.confetti-burst-7 { animation-name: confetti-burst-7; }
+
+@keyframes confetti-rain-0 {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-90rpx, 1400rpx, 0) rotate(560deg);
+    opacity: 0.12;
+  }
+}
+
+@keyframes confetti-rain-1 {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(20deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(50rpx, 1400rpx, 0) rotate(-640deg);
+    opacity: 0.12;
+  }
+}
+
+@keyframes confetti-rain-2 {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-12deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(120rpx, 1400rpx, 0) rotate(780deg);
+    opacity: 0.1;
+  }
+}
+
+@keyframes confetti-burst-0 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(12rpx, -520rpx, 0) scale(1) rotate(380deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(260rpx, -420rpx, 0) scale(1) rotate(420deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(340rpx, -20rpx, 0) scale(1) rotate(-360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst-3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(250rpx, 420rpx, 0) scale(1) rotate(480deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst-4 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-10rpx, 560rpx, 0) scale(1) rotate(-300deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst-5 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-250rpx, 420rpx, 0) scale(1) rotate(520deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst-6 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-340rpx, -20rpx, 0) scale(1) rotate(-420deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst-7 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-260rpx, -420rpx, 0) scale(1) rotate(360deg);
+    opacity: 0;
+  }
+}

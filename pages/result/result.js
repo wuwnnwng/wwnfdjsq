@@ -18,6 +18,7 @@ const {
   savePlan
 } = require('../../utils/plans')
 const { exportResultToExcel, openExcelFile, shareExcelFile } = require('../../utils/excel')
+const { createConfettiPieces } = require('../../utils/confetti')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -91,6 +92,8 @@ Page({
     showSplitTip: false,
     showRewardTip: false,
     showSavePlanTip: false,
+    showEarlySavedPopup: false,
+    confettiPieces: [],
     planNameDraft: '',
     planNameMaxLen: NAME_MAX_LEN,
     rewardQrPath: getRewardQrPath(),
@@ -168,6 +171,7 @@ Page({
       visibleSchedule: [],
       canExport: false
     })
+    this.scheduleEarlySavedPopup(!!shared.isEarlyRepayment)
   },
 
   applyLocalResult(result, options = {}) {
@@ -243,6 +247,30 @@ Page({
       visibleSchedule: [],
       canExport: fullSchedule.length > 0
     })
+    this.scheduleEarlySavedPopup(isEarlyRepayment)
+  },
+
+  scheduleEarlySavedPopup(isEarly) {
+    if (this._earlySavedTimer) {
+      clearTimeout(this._earlySavedTimer)
+      this._earlySavedTimer = null
+    }
+    if (!isEarly) return
+    this._earlySavedTimer = setTimeout(() => {
+      this._earlySavedTimer = null
+      this.setData({
+        showEarlySavedPopup: true,
+        confettiPieces: createConfettiPieces({
+          colors: ['#fbbf24', '#34d399', '#f59e0b', '#10b981', '#60a5fa', '#fb923c', '#facc15', '#4ade80']
+        })
+      })
+    }, 280)
+  },
+
+  onEarlySavedDialogTap() {},
+
+  onCloseEarlySavedPopup() {
+    this.setData({ showEarlySavedPopup: false, confettiPieces: [] })
   },
 
   getShareView() {
@@ -443,6 +471,13 @@ Page({
   },
 
   preventMove() {},
+
+  onUnload() {
+    if (this._earlySavedTimer) {
+      clearTimeout(this._earlySavedTimer)
+      this._earlySavedTimer = null
+    }
+  },
 
   onRecalculate() {
     if (this.data.fromShare) {

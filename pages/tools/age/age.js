@@ -49,6 +49,84 @@ function lunarYears() {
 }
 
 const PICKER_LUNAR_YEARS = lunarYears()
+const SOLAR_YEAR_START = 1900
+const SOLAR_YEAR_END = 2100
+
+function compareYMD(a, b) {
+  if (!a) return -1
+  if (!b) return 1
+  if (a.year !== b.year) return a.year - b.year
+  if (a.month !== b.month) return a.month - b.month
+  return a.day - b.day
+}
+
+function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate()
+}
+
+function clampYMD(parts, minParts, maxParts) {
+  let year = Number(parts && parts.year)
+  let month = Number(parts && parts.month)
+  let day = Number(parts && parts.day)
+  if (!year || !month || !day) {
+    return { year: minParts.year, month: minParts.month, day: minParts.day }
+  }
+  month = Math.min(12, Math.max(1, month))
+  day = Math.min(daysInMonth(year, month), Math.max(1, day))
+  const next = { year, month, day }
+  if (compareYMD(next, minParts) < 0) return { year: minParts.year, month: minParts.month, day: minParts.day }
+  if (compareYMD(next, maxParts) > 0) return { year: maxParts.year, month: maxParts.month, day: maxParts.day }
+  return next
+}
+
+function buildSolarYears(minParts, maxParts) {
+  const years = []
+  for (let year = minParts.year; year <= maxParts.year; year += 1) {
+    years.push(year)
+  }
+  return years
+}
+
+function buildSolarMonths(year, minParts, maxParts) {
+  let start = 1
+  let end = 12
+  if (year <= minParts.year) start = minParts.month
+  if (year >= maxParts.year) end = maxParts.month
+  if (start > end) start = end
+  const months = []
+  for (let month = start; month <= end; month += 1) {
+    months.push(month)
+  }
+  return months
+}
+
+function buildSolarDays(year, month, minParts, maxParts) {
+  let start = 1
+  let end = daysInMonth(year, month)
+  if (year === minParts.year && month === minParts.month) start = minParts.day
+  if (year === maxParts.year && month === maxParts.month) end = Math.min(end, maxParts.day)
+  if (start > end) start = end
+  const days = []
+  for (let day = start; day <= end; day += 1) {
+    days.push(day)
+  }
+  return days
+}
+
+function indexOrLast(list, value) {
+  const index = list.indexOf(value)
+  if (index >= 0) return index
+  return Math.max(0, list.length - 1)
+}
+
+function solarPickerValue(parts, years, months, days) {
+  return [indexOrLast(years, parts.year), indexOrLast(months, parts.month), indexOrLast(days, parts.day)]
+}
+
+function formatDisplayYMD(parts) {
+  if (!parts) return ''
+  return `${parts.year}年${parts.month}月${parts.day}日`
+}
 
 const CONFETTI_COLORS = ['#f472b6', '#fb7185', '#fbbf24', '#34d399', '#60a5fa', '#c084fc', '#fb923c', '#f9a8d4']
 const CONFETTI_FLOWERS = ['🌸', '🌺', '🌼', '💮', '🌷', '🌹', '✨']
@@ -141,8 +219,15 @@ Page({
     asOf: todayYMD(),
     birthCalendar: 'solar',
     birthdayDisplay: '',
+    asOfDisplay: '',
     lunarBirthdayText: '',
     showLunarPicker: false,
+    showSolarPicker: false,
+    solarPickerTitle: '选择日期',
+    solarYears: [],
+    solarMonths: [],
+    solarDays: [],
+    solarPickerValue: [0, 0, 0],
     lunarYears: PICKER_LUNAR_YEARS,
     lunarMonths: [],
     lunarDays: [],
@@ -172,11 +257,155 @@ Page({
 
   syncBirthdayDisplay() {
     const solar = parseYMDParts(this.data.birthday) || parseYMDParts(defaultBirthday())
+    const asOf = parseYMDParts(this.data.asOf) || this.todayParts()
     const lunarState = buildLunarPickerState(solar)
     this.setData({
-      birthdayDisplay: `${solar.year}年${solar.month}月${solar.day}日`,
+      birthdayDisplay: formatDisplayYMD(solar),
+      asOfDisplay: formatDisplayYMD(asOf),
       lunarBirthdayText: lunarState.lunarBirthdayText
     })
+  },
+
+  solarPickerBounds(target) {
+    const today = this.todayParts()
+    const minBirthday = { year: SOLAR_YEAR_START, month: 1, day: 1 }
+    const maxAsOf = { year: SOLAR_YEAR_END, month: 12, day: 31 }
+    if (target === 'asOf') {
+      const birthday = parseYMDParts(this.data.birthday) || minBirthday
+      return { min: birthday, max: maxAsOf }
+    }
+    return { min: minBirthday, max: today }
+  },
+
+  openSolarPicker(target) {
+    const bounds = this.solarPickerBounds(target)
+    const current =
+      parseYMDParts(target === 'asOf' ? this.data.asOf : this.data.birthday) || bounds.max
+    const picked = clampYMD(current, bounds.min, bounds.max)
+    const years = buildSolarYears(bounds.min, bounds.max)
+    const months = buildSolarMonths(picked.year, bounds.min, bounds.max)
+    const days = buildSolarDays(picked.year, picked.month, bounds.min, bounds.max)
+    this._solarPickerTarget = target
+    this._pendingSolar = picked
+    this._solarPickerReady = false
+    if (this._pickerTick) this._pickerTick.prepare()
+    this.setData(
+      {
+        showSolarPicker: true,
+        solarPickerTitle: target === 'asOf' ? '选择计算日期' : '选择出生日期',
+        solarYears: years,
+        solarMonths: months,
+        solarDays: days,
+        solarPickerValue: solarPickerValue(picked, years, months, days)
+      },
+      () => {
+        setTimeout(() => {
+          this._solarPickerReady = true
+        }, 180)
+      }
+    )
+  },
+
+  onOpenBirthdayPicker() {
+    this.openSolarPicker('birthday')
+  },
+
+  onOpenAsOfPicker() {
+    this.openSolarPicker('asOf')
+  },
+
+  onSolarPickerChange(e) {
+    const value = (e.detail && e.detail.value) || []
+    const bounds = this.solarPickerBounds(this._solarPickerTarget || 'birthday')
+    const years = this.data.solarYears && this.data.solarYears.length
+      ? this.data.solarYears
+      : buildSolarYears(bounds.min, bounds.max)
+    const year = years[value[0]] || bounds.min.year
+    const currentMonths =
+      this.data.solarMonths && this.data.solarMonths.length
+        ? this.data.solarMonths
+        : buildSolarMonths(year, bounds.min, bounds.max)
+    const nextMonths = buildSolarMonths(year, bounds.min, bounds.max)
+    let month = currentMonths[value[1]] || nextMonths[0]
+    if (nextMonths.indexOf(month) < 0) {
+      month = nextMonths[Math.min(nextMonths.length - 1, Math.max(0, value[1] || 0))]
+    }
+    const currentDays =
+      this.data.solarDays && this.data.solarDays.length
+        ? this.data.solarDays
+        : buildSolarDays(year, month, bounds.min, bounds.max)
+    const nextDays = buildSolarDays(year, month, bounds.min, bounds.max)
+    let day = currentDays[value[2]] || nextDays[0]
+    if (nextDays.indexOf(day) < 0) {
+      day = nextDays[Math.min(nextDays.length - 1, Math.max(0, value[2] || 0))]
+    }
+    const picked = { year, month, day }
+    this._pendingSolar = picked
+    if (this._syncingSolarPicker) return
+    if (this._solarPickerReady && this._pickerTick) this._pickerTick.play()
+    if (
+      nextMonths.length !== currentMonths.length ||
+      nextMonths[0] !== currentMonths[0] ||
+      nextDays.length !== currentDays.length ||
+      nextDays[0] !== currentDays[0]
+    ) {
+      this._syncingSolarPicker = true
+      this.setData(
+        {
+          solarMonths: nextMonths,
+          solarDays: nextDays,
+          solarPickerValue: solarPickerValue(picked, years, nextMonths, nextDays)
+        },
+        () => {
+          this._syncingSolarPicker = false
+        }
+      )
+    }
+  },
+
+  onConfirmSolarPicker() {
+    const target = this._solarPickerTarget || 'birthday'
+    const bounds = this.solarPickerBounds(target)
+    const picked = clampYMD(this._pendingSolar, bounds.min, bounds.max)
+    if (target === 'asOf') {
+      this.setData(
+        {
+          asOf: formatYMD(picked.year, picked.month, picked.day),
+          showSolarPicker: false
+        },
+        () => {
+          this.syncBirthdayDisplay()
+          this.recalculate({ celebrate: true, delay: 180 })
+        }
+      )
+      return
+    }
+    this.applyBirthday(picked)
+  },
+
+  onCancelSolarPicker() {
+    this.setData({ showSolarPicker: false })
+  },
+
+  onSolarPickerSheetTap() {},
+
+  applyBirthday(parts) {
+    const today = this.todayParts()
+    const birthday = clampSolarToToday(parts, today)
+    let asOf = parseYMDParts(this.data.asOf) || today
+    if (compareYMD(asOf, birthday) < 0) asOf = birthday
+    this.setData(
+      {
+        birthday: formatYMD(birthday.year, birthday.month, birthday.day),
+        asOf: formatYMD(asOf.year, asOf.month, asOf.day),
+        showSolarPicker: false,
+        showLunarPicker: false
+      },
+      () => {
+        this.syncBirthdayDisplay()
+        this.recalculate({ celebrate: true, delay: 180 })
+      }
+    )
   },
 
   onSwitchBirthCalendar(e) {
@@ -186,17 +415,6 @@ Page({
       this.syncBirthdayDisplay()
       this.recalculate()
     })
-  },
-
-  onBirthdayChange(e) {
-    this.setData({ birthday: e.detail.value }, () => {
-      this.syncBirthdayDisplay()
-      this.recalculate({ celebrate: true })
-    })
-  },
-
-  onAsOfChange(e) {
-    this.setData({ asOf: e.detail.value }, () => this.recalculate({ celebrate: true }))
   },
 
   onOpenLunarPicker() {
@@ -283,16 +501,7 @@ Page({
     const solar = lunarToSolar(pending.year, month.month, day, month.isLeap)
     const today = this.todayParts()
     const clamped = clampSolarToToday(solar, today)
-    this.setData(
-      {
-        birthday: formatYMD(clamped.year, clamped.month, clamped.day),
-        showLunarPicker: false
-      },
-      () => {
-        this.syncBirthdayDisplay()
-        this.recalculate({ celebrate: true, delay: 180 })
-      }
-    )
+    this.applyBirthday(clamped)
   },
 
   onCancelLunarPicker() {

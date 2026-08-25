@@ -46,18 +46,9 @@
         </view>
       </view>
       <view class="field">
-        <text class="field-label">出生日期</text>
+        <text class="field-label">请选择出生日期</text>
         <view class="field-control">
-          <picker
-            wx:if="{{birthCalendar === 'solar'}}"
-            mode="date"
-            value="{{birthday}}"
-            start="1900-01-01"
-            end="{{today}}"
-            bindchange="onBirthdayChange"
-          >
-            <view class="picker-value">{{birthdayDisplay}}</view>
-          </picker>
+          <view wx:if="{{birthCalendar === 'solar'}}" class="picker-value" bindtap="onOpenBirthdayPicker">{{birthdayDisplay}}</view>
           <view wx:else class="picker-value" bindtap="onOpenLunarPicker">{{lunarBirthdayText}}</view>
         </view>
       </view>
@@ -67,9 +58,7 @@
       <view class="field">
         <text class="field-label">计算到</text>
         <view class="field-control">
-          <picker mode="date" value="{{asOf}}" start="{{birthday}}" end="2100-12-31" bindchange="onAsOfChange">
-            <view class="picker-value">{{asOf}}</view>
-          </picker>
+          <view class="picker-value" bindtap="onOpenAsOfPicker">{{asOfDisplay}}</view>
         </view>
       </view>
     </view>
@@ -136,6 +125,34 @@
       <view class="lived-unit">天</view>
       <view class="lived-sub" wx:if="{{result}}">周岁 {{result.yearText}} · 人生第 {{result.lifeDayNumberText}} 天</view>
       <view class="lived-confirm" catchtap="onCloseLivedPopup">知道了</view>
+    </view>
+  </view>
+
+  <view wx:if="{{showSolarPicker}}" class="date-picker-mask" catchtap="onCancelSolarPicker" catchtouchmove="preventMove">
+    <view class="date-picker-sheet" catchtap="onSolarPickerSheetTap">
+      <view class="date-picker-head">
+        <view class="date-picker-action" catchtap="onCancelSolarPicker">取消</view>
+        <view class="date-picker-title">{{solarPickerTitle}}</view>
+        <view class="date-picker-action confirm" catchtap="onConfirmSolarPicker">确定</view>
+      </view>
+      <picker-view
+        class="date-picker-view"
+        value="{{solarPickerValue}}"
+        immediate-change="{{true}}"
+        bindchange="onSolarPickerChange"
+        indicator-style="height: 72rpx;"
+        indicator-class="date-picker-indicator"
+      >
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{solarYears}}" wx:key="*this">{{item}}年</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{solarMonths}}" wx:key="*this">{{item}}月</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{solarDays}}" wx:key="*this">{{item}}日</view>
+        </picker-view-column>
+      </picker-view>
     </view>
   </view>
 

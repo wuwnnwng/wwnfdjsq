@@ -4,9 +4,17 @@ const {
 } = require('./mortgage')
 const { getToolById } = require('./toolsConfig')
 
-const APP_BRAND = '置居计算器'
+const APP_BRAND = '置居试算计算器'
+const TOOL_NAV_BRAND = APP_BRAND
 const TOOLS_HUB_PATH = '/pages/tools/index'
 const TOOLS_HUB_TITLE = `${APP_BRAND}｜更多实用工具`
+
+function buildToolNavTitle(name) {
+  const title = String(name || '').trim()
+  if (!title) return TOOL_NAV_BRAND
+  if (title.indexOf(TOOL_NAV_BRAND) === 0) return title
+  return `${TOOL_NAV_BRAND}｜${title}`
+}
 
 /**
  * 开启右上角「转发好友 / 分享朋友圈」菜单
@@ -190,7 +198,7 @@ function buildResultShareTitle({
     .join(' ')
   if (typePart && payPart) return `${typePart}｜${payPart}`
   if (payPart) return `房贷计算结果｜${payPart}`
-  return '置居计算器｜查看我的计算结果'
+  return '置居试算计算器｜查看我的计算结果'
 }
 
 /**
@@ -419,6 +427,7 @@ function tipShareTimeline() {
 }
 
 module.exports = {
+  buildToolNavTitle,
   enableShareMenu,
   getShareAppMessage,
   getShareTimeline,

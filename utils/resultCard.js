@@ -3,7 +3,7 @@
  */
 const { LEVELS, trackFlex } = require('./bmiCalc')
 
-const APP_BRAND = '置居计算器'
+const APP_BRAND = '置居试算计算器'
 const SAVE_FILE = 'result-card.png'
 
 const BMI_LEVEL_STYLE = {

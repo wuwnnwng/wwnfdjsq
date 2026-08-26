@@ -11,7 +11,7 @@ const {
 } = require('../../../utils/exchangeRate')
 const { findUnitIndex } = require('../../../utils/currencyNames')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
-const { enableShareMenu, getConverterToolShare } = require('../../../utils/share')
+const { enableShareMenu, getConverterToolShare, buildToolNavTitle } = require('../../../utils/share')
 const { getToolById } = require('../../../utils/toolsConfig')
 const {
   calcPickerSheetLayout,
@@ -155,7 +155,7 @@ Page({
 
   applyConverterConfig(config, callback) {
     if (!config) return
-    wx.setNavigationBarTitle({ title: config.title })
+    wx.setNavigationBarTitle({ title: buildToolNavTitle(config.title) })
 
     const type = config.type || this.data.type
     const units = decorateUnits(config.units || [])

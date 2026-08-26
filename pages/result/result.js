@@ -295,7 +295,7 @@ Page({
   onShareAppMessage() {
     if (!this.data.ready) {
       return {
-        title: '置居计算器｜公积金、商贷、组合贷一键算清',
+        title: '置居试算计算器｜公积金、商贷、组合贷一键算清',
         path: '/pages/index/index'
       }
     }
@@ -305,7 +305,7 @@ Page({
   onShareTimeline() {
     if (!this.data.ready) {
       return {
-        title: '置居计算器｜公积金、商贷、组合贷一键算清',
+        title: '置居试算计算器｜公积金、商贷、组合贷一键算清',
         query: ''
       }
     }

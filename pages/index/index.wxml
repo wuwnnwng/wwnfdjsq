@@ -2,7 +2,7 @@
   <view class="panel hero-panel">
     <view class="hero-top">
       <view class="brand-wrap">
-        <view class="brand">置居计算器</view>
+        <view class="brand">置居试算计算器</view>
         <view class="theme-switch" aria-label="切换皮肤">
           <view
             wx:for="{{themeList}}"

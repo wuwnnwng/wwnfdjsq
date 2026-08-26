@@ -15,8 +15,8 @@
 
 .tools-entry {
   display: flex;
-  align-items: center;
-  gap: 12rpx;
+  align-items: flex-start;
+  gap: 8rpx;
   padding-top: 18rpx;
   border-top: 1rpx solid var(--color-line);
 }
@@ -31,10 +31,23 @@
   line-height: 36rpx;
 }
 
+.tools-swiper {
+  flex: 1;
+  min-width: 0;
+  height: 196rpx;
+}
+
+.tools-page {
+  display: flex;
+  align-items: flex-start;
+  height: 132rpx;
+}
+
 .tools-fold {
   flex-shrink: 0;
   width: 36rpx;
   height: 72rpx;
+  margin-top: 8rpx;
   line-height: 72rpx;
   text-align: center;
   font-size: 20rpx;
@@ -91,10 +104,19 @@
 }
 
 .tools-chip-name {
-  font-size: 22rpx;
+  max-width: 100%;
+  padding: 0 4rpx;
+  font-size: 20rpx;
   font-weight: 600;
   color: var(--color-ink);
   line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tools-chip-pad {
+  pointer-events: none;
 }
 
 .tools-new-badge {
@@ -132,6 +154,18 @@
 
 .tool-icon-age {
   background: linear-gradient(135deg, #fce7f3, #f472b6);
+}
+
+.tool-icon-qrcode {
+  background: linear-gradient(135deg, #e2e8f0, #64748b);
+}
+
+.tool-icon-bmi {
+  background: linear-gradient(135deg, #d1fae5, #34d399);
+}
+
+.tool-icon-weight {
+  background: linear-gradient(135deg, #f3e8ff, #c4b5fd);
 }
 
 .tool-icon-currency {

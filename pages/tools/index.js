@@ -1,4 +1,4 @@
-const { TOOLS, searchTools, markToolsHubSeen } = require('../../utils/toolsConfig')
+const { searchTools, groupTools, markToolsHubSeen } = require('../../utils/toolsConfig')
 const { getThemeId, applyThemeChrome } = require('../../utils/theme')
 const {
   enableShareMenu,
@@ -10,7 +10,7 @@ Page({
   data: {
     theme: getThemeId(),
     keyword: '',
-    tools: TOOLS
+    groups: groupTools()
   },
 
   onLoad() {
@@ -28,14 +28,14 @@ Page({
     const keyword = (e.detail && e.detail.value) || ''
     this.setData({
       keyword,
-      tools: searchTools(keyword)
+      groups: groupTools(searchTools(keyword))
     })
   },
 
   onClearSearch() {
     this.setData({
       keyword: '',
-      tools: TOOLS
+      groups: groupTools()
     })
   },
 

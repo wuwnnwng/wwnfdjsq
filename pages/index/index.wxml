@@ -30,34 +30,42 @@
     </view>
 
     <view class="tools-entry {{featuredToolsOpen ? '' : 'collapsed'}}">
-      <view
-        class="tools-chip"
+      <swiper
         wx:if="{{featuredToolsOpen}}"
-        wx:for="{{featuredTools}}"
-        wx:key="id"
-        bindtap="onOpenFeaturedTool"
-        data-page="{{item.page}}"
-        aria-role="button"
-        aria-label="{{item.name}}"
+        class="tools-swiper"
+        indicator-dots
+        indicator-color="rgba(20, 35, 28, 0.16)"
+        indicator-active-color="{{toolsIndicator}}"
+        circular
+        autoplay
+        interval="4800"
+        duration="420"
+        easing-function="easeOutCubic"
       >
-        <view class="tools-chip-icon tool-icon-{{item.iconType}}">
-          <text class="tools-chip-emoji">{{item.icon}}</text>
-        </view>
-        <text class="tools-chip-name">{{item.shortName}}</text>
-      </view>
-      <view
-        class="tools-chip"
-        wx:if="{{featuredToolsOpen}}"
-        bindtap="onGoTools"
-        aria-role="button"
-        aria-label="全部工具"
-      >
-        <view class="tools-chip-icon tools-chip-more">
-          <text class="tools-chip-more-mark">全</text>
-          <view class="tools-new-badge" wx:if="{{showToolsNew}}">新</view>
-        </view>
-        <text class="tools-chip-name">全部</text>
-      </view>
+        <swiper-item wx:for="{{featuredToolPages}}" wx:for-item="page" wx:key="key">
+          <view class="tools-page">
+            <block wx:for="{{page.tools}}" wx:for-item="item" wx:key="id">
+              <view wx:if="{{item.isPad}}" class="tools-chip tools-chip-pad"></view>
+              <view
+                wx:else
+                class="tools-chip"
+                bindtap="onOpenFeaturedTool"
+                data-id="{{item.id}}"
+                data-page="{{item.page}}"
+                aria-role="button"
+                aria-label="{{item.name}}"
+              >
+                <view class="tools-chip-icon {{item.isMore ? 'tools-chip-more' : ''}} tool-icon-{{item.iconType}}">
+                  <text wx:if="{{item.isMore}}" class="tools-chip-more-mark">全</text>
+                  <text wx:else class="tools-chip-emoji">{{item.icon}}</text>
+                  <view class="tools-new-badge" wx:if="{{item.isMore && showToolsNew}}">新</view>
+                </view>
+                <text class="tools-chip-name">{{item.shortName}}</text>
+              </view>
+            </block>
+          </view>
+        </swiper-item>
+      </swiper>
       <view
         class="tools-fold"
         catchtap="onToggleFeaturedTools"

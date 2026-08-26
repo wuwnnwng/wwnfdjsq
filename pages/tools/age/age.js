@@ -11,6 +11,7 @@ const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getAgeToolShare } = require('../../../utils/share')
 const { createPickerTick } = require('../../../utils/pickerTick')
 const { createConfettiPieces } = require('../../../utils/confetti')
+const { saveResultCard, handleSaveError, drawAgeCard } = require('../../../utils/resultCard')
 
 const LUNAR_YEAR_START = 1900
 const LUNAR_YEAR_END = 2100
@@ -187,7 +188,8 @@ Page({
     lunarPickerValue: [0, 0, 0],
     result: null,
     showLivedPopup: false,
-    confettiPieces: []
+    confettiPieces: [],
+    savingCard: false
   },
 
   onLoad() {
@@ -508,6 +510,33 @@ Page({
 
   onShareTimeline() {
     return getAgeToolShare().timeline
+  },
+
+  onSaveCard() {
+    const result = this.data.result
+    if (!result || !result.valid) {
+      wx.showToast({ title: '请先算出结果', icon: 'none' })
+      return
+    }
+    if (this._savingCard) return
+    this._savingCard = true
+    this.setData({ savingCard: true })
+    wx.showLoading({ title: '正在生成', mask: true })
+    saveResultCard(this, 'resultCard', (ctx, width, height) => {
+      drawAgeCard(ctx, width, height, result)
+    })
+      .then(() => {
+        wx.hideLoading()
+        wx.showToast({ title: '已保存到相册', icon: 'success' })
+      })
+      .catch((err) => {
+        wx.hideLoading()
+        handleSaveError(err)
+      })
+      .then(() => {
+        this._savingCard = false
+        this.setData({ savingCard: false })
+      })
   },
 
   onUnload() {

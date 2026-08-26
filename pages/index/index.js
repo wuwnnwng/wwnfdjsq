@@ -11,6 +11,7 @@ const {
 const { getLprDisplay, loadLprDisplay } = require('../../utils/lpr')
 const {
   getThemeId,
+  getTheme,
   setThemeId,
   applyThemeChrome,
   THEME_LIST
@@ -24,7 +25,7 @@ const {
   removePlan
 } = require('../../utils/plans')
 const {
-  getFeaturedTools,
+  getFeaturedToolPages,
   hasSeenToolsHub,
   markToolsHubSeen
 } = require('../../utils/toolsConfig')
@@ -99,9 +100,10 @@ Page({
     derivedRemainingMonths: '--',
     derivedMessage: '',
 
-    featuredTools: getFeaturedTools(),
+    featuredToolPages: getFeaturedToolPages(),
     featuredToolsOpen: readFeaturedToolsOpen(),
-    showToolsNew: !hasSeenToolsHub()
+    showToolsNew: !hasSeenToolsHub(),
+    toolsIndicator: getTheme(getThemeId()).principal
   },
 
   onLoad() {
@@ -129,7 +131,11 @@ Page({
 
   applyTheme(themeId) {
     const theme = setThemeId(themeId)
-    this.setData({ theme })
+    const palette = getTheme(theme)
+    this.setData({
+      theme,
+      toolsIndicator: palette.principal
+    })
     applyThemeChrome(theme)
   },
 
@@ -207,6 +213,11 @@ Page({
   },
 
   onOpenFeaturedTool(e) {
+    const id = e.currentTarget.dataset.id
+    if (id === 'more') {
+      this.onGoTools()
+      return
+    }
     const page = e.currentTarget.dataset.page
     if (!page) return
     wx.navigateTo({ url: page })

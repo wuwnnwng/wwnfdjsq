@@ -123,7 +123,7 @@
 }
 
 .bmi-seg.under {
-  flex: 18.5;
+  flex: 4.5;
   background: #60a5fa;
 }
 
@@ -161,7 +161,41 @@
 .bmi-legend {
   margin-top: 12rpx;
   display: flex;
-  justify-content: space-between;
   font-size: 20rpx;
   color: var(--color-muted);
+}
+
+.bmi-legend-item {
+  text-align: center;
+}
+
+.bmi-legend-item.under {
+  flex: 4.5;
+}
+
+.bmi-legend-item.normal {
+  flex: 5.5;
+}
+
+.bmi-legend-item.over {
+  flex: 4;
+}
+
+.bmi-legend-item.obese {
+  flex: 8;
+}
+
+.save-card-btn {
+  width: 100%;
+  margin-top: 28rpx;
+  margin-bottom: 12rpx;
+  box-sizing: border-box;
+}
+
+.result-card-canvas {
+  position: fixed;
+  left: -2000px;
+  top: 0;
+  width: 300px;
+  height: 500px;
 }

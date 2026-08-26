@@ -26,10 +26,10 @@
           <view class="bmi-marker" style="left: {{result.markerPercent}}%;"></view>
         </view>
         <view class="bmi-legend">
-          <text>过低</text>
-          <text>正常</text>
-          <text>超重</text>
-          <text>肥胖</text>
+          <text class="bmi-legend-item under">过低</text>
+          <text class="bmi-legend-item normal">正常</text>
+          <text class="bmi-legend-item over">超重</text>
+          <text class="bmi-legend-item obese">肥胖</text>
         </view>
       </block>
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
@@ -67,6 +67,8 @@
         <view class="result-row-value">{{result.hint}}</view>
       </view>
       <view class="tool-note">成人标准依据卫生行业标准 WS/T 428：BMI &lt; 18.5 过低，18.5–23.9 正常，24.0–27.9 超重，≥ 28 肥胖。结果仅供参考，不能替代医疗意见。</view>
+      <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '生成卡片保存到相册'}}</view>
     </view>
   </scroll-view>
+  <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
 </view>

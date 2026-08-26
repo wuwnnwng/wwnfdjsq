@@ -2,7 +2,15 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FEATURED_IDS = ['fitout', 'housetax', 'age']
+const FEATURED_IDS = ['fitout', 'housetax', 'age', 'calendar', 'qrcode', 'bmi', 'weight']
+const FEATURED_PAGE_SIZE = 4
+
+const CATEGORIES = [
+  { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
+  { id: 'daily', name: '日常工具', toolIds: ['calendar', 'weather', 'qrcode', 'datetime', 'age', 'bmi'] },
+  { id: 'calc', name: '计算工具', toolIds: ['calc', 'rmb', 'percent', 'base'] },
+  { id: 'unit', name: '单位换算', toolIds: ['currency', 'length', 'area', 'volume', 'weight', 'temperature', 'speed', 'pressure', 'power'] }
+]
 
 const TOOLS = [
   {
@@ -125,6 +133,7 @@ const TOOLS = [
   {
     id: 'volume',
     name: '体积',
+    shortName: '体积',
     icon: '🧊',
     iconType: 'volume',
     page: '/pages/tools/converter/converter?type=volume'
@@ -132,13 +141,16 @@ const TOOLS = [
   {
     id: 'weight',
     name: '重量',
+    shortName: '体重',
     icon: '⚖️',
     iconType: 'weight',
+    keywords: '重量体重公斤斤磅千克换算',
     page: '/pages/tools/converter/converter?type=weight'
   },
   {
     id: 'temperature',
     name: '温度',
+    shortName: '温度',
     icon: '🌡️',
     iconType: 'temperature',
     page: '/pages/tools/converter/converter?type=temperature'
@@ -146,6 +158,7 @@ const TOOLS = [
   {
     id: 'speed',
     name: '速度',
+    shortName: '速度',
     icon: '🏎️',
     iconType: 'speed',
     page: '/pages/tools/converter/converter?type=speed'
@@ -153,6 +166,7 @@ const TOOLS = [
   {
     id: 'pressure',
     name: '压强',
+    shortName: '压强',
     icon: '🎛️',
     iconType: 'pressure',
     page: '/pages/tools/converter/converter?type=pressure'
@@ -160,6 +174,7 @@ const TOOLS = [
   {
     id: 'power',
     name: '功率',
+    shortName: '功率',
     icon: '⚡',
     iconType: 'power',
     page: '/pages/tools/converter/converter?type=power'
@@ -167,6 +182,7 @@ const TOOLS = [
   {
     id: 'base',
     name: '进制',
+    shortName: '进制',
     icon: '🔢',
     iconType: 'base',
     page: '/pages/tools/base/base'
@@ -174,6 +190,7 @@ const TOOLS = [
   {
     id: 'length',
     name: '长度',
+    shortName: '长度',
     icon: '📏',
     iconType: 'length',
     page: '/pages/tools/converter/converter?type=length'
@@ -239,6 +256,75 @@ function getFeaturedTools() {
   }).filter(Boolean)
 }
 
+function padFeaturedPage(page, size) {
+  const next = page.slice()
+  let pad = 0
+  while (next.length < size) {
+    pad += 1
+    next.push({
+      id: `pad-${pad}`,
+      isPad: true
+    })
+  }
+  return next
+}
+
+function getFeaturedToolPages() {
+  const more = {
+    id: 'more',
+    name: '全部',
+    shortName: '全部',
+    icon: '',
+    iconType: 'more',
+    page: '/pages/tools/index',
+    isMore: true
+  }
+  const list = getFeaturedTools().concat(more)
+  const pages = []
+  for (let i = 0; i < list.length; i += FEATURED_PAGE_SIZE) {
+    const index = i / FEATURED_PAGE_SIZE
+    pages.push({
+      key: `featured-${index}`,
+      tools: padFeaturedPage(list.slice(i, i + FEATURED_PAGE_SIZE), FEATURED_PAGE_SIZE)
+    })
+  }
+  return pages
+}
+
+function groupTools(list) {
+  const source = Array.isArray(list) ? list : TOOLS
+  const byId = {}
+  source.forEach((item) => {
+    byId[item.id] = item
+  })
+  const used = new Set()
+  const groups = CATEGORIES.map((cat) => {
+    const tools = cat.toolIds
+      .map((id) => {
+        const item = byId[id]
+        if (!item) return null
+        used.add(id)
+        return item
+      })
+      .filter(Boolean)
+    return {
+      id: cat.id,
+      name: cat.name,
+      tools
+    }
+  }).filter((group) => group.tools.length)
+
+  const rest = source.filter((item) => !used.has(item.id))
+  if (rest.length) {
+    groups.push({
+      id: 'other',
+      name: '其他',
+      tools: rest
+    })
+  }
+  return groups
+}
+
 function hasSeenToolsHub() {
   try {
     return !!wx.getStorageSync(TOOLS_HUB_SEEN_KEY)
@@ -255,9 +341,12 @@ function markToolsHubSeen() {
 
 module.exports = {
   TOOLS,
+  CATEGORIES,
   getToolById,
   searchTools,
+  groupTools,
   getFeaturedTools,
+  getFeaturedToolPages,
   hasSeenToolsHub,
   markToolsHubSeen
 }

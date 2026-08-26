@@ -15,20 +15,25 @@
       </view>
     </view>
 
-    <view class="panel tool-grid-panel" wx:if="{{tools.length}}">
-      <view
-        class="tool-card"
-        wx:for="{{tools}}"
-        wx:key="id"
-        bindtap="onOpenTool"
-        data-page="{{item.page}}"
-      >
-        <view class="tool-icon-wrap tool-icon-{{item.iconType}}">
-          <text class="tool-icon">{{item.icon}}</text>
+    <block wx:if="{{groups.length}}">
+      <view class="panel tool-group-panel" wx:for="{{groups}}" wx:for-item="group" wx:key="id">
+        <view class="tool-group-title">{{group.name}}</view>
+        <view class="tool-grid">
+          <view
+            class="tool-card"
+            wx:for="{{group.tools}}"
+            wx:key="id"
+            bindtap="onOpenTool"
+            data-page="{{item.page}}"
+          >
+            <view class="tool-icon-wrap tool-icon-{{item.iconType}}">
+              <text class="tool-icon">{{item.icon}}</text>
+            </view>
+            <view class="tool-card-name">{{item.name}}</view>
+          </view>
         </view>
-        <view class="tool-card-name">{{item.name}}</view>
       </view>
-    </view>
+    </block>
 
     <view class="panel tool-empty" wx:else>
       没有找到「{{keyword}}」相关工具

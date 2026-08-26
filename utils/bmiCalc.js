@@ -18,14 +18,29 @@ function formatNumber(value, digits) {
 }
 
 const LEVELS = [
-  { id: 'under', max: 18.5, name: '体重过低', hint: '可适当增加营养与力量训练' },
-  { id: 'normal', max: 24, name: '体重正常', hint: '保持当前饮食和运动习惯' },
-  { id: 'over', max: 28, name: '超重', hint: '建议控制饮食并增加有氧运动' },
-  { id: 'obese', max: Infinity, name: '肥胖', hint: '建议咨询医生或营养师后再减重' }
+  { id: 'under', min: 0, max: 18.5, name: '体重过低', hint: '可适当增加营养与力量训练', color: '#60a5fa' },
+  { id: 'normal', min: 18.5, max: 24, name: '体重正常', hint: '保持当前饮食和运动习惯', color: '#34d399' },
+  { id: 'over', min: 24, max: 28, name: '超重', hint: '建议控制饮食并增加有氧运动', color: '#fbbf24' },
+  { id: 'obese', min: 28, max: Infinity, name: '肥胖', hint: '建议咨询医生或营养师后再减重', color: '#f87171' }
 ]
+
+/** 色条与指针共用刻度：14–36，与页面 flex 分段一致 */
+const TRACK_MIN = 14
+const TRACK_MAX = 36
 
 function levelOf(bmi) {
   return LEVELS.find((item) => bmi < item.max) || LEVELS[LEVELS.length - 1]
+}
+
+function trackFlex(item) {
+  const start = Math.max(item.min, TRACK_MIN)
+  const end = Math.min(item.max === Infinity ? TRACK_MAX : item.max, TRACK_MAX)
+  return Math.max(0, end - start)
+}
+
+function markerPercentOf(bmi) {
+  const pct = ((Number(bmi) - TRACK_MIN) / (TRACK_MAX - TRACK_MIN)) * 100
+  return Math.round(Math.max(0, Math.min(100, pct)) * 10) / 10
 }
 
 function calculateBmi(heightText, weightText) {
@@ -49,7 +64,6 @@ function calculateBmi(heightText, weightText) {
   const level = levelOf(bmi)
   const minWeight = 18.5 * heightM * heightM
   const maxWeight = 23.9 * heightM * heightM
-  const marker = Math.max(0, Math.min(100, ((bmi - 14) / (36 - 14)) * 100))
 
   return {
     valid: true,
@@ -63,10 +77,15 @@ function calculateBmi(heightText, weightText) {
     rangeText: `${formatNumber(minWeight, 1)} – ${formatNumber(maxWeight, 1)} 公斤`,
     minWeightText: formatNumber(minWeight, 1),
     maxWeightText: formatNumber(maxWeight, 1),
-    markerPercent: Math.round(marker * 10) / 10
+    markerPercent: markerPercentOf(bmi)
   }
 }
 
 module.exports = {
-  calculateBmi
+  LEVELS,
+  TRACK_MIN,
+  TRACK_MAX,
+  trackFlex,
+  calculateBmi,
+  markerPercentOf
 }

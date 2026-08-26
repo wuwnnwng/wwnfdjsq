@@ -113,6 +113,7 @@
       <view class="tool-note">
         依据国家统计局公布的人均年龄79.25 进行科学趣味计算，不代表个人实际寿命，理性看待，好好生活
       </view>
+      <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '生成卡片保存到相册'}}</view>
     </view>
   </scroll-view>
 
@@ -202,4 +203,5 @@
       </picker-view>
     </view>
   </view>
+  <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
 </view>

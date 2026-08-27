@@ -241,19 +241,20 @@ function searchTools(keyword) {
     .map((row) => row.item)
 }
 
+function toFeaturedChip(item) {
+  if (!item) return null
+  return {
+    id: item.id,
+    name: item.name,
+    shortName: item.shortName || item.name,
+    icon: item.icon,
+    iconType: item.iconType,
+    page: item.page
+  }
+}
+
 function getFeaturedTools() {
-  return FEATURED_IDS.map((id) => {
-    const item = getToolById(id)
-    if (!item) return null
-    return {
-      id: item.id,
-      name: item.name,
-      shortName: item.shortName || item.name,
-      icon: item.icon,
-      iconType: item.iconType,
-      page: item.page
-    }
-  }).filter(Boolean)
+  return FEATURED_IDS.map((id) => toFeaturedChip(getToolById(id))).filter(Boolean)
 }
 
 function padFeaturedPage(page, size) {
@@ -287,7 +288,10 @@ function getFeaturedToolPages() {
     page: '/pages/tools/index',
     isMore: true
   }
-  const list = getFeaturedTools().concat(random, more)
+  const besideMore = ['weather', 'rmb']
+    .map((id) => toFeaturedChip(getToolById(id)))
+    .filter(Boolean)
+  const list = getFeaturedTools().concat(random, besideMore, more)
   const pages = []
   for (let i = 0; i < list.length; i += FEATURED_PAGE_SIZE) {
     const index = i / FEATURED_PAGE_SIZE

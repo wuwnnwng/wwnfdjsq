@@ -1,0 +1,84 @@
+<view class="page page-shell theme-{{theme}} doodle-page">
+  <view class="panel canvas-hero">
+    <view class="conv-hero-id">
+      <view class="tool-icon-wrap tool-icon-canvas">
+        <text class="tool-icon">🎨</text>
+      </view>
+      <view class="conv-hero-copy">
+        <view class="conv-kicker">调色 · 会话 · 卡片</view>
+        <view class="conv-title">画布</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="session-bar">
+    <view class="session-label">会话（最多 5 个，下次可继续画，长按删除）</view>
+    <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="session-scroll">
+      <view class="session-row">
+        <view class="session-chip new" bindtap="onNewSession">新建</view>
+        <view
+          class="session-chip {{item.id === sessionId ? 'active' : ''}}"
+          wx:for="{{sessions}}"
+          wx:key="id"
+          bindtap="onOpenSession"
+          bindlongpress="onDeleteSession"
+          data-id="{{item.id}}"
+        >{{item.name}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="canvas-stage" catchtouchmove="preventMove">
+    <view class="canvas-frame">
+      <canvas
+        type="2d"
+        id="drawCanvas"
+        class="draw-canvas"
+        disable-scroll="{{true}}"
+        bindtouchstart="onDrawStart"
+        bindtouchmove="onDrawMove"
+        bindtouchend="onDrawEnd"
+        bindtouchcancel="onDrawEnd"
+      ></canvas>
+    </view>
+  </view>
+
+  <view class="palette-panel">
+    <view class="color-row">
+      <view class="current-ink" style="background: {{color}};"></view>
+      <view
+        class="color-dot {{color === item ? 'active' : ''}}"
+        wx:for="{{presetColors}}"
+        wx:key="*this"
+        style="background: {{item}};"
+        data-color="{{item}}"
+        bindtap="onPickColor"
+      ></view>
+    </view>
+    <view
+      class="hue-bar"
+      bindtouchstart="onHueTouch"
+      bindtouchmove="onHueTouch"
+      catchtouchmove="preventMove"
+    ></view>
+    <view class="tool-row">
+      <view
+        class="size-chip {{brushSize === item ? 'active' : ''}}"
+        wx:for="{{brushSizes}}"
+        wx:key="*this"
+        data-size="{{item}}"
+        bindtap="onPickSize"
+      >{{item}}笔</view>
+      <view class="mode-chip {{eraser ? 'active' : ''}}" bindtap="onToggleEraser">橡皮</view>
+      <view class="mode-chip" bindtap="onUndo">撤销</view>
+      <view class="mode-chip" bindtap="onClear">清空</view>
+    </view>
+  </view>
+
+  <view class="save-card-bar doodle-bar">
+    <view class="ghost-btn" bindtap="onSaveDraft">暂存 {{sessions.length}}/5</view>
+    <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '导出卡片'}}</view>
+  </view>
+
+  <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
+</view>

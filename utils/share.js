@@ -169,6 +169,22 @@ function getBmiToolShare() {
   }
 }
 
+function getCanvasToolShare() {
+  const path = '/pages/tools/canvas/canvas'
+  return {
+    appMessage: buildToolShareAppMessage(path, '画布'),
+    timeline: buildToolShareTimeline(path, '画布')
+  }
+}
+
+function getPuzzleToolShare() {
+  const path = '/pages/tools/puzzle/puzzle'
+  return {
+    appMessage: buildToolShareAppMessage(path, '拼图'),
+    timeline: buildToolShareTimeline(path, '拼图')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
@@ -447,6 +463,8 @@ module.exports = {
   getPercentToolShare,
   getAgeToolShare,
   getBmiToolShare,
+  getCanvasToolShare,
+  getPuzzleToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

@@ -189,7 +189,7 @@
     </view>
   </view>
 
-  <view wx:if="{{showEarlySavedPopup}}" class="confetti-mask" catchtap="onCloseEarlySavedPopup" catchtouchmove="preventMove">
+  <view wx:if="{{showInterestPopup}}" class="confetti-mask" catchtap="onCloseEarlySavedPopup" catchtouchmove="preventMove">
     <view class="confetti-layer">
       <view
         wx:for="{{confettiPieces}}"
@@ -201,12 +201,12 @@
       </view>
     </view>
     <view class="save-dialog" catchtap="onEarlySavedDialogTap">
-      <view class="save-kicker">🎉</view>
-      <view class="save-title">提前还款预计节省</view>
-      <view class="save-amount">{{earlyInfo.interestSaved}}</view>
-      <view class="save-unit">元利息</view>
-      <view class="save-sub" wx:if="{{earlyInfo.typeLabel}}">{{earlyInfo.typeLabel}}</view>
-      <view class="save-confirm" catchtap="onCloseEarlySavedPopup">太好了</view>
+      <view class="save-kicker">{{interestPopup.kicker}}</view>
+      <view class="save-title">{{interestPopup.title}}</view>
+      <view class="save-amount">{{interestPopup.amount}}</view>
+      <view class="save-unit">{{interestPopup.unit}}</view>
+      <view class="save-sub" wx:if="{{interestPopup.sub}}">{{interestPopup.sub}}</view>
+      <view class="save-confirm" catchtap="onCloseEarlySavedPopup">{{interestPopup.confirm}}</view>
     </view>
   </view>
 

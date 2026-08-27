@@ -1,7 +1,7 @@
 /**
  * 黄历：建除十二神、宜忌、吉日筛选（离线规则，仅供参考）
  */
-const { getGanZhiDay, solarToLunar } = require('./lunar')
+const { getGanZhiDay, solarToLunar, getSolarTermDate, getJieMonthZhiIndex } = require('./lunar')
 
 const JIAN_CHU = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭']
 
@@ -59,84 +59,105 @@ const LUCKY_HOUR_DEITIES = {
   司命: true
 }
 
+/** 通胜建除用事（事项名与手机黄历、中华万年历常用口径一致） */
 const JIAN_CHU_YI_JI = {
   建: {
-    yi: '祭祀 祈福 求嗣 开光 出行 上任 会亲友 求职 签约 开市 交易 立券 纳财 栽种 牧养 入学',
-    ji: '动土 破土 开仓 乘船 安门 开渠 掘井 安葬 行丧 盖屋 嫁娶'
+    yi: '出行 上任 会亲友 上书 见贵 求职 开市 交易 立券 纳财 栽种 牧养 开光 求嗣 祭祀 祈福 嫁娶 订盟 入学',
+    ji: '动土 破土 开仓 乘船 安葬 行丧 盖屋 作灶 安门 开渠'
   },
   除: {
-    yi: '解除 沐浴 整容 剃头 理发 整手足甲 求医 治病 扫舍 破屋 坏垣 拆卸 修饰垣墙 平治道涂 斋醮',
-    ji: '嫁娶 入宅 开市 出行 栽种 牧养 安葬 破土 搬家 开业 移徙 立券'
+    yi: '解除 沐浴 整容 剃头 理发 求医 治病 扫舍 破屋 坏垣 拆卸 出货 开市 交易 祭祀 祈福',
+    ji: '嫁娶 入宅 远行 出行 栽种 安葬 移徙 开业 搬家 立券'
   },
   满: {
-    yi: '祭祀 祈福 斋醮 开光 求嗣 进人口 结婚姻 纳采 开市 立券 交易 纳财 栽种 牧养 开业 会亲友',
-    ji: '服药 针灸 出行 赴任 词讼 安葬 行丧 破土 求医 盖屋'
+    yi: '祭祀 祈福 开光 求嗣 嫁娶 订盟 纳采 开市 立券 交易 纳财 栽种 牧养 开仓 入宅 会亲友',
+    ji: '破土 安葬 行丧 服药 针灸 出师 求医 盖屋'
   },
   平: {
-    yi: '修饰垣墙 平治道涂 修造 装修 补垣 塞穴 祭祀 扫舍 拆卸 开池 筑堤 栽种',
+    yi: '修饰垣墙 平治道涂 修造 装修 补垣 塞穴 拆卸 开池 祭祀 扫舍 栽种',
     ji: '开市 交易 嫁娶 破土 安葬 出行 开业 入宅 立券 搬家'
   },
   定: {
-    yi: '订盟 纳采 嫁娶 祭祀 祈福 求嗣 开光 开市 立券 交易 纳财 栽种 牧养 开业 签约 安床 会亲友',
+    yi: '订盟 纳采 嫁娶 祭祀 祈福 求嗣 开光 开市 立券 交易 纳财 栽种 牧养 开业 安床 会亲友',
     ji: '词讼 诉讼 出行 求医 安葬 行丧 破土 开仓 乘船'
   },
   执: {
-    yi: '捕捉 畋猎 取鱼 结网 纳财 栽种 牧养 订盟 纳采 开仓 纳畜 进人口 会亲友',
+    yi: '捕捉 畋猎 取鱼 结网 纳财 栽种 牧养 订盟 纳采 开仓 纳畜 进人口 会亲友 祭祀',
     ji: '搬家 远行 开市 破土 安葬 出行 入宅 开业 嫁娶 移徙'
   },
   破: {
-    yi: '破屋 坏垣 求医 治病 解除 拆卸 扫舍 修饰垣墙 平治道涂 沐浴',
-    ji: '嫁娶 签约 出行 开市 开业 入宅 安葬 立券 交易 栽种 搬家 求嗣'
+    yi: '破屋 坏垣 求医 治病 解除 拆卸 扫舍 沐浴',
+    ji: '嫁娶 订盟 出行 开市 开业 入宅 安葬 立券 交易 栽种 搬家 求嗣'
   },
   危: {
-    yi: '祭祀 祈福 安床 入殓 移柩 成服 除服 开生坟 合寿木 进人口 纳畜',
-    ji: '登高 行船 嫁娶 开市 出行 开业 入宅 栽种 立券 搬家'
+    yi: '祭祀 祈福 安床 入殓 移柩 成服 除服 纳畜 栽种 牧养',
+    ji: '登高 行船 乘船 嫁娶 开市 出行 开业 入宅 立券 搬家'
   },
   成: {
-    yi: '嫁娶 开业 入学 交易 求嗣 出行 入宅 移徙 开市 立券 纳财 栽种 牧养 订盟 纳采 祭祀 祈福 搬家',
+    yi: '嫁娶 开业 入学 交易 求嗣 出行 入宅 移徙 开市 立券 纳财 栽种 牧养 订盟 纳采 祭祀 祈福 搬家 开光',
     ji: '诉讼 词讼 破土 安葬 行丧 开仓 掘井 乘船'
   },
   收: {
-    yi: '收财 纳畜 进人口 入学 开仓 纳财 捕捉 畋猎 取鱼 结网 牧养 栽种 祭祀 祈福',
-    ji: '开业 求医 出行 安葬 开市 嫁娶 入宅 破土 搬家 立券'
+    yi: '纳畜 进人口 入学 开仓 纳财 捕捉 畋猎 牧养 栽种 祭祀 祈福 入宅 安床',
+    ji: '开业 求医 出行 安葬 开市 嫁娶 破土 搬家 立券 开光'
   },
   开: {
     yi: '开业 出行 嫁娶 搬家 求嗣 入宅 移徙 开市 立券 交易 纳财 祭祀 祈福 开光 上任 入学 会亲友',
     ji: '安葬 破土 伐木 行丧 开生坟 合寿木 入殓 乘船'
   },
   闭: {
-    yi: '筑堤 补垣 塞穴 收纳 安葬 破土 入殓 移柩 成服 除服 开生坟 合寿木 纳畜',
-    ji: '开业 出行 嫁娶 开市 入宅 开光 上任 求嗣 搬家 立券 交易'
+    yi: '筑堤 补垣 塞穴 安葬 破土 入殓 移柩 成服 除服 纳畜 祭祀',
+    ji: '开业 出行 嫁娶 开市 入宅 开光 上任 求嗣 搬家 立券 交易 栽种'
   }
 }
 
-const GAN_YI_JI = {
-  甲: { yi: '开市 立券 交易 栽种 牧养 会亲友 纳财', ji: '盖屋 动土 安门' },
-  乙: { yi: '嫁娶 开市 立券 祭祀 祈福 出行', ji: '栽种 进人口 开仓' },
-  丙: { yi: '祭祀 祈福 嫁娶 开市 出行 会亲友', ji: '开仓 出货 掘井' },
-  丁: { yi: '祭祀 祈福 求嗣 开光 安床 斋醮', ji: '开市 动土 破土' },
-  戊: { yi: '开市 交易 立券 栽种 修造 纳财', ji: '嫁娶 出行 乘船' },
-  己: { yi: '祭祀 祈福 嫁娶 安床 扫舍 解除', ji: '开仓 远行 开渠' },
-  庚: { yi: '祭祀 出行 开市 上任 求职 签约', ji: '动土 破土 安葬' },
-  辛: { yi: '祭祀 嫁娶 开市 订盟 纳采 会亲友', ji: '栽种 开仓 伐木' },
-  壬: { yi: '祭祀 祈福 出行 求嗣 开光 入学', ji: '开仓 动土 盖屋' },
-  癸: { yi: '祭祀 祈福 嫁娶 沐浴 治病 求医', ji: '开市 栽种 修造' }
+const PENGZU_GAN = {
+  甲: ['开仓', '出货'],
+  乙: ['栽种', '纳畜'],
+  丙: ['作灶'],
+  丁: ['剃头', '理发', '整容'],
+  戊: ['耕种'],
+  己: ['立券', '交易'],
+  庚: ['经络'],
+  辛: ['酝酿'],
+  壬: ['开渠', '穿井', '乘船', '行船'],
+  癸: ['词讼', '诉讼']
 }
 
-const ZHI_YI_JI = {
-  子: { yi: '祭祀 祈福 求嗣 安床 入殓 开光', ji: '开仓 动土 破土' },
-  丑: { yi: '祭祀 开市 立券 修造 纳财 牧养', ji: '出行 嫁娶 乘船' },
-  寅: { yi: '祭祀 出行 开市 上任 会亲友 求职', ji: '动土 安葬 行丧' },
-  卯: { yi: '祭祀 嫁娶 开市 订盟 纳采 开光', ji: '开仓 出货 伐木' },
-  辰: { yi: '祭祀 开市 修造 装修 栽种 纳财', ji: '出行 嫁娶 行船' },
-  巳: { yi: '祭祀 开市 立券 交易 求嗣 入学', ji: '嫁娶 安葬 破土' },
-  午: { yi: '祭祀 祈福 出行 上任 开光 会亲友', ji: '开仓 动土 安门' },
-  未: { yi: '祭祀 开市 嫁娶 入宅 移徙 牧养', ji: '出行 动土 掘井' },
-  申: { yi: '祭祀 出行 开市 签约 求职 交易', ji: '动土 安葬 开生坟' },
-  酉: { yi: '祭祀 嫁娶 开市 安床 订盟 纳财', ji: '开仓 栽种 伐木' },
-  戌: { yi: '祭祀 开市 修造 补垣 塞穴 扫舍', ji: '出行 嫁娶 乘船' },
-  亥: { yi: '祭祀 祈福 嫁娶 求嗣 沐浴 治病', ji: '开市 动土 开渠' }
+const PENGZU_ZHI = {
+  子: ['问卜'],
+  丑: ['冠带'],
+  寅: ['祭祀', '祈福'],
+  卯: ['穿井', '掘井'],
+  辰: ['哭泣', '行丧'],
+  巳: ['远行', '出行'],
+  午: ['苫盖', '盖屋'],
+  未: ['服药', '求医', '治病'],
+  申: ['安床'],
+  酉: ['会亲友'],
+  戌: ['吃犬'],
+  亥: ['嫁娶', '纳采']
 }
+
+const YANG_GONG_DAYS = [
+  [1, 13],
+  [2, 11],
+  [3, 9],
+  [4, 7],
+  [5, 5],
+  [6, 3],
+  [7, 1],
+  [7, 29],
+  [8, 27],
+  [9, 25],
+  [10, 23],
+  [11, 21],
+  [12, 19]
+]
+
+const SI_JUE_TERMS = [2, 8, 14, 20]
+const SI_LI_TERMS = [5, 11, 17, 23]
+const YUE_PO_EXTRA_JI = ['修造', '动土', '嫁娶', '开市', '安葬', '移徙', '入宅', '开业']
 
 function splitYiJiItems(text) {
   if (Array.isArray(text)) return text.filter(Boolean)
@@ -192,9 +213,58 @@ const AUSPICIOUS_EVENTS = [
   { id: 'medical', name: '求医', jianChu: ['除', '成', '开', '定'] }
 ]
 
-function getMonthZhiIndex(year, month) {
-  const base = (year - 1900) * 12 + (month - 1)
-  return (base + 2) % 12
+function isYangGongDay(lunar) {
+  if (!lunar) return false
+  return YANG_GONG_DAYS.some((item) => item[0] === lunar.lunarMonth && item[1] === lunar.lunarDay)
+}
+
+function isPrevDayOfTerm(year, month, day, termIndex) {
+  const cur = Date.UTC(year, month - 1, day)
+  for (let y = year - 1; y <= year + 1; y += 1) {
+    const t = getSolarTermDate(y, termIndex)
+    const term = Date.UTC(y, t.month - 1, t.day)
+    if (term - cur === 86400000) return true
+  }
+  return false
+}
+
+function isSiJueDay(year, month, day) {
+  return SI_JUE_TERMS.some((n) => isPrevDayOfTerm(year, month, day, n))
+}
+
+function isSiLiDay(year, month, day) {
+  return SI_LI_TERMS.some((n) => isPrevDayOfTerm(year, month, day, n))
+}
+
+function isYuePoDay(year, month, day) {
+  const monthZhi = getJieMonthZhiIndex(year, month, day)
+  const dayZhi = getDayZhiIndex(year, month, day)
+  return dayZhi === (monthZhi + 6) % 12
+}
+
+function pengzuForbidden(gan, zhi) {
+  return uniqueYiJiItems([].concat(PENGZU_GAN[gan] || [], PENGZU_ZHI[zhi] || []))
+}
+
+function buildTongShuYiJi(year, month, day, jianChu, ganZhi, lunar) {
+  if (isYangGongDay(lunar) || isSiJueDay(year, month, day) || isSiLiDay(year, month, day)) {
+    return {
+      yi: ['余事勿取'],
+      ji: ['诸事不宜'],
+      yiText: '余事勿取',
+      jiText: '诸事不宜'
+    }
+  }
+
+  const base = JIAN_CHU_YI_JI[jianChu] || { yi: '', ji: '' }
+  const gan = ganZhi.charAt(0)
+  const zhi = ganZhi.charAt(1)
+  const extraJi = pengzuForbidden(gan, zhi).concat(isYuePoDay(year, month, day) ? YUE_PO_EXTRA_JI : [])
+  return mergeYiJi([{ yi: base.yi, ji: `${base.ji} ${extraJi.join(' ')}` }])
+}
+
+function getMonthZhiIndex(year, month, day) {
+  return getJieMonthZhiIndex(year, month, day)
 }
 
 function getDayZhiIndex(year, month, day) {
@@ -204,7 +274,7 @@ function getDayZhiIndex(year, month, day) {
 }
 
 function getJianChu(year, month, day) {
-  const monthZhi = getMonthZhiIndex(year, month)
+  const monthZhi = getMonthZhiIndex(year, month, day)
   const dayZhi = getDayZhiIndex(year, month, day)
   const idx = (dayZhi - monthZhi + 12) % 12
   return JIAN_CHU[idx]
@@ -258,20 +328,14 @@ function buildHourLuckList(year, month, day, now) {
 function getAlmanac(year, month, day) {
   const jianChu = getJianChu(year, month, day)
   const ganZhi = getGanZhiDay(year, month, day)
-  const gan = ganZhi.charAt(0)
-  const zhi = ganZhi.charAt(1)
-  const merged = mergeYiJi([
-    JIAN_CHU_YI_JI[jianChu],
-    GAN_YI_JI[gan],
-    ZHI_YI_JI[zhi]
-  ])
   const lunar = solarToLunar(year, month, day)
+  const merged = buildTongShuYiJi(year, month, day, jianChu, ganZhi, lunar)
   return {
     jianChu,
     yi: merged.yiText || '诸事皆宜',
     ji: merged.jiText || '诸事不宜',
-    yiList: merged.yi,
-    jiList: merged.ji,
+    yiList: merged.yi.length ? merged.yi : ['诸事皆宜'],
+    jiList: merged.ji.length ? merged.ji : ['诸事不宜'],
     lunar
   }
 }
@@ -282,6 +346,7 @@ function isAuspiciousDay(year, month, day, eventId) {
   const jianChu = getJianChu(year, month, day)
   if (event.jianChu.indexOf(jianChu) < 0) return false
   const ji = getAlmanac(year, month, day).ji || ''
+  if (ji.indexOf('诸事不宜') >= 0) return false
   const conflict = {
     marriage: '嫁娶',
     travel: '出行',

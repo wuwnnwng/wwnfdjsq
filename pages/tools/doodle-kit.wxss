@@ -1,0 +1,265 @@
+@import "../tool-common.wxss";
+@import "../calc-kit.wxss";
+
+.doodle-page {
+  background: var(--bg-grad-2);
+  padding-bottom: 12rpx;
+}
+
+.session-bar {
+  flex-shrink: 0;
+  padding: 12rpx 8rpx 4rpx;
+}
+
+.session-label {
+  padding: 0 12rpx 8rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.conv-hero-copy {
+  min-width: 0;
+}
+
+.session-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.session-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 0 8rpx 8rpx;
+}
+
+.session-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 56rpx;
+  padding: 0 20rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1rpx solid var(--color-line);
+}
+
+.session-chip.active {
+  color: #fff;
+  background: var(--color-brand);
+  border-color: transparent;
+}
+
+.session-chip.new {
+  color: var(--color-brand);
+  border-style: dashed;
+}
+
+.canvas-stage {
+  flex: 1;
+  min-height: 360rpx;
+  margin: 8rpx 0 0;
+  padding: 0 8rpx;
+}
+
+.canvas-frame {
+  height: 100%;
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: #fffefb;
+  box-shadow: 0 10rpx 28rpx var(--color-shadow);
+}
+
+.draw-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.palette-panel {
+  flex-shrink: 0;
+  padding: 16rpx 20rpx 8rpx;
+}
+
+.color-row,
+.tool-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.color-dot {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1rpx var(--color-line);
+}
+
+.color-dot.active {
+  box-shadow: 0 0 0 4rpx var(--color-brand-soft);
+}
+
+.hue-bar {
+  margin-top: 16rpx;
+  height: 28rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #ef4444, #f59e0b, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444);
+}
+
+.current-ink {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid var(--color-line);
+}
+
+.size-chip,
+.mode-chip {
+  min-width: 72rpx;
+  height: 52rpx;
+  padding: 0 16rpx;
+  line-height: 52rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1rpx solid var(--color-line);
+}
+
+.size-chip.active,
+.mode-chip.active {
+  color: #fff;
+  background: var(--color-brand);
+  border-color: transparent;
+}
+
+.tool-row {
+  margin-top: 14rpx;
+  flex-wrap: wrap;
+}
+
+.doodle-page .save-card-bar {
+  position: relative;
+}
+
+.doodle-bar {
+  display: flex;
+  gap: 12rpx;
+}
+
+.doodle-bar .ghost-btn,
+.doodle-bar .save-card-btn {
+  flex: 1;
+  margin: 0;
+  min-height: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.ghost-btn {
+  color: var(--color-brand);
+  background: transparent;
+  border: 1rpx solid var(--color-line);
+}
+
+.puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.puzzle-card {
+  border-radius: 20rpx;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 8rpx 20rpx var(--color-shadow);
+}
+
+.puzzle-thumb {
+  width: 100%;
+  padding-bottom: 100%;
+  position: relative;
+}
+
+.puzzle-thumb-canvas,
+.puzzle-thumb-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.puzzle-name {
+  padding: 10rpx 8rpx 12rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-ink);
+}
+
+.play-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  padding: 8rpx 8rpx 12rpx;
+}
+
+.play-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.play-back {
+  font-size: 24rpx;
+  color: var(--color-brand-soft);
+}
+
+.tile-board {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  gap: 6rpx;
+  padding: 6rpx;
+  border-radius: 20rpx;
+  background: rgba(20, 35, 28, 0.08);
+  box-sizing: border-box;
+}
+
+.tile {
+  border-radius: 8rpx;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  background-color: #e2e8f0;
+}
+
+.tile.selected {
+  box-shadow: 0 0 0 4rpx var(--color-accent);
+}
+
+.preview-thumb {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 16rpx;
+  background-size: cover;
+  background-position: center;
+  border: 1rpx solid var(--color-line);
+}
+
+.done-banner {
+  margin-top: 12rpx;
+  text-align: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--color-brand-soft);
+}

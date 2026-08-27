@@ -444,6 +444,31 @@ function drawAgeCard(ctx, width, height, result) {
   drawFooter(ctx, width, height, '趣味计算，好好生活')
 }
 
+function drawArtworkCard(ctx, width, height, view) {
+  const headerColors = view.headerColors || ['#e879f9', '#7c3aed']
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, width, height)
+  drawHeader(ctx, width, 88, view.title || '画布', headerColors)
+
+  const pad = 20
+  const imgY = 102
+  const imgW = width - pad * 2
+  const imgH = height - 150
+  fillRoundRect(ctx, pad, imgY, imgW, imgH, 18, view.frameColor || '#f8fafc')
+
+  ctx.save()
+  roundRectPath(ctx, pad + 8, imgY + 8, imgW - 16, imgH - 16, 12)
+  ctx.clip()
+  ctx.fillStyle = view.paperColor || '#fffefb'
+  ctx.fillRect(pad + 8, imgY + 8, imgW - 16, imgH - 16)
+  if (typeof view.paint === 'function') {
+    view.paint(ctx, pad + 8, imgY + 8, imgW - 16, imgH - 16)
+  }
+  ctx.restore()
+
+  drawFooter(ctx, width, height, view.note || '置居试算计算器')
+}
+
 function saveResultCard(page, canvasId, painter) {
   return requirePrivacy()
     .then(() => ensureAlbumAuth())
@@ -468,5 +493,6 @@ module.exports = {
   saveResultCard,
   handleSaveError,
   drawBmiCard,
-  drawAgeCard
+  drawAgeCard,
+  drawArtworkCard
 }

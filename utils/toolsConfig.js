@@ -3,11 +3,11 @@
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
 const FEATURED_IDS = ['fitout', 'housetax', 'age', 'calendar', 'qrcode', 'bmi', 'weight']
-const FEATURED_PAGE_SIZE = 4
+const FEATURED_PAGE_SIZE = 3
 
 const CATEGORIES = [
   { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
-  { id: 'daily', name: '日常工具', toolIds: ['calendar', 'weather', 'qrcode', 'datetime', 'age', 'bmi'] },
+  { id: 'daily', name: '日常工具', toolIds: ['calendar', 'weather', 'qrcode', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'length', 'area', 'volume', 'weight', 'temperature', 'speed', 'pressure', 'power'] }
 ]
@@ -113,6 +113,24 @@ const TOOLS = [
     iconType: 'bmi',
     keywords: 'BMI体重身高肥胖超重健康',
     page: '/pages/tools/bmi/bmi'
+  },
+  {
+    id: 'canvas',
+    name: '画布',
+    shortName: '画布',
+    icon: '🎨',
+    iconType: 'canvas',
+    keywords: '画布涂鸦绘画调色会话画板草稿卡片',
+    page: '/pages/tools/canvas/canvas'
+  },
+  {
+    id: 'puzzle',
+    name: '拼图',
+    shortName: '拼图',
+    icon: '🧩',
+    iconType: 'puzzle',
+    keywords: '拼图游戏切图益智卡片',
+    page: '/pages/tools/puzzle/puzzle'
   },
   {
     id: 'currency',
@@ -279,19 +297,10 @@ function getFeaturedToolPages() {
     iconType: 'random',
     isRandom: true
   }
-  const more = {
-    id: 'more',
-    name: '全部',
-    shortName: '全部',
-    icon: '',
-    iconType: 'more',
-    page: '/pages/tools/index',
-    isMore: true
-  }
-  const extra = ['rmb', 'weather']
+  const extra = ['rmb', 'weather', 'canvas', 'puzzle']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
-  const list = getFeaturedTools().concat(extra, random, more)
+  const list = getFeaturedTools().concat(extra, random)
   const pages = []
   for (let i = 0; i < list.length; i += FEATURED_PAGE_SIZE) {
     const index = i / FEATURED_PAGE_SIZE

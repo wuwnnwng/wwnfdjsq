@@ -31,10 +31,30 @@
   line-height: 36rpx;
 }
 
-.tools-swiper {
+.tools-main {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.tools-entry.collapsed .tools-main {
+  justify-content: flex-end;
+}
+
+.tools-swiper {
+  flex: 3;
+  min-width: 0;
   height: 196rpx;
+}
+
+.tools-more-fixed {
+  flex: 1;
+  min-width: 0;
+}
+
+.tools-entry.collapsed .tools-more-fixed {
+  flex: 0 0 22%;
 }
 
 .tools-page {
@@ -170,6 +190,14 @@
 
 .tool-icon-random {
   background: linear-gradient(135deg, #ede9fe, #c4b5fd);
+}
+
+.tool-icon-canvas {
+  background: linear-gradient(135deg, #fce7f3, #e879f9);
+}
+
+.tool-icon-puzzle {
+  background: linear-gradient(135deg, #dbeafe, #60a5fa);
 }
 
 .tool-icon-currency {

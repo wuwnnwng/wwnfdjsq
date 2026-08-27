@@ -1,0 +1,89 @@
+<view class="page page-shell theme-{{theme}} doodle-page">
+  <view class="panel puzzle-hero">
+    <view class="conv-hero-id">
+      <view class="tool-icon-wrap tool-icon-puzzle">
+        <text class="tool-icon">🧩</text>
+      </view>
+      <view class="conv-hero-copy">
+        <view class="conv-kicker">热门题材 · 会话 · 卡片</view>
+        <view class="conv-title">拼图</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="session-bar" wx:if="{{sessions.length}}">
+    <view class="session-label">暂存会话（最多 5 个，下次可继续拼，长按删除）</view>
+    <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="session-scroll">
+      <view class="session-row">
+        <view
+          class="session-chip {{item.id === sessionId ? 'active' : ''}}"
+          wx:for="{{sessions}}"
+          wx:key="id"
+          bindtap="onOpenSession"
+          bindlongpress="onDeleteSession"
+          data-id="{{item.id}}"
+        >{{item.name}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <scroll-view wx:if="{{!playing}}" scroll-y class="puzzle-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel" style="margin-top: 12rpx;">
+      <view class="section-title">热门拼图 30 款</view>
+      <view class="tool-note">点选一张开始。点两块互换位置，拼好后可导出卡片。</view>
+      <view class="puzzle-grid" style="margin-top: 20rpx;">
+        <view
+          class="puzzle-card"
+          wx:for="{{puzzles}}"
+          wx:key="id"
+          bindtap="onPickPuzzle"
+          data-id="{{item.id}}"
+        >
+          <view
+            class="puzzle-thumb"
+            style="{{item.thumbStyle}}"
+          ></view>
+          <view class="puzzle-name">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view wx:else class="play-wrap">
+    <view class="play-head">
+      <view class="play-back" bindtap="onBackGallery">‹ 换一张</view>
+      <view class="play-title">{{puzzleName}}</view>
+      <view class="preview-thumb" style="background-image: url('{{imagePath}}');"></view>
+    </view>
+    <view class="tool-row" style="margin-top: 0; padding: 0 8rpx 12rpx;">
+      <view
+        class="size-chip {{cols === item ? 'active' : ''}}"
+        wx:for="{{colOptions}}"
+        wx:key="*this"
+        data-cols="{{item}}"
+        bindtap="onChangeCols"
+      >{{item}}×{{item}}</view>
+    </view>
+    <view class="play-board-wrap">
+      <view class="tile-board" style="grid-template-columns: repeat({{cols}}, 1fr); width: {{boardSize}}px; height: {{boardSize}}px;">
+        <view
+          class="tile {{item.index === selectedIndex ? 'selected' : ''}}"
+          wx:for="{{tiles}}"
+          wx:key="index"
+          data-index="{{item.index}}"
+          bindtap="onTapTile"
+          style="background-image: url('{{imagePath}}'); background-size: {{bgSize}}; background-position: {{item.bgPos}};"
+        ></view>
+      </view>
+    </view>
+    <view class="done-banner" wx:if="{{solved}}">拼好了，可以导出卡片或暂存</view>
+  </view>
+
+  <view class="save-card-bar doodle-bar" wx:if="{{playing}}">
+    <view class="ghost-btn" bindtap="onSaveDraft">暂存 {{sessions.length}}/5</view>
+    <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '导出卡片'}}</view>
+  </view>
+
+  <canvas type="2d" id="puzzleArt" class="puzzle-art-canvas"></canvas>
+  <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
+</view>

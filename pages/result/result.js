@@ -92,7 +92,15 @@ Page({
     showSplitTip: false,
     showRewardTip: false,
     showSavePlanTip: false,
-    showEarlySavedPopup: false,
+    showInterestPopup: false,
+    interestPopup: {
+      kicker: '🌸',
+      title: '',
+      amount: '',
+      unit: '元',
+      sub: '',
+      confirm: '知道了'
+    },
     confettiPieces: [],
     planNameDraft: '',
     planNameMaxLen: NAME_MAX_LEN,
@@ -171,7 +179,14 @@ Page({
       visibleSchedule: [],
       canExport: false
     })
-    this.scheduleEarlySavedPopup(!!shared.isEarlyRepayment)
+    this.scheduleInterestPopup({
+      isEarlyRepayment: !!shared.isEarlyRepayment,
+      isRemaining: !!shared.isRemaining,
+      display: shared.display || {},
+      earlyInfo: shared.earlyInfo || {},
+      loanTypeLabel: shared.loanTypeLabel,
+      methodLabel: shared.methodLabel
+    })
   },
 
   applyLocalResult(result, options = {}) {
@@ -247,21 +262,66 @@ Page({
       visibleSchedule: [],
       canExport: fullSchedule.length > 0
     })
-    this.scheduleEarlySavedPopup(isEarlyRepayment)
+    this.scheduleInterestPopup({
+      isEarlyRepayment,
+      isRemaining,
+      display: result.display || {},
+      earlyInfo: isEarlyRepayment
+        ? {
+            typeLabel: PREPAY_TYPE_LABEL[early.prepayType] || '',
+            interestSaved: formatMoneyWithComma(early.interestSaved || 0)
+          }
+        : {},
+      loanTypeLabel,
+      methodLabel: METHOD_LABEL[result.method] || ''
+    })
   },
 
-  scheduleEarlySavedPopup(isEarly) {
+  scheduleInterestPopup(view) {
     if (this._earlySavedTimer) {
       clearTimeout(this._earlySavedTimer)
       this._earlySavedTimer = null
     }
-    if (!isEarly) return
+    const isEarly = !!view.isEarlyRepayment
+    const isRemaining = !!view.isRemaining
+    let popup
+    if (isEarly) {
+      popup = {
+        kicker: '🎉',
+        title: '提前还款预计节省',
+        amount: (view.earlyInfo && view.earlyInfo.interestSaved) || '0.00',
+        unit: '元利息',
+        sub: (view.earlyInfo && view.earlyInfo.typeLabel) || '',
+        confirm: '太好了'
+      }
+    } else if (isRemaining) {
+      popup = {
+        kicker: '🌸',
+        title: '已有贷款剩余利息',
+        amount: (view.display && view.display.totalInterest) || '0.00',
+        unit: '元',
+        sub: [view.loanTypeLabel, view.methodLabel].filter(Boolean).join(' · '),
+        confirm: '知道了'
+      }
+    } else {
+      popup = {
+        kicker: '🌸',
+        title: '新贷款支付利息',
+        amount: (view.display && view.display.totalInterest) || '0.00',
+        unit: '元',
+        sub: [view.loanTypeLabel, view.methodLabel].filter(Boolean).join(' · '),
+        confirm: '知道了'
+      }
+    }
     this._earlySavedTimer = setTimeout(() => {
       this._earlySavedTimer = null
       this.setData({
-        showEarlySavedPopup: true,
+        showInterestPopup: true,
+        interestPopup: popup,
         confettiPieces: createConfettiPieces({
-          colors: ['#fbbf24', '#34d399', '#f59e0b', '#10b981', '#60a5fa', '#fb923c', '#facc15', '#4ade80']
+          colors: isEarly
+            ? ['#fbbf24', '#34d399', '#f59e0b', '#10b981', '#60a5fa', '#fb923c', '#facc15', '#4ade80']
+            : ['#f472b6', '#fb7185', '#fbbf24', '#34d399', '#60a5fa', '#c084fc', '#fb923c', '#f9a8d4']
         })
       })
     }, 280)
@@ -270,7 +330,7 @@ Page({
   onEarlySavedDialogTap() {},
 
   onCloseEarlySavedPopup() {
-    this.setData({ showEarlySavedPopup: false, confettiPieces: [] })
+    this.setData({ showInterestPopup: false, confettiPieces: [] })
   },
 
   getShareView() {

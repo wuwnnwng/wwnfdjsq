@@ -1,0 +1,38 @@
+@import "../doodle-kit.wxss";
+
+.tool-icon-puzzle {
+  background: linear-gradient(135deg, #dbeafe, #60a5fa);
+}
+
+.puzzle-hero {
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 20rpx 24rpx 8rpx;
+}
+
+.play-wrap {
+  flex: 1;
+  min-height: 0;
+  padding: 0 8rpx 12rpx;
+  overflow: auto;
+}
+
+.puzzle-scroll {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+}
+
+.play-board-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.puzzle-art-canvas {
+  position: fixed;
+  left: -2000px;
+  top: 0;
+  width: 300px;
+  height: 300px;
+}

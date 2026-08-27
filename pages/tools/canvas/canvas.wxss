@@ -1,0 +1,20 @@
+@import "../doodle-kit.wxss";
+
+.tool-icon-canvas {
+  background: linear-gradient(135deg, #fce7f3, #e879f9);
+}
+
+.conv-hero-copy {
+  min-width: 0;
+}
+
+.canvas-hero {
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 20rpx 24rpx 8rpx;
+}
+
+.doodle-page {
+  display: flex;
+  flex-direction: column;
+}

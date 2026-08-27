@@ -16,6 +16,8 @@
     "pages/tools/percent/percent",
     "pages/tools/age/age",
     "pages/tools/bmi/bmi",
+    "pages/tools/canvas/canvas",
+    "pages/tools/puzzle/puzzle",
     "pages/result/result"
   ],
   "window": {
@@ -30,7 +32,7 @@
       "desc": "用于获取你所在城市的天气"
     },
     "scope.writePhotosAlbum": {
-      "desc": "用于把生成的二维码、结果卡片保存到相册"
+      "desc": "用于把生成的二维码、画布、拼图和结果卡片保存到相册"
     }
   },
   "requiredPrivateInfos": ["getLocation"],

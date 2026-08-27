@@ -350,6 +350,52 @@ function getSolarTermDate(year, n) {
   return termDate(year, n)
 }
 
+function termUtc(year, n) {
+  const y = Number(year) || 1900
+  const idx = Math.max(0, Math.min(TERM_INFO.length - 1, Number(n) || 0))
+  return Date.UTC(1900, 0, 6, 2, 5) + 31556925974.7 * (y - 1900) + TERM_INFO[idx] * 60000
+}
+
+/** 节气月地支：小寒后丑月，立春后寅月，惊蛰后卯月…（与通书/系统黄历一致） */
+function getJieMonthZhiIndex(year, month, day) {
+  const cur = Date.UTC(year, month - 1, day)
+  const jieIndex = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]
+  const zhiAfter = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0]
+  let bestTs = -Infinity
+  let zhi = 1
+  for (let y = year - 1; y <= year; y += 1) {
+    for (let i = 0; i < 12; i += 1) {
+      const parts = utcDateParts(termUtc(y, jieIndex[i]))
+      const ts = Date.UTC(parts.year, parts.month - 1, parts.day)
+      if (ts <= cur && ts > bestTs) {
+        bestTs = ts
+        zhi = zhiAfter[i]
+      }
+    }
+  }
+  return zhi
+}
+
+/** 年柱：立春换年，与手机黄历、万年历一致 */
+function getGanZhiYearExact(year, month, day) {
+  const li = utcDateParts(termUtc(year, 2))
+  const curTs = Date.UTC(year, month - 1, day)
+  const liDayTs = Date.UTC(li.year, li.month - 1, li.day)
+  if (curTs >= liDayTs) return getGanZhiYear(li.year)
+  return getGanZhiYear(li.year - 1)
+}
+
+/** 月柱：节气换月 + 五虎遁 */
+function getGanZhiMonthExact(year, month, day) {
+  const monthZhiIndex = getJieMonthZhiIndex(year, month, day)
+  const yearGanZhi = getGanZhiYearExact(year, month, day)
+  const yearGanIndex = GAN.indexOf(yearGanZhi.charAt(0))
+  const firstYinGanIndex = [2, 4, 6, 8, 0][yearGanIndex % 5]
+  const offsetFromYin = (monthZhiIndex - 2 + 12) % 12
+  const monthGanIndex = (firstYinGanIndex + offsetFromYin) % 10
+  return `${GAN[monthGanIndex]}${ZHI[monthZhiIndex]}`
+}
+
 function getSolarTerm(year, month, day) {
   try {
     for (let i = 0; i < 24; i += 1) {
@@ -399,8 +445,8 @@ function buildDayInfo(year, month, day) {
     weekText: weekInfo.weekText,
     lunar,
     lunarText: formatLunarDate(lunar),
-    ganZhiYear: getGanZhiYear(lunar.lunarYear),
-    ganZhiMonth: getGanZhiMonth(lunar.lunarYear, lunar.lunarMonth),
+    ganZhiYear: getGanZhiYearExact(year, month, day),
+    ganZhiMonth: getGanZhiMonthExact(year, month, day),
     ganZhiDay: getGanZhiDay(year, month, day),
     zodiac: getZodiac(lunar.lunarYear),
     constellation: getConstellation(month, day),
@@ -446,6 +492,9 @@ module.exports = {
   monthDays,
   getGanZhiYear,
   getGanZhiMonth,
+  getGanZhiYearExact,
+  getGanZhiMonthExact,
+  getJieMonthZhiIndex,
   getGanZhiDay,
   getZodiac,
   getConstellation,

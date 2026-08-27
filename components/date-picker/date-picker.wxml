@@ -1,0 +1,27 @@
+<view wx:if="{{visible}}" class="date-picker-mask" catchtap="onCancel" catchtouchmove="preventMove">
+  <view class="date-picker-sheet" catchtap="onSheetTap">
+    <view class="date-picker-head">
+      <view class="date-picker-action" catchtap="onCancel">取消</view>
+      <view class="date-picker-title">{{title}}</view>
+      <view class="date-picker-action confirm" catchtap="onConfirm">确定</view>
+    </view>
+    <picker-view
+      class="date-picker-view"
+      value="{{pickerValue}}"
+      immediate-change="{{true}}"
+      bindchange="onPickerChange"
+      indicator-style="height: 72rpx;"
+      indicator-class="date-picker-indicator"
+    >
+      <picker-view-column>
+        <view class="date-picker-item" wx:for="{{years}}" wx:key="*this">{{item}}年</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view class="date-picker-item" wx:for="{{months}}" wx:key="*this">{{item}}月</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view class="date-picker-item" wx:for="{{days}}" wx:key="*this">{{item}}日</view>
+      </picker-view-column>
+    </picker-view>
+  </view>
+</view>

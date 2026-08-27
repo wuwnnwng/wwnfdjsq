@@ -103,7 +103,8 @@ Page({
     featuredToolPages: getFeaturedToolPages(),
     featuredToolsOpen: readFeaturedToolsOpen(),
     showToolsNew: !hasSeenToolsHub(),
-    toolsIndicator: getTheme(getThemeId()).principal
+    toolsIndicator: getTheme(getThemeId()).principal,
+    showFirstDatePicker: false
   },
 
   onLoad() {
@@ -440,10 +441,20 @@ Page({
     this.setData(patch, () => this.refreshDerived())
   },
 
-  onFirstDateChange(e) {
+  onOpenFirstDatePicker() {
+    this.setData({ showFirstDatePicker: true })
+  },
+
+  onHideFirstDatePicker() {
+    this.setData({ showFirstDatePicker: false })
+  },
+
+  onFirstDateConfirm(e) {
+    const value = (e.detail && e.detail.value) || ''
     this.setData(
       {
-        firstRepaymentDate: e.detail.value
+        firstRepaymentDate: value,
+        showFirstDatePicker: false
       },
       () => this.refreshDerived()
     )

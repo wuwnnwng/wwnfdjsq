@@ -70,17 +70,13 @@
         <view class="field">
           <text class="field-label">开始日期</text>
           <view class="field-control">
-            <picker mode="date" value="{{startDate}}" start="1900-01-01" end="2100-12-31" bindchange="onStartDateChange">
-              <view class="picker-value">{{startDate}}</view>
-            </picker>
+            <view class="picker-value" bindtap="onOpenDatePicker" data-field="startDate">{{startDate}}</view>
           </view>
         </view>
         <view class="field">
           <text class="field-label">结束日期</text>
           <view class="field-control">
-            <picker mode="date" value="{{endDate}}" start="1900-01-01" end="2100-12-31" bindchange="onEndDateChange">
-              <view class="picker-value">{{endDate}}</view>
-            </picker>
+            <view class="picker-value" bindtap="onOpenDatePicker" data-field="endDate">{{endDate}}</view>
           </view>
         </view>
         <view class="swap-link" bindtap="onSwapDates">交换起止日期</view>
@@ -90,9 +86,7 @@
         <view class="field">
           <text class="field-label">起始日期</text>
           <view class="field-control">
-            <picker mode="date" value="{{baseDate}}" start="1900-01-01" end="2100-12-31" bindchange="onBaseDateChange">
-              <view class="picker-value">{{baseDate}}</view>
-            </picker>
+            <view class="picker-value" bindtap="onOpenDatePicker" data-field="baseDate">{{baseDate}}</view>
           </view>
         </view>
         <view class="field">
@@ -185,4 +179,14 @@
       <view class="tool-note">按月、年推算时跟随日历滚动，例如 1 月 31 日加一个月会落到 3 月初。</view>
     </view>
   </scroll-view>
+
+  <date-picker
+    show="{{showDatePicker}}"
+    title="{{datePickerTitle}}"
+    value="{{datePickerValue}}"
+    start="1900-01-01"
+    end="2100-12-31"
+    bindconfirm="onDatePickerConfirm"
+    bindcancel="onHideDatePicker"
+  />
 </view>

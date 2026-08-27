@@ -44,7 +44,10 @@ Page({
     offsetDirection: 'after',
     convertResult: null,
     diffResult: null,
-    offsetResult: null
+    offsetResult: null,
+    showDatePicker: false,
+    datePickerTitle: '选择日期',
+    datePickerValue: ''
   },
 
   onLoad() {
@@ -121,12 +124,40 @@ Page({
     )
   },
 
-  onStartDateChange(e) {
-    this.setData({ startDate: e.detail.value }, () => this.recalculate())
+  onOpenDatePicker(e) {
+    const field = e.currentTarget.dataset.field
+    if (!field) return
+    const titles = {
+      startDate: '选择开始日期',
+      endDate: '选择结束日期',
+      baseDate: '选择起始日期'
+    }
+    this._datePickerField = field
+    this.setData({
+      datePickerTitle: titles[field] || '选择日期',
+      datePickerValue: this.data[field] || '',
+      showDatePicker: true
+    })
   },
 
-  onEndDateChange(e) {
-    this.setData({ endDate: e.detail.value }, () => this.recalculate())
+  onHideDatePicker() {
+    this.setData({ showDatePicker: false })
+  },
+
+  onDatePickerConfirm(e) {
+    const field = this._datePickerField
+    const value = (e.detail && e.detail.value) || ''
+    if (!field) {
+      this.setData({ showDatePicker: false })
+      return
+    }
+    this.setData(
+      {
+        [field]: value,
+        showDatePicker: false
+      },
+      () => this.recalculate()
+    )
   },
 
   onSwapDates() {
@@ -137,10 +168,6 @@ Page({
       },
       () => this.recalculate()
     )
-  },
-
-  onBaseDateChange(e) {
-    this.setData({ baseDate: e.detail.value }, () => this.recalculate())
   },
 
   onOffsetValue(e) {

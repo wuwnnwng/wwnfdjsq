@@ -185,11 +185,32 @@
   flex: 8;
 }
 
-.save-card-btn {
-  width: 100%;
-  margin-top: 28rpx;
-  margin-bottom: 12rpx;
+.save-card-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: var(--color-footer);
+  box-shadow: 0 -12rpx 28rpx rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
+}
+
+.save-card-bar .save-card-btn {
+  width: 100%;
+  margin: 0;
+  min-height: 88rpx;
+  height: 88rpx;
+  box-sizing: border-box;
+}
+
+.tool-scroll.has-save-bar {
+  padding-bottom: 0;
+}
+
+.save-bar-spacer {
+  height: calc(148rpx + env(safe-area-inset-bottom));
 }
 
 .result-card-canvas {

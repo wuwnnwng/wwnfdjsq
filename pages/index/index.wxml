@@ -364,11 +364,12 @@
         <view class="field">
           <text class="field-label">首次还款日期</text>
           <view class="field-control">
-            <picker mode="date" value="{{firstRepaymentDate}}" bindchange="onFirstDateChange">
-              <view class="picker-value {{firstRepaymentDate ? '' : 'placeholder'}}">
-                {{firstRepaymentDate || '请选择日期'}}
-              </view>
-            </picker>
+            <view
+              class="picker-value {{firstRepaymentDate ? '' : 'placeholder'}}"
+              bindtap="onOpenFirstDatePicker"
+            >
+              {{firstRepaymentDate || '请选择日期'}}
+            </view>
           </view>
         </view>
 
@@ -522,4 +523,14 @@
     <button class="primary-btn" bindtap="onCalculate">开始计算</button>
     <view class="disclaimer">计算结果仅供参考，实际以银行审批为准</view>
   </view>
+
+  <date-picker
+    show="{{showFirstDatePicker}}"
+    title="选择首次还款日期"
+    value="{{firstRepaymentDate}}"
+    start="1990-01-01"
+    end="2100-12-31"
+    bindconfirm="onFirstDateConfirm"
+    bindcancel="onHideFirstDatePicker"
+  />
 </view>

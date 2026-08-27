@@ -168,6 +168,10 @@
   background: linear-gradient(135deg, #f3e8ff, #c4b5fd);
 }
 
+.tool-icon-random {
+  background: linear-gradient(135deg, #ede9fe, #c4b5fd);
+}
+
 .tool-icon-currency {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
 }

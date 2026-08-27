@@ -26,6 +26,7 @@ const {
 } = require('../../utils/plans')
 const {
   getFeaturedToolPages,
+  pickRandomTool,
   hasSeenToolsHub,
   markToolsHubSeen
 } = require('../../utils/toolsConfig')
@@ -219,9 +220,22 @@ Page({
       this.onGoTools()
       return
     }
+    if (id === 'random') {
+      this.onOpenRandomTool()
+      return
+    }
     const page = e.currentTarget.dataset.page
     if (!page) return
     wx.navigateTo({ url: page })
+  },
+
+  onOpenRandomTool() {
+    const tool = pickRandomTool()
+    if (!tool || !tool.page) {
+      wx.showToast({ title: '暂无工具', icon: 'none' })
+      return
+    }
+    wx.navigateTo({ url: tool.page })
   },
 
   onShowPlans() {

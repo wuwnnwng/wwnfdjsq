@@ -270,6 +270,14 @@ function padFeaturedPage(page, size) {
 }
 
 function getFeaturedToolPages() {
+  const random = {
+    id: 'random',
+    name: '随机工具',
+    shortName: '随机',
+    icon: '🎲',
+    iconType: 'random',
+    isRandom: true
+  }
   const more = {
     id: 'more',
     name: '全部',
@@ -279,7 +287,7 @@ function getFeaturedToolPages() {
     page: '/pages/tools/index',
     isMore: true
   }
-  const list = getFeaturedTools().concat(more)
+  const list = getFeaturedTools().concat(random, more)
   const pages = []
   for (let i = 0; i < list.length; i += FEATURED_PAGE_SIZE) {
     const index = i / FEATURED_PAGE_SIZE
@@ -289,6 +297,12 @@ function getFeaturedToolPages() {
     })
   }
   return pages
+}
+
+function pickRandomTool() {
+  if (!TOOLS.length) return null
+  const index = Math.floor(Math.random() * TOOLS.length)
+  return TOOLS[index] || null
 }
 
 function groupTools(list) {
@@ -347,6 +361,7 @@ module.exports = {
   groupTools,
   getFeaturedTools,
   getFeaturedToolPages,
+  pickRandomTool,
   hasSeenToolsHub,
   markToolsHubSeen
 }

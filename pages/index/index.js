@@ -105,6 +105,7 @@ Page({
     featuredToolsOpen: readFeaturedToolsOpen(),
     showToolsNew: !hasSeenToolsHub(),
     toolsIndicator: getTheme(getThemeId()).principal,
+    toolsSwiperCurrent: 0,
     showFirstDatePicker: false
   },
 
@@ -212,6 +213,12 @@ Page({
     const featuredToolsOpen = !this.data.featuredToolsOpen
     writeFeaturedToolsOpen(featuredToolsOpen)
     this.setData({ featuredToolsOpen })
+  },
+
+  onFeaturedSwiperChange(e) {
+    const current = e.detail && e.detail.current
+    if (typeof current !== 'number' || current === this.data.toolsSwiperCurrent) return
+    this.setData({ toolsSwiperCurrent: current })
   },
 
   onOpenFeaturedTool(e) {

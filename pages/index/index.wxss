@@ -38,10 +38,35 @@
   align-items: flex-start;
 }
 
-.tools-swiper {
+.tools-swiper-wrap {
   flex: 3;
   min-width: 0;
+  position: relative;
   height: 136rpx;
+}
+
+.tools-swiper {
+  height: 136rpx;
+}
+
+.tools-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4rpx;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10rpx;
+  pointer-events: none;
+}
+
+.tools-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: rgba(20, 35, 28, 0.16);
 }
 
 .tools-more-fixed {

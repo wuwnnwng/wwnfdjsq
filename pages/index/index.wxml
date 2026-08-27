@@ -31,39 +31,47 @@
 
     <view class="tools-entry {{featuredToolsOpen ? '' : 'collapsed'}}">
       <view class="tools-main" wx:if="{{featuredToolsOpen}}">
-        <swiper
-          class="tools-swiper"
-          indicator-dots
-          indicator-color="rgba(20, 35, 28, 0.16)"
-          indicator-active-color="{{toolsIndicator}}"
-          circular
-          autoplay
-          interval="4800"
-          duration="420"
-          easing-function="easeOutCubic"
-        >
-          <swiper-item wx:for="{{featuredToolPages}}" wx:for-item="page" wx:key="key">
-            <view class="tools-page">
-              <block wx:for="{{page.tools}}" wx:for-item="item" wx:key="id">
-                <view wx:if="{{item.isPad}}" class="tools-chip tools-chip-pad"></view>
-                <view
-                  wx:else
-                  class="tools-chip"
-                  bindtap="onOpenFeaturedTool"
-                  data-id="{{item.id}}"
-                  data-page="{{item.page}}"
-                  aria-role="button"
-                  aria-label="{{item.name}}"
-                >
-                  <view class="tools-chip-icon tool-icon-{{item.iconType}}">
-                    <text class="tools-chip-emoji">{{item.icon}}</text>
+        <view class="tools-swiper-wrap">
+          <swiper
+            class="tools-swiper"
+            circular
+            autoplay
+            interval="4800"
+            duration="420"
+            easing-function="easeOutCubic"
+            bindchange="onFeaturedSwiperChange"
+          >
+            <swiper-item wx:for="{{featuredToolPages}}" wx:for-item="page" wx:key="key">
+              <view class="tools-page">
+                <block wx:for="{{page.tools}}" wx:for-item="item" wx:key="id">
+                  <view wx:if="{{item.isPad}}" class="tools-chip tools-chip-pad"></view>
+                  <view
+                    wx:else
+                    class="tools-chip"
+                    bindtap="onOpenFeaturedTool"
+                    data-id="{{item.id}}"
+                    data-page="{{item.page}}"
+                    aria-role="button"
+                    aria-label="{{item.name}}"
+                  >
+                    <view class="tools-chip-icon tool-icon-{{item.iconType}}">
+                      <text class="tools-chip-emoji">{{item.icon}}</text>
+                    </view>
+                    <text class="tools-chip-name">{{item.shortName}}</text>
                   </view>
-                  <text class="tools-chip-name">{{item.shortName}}</text>
-                </view>
-              </block>
-            </view>
-          </swiper-item>
-        </swiper>
+                </block>
+              </view>
+            </swiper-item>
+          </swiper>
+          <view class="tools-dots" aria-hidden="true">
+            <view
+              wx:for="{{featuredToolPages}}"
+              wx:key="key"
+              class="tools-dot {{index === toolsSwiperCurrent ? 'active' : ''}}"
+              style="{{index === toolsSwiperCurrent ? 'background:' + toolsIndicator : ''}}"
+            ></view>
+          </view>
+        </view>
         <view
           class="tools-chip tools-more-fixed"
           bindtap="onOpenFeaturedTool"

@@ -1,0 +1,82 @@
+var startX = 0
+var startY = 0
+var shown = false
+var hasStart = false
+var size = 0
+var threshold = 12
+
+function toNumber(value, fallback) {
+  var n = parseFloat(value)
+  return n !== n ? fallback : n
+}
+
+function hideGhost(ownerInstance) {
+  var ghost = ownerInstance.select('#tileGhost')
+  if (!ghost) ghost = ownerInstance.select('.tile-ghost')
+  if (ghost) {
+    ghost.setStyle({
+      display: 'none'
+    })
+  }
+  shown = false
+  hasStart = false
+  startX = 0
+  startY = 0
+}
+
+function markStart(event) {
+  var dataset = event.currentTarget.dataset || {}
+  if (dataset.solved === true || dataset.solved === 'true') return false
+  var touch = event.touches[0]
+  startX = touch.clientX
+  startY = touch.clientY
+  size = toNumber(dataset.size, 64)
+  shown = false
+  hasStart = true
+  return true
+}
+
+function start(event, ownerInstance) {
+  var dataset = event.currentTarget.dataset || {}
+  if (dataset.solved === true || dataset.solved === 'true') {
+    hideGhost(ownerInstance)
+    return false
+  }
+  markStart(event)
+}
+
+function move(event, ownerInstance) {
+  var dataset = event.currentTarget.dataset || {}
+  if (dataset.solved === true || dataset.solved === 'true') return false
+  if (!hasStart) markStart(event)
+  var touch = event.touches[0]
+  var dx = touch.clientX - startX
+  var dy = touch.clientY - startY
+  if (!shown && dx * dx + dy * dy < threshold * threshold) return false
+  shown = true
+  var ghost = ownerInstance.select('#tileGhost')
+  if (!ghost) ghost = ownerInstance.select('.tile-ghost')
+  if (!ghost) return false
+  var half = size / 2
+  ghost.setStyle({
+    display: 'block',
+    position: 'fixed',
+    left: touch.clientX - half + 'px',
+    top: touch.clientY - half + 'px',
+    width: size + 'px',
+    height: size + 'px',
+    'z-index': 99,
+    'pointer-events': 'none'
+  })
+  return false
+}
+
+function end(event, ownerInstance) {
+  hideGhost(ownerInstance)
+}
+
+module.exports = {
+  start: start,
+  move: move,
+  end: end
+}

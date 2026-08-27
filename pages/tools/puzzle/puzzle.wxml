@@ -1,3 +1,4 @@
+<wxs module="drag" src="./puzzle-drag.wxs"></wxs>
 <view class="page page-shell theme-{{theme}} doodle-page">
   <view class="panel puzzle-hero">
     <view class="conv-hero-id">
@@ -30,7 +31,7 @@
   <scroll-view wx:if="{{!playing}}" scroll-y class="puzzle-scroll" enhanced show-scrollbar="{{false}}">
     <view class="panel" style="margin-top: 12rpx;">
       <view class="section-title">热门拼图 30 款</view>
-      <view class="tool-note">点选一张开始。点两块互换位置，拼好后可导出卡片。</view>
+      <view class="tool-note">点选一张开始。拖动图块互换位置，也可点两块互换。拼好后可导出卡片。</view>
       <view class="puzzle-grid" style="margin-top: 20rpx;">
         <view
           class="puzzle-card"
@@ -39,10 +40,14 @@
           bindtap="onPickPuzzle"
           data-id="{{item.id}}"
         >
-          <view
-            class="puzzle-thumb"
-            style="{{item.thumbStyle}}"
-          ></view>
+          <view class="puzzle-thumb" style="{{item.thumbStyle}}">
+            <image
+              wx:if="{{item.thumbPath}}"
+              class="puzzle-thumb-img"
+              src="{{item.thumbPath}}"
+              mode="aspectFill"
+            />
+          </view>
           <view class="puzzle-name">{{item.name}}</view>
         </view>
       </view>
@@ -53,7 +58,8 @@
     <view class="play-head">
       <view class="play-back" bindtap="onBackGallery">‹ 换一张</view>
       <view class="play-title">{{puzzleName}}</view>
-      <view class="preview-thumb" style="background-image: url('{{imagePath}}');"></view>
+      <image wx:if="{{imagePath}}" class="preview-thumb" src="{{imagePath}}" mode="aspectFill" />
+      <view wx:else class="preview-thumb"></view>
     </view>
     <view class="tool-row" style="margin-top: 0; padding: 0 8rpx 12rpx;">
       <view
@@ -65,14 +71,41 @@
       >{{item}}×{{item}}</view>
     </view>
     <view class="play-board-wrap">
-      <view class="tile-board" style="grid-template-columns: repeat({{cols}}, 1fr); width: {{boardSize}}px; height: {{boardSize}}px;">
+      <view
+        id="tileBoardHost"
+        class="tile-board-host"
+        data-size="{{tilePx}}"
+        data-solved="{{solved}}"
+        bindtouchstart="{{drag.start}}"
+        catchtouchmove="{{drag.move}}"
+        bindtouchend="{{drag.end}}"
+        bindtouchcancel="{{drag.end}}"
+        style="width: {{boardSize}}px; height: {{boardSize}}px;"
+      >
         <view
-          class="tile {{item.index === selectedIndex ? 'selected' : ''}}"
-          wx:for="{{tiles}}"
-          wx:key="index"
-          data-index="{{item.index}}"
-          bindtap="onTapTile"
-          style="background-image: url('{{imagePath}}'); background-size: {{bgSize}}; background-position: {{item.bgPos}};"
+          id="tileBoard"
+          class="tile-board"
+          style="grid-template-columns: repeat({{cols}}, 1fr); width: {{boardSize}}px; height: {{boardSize}}px;"
+        >
+          <view
+            class="tile {{item.index === selectedIndex ? 'selected' : ''}} {{item.index === dragFrom ? 'lifted' : ''}}"
+            wx:for="{{tiles}}"
+            wx:key="index"
+            data-index="{{item.index}}"
+            data-size="{{tilePx}}"
+            data-solved="{{solved}}"
+            hover-class="none"
+            bindtouchstart="onTileTouchStart"
+            catchtouchmove="{{drag.move}}"
+            bindtouchend="onTileTouchEnd"
+            bindtouchcancel="onTileTouchEnd"
+            style="background-image: url('{{imagePath}}'); background-size: {{bgSize}}; background-position: {{item.bgPos}};"
+          ></view>
+        </view>
+        <view
+          id="tileGhost"
+          class="tile-ghost"
+          style="background-image: url('{{imagePath}}'); background-size: {{bgSize}}; background-position: {{dragBgPos}};"
         ></view>
       </view>
     </view>
@@ -85,5 +118,6 @@
   </view>
 
   <canvas type="2d" id="puzzleArt" class="puzzle-art-canvas"></canvas>
+  <canvas type="2d" id="puzzleThumbs" class="puzzle-thumbs-canvas"></canvas>
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
 </view>

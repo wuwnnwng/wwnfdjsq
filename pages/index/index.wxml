@@ -30,9 +30,8 @@
     </view>
 
     <view class="tools-entry {{featuredToolsOpen ? '' : 'collapsed'}}">
-      <view class="tools-main">
+      <view class="tools-main" wx:if="{{featuredToolsOpen}}">
         <swiper
-          wx:if="{{featuredToolsOpen}}"
           class="tools-swiper"
           indicator-dots
           indicator-color="rgba(20, 35, 28, 0.16)"

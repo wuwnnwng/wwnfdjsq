@@ -1,5 +1,5 @@
-@import "../tool-common.wxss";
-@import "../calc-kit.wxss";
+@import "./tool-common.wxss";
+@import "./calc-kit.wxss";
 
 .doodle-page {
   background: var(--bg-grad-2);

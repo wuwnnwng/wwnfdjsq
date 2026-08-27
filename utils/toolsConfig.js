@@ -288,10 +288,10 @@ function getFeaturedToolPages() {
     page: '/pages/tools/index',
     isMore: true
   }
-  const besideMore = ['weather', 'rmb']
+  const extra = ['rmb', 'weather']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
-  const list = getFeaturedTools().concat(random, besideMore, more)
+  const list = getFeaturedTools().concat(extra, random, more)
   const pages = []
   for (let i = 0; i < list.length; i += FEATURED_PAGE_SIZE) {
     const index = i / FEATURED_PAGE_SIZE

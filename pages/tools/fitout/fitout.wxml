@@ -16,9 +16,20 @@
       <block wx:if="{{result && result.valid}}">
         <view class="conv-eq">{{result.formula}}</view>
         <view class="conv-result">{{result.summary}}</view>
-        <view class="conv-result-unit">{{result.unit}}{{result.costText ? ' · ' + result.costText : ''}}</view>
+        <view class="conv-result-unit">{{result.unit}}</view>
       </block>
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
+      <view class="conv-stats" wx:if="{{(result && result.costText) || totalCost > 0}}">
+        <view class="conv-stat" wx:if="{{result && result.costText}}">
+          <view class="conv-eq">本次金额</view>
+          <view class="conv-result">{{result.costText}}</view>
+        </view>
+        <view class="conv-stat" wx:if="{{totalCost > 0}}">
+          <view class="conv-eq">合计金额</view>
+          <view class="conv-result">{{totalCostText}}</view>
+        </view>
+      </view>
+      <view class="total-clear" wx:if="{{totalCost > 0}}" bindtap="onClearTotal">清空合计</view>
     </view>
 
     <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="chip-scroll">
@@ -182,7 +193,7 @@
       <view class="field">
         <text class="field-label">预算单价</text>
         <view class="field-control">
-          <input class="field-input" type="digit" value="{{form.price}}" data-field="price" bindinput="onInput" placeholder="选填，按采购单位" />
+          <input class="field-input" type="digit" value="{{form.price}}" data-field="price" bindinput="onInput" bindblur="onPriceBlur" placeholder="选填，按采购单位" />
           <text class="field-unit">元</text>
         </view>
       </view>
@@ -204,6 +215,15 @@
         按装饰工程量常用面积法、周长法估算。瓷砖按单片面积倒推块数；乳胶漆按墙面净面积（周长×层高−门窗）与涂布率；美缝剂按缝长×缝宽×缝深×密度。损耗率为施工裁切备料，默认取行业常见值，复杂拼花、斜铺应提高。结果用于备料，不以本工具作为结算依据。
       </view>
       <view class="tip-confirm" bindtap="onHideTip">我知道了</view>
+    </view>
+  </view>
+
+  <view class="tip-mask" wx:if="{{showAddTip}}" catchtouchmove="preventMove" bindtap="onSkipAccumulate">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">是否累加本次金额</view>
+      <view class="tip-text tip-single">本次金额 {{pendingCostText}}，是否计入上方合计？</view>
+      <view class="tip-confirm" bindtap="onConfirmAccumulate">累加</view>
+      <view class="tip-confirm ghost" bindtap="onSkipAccumulate">不累加</view>
     </view>
   </view>
 </view>

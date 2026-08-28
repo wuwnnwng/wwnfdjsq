@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "置居试算计算器｜纪念日",
+  "navigationBarTitleText": "纪念日｜置居试算计算器",
   "disableScroll": true,
   "usingComponents": {
     "date-picker": "/components/date-picker/date-picker"

@@ -6,13 +6,19 @@ const {
 const APP_BRAND = '置居试算计算器'
 const TOOL_NAV_BRAND = APP_BRAND
 const TOOLS_HUB_PATH = '/pages/tools/index'
-const TOOLS_HUB_TITLE = `${APP_BRAND}｜更多实用工具`
+const TOOLS_HUB_TITLE = `更多实用工具｜${APP_BRAND}`
 
 function buildToolNavTitle(name) {
   const title = String(name || '').trim()
-  if (!title) return TOOL_NAV_BRAND
-  if (title.indexOf(TOOL_NAV_BRAND) === 0) return title
-  return `${TOOL_NAV_BRAND}｜${title}`
+  if (!title || title === TOOL_NAV_BRAND) return TOOL_NAV_BRAND
+  const prefix = `${TOOL_NAV_BRAND}｜`
+  const suffix = `｜${TOOL_NAV_BRAND}`
+  if (title.endsWith(suffix)) return title
+  if (title.indexOf(prefix) === 0) {
+    const rest = title.slice(prefix.length).trim()
+    return rest ? `${rest}${suffix}` : TOOL_NAV_BRAND
+  }
+  return `${title}${suffix}`
 }
 
 /**
@@ -142,7 +148,9 @@ function parseJsonQueryValue(value) {
 }
 
 function buildToolShareTitle(name) {
-  return `${APP_BRAND}｜${name}`
+  const title = String(name || '').trim()
+  if (!title) return APP_BRAND
+  return `${title}｜${APP_BRAND}`
 }
 
 function buildToolShareAppMessage(path, name) {
@@ -314,14 +322,14 @@ function getPuzzleToolShare() {
 
 function getShareAppMessage() {
   return {
-    title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
+    title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
     path: '/pages/index/index'
   }
 }
 
 function getShareTimeline() {
   return {
-    title: `${APP_BRAND}｜公积金、商贷、组合贷一键算清`,
+    title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
     query: ''
   }
 }
@@ -341,7 +349,7 @@ function buildResultShareTitle({
     .join(' ')
   if (typePart && payPart) return `${typePart}｜${payPart}`
   if (payPart) return `房贷计算结果｜${payPart}`
-  return '置居试算计算器｜查看我的计算结果'
+  return '查看我的计算结果｜置居试算计算器'
 }
 
 /**

@@ -85,6 +85,7 @@ function calcTile(input) {
       { label: `含损耗 ${loss}%`, value: `${formatNum(withLoss, 1)} 片` },
       { label: '建议采购', value: perBox > 0 ? `${pieces} 片 / ${boxCount} 箱` : `${pieces} 片` }
     ],
+    cost: price.cost,
     costText: price.costText
   }
 }
@@ -108,6 +109,7 @@ function calcFloor(input) {
       { label: `含损耗 ${loss}%`, value: `${formatNum(withLoss, 2)} ㎡` },
       { label: '建议采购', value: `${formatNum(buy, 1)} ㎡` }
     ],
+    cost: price.cost,
     costText: price.costText
   }
 }
@@ -151,6 +153,7 @@ function calcPaint(input) {
         value: bucket > 0 ? `${formatNum(withLoss, 1)} 升 / ${buckets} 桶` : `${formatNum(ceilTo(withLoss, 0.5), 1)} 升`
       }
     ],
+    cost: price.cost,
     costText: price.costText
   }
 }
@@ -185,6 +188,7 @@ function calcWallpaper(input) {
       { label: `含损耗 ${loss}%`, value: `${formatNum(withLoss, 2)} 卷` },
       { label: '建议采购', value: `${rolls} 卷` }
     ],
+    cost: price.cost,
     costText: price.costText
   }
 }
@@ -217,6 +221,7 @@ function calcSkirting(input) {
         value: pieceLen > 0 ? `${formatNum(withLoss, 2)} 米 / ${pieces} 根` : `${formatNum(ceilTo(withLoss, 0.1), 1)} 米`
       }
     ],
+    cost: price.cost,
     costText: price.costText
   }
 }
@@ -240,6 +245,7 @@ function calcCeiling(input) {
       { label: `含损耗 ${loss}%`, value: `${formatNum(withLoss, 2)} ㎡` },
       { label: '建议采购', value: `${formatNum(buy, 1)} ㎡` }
     ],
+    cost: price.cost,
     costText: price.costText
   }
 }
@@ -276,6 +282,7 @@ function calcGrout(input) {
       { label: `含损耗 ${loss}%`, value: `${formatNum(withLoss, 2)} kg` },
       { label: '建议采购', value: `${formatNum(buy, 1)} kg` }
     ],
+    cost: price.cost,
     costText: price.costText
   }
 }
@@ -306,6 +313,7 @@ function calcMortar(input) {
       { label: '水泥用量', value: `${formatNum(cement, 0)} kg` },
       { label: '中砂用量', value: `${formatNum(sand, 0)} kg` }
     ],
+    cost: price.cost,
     costText: price.costText
   }
 }

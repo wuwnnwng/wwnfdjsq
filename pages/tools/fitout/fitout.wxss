@@ -91,6 +91,40 @@
   color: var(--color-ink);
 }
 
+.conv-stats {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  margin-top: 24rpx;
+}
+
+.conv-stat {
+  flex: 1;
+  min-width: 0;
+}
+
+.conv-stat + .conv-stat {
+  margin-left: 24rpx;
+  padding-left: 24rpx;
+  border-left: 1rpx solid var(--color-line);
+}
+
+.conv-stats .conv-eq {
+  margin-top: 0;
+}
+
+.conv-stats .conv-result {
+  margin-top: 8rpx;
+  font-size: 40rpx;
+}
+
+.total-clear {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+
 .chip-scroll {
   margin-top: 8rpx;
   white-space: nowrap;
@@ -185,4 +219,11 @@
   font-weight: 600;
   color: #fff;
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+}
+
+.tip-confirm.ghost {
+  margin-top: 16rpx;
+  color: var(--color-brand);
+  background: transparent;
+  border: 1rpx solid var(--color-line);
 }

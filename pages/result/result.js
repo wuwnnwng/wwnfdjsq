@@ -6,7 +6,9 @@ const {
   getResultShareTimeline,
   parseShareInputQuery,
   parseResultShareQuery,
-  rebuildResultFromShareInput
+  rebuildResultFromShareInput,
+  resolvePageQuery,
+  isShareLanding
 } = require('../../utils/share')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
 const { getRewardQrPath, saveRewardQrToAlbum } = require('../../utils/reward')
@@ -121,29 +123,41 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+    this.applyEnterResult(options)
+  },
 
-    const shareInput = parseShareInputQuery(options || {})
+  applyEnterResult(pageOptions) {
+    if (this.data.ready) return true
+    const query = resolvePageQuery(pageOptions || {})
+
+    const shareInput = parseShareInputQuery(query)
     if (shareInput) {
       const result = rebuildResultFromShareInput(shareInput)
       if (result) {
         this.applyLocalResult(result, { fromShare: true })
-        return
+        return true
       }
     }
 
-    const shared = parseResultShareQuery(options || {})
+    const shared = parseResultShareQuery(query)
     if (shared) {
       this.applySharedResult(shared)
-      return
+      return true
+    }
+
+    if (query.p || query.s || isShareLanding()) {
+      this.setData({ ready: false })
+      return false
     }
 
     const result = wx.getStorageSync('mortgageResult')
     if (!result || !result.totalPrincipal) {
       this.setData({ ready: false })
-      return
+      return false
     }
 
     this.applyLocalResult(result, { fromShare: false })
+    return true
   },
 
   applySharedResult(shared) {
@@ -178,7 +192,7 @@ Page({
       fullSchedule: [],
       visibleSchedule: [],
       canExport: false
-    })
+    }, () => this.drawPieIfReady())
     this.scheduleInterestPopup({
       isEarlyRepayment: !!shared.isEarlyRepayment,
       isRemaining: !!shared.isRemaining,
@@ -261,7 +275,7 @@ Page({
       fullSchedule,
       visibleSchedule: [],
       canExport: fullSchedule.length > 0
-    })
+    }, () => this.drawPieIfReady())
     this.scheduleInterestPopup({
       isEarlyRepayment,
       isRemaining,
@@ -471,11 +485,18 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+    if (!this.data.ready) this.applyEnterResult()
   },
 
   onReady() {
-    if (!this.data.ready) return
+    this._pageReady = true
+    this.drawPieIfReady()
+  },
+
+  drawPieIfReady() {
+    if (!this._pageReady || !this.data.ready) return
     setTimeout(() => {
+      if (!this.data.ready) return
       const theme = getTheme(this.data.theme)
       renderPie(this, 'pieCanvas', {
         ...(this.pieData || {}),

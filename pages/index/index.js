@@ -6,7 +6,8 @@ const {
 const {
   enableShareMenu,
   getShareAppMessage,
-  getShareTimeline
+  getShareTimeline,
+  consumeShareEnter
 } = require('../../utils/share')
 const { getLprDisplay, loadLprDisplay } = require('../../utils/lpr')
 const {
@@ -111,6 +112,7 @@ Page({
   },
 
   onLoad() {
+    if (consumeShareEnter('pages/index/index')) return
     enableShareMenu()
     this.applyTheme(getThemeId())
     this.refreshLpr()
@@ -127,6 +129,7 @@ Page({
   },
 
   onShow() {
+    if (consumeShareEnter('pages/index/index')) return
     this.applyTheme(getThemeId())
     this.setData({
       showToolsNew: !hasSeenToolsHub()

@@ -3,10 +3,12 @@ const { getThemeId } = require('./utils/theme')
 
 App({
   globalData: {
-    theme: 'forest'
+    theme: 'forest',
+    enterOptions: null
   },
 
-  onLaunch() {
+  onLaunch(options) {
+    this.globalData.enterOptions = options || null
     this.globalData.theme = getThemeId()
 
     const versionInfo = checkLocalVersion()
@@ -18,5 +20,11 @@ App({
 
     // 正式版/体验版：自动检查微信后台是否有新版本包
     checkMiniProgramUpdate()
+  },
+
+  onShow(options) {
+    if (options && (options.path || (options.query && Object.keys(options.query).length))) {
+      this.globalData.enterOptions = options
+    }
   }
 })

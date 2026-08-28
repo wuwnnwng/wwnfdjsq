@@ -17,13 +17,128 @@ function buildToolNavTitle(name) {
 
 /**
  * 开启右上角「转发好友 / 分享朋友圈」菜单
+ * 不开启 withShareTicket：当前并不读取群信息，打开后部分微信版本会出现「第一次点卡片进不去」。
  */
 function enableShareMenu() {
   if (!wx.showShareMenu) return
   wx.showShareMenu({
-    withShareTicket: true,
+    withShareTicket: false,
     menus: ['shareAppMessage', 'shareTimeline']
   })
+}
+
+const SHARE_ENTER_SCENES = [1007, 1008, 1036, 1044, 1073, 1074, 1096, 1154, 1155, 1167]
+let consumedShareEnterKey = ''
+
+function isShareEnterScene(scene) {
+  return SHARE_ENTER_SCENES.indexOf(Number(scene)) >= 0
+}
+
+function getEnterOptions() {
+  let enter = {}
+  let launch = {}
+  let appEnter = {}
+  try {
+    if (wx.getEnterOptionsSync) enter = wx.getEnterOptionsSync() || {}
+  } catch (e) {}
+  try {
+    if (wx.getLaunchOptionsSync) launch = wx.getLaunchOptionsSync() || {}
+  } catch (e) {}
+  try {
+    const app = getApp()
+    if (app && app.globalData && app.globalData.enterOptions) appEnter = app.globalData.enterOptions
+  } catch (e) {}
+
+  const query = {}
+  fillQuery(query, enter.query)
+  fillQuery(query, launch.query)
+  fillQuery(query, appEnter.query)
+
+  return {
+    path: enter.path || launch.path || appEnter.path || '',
+    scene: enter.scene || launch.scene || appEnter.scene,
+    query
+  }
+}
+
+function fillQuery(target, source) {
+  if (!source || typeof source !== 'object') return target
+  Object.keys(source).forEach((key) => {
+    if (target[key] == null || target[key] === '') target[key] = source[key]
+  })
+  return target
+}
+
+function resolvePageQuery(pageOptions) {
+  const query = {}
+  fillQuery(query, pageOptions)
+  const enter = getEnterOptions()
+  fillQuery(query, enter.query)
+  return query
+}
+
+function normalizeRoute(path) {
+  return String(path || '')
+    .replace(/^\//, '')
+    .split('?')[0]
+}
+
+function buildUrlFromEnter(path, query) {
+  const route = normalizeRoute(path)
+  if (!route) return ''
+  const keys = query && typeof query === 'object' ? Object.keys(query) : []
+  const qs = keys
+    .filter((key) => query[key] != null && query[key] !== '')
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(String(query[key]))}`)
+    .join('&')
+  return qs ? `/${route}?${qs}` : `/${route}`
+}
+
+function shareEnterKey(enter) {
+  return `${enter.scene || ''}|${normalizeRoute(enter.path)}|${JSON.stringify(enter.query || {})}`
+}
+
+function consumeShareEnter(currentRoute) {
+  const enter = getEnterOptions()
+  if (!isShareEnterScene(enter.scene)) return false
+  const target = normalizeRoute(enter.path)
+  if (!target || target === 'pages/index/index') return false
+  if (normalizeRoute(currentRoute) === target) return false
+  const key = shareEnterKey(enter)
+  if (consumedShareEnterKey === key) return false
+  const url = buildUrlFromEnter(enter.path, enter.query)
+  if (!url) return false
+  consumedShareEnterKey = key
+  wx.reLaunch({ url })
+  return true
+}
+
+function isShareLanding() {
+  return isShareEnterScene(getEnterOptions().scene)
+}
+
+function safeDecodeURIComponent(value) {
+  const text = String(value == null ? '' : value)
+  try {
+    return decodeURIComponent(text)
+  } catch (e) {
+    return text
+  }
+}
+
+function parseJsonQueryValue(value) {
+  if (value == null || value === '') return null
+  let text = String(value).replace(/\+/g, ' ')
+  for (let i = 0; i < 2; i += 1) {
+    try {
+      const parsed = JSON.parse(text)
+      if (parsed && typeof parsed === 'object') return parsed
+    } catch (e) {}
+    const decoded = safeDecodeURIComponent(text)
+    if (decoded === text) break
+    text = decoded
+  }
+  return null
 }
 
 function buildToolShareTitle(name) {
@@ -277,7 +392,7 @@ function encodeShareInput(shareInput) {
 function parseShareInputQuery(query) {
   if (!query || !query.p) return null
   try {
-    const snap = JSON.parse(decodeURIComponent(query.p))
+    const snap = parseJsonQueryValue(query.p)
     if (!snap || snap.v !== 2) return null
     if (snap.m === 'r') {
       return {
@@ -391,7 +506,7 @@ function encodeResultShareQuery(view) {
 function parseResultShareQuery(query) {
   if (!query || !query.s) return null
   try {
-    const snap = JSON.parse(decodeURIComponent(query.s))
+    const snap = parseJsonQueryValue(query.s)
     if (!snap || snap.v !== 1) return null
     return {
       fromShare: true,
@@ -457,6 +572,9 @@ function tipShareTimeline() {
 module.exports = {
   buildToolNavTitle,
   enableShareMenu,
+  resolvePageQuery,
+  consumeShareEnter,
+  isShareLanding,
   getShareAppMessage,
   getShareTimeline,
   getToolsHubShareAppMessage,

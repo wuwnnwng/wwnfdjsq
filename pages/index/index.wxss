@@ -251,6 +251,7 @@
   border-radius: 50%;
   border: 2rpx solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 0 1rpx var(--color-line);
+  transition: box-shadow 0.32s ease, background 0.32s ease;
 }
 
 .theme-dot.active {
@@ -262,15 +263,15 @@
 }
 
 .theme-dot.ocean {
-  background: linear-gradient(135deg, #123a6b, #1f6fb5);
+  background: linear-gradient(135deg, #1a3f66, #3a73a6);
 }
 
 .theme-dot.amber {
-  background: linear-gradient(135deg, #7a4a12, #b7791f);
+  background: linear-gradient(135deg, #6e4a22, #a67c38);
 }
 
 .theme-dot.crimson {
-  background: linear-gradient(135deg, #7a1520, #c41e3a);
+  background: linear-gradient(135deg, #6b1e28, #b3384a);
 }
 
 .theme-dot.rose {
@@ -294,6 +295,7 @@
   letter-spacing: 1rpx;
   color: var(--color-brand);
   line-height: 1.2;
+  transition: color 0.32s ease;
 }
 
 .mode-segment {
@@ -420,6 +422,7 @@
   font-weight: 600;
   color: #fff;
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+  transition: background 0.32s ease, color 0.32s ease;
 }
 
 .type-segment {
@@ -747,6 +750,7 @@
   padding: 12rpx 28rpx calc(12rpx + env(safe-area-inset-bottom));
   background: var(--color-footer);
   box-shadow: 0 -4rpx 16rpx var(--color-shadow);
+  transition: background-color 0.32s ease, box-shadow 0.32s ease;
 }
 
 .disclaimer {

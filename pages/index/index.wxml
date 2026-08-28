@@ -1,4 +1,4 @@
-<view class="page page-shell theme-{{theme}}">
+<view class="page page-shell theme-{{theme}} {{themeFading ? 'is-theme-fading' : ''}}">
   <view class="panel hero-panel">
     <view class="hero-top">
       <view class="brand-wrap">

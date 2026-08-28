@@ -68,6 +68,7 @@ Page({
     renamePlanId: '',
     theme: getThemeId(),
     themeList: THEME_LIST,
+    themeFading: false,
 
     commercialAmount: '100',
     commercialYears: '30',
@@ -144,8 +145,31 @@ Page({
 
   onThemeChange(e) {
     const theme = e.currentTarget.dataset.theme
-    if (!theme || theme === this.data.theme) return
-    this.applyTheme(theme)
+    if (!theme || theme === this.data.theme || this._themeSwitching) return
+    this._themeSwitching = true
+    this.setData({ themeFading: true })
+    if (this._themeFadeTimer) clearTimeout(this._themeFadeTimer)
+    this._themeFadeTimer = setTimeout(() => {
+      const next = setThemeId(theme)
+      const palette = getTheme(next)
+      this.setData({
+        theme: next,
+        toolsIndicator: palette.principal,
+        themeFading: false
+      })
+      applyThemeChrome(next)
+      this._themeFadeTimer = setTimeout(() => {
+        this._themeSwitching = false
+        this._themeFadeTimer = null
+      }, 220)
+    }, 200)
+  },
+
+  onUnload() {
+    if (this._themeFadeTimer) {
+      clearTimeout(this._themeFadeTimer)
+      this._themeFadeTimer = null
+    }
   },
 
   async refreshLpr() {

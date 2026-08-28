@@ -13,37 +13,37 @@ const THEMES = {
     navBar: '#0B3D2E',
     pageBg: '#F3F6F4',
     principal: '#1f6b52',
-    interest: '#c45c26',
+    interest: '#b86232',
     dialog: '#f7f8f6',
     ink: '#14231c'
   },
   ocean: {
     id: 'ocean',
     name: '商务蓝',
-    navBar: '#123A6B',
+    navBar: '#1A3F66',
     pageBg: '#EEF3F9',
-    principal: '#1F6FB5',
-    interest: '#D97706',
+    principal: '#3A73A6',
+    interest: '#C4843A',
     dialog: '#F5F8FC',
     ink: '#13233A'
   },
   amber: {
     id: 'amber',
     name: '琥珀金',
-    navBar: '#7A4A12',
+    navBar: '#6E4A22',
     pageBg: '#F7F2EA',
-    principal: '#B7791F',
-    interest: '#C05621',
+    principal: '#A67C38',
+    interest: '#B05C38',
     dialog: '#FBF7F0',
     ink: '#2B2116'
   },
   crimson: {
     id: 'crimson',
     name: '中国红',
-    navBar: '#7A1520',
+    navBar: '#6B1E28',
     pageBg: '#F7F1F1',
-    principal: '#C41E3A',
-    interest: '#C9A227',
+    principal: '#B3384A',
+    interest: '#C4A040',
     dialog: '#FBF6F6',
     ink: '#2A1418'
   },
@@ -53,7 +53,7 @@ const THEMES = {
     navBar: '#8E3B55',
     pageBg: '#F7F1F3',
     principal: '#C45C7A',
-    interest: '#B7791F',
+    interest: '#A67C38',
     dialog: '#FBF6F7',
     ink: '#2A171C'
   }
@@ -106,8 +106,8 @@ function applyThemeChrome(themeId) {
     frontColor: '#ffffff',
     backgroundColor: theme.navBar,
     animation: {
-      duration: 200,
-      timingFunc: 'easeIn'
+      duration: 320,
+      timingFunc: 'easeInOut'
     }
   })
   if (wx.setBackgroundColor) {

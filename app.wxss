@@ -4,9 +4,9 @@ page {
   --color-muted: #5f7268;
   --color-brand: #0b3d2e;
   --color-brand-soft: #1f6b52;
-  --color-accent: #c45c26;
+  --color-accent: #b86232;
   --color-principal: #1f6b52;
-  --color-interest: #c45c26;
+  --color-interest: #b86232;
   --color-surface: rgba(255, 255, 255, 0.78);
   --color-line: rgba(20, 35, 28, 0.1);
   --color-footer: #f3f6f4;
@@ -15,7 +15,7 @@ page {
   --color-shadow: rgba(11, 61, 46, 0.18);
   --color-shadow-strong: rgba(11, 61, 46, 0.22);
   --bg-glow-1: rgba(31, 107, 82, 0.14);
-  --bg-glow-2: rgba(196, 92, 38, 0.12);
+  --bg-glow-2: rgba(184, 98, 50, 0.12);
   --bg-grad-1: #eef4f0;
   --bg-grad-2: #f3f6f4;
   --bg-grad-3: #f7f3ee;
@@ -35,9 +35,9 @@ page {
   --color-muted: #5f7268;
   --color-brand: #0b3d2e;
   --color-brand-soft: #1f6b52;
-  --color-accent: #c45c26;
+  --color-accent: #b86232;
   --color-principal: #1f6b52;
-  --color-interest: #c45c26;
+  --color-interest: #b86232;
   --color-surface: rgba(255, 255, 255, 0.78);
   --color-line: rgba(20, 35, 28, 0.1);
   --color-footer: #f3f6f4;
@@ -46,7 +46,7 @@ page {
   --color-shadow: rgba(11, 61, 46, 0.18);
   --color-shadow-strong: rgba(11, 61, 46, 0.22);
   --bg-glow-1: rgba(31, 107, 82, 0.14);
-  --bg-glow-2: rgba(196, 92, 38, 0.12);
+  --bg-glow-2: rgba(184, 98, 50, 0.12);
   --bg-grad-1: #eef4f0;
   --bg-grad-2: #f3f6f4;
   --bg-grad-3: #f7f3ee;
@@ -55,20 +55,20 @@ page {
 .theme-ocean {
   --color-ink: #13233a;
   --color-muted: #5b6f88;
-  --color-brand: #123a6b;
-  --color-brand-soft: #1f6fb5;
-  --color-accent: #d97706;
-  --color-principal: #1f6fb5;
-  --color-interest: #d97706;
+  --color-brand: #1a3f66;
+  --color-brand-soft: #3a73a6;
+  --color-accent: #c4843a;
+  --color-principal: #3a73a6;
+  --color-interest: #c4843a;
   --color-surface: rgba(255, 255, 255, 0.82);
   --color-line: rgba(19, 35, 58, 0.1);
   --color-footer: #eef3f9;
   --color-dialog: #f5f8fc;
   --color-mask: rgba(19, 35, 58, 0.45);
-  --color-shadow: rgba(18, 58, 107, 0.18);
-  --color-shadow-strong: rgba(18, 58, 107, 0.22);
-  --bg-glow-1: rgba(31, 111, 181, 0.14);
-  --bg-glow-2: rgba(217, 119, 6, 0.12);
+  --color-shadow: rgba(26, 63, 102, 0.18);
+  --color-shadow-strong: rgba(26, 63, 102, 0.22);
+  --bg-glow-1: rgba(58, 115, 166, 0.14);
+  --bg-glow-2: rgba(196, 132, 58, 0.12);
   --bg-grad-1: #eaf1f9;
   --bg-grad-2: #eef3f9;
   --bg-grad-3: #f4f0ea;
@@ -77,20 +77,20 @@ page {
 .theme-amber {
   --color-ink: #2b2116;
   --color-muted: #7a6a55;
-  --color-brand: #7a4a12;
-  --color-brand-soft: #b7791f;
-  --color-accent: #c05621;
-  --color-principal: #b7791f;
-  --color-interest: #c05621;
+  --color-brand: #6e4a22;
+  --color-brand-soft: #a67c38;
+  --color-accent: #b05c38;
+  --color-principal: #a67c38;
+  --color-interest: #b05c38;
   --color-surface: rgba(255, 255, 255, 0.8);
   --color-line: rgba(43, 33, 22, 0.1);
   --color-footer: #f7f2ea;
   --color-dialog: #fbf7f0;
   --color-mask: rgba(43, 33, 22, 0.45);
-  --color-shadow: rgba(122, 74, 18, 0.18);
-  --color-shadow-strong: rgba(122, 74, 18, 0.22);
-  --bg-glow-1: rgba(183, 121, 31, 0.16);
-  --bg-glow-2: rgba(192, 86, 33, 0.12);
+  --color-shadow: rgba(110, 74, 34, 0.18);
+  --color-shadow-strong: rgba(110, 74, 34, 0.22);
+  --bg-glow-1: rgba(166, 124, 56, 0.16);
+  --bg-glow-2: rgba(176, 92, 56, 0.12);
   --bg-grad-1: #f6efe4;
   --bg-grad-2: #f7f2ea;
   --bg-grad-3: #f3ebe2;
@@ -99,20 +99,20 @@ page {
 .theme-crimson {
   --color-ink: #2a1418;
   --color-muted: #7a5a60;
-  --color-brand: #7a1520;
-  --color-brand-soft: #c41e3a;
-  --color-accent: #c9a227;
-  --color-principal: #c41e3a;
-  --color-interest: #c9a227;
+  --color-brand: #6b1e28;
+  --color-brand-soft: #b3384a;
+  --color-accent: #c4a040;
+  --color-principal: #b3384a;
+  --color-interest: #c4a040;
   --color-surface: rgba(255, 255, 255, 0.82);
   --color-line: rgba(42, 20, 24, 0.1);
   --color-footer: #f7f1f1;
   --color-dialog: #fbf6f6;
   --color-mask: rgba(42, 20, 24, 0.45);
-  --color-shadow: rgba(122, 21, 32, 0.18);
-  --color-shadow-strong: rgba(122, 21, 32, 0.22);
-  --bg-glow-1: rgba(196, 30, 58, 0.14);
-  --bg-glow-2: rgba(201, 162, 39, 0.14);
+  --color-shadow: rgba(107, 30, 40, 0.18);
+  --color-shadow-strong: rgba(107, 30, 40, 0.22);
+  --bg-glow-1: rgba(179, 56, 74, 0.14);
+  --bg-glow-2: rgba(196, 160, 64, 0.14);
   --bg-grad-1: #f6eaea;
   --bg-grad-2: #f7f1f1;
   --bg-grad-3: #f4eee6;
@@ -123,9 +123,9 @@ page {
   --color-muted: #7a5a64;
   --color-brand: #8e3b55;
   --color-brand-soft: #c45c7a;
-  --color-accent: #b7791f;
+  --color-accent: #a67c38;
   --color-principal: #c45c7a;
-  --color-interest: #b7791f;
+  --color-interest: #a67c38;
   --color-surface: rgba(255, 255, 255, 0.82);
   --color-line: rgba(42, 23, 28, 0.1);
   --color-footer: #f7f1f3;
@@ -134,7 +134,7 @@ page {
   --color-shadow: rgba(142, 59, 85, 0.18);
   --color-shadow-strong: rgba(142, 59, 85, 0.22);
   --bg-glow-1: rgba(196, 92, 122, 0.16);
-  --bg-glow-2: rgba(183, 121, 31, 0.12);
+  --bg-glow-2: rgba(166, 124, 56, 0.12);
   --bg-grad-1: #f6eaee;
   --bg-grad-2: #f7f1f3;
   --bg-grad-3: #f4eee8;
@@ -157,6 +157,11 @@ canvas {
     radial-gradient(120% 80% at 0% 0%, var(--bg-glow-1), transparent 55%),
     radial-gradient(90% 70% at 100% 10%, var(--bg-glow-2), transparent 50%),
     linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 42%, var(--bg-grad-3) 100%);
+  transition: opacity 0.2s ease, color 0.32s ease;
+}
+
+.page.is-theme-fading {
+  opacity: 0.5;
 }
 
 .section-title {
@@ -165,6 +170,7 @@ canvas {
   font-weight: 600;
   color: var(--color-brand);
   letter-spacing: 1rpx;
+  transition: color 0.32s ease;
 }
 
 .section-desc {
@@ -172,6 +178,7 @@ canvas {
   font-size: 24rpx;
   color: var(--color-muted);
   line-height: 1.5;
+  transition: color 0.32s ease;
 }
 
 .field {
@@ -238,7 +245,7 @@ canvas {
   border: 1rpx solid var(--color-line);
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.45);
-  transition: all 0.2s ease;
+  transition: color 0.32s ease, background 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease;
 }
 
 .segment-item.active {
@@ -269,6 +276,7 @@ canvas {
   color: #fff;
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   box-shadow: 0 10rpx 24rpx var(--color-shadow);
+  transition: background 0.32s ease, box-shadow 0.32s ease, color 0.32s ease;
 }
 
 .primary-btn::after {
@@ -282,4 +290,5 @@ canvas {
   background: var(--color-surface);
   border: 1rpx solid rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(8px);
+  transition: background-color 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease, color 0.32s ease;
 }

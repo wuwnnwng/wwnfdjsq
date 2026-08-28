@@ -4,7 +4,7 @@
 
 .conv-hero {
   background:
-    linear-gradient(160deg, rgba(244, 114, 182, 0.14) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, var(--bg-glow-1) 0%, rgba(255, 255, 255, 0.55) 58%),
     var(--color-surface);
 }
 
@@ -113,7 +113,7 @@
   border-radius: 32rpx;
   text-align: center;
   background:
-    linear-gradient(180deg, rgba(252, 231, 243, 0.92) 0%, var(--color-dialog) 46%),
+    linear-gradient(180deg, var(--bg-glow-1) 0%, var(--color-dialog) 46%),
     var(--color-dialog);
   box-shadow: 0 24rpx 60rpx var(--color-shadow-strong);
   animation: lived-dialog-in 0.28s ease-out;
@@ -168,7 +168,7 @@
 .life-progress {
   margin-top: 28rpx;
   padding-top: 24rpx;
-  border-top: 1rpx solid rgba(52, 211, 153, 0.28);
+  border-top: 1rpx solid var(--color-line);
   text-align: left;
 }
 
@@ -189,7 +189,7 @@
   font-family: var(--font-display);
   font-size: 28rpx;
   font-weight: 800;
-  color: #059669;
+  color: var(--color-brand-soft);
 }
 
 .life-bar {
@@ -197,13 +197,13 @@
   height: 18rpx;
   border-radius: 999rpx;
   overflow: hidden;
-  background: rgba(52, 211, 153, 0.18);
+  background: var(--bg-glow-1);
 }
 
 .life-bar-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #86efac 0%, #34d399 48%, #059669 100%);
+  background: linear-gradient(90deg, var(--color-brand-soft) 0%, var(--color-brand) 100%);
   transform-origin: left center;
 }
 
@@ -245,5 +245,6 @@
   font-size: 28rpx;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+  box-shadow: 0 10rpx 24rpx var(--color-shadow);
 }

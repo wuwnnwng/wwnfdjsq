@@ -157,7 +157,7 @@ canvas {
     radial-gradient(120% 80% at 0% 0%, var(--bg-glow-1), transparent 55%),
     radial-gradient(90% 70% at 100% 10%, var(--bg-glow-2), transparent 50%),
     linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 42%, var(--bg-grad-3) 100%);
-  transition: opacity 0.2s ease, color 0.32s ease;
+  transition: opacity 0.3s ease, color 0.3s ease;
 }
 
 .page.is-theme-fading {

@@ -106,7 +106,7 @@ function applyThemeChrome(themeId) {
     frontColor: '#ffffff',
     backgroundColor: theme.navBar,
     animation: {
-      duration: 320,
+      duration: 300,
       timingFunc: 'easeInOut'
     }
   })

@@ -161,8 +161,8 @@ Page({
       this._themeFadeTimer = setTimeout(() => {
         this._themeSwitching = false
         this._themeFadeTimer = null
-      }, 220)
-    }, 200)
+      }, 300)
+    }, 300)
   },
 
   onUnload() {

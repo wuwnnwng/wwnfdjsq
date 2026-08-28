@@ -1,9 +1,111 @@
 {
-  "desc": "关于本文件的更多信息，请参考文档 https://developers.weixin.qq.com/miniprogram/dev/framework/sitemap.html",
+  "desc": "置居试算计算器页面索引配置。详见 https://developers.weixin.qq.com/miniprogram/dev/framework/sitemap.html",
   "rules": [
     {
+      "action": "disallow",
+      "page": "pages/result/result"
+    },
+    {
       "action": "allow",
-      "page": "*"
+      "page": "pages/index/index",
+      "priority": 100
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/index",
+      "priority": 90
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/calendar/calendar",
+      "priority": 80
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/calc/calc",
+      "priority": 80
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/qrcode/qrcode",
+      "priority": 80
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/weather/weather",
+      "priority": 80
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/converter/converter",
+      "params": ["type"],
+      "matching": "inclusive",
+      "priority": 70
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/anniversary/anniversary",
+      "priority": 70
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/fitout/fitout",
+      "priority": 70
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/housetax/housetax",
+      "priority": 70
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/tax/tax",
+      "priority": 70
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/datetime/datetime",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/rmb/rmb",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/percent/percent",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/age/age",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/bmi/bmi",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/base/base",
+      "priority": 50
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/canvas/canvas",
+      "priority": 40
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/puzzle/puzzle",
+      "priority": 40
+    },
+    {
+      "action": "allow",
+      "page": "*",
+      "priority": 20
     }
   ]
 }

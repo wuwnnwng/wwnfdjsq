@@ -122,6 +122,10 @@
   background: linear-gradient(135deg, #dbeafe, #93c5fd);
 }
 
+.tool-icon-unit {
+  background: linear-gradient(135deg, #dbeafe, #93c5fd);
+}
+
 .tool-icon-area {
   background: linear-gradient(135deg, #dcfce7, #86efac);
 }
@@ -208,6 +212,10 @@
 
 .tool-icon-puzzle {
   background: linear-gradient(135deg, #dbeafe, #60a5fa);
+}
+
+.tool-icon-anniversary {
+  background: linear-gradient(135deg, #fce7f3, #e879f9);
 }
 
 .tool-card-name {

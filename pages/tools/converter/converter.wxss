@@ -142,6 +142,31 @@
   padding: 8rpx 8rpx 16rpx;
 }
 
+.unit-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10rpx;
+  margin: 8rpx 12rpx 16rpx;
+}
+
+.unit-tab {
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1rpx solid var(--color-line);
+}
+
+.unit-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+  border-color: transparent;
+}
+
 .conv-card {
   padding: 24rpx 20rpx 20rpx;
   border-radius: 20rpx;

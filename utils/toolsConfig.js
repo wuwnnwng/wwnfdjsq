@@ -2,14 +2,14 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FEATURED_IDS = ['fitout', 'housetax', 'age', 'calendar', 'qrcode', 'bmi', 'weight']
+const FEATURED_IDS = ['calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'fitout', 'housetax', 'age']
 const FEATURED_PAGE_SIZE = 3
 
 const CATEGORIES = [
   { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
-  { id: 'daily', name: '日常工具', toolIds: ['calendar', 'weather', 'qrcode', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
+  { id: 'daily', name: '日常工具', toolIds: ['calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'rmb', 'percent', 'base'] },
-  { id: 'unit', name: '单位换算', toolIds: ['currency', 'length', 'area', 'volume', 'weight', 'temperature', 'speed', 'pressure', 'power'] }
+  { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] }
 ]
 
 const TOOLS = [
@@ -79,6 +79,15 @@ const TOOLS = [
     page: '/pages/tools/qrcode/qrcode'
   },
   {
+    id: 'anniversary',
+    name: '纪念日倒计时',
+    shortName: '纪念日',
+    icon: '🎉',
+    iconType: 'anniversary',
+    keywords: '纪念日倒计时恋爱结婚生日相识周年撒花',
+    page: '/pages/tools/anniversary/anniversary'
+  },
+  {
     id: 'rmb',
     name: '人民币大写',
     shortName: '人民币大写',
@@ -141,61 +150,13 @@ const TOOLS = [
     page: '/pages/tools/converter/converter?type=currency'
   },
   {
-    id: 'area',
-    name: '面积',
-    shortName: '面积',
-    icon: '📐',
-    iconType: 'area',
-    page: '/pages/tools/converter/converter?type=area'
-  },
-  {
-    id: 'volume',
-    name: '体积',
-    shortName: '体积',
-    icon: '🧊',
-    iconType: 'volume',
-    page: '/pages/tools/converter/converter?type=volume'
-  },
-  {
-    id: 'weight',
-    name: '重量',
-    shortName: '体重',
-    icon: '⚖️',
-    iconType: 'weight',
-    keywords: '重量体重公斤斤磅千克换算',
-    page: '/pages/tools/converter/converter?type=weight'
-  },
-  {
-    id: 'temperature',
-    name: '温度',
-    shortName: '温度',
-    icon: '🌡️',
-    iconType: 'temperature',
-    page: '/pages/tools/converter/converter?type=temperature'
-  },
-  {
-    id: 'speed',
-    name: '速度',
-    shortName: '速度',
-    icon: '🏎️',
-    iconType: 'speed',
-    page: '/pages/tools/converter/converter?type=speed'
-  },
-  {
-    id: 'pressure',
-    name: '压强',
-    shortName: '压强',
-    icon: '🎛️',
-    iconType: 'pressure',
-    page: '/pages/tools/converter/converter?type=pressure'
-  },
-  {
-    id: 'power',
-    name: '功率',
-    shortName: '功率',
-    icon: '⚡',
-    iconType: 'power',
-    page: '/pages/tools/converter/converter?type=power'
+    id: 'unit',
+    name: '单位换算',
+    shortName: '换算',
+    icon: '📏',
+    iconType: 'unit',
+    keywords: '单位换算长度面积体积重量体重温度速度压强功率公斤斤磅千克毫米厘米米亩坪公顷升毫升瓦千瓦马力',
+    page: '/pages/tools/converter/converter'
   },
   {
     id: 'base',
@@ -204,14 +165,6 @@ const TOOLS = [
     icon: '🔢',
     iconType: 'base',
     page: '/pages/tools/base/base'
-  },
-  {
-    id: 'length',
-    name: '长度',
-    shortName: '长度',
-    icon: '📏',
-    iconType: 'length',
-    page: '/pages/tools/converter/converter?type=length'
   }
 ]
 
@@ -297,7 +250,7 @@ function getFeaturedToolPages() {
     iconType: 'random',
     isRandom: true
   }
-  const extra = ['rmb', 'weather', 'canvas', 'puzzle']
+  const extra = ['bmi', 'unit', 'rmb', 'canvas', 'puzzle']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
   const list = getFeaturedTools().concat(extra, random)

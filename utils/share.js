@@ -2,7 +2,6 @@ const {
   calculateMortgage,
   calculateRemainingMortgage
 } = require('./mortgage')
-const { getToolById } = require('./toolsConfig')
 
 const APP_BRAND = '置居试算计算器'
 const TOOL_NAV_BRAND = APP_BRAND
@@ -56,12 +55,17 @@ function getToolsHubShareTimeline() {
 
 function getConverterToolShare(type) {
   const toolType = type || 'length'
-  const tool = getToolById(toolType)
-  const name = (tool && tool.name) || '单位换算'
+  if (toolType === 'currency') {
+    const path = '/pages/tools/converter/converter?type=currency'
+    return {
+      appMessage: buildToolShareAppMessage(path, '汇率'),
+      timeline: buildToolShareTimeline(path, '汇率')
+    }
+  }
   const path = `/pages/tools/converter/converter?type=${encodeURIComponent(toolType)}`
   return {
-    appMessage: buildToolShareAppMessage(path, name),
-    timeline: buildToolShareTimeline(path, name)
+    appMessage: buildToolShareAppMessage(path, '单位换算'),
+    timeline: buildToolShareTimeline(path, '单位换算')
   }
 }
 
@@ -134,6 +138,14 @@ function getQrcodeToolShare() {
   return {
     appMessage: buildToolShareAppMessage(path, '二维码'),
     timeline: buildToolShareTimeline(path, '二维码')
+  }
+}
+
+function getAnniversaryToolShare() {
+  const path = '/pages/tools/anniversary/anniversary'
+  return {
+    appMessage: buildToolShareAppMessage(path, '纪念日倒计时'),
+    timeline: buildToolShareTimeline(path, '纪念日倒计时')
   }
 }
 
@@ -459,6 +471,7 @@ module.exports = {
   getFitoutToolShare,
   getDatetimeToolShare,
   getQrcodeToolShare,
+  getAnniversaryToolShare,
   getRmbToolShare,
   getPercentToolShare,
   getAgeToolShare,

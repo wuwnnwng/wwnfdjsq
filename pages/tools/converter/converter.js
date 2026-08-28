@@ -3,7 +3,10 @@ const {
   convertValue,
   formatNumber,
   parseInput,
-  setCurrencyUnits
+  setCurrencyUnits,
+  UNIT_TYPE_TABS,
+  isUnitType,
+  getUnitTypeTab
 } = require('../../../utils/converters')
 const {
   loadExchangeRates,
@@ -45,11 +48,21 @@ function decorateUnits(units) {
 }
 
 function toolMeta(type) {
-  const tool = getToolById(type) || {}
+  if (type === 'currency') {
+    const tool = getToolById('currency') || {}
+    return {
+      icon: tool.icon || '💱',
+      iconType: 'currency',
+      kicker: tool.shortName || '汇率',
+      title: '汇率换算'
+    }
+  }
+  const tab = getUnitTypeTab(type)
   return {
-    icon: tool.icon || '🔄',
-    iconType: tool.iconType || type || 'length',
-    kicker: tool.shortName || tool.name || '单位换算'
+    icon: tab.icon || '📏',
+    iconType: type || 'length',
+    kicker: tab.name || '换算',
+    title: '单位换算'
   }
 }
 
@@ -59,8 +72,9 @@ Page({
     type: '',
     title: '',
     kicker: '',
-    icon: '🔄',
+    icon: '📏',
     iconType: 'length',
+    unitTabs: UNIT_TYPE_TABS,
     fromName: '',
     fromSymbol: '',
     fromLabel: '',
@@ -97,7 +111,7 @@ Page({
   onLoad(options) {
     enableShareMenu()
     const type = options.type || 'length'
-    this.initConverter(type)
+    this.initConverter(isUnitType(type) || type === 'currency' ? type : 'length')
   },
 
   onShow() {
@@ -153,9 +167,38 @@ Page({
     })
   },
 
+  rememberUnitState() {
+    if (!isUnitType(this.data.type)) return
+    this._unitState = this._unitState || {}
+    this._unitState[this.data.type] = {
+      fromIndex: this.data.fromIndex,
+      toIndex: this.data.toIndex,
+      inputValue: this.data.inputValue
+    }
+  },
+
+  restoreUnitState(type, units) {
+    const saved = this._unitState && this._unitState[type]
+    const max = Math.max(0, (units || []).length - 1)
+    if (!saved) {
+      return { fromIndex: 0, toIndex: Math.min(1, max), inputValue: this.data.inputValue || '1' }
+    }
+    return {
+      fromIndex: Math.min(max, Math.max(0, Number(saved.fromIndex) || 0)),
+      toIndex: Math.min(max, Math.max(0, Number(saved.toIndex) || 0)),
+      inputValue: saved.inputValue == null ? this.data.inputValue || '1' : saved.inputValue
+    }
+  },
+
+  onSwitchUnitType(e) {
+    const type = e.currentTarget.dataset.type
+    if (!isUnitType(type) || type === this.data.type) return
+    this.rememberUnitState()
+    this.initConverter(type)
+  },
+
   applyConverterConfig(config, callback) {
     if (!config) return
-    wx.setNavigationBarTitle({ title: buildToolNavTitle(config.title) })
 
     const type = config.type || this.data.type
     const units = decorateUnits(config.units || [])
@@ -163,19 +206,29 @@ Page({
       setCurrencyUnits(units.length ? units : null)
     }
 
+    const meta = toolMeta(type)
+    wx.setNavigationBarTitle({ title: buildToolNavTitle(meta.title || config.title) })
+
     let fromIndex = config.fromIndex
     let toIndex = config.toIndex
+    let inputValue = this.data.inputValue || '1'
     if (fromIndex == null || toIndex == null) {
-      const defaults = this.getDefaultCurrencyIndices(units)
-      fromIndex = defaults.fromIndex
-      toIndex = defaults.toIndex
+      if (type === 'currency') {
+        const defaults = this.getDefaultCurrencyIndices(units)
+        fromIndex = defaults.fromIndex
+        toIndex = defaults.toIndex
+      } else {
+        const saved = this.restoreUnitState(type, units)
+        fromIndex = saved.fromIndex
+        toIndex = saved.toIndex
+        inputValue = saved.inputValue
+      }
     }
 
-    const meta = toolMeta(type)
     this.setData(
       {
         type,
-        title: config.title,
+        title: meta.title || config.title,
         kicker: meta.kicker,
         icon: meta.icon,
         iconType: meta.iconType,
@@ -185,6 +238,7 @@ Page({
         digits: config.digits || 6,
         units,
         unitLabels: units.map((item) => item.name || item.label),
+        inputValue,
         fromIndex,
         toIndex,
         showAll: type === 'currency' ? (config.resetShowAll ? false : this.data.showAll) : true
@@ -233,9 +287,7 @@ Page({
         ...config,
         resetShowAll: true
       },
-      () => {
-        this.setData({ inputValue: '1' }, () => this.recalculate())
-      }
+      () => this.recalculate()
     )
   },
 

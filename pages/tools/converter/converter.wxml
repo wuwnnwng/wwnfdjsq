@@ -28,6 +28,17 @@
     </view>
 
     <view class="panel conv-board">
+      <view class="unit-tabs" wx:if="{{type !== 'currency'}}">
+        <view
+          wx:for="{{unitTabs}}"
+          wx:key="id"
+          class="unit-tab {{type === item.id ? 'active' : ''}}"
+          bindtap="onSwitchUnitType"
+          data-type="{{item.id}}"
+        >
+          {{item.name}}
+        </view>
+      </view>
       <view class="conv-card">
         <view class="conv-card-label">从</view>
         <view

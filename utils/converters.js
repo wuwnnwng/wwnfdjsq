@@ -158,6 +158,25 @@ const CONVERTER_TYPES = {
   }
 }
 
+const UNIT_TYPE_TABS = [
+  { id: 'length', name: '长度', icon: '📏' },
+  { id: 'area', name: '面积', icon: '📐' },
+  { id: 'volume', name: '体积', icon: '🧊' },
+  { id: 'weight', name: '重量', icon: '⚖️' },
+  { id: 'temperature', name: '温度', icon: '🌡️' },
+  { id: 'speed', name: '速度', icon: '🏎️' },
+  { id: 'pressure', name: '压强', icon: '🎛️' },
+  { id: 'power', name: '功率', icon: '⚡' }
+]
+
+function isUnitType(type) {
+  return UNIT_TYPE_TABS.some((item) => item.id === type)
+}
+
+function getUnitTypeTab(type) {
+  return UNIT_TYPE_TABS.find((item) => item.id === type) || UNIT_TYPE_TABS[0]
+}
+
 let dynamicCurrencyUnits = null
 
 function setCurrencyUnits(units) {
@@ -422,6 +441,9 @@ function evaluateExpression(expr) {
 
 module.exports = {
   CONVERTER_TYPES,
+  UNIT_TYPE_TABS,
+  isUnitType,
+  getUnitTypeTab,
   getConverterType,
   getUnit,
   getUnitsForType,

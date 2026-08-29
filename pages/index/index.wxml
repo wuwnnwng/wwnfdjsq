@@ -1,31 +1,20 @@
 <view class="page page-shell theme-{{theme}} {{themeFading ? 'is-theme-fading' : ''}}">
   <view class="panel hero-panel">
-    <view class="hero-top">
+    <view class="hero-head">
       <view class="brand-wrap">
-        <view class="brand">置居试算计算器</view>
-        <view class="theme-switch" aria-label="切换皮肤">
-          <view
-            wx:for="{{themeList}}"
-            wx:key="id"
-            class="theme-dot {{item.id}} {{theme === item.id ? 'active' : ''}}"
-            data-theme="{{item.id}}"
-            bindtap="onThemeChange"
-            aria-role="button"
-            aria-label="{{item.name}}皮肤"
-          ></view>
-        </view>
+        <view class="brand">置居试算</view>
+        <view class="brand-kicker">公积金 · 商贷 · 组合贷</view>
       </view>
-      <view class="segment segment-row mode-segment">
+      <view class="theme-switch" aria-label="切换皮肤">
         <view
-          class="segment-item {{calcMode === 'new' ? 'active' : ''}}"
-          data-mode="new"
-          bindtap="onCalcModeChange"
-        >新贷款</view>
-        <view
-          class="segment-item {{calcMode === 'remaining' ? 'active' : ''}}"
-          data-mode="remaining"
-          bindtap="onCalcModeChange"
-        >已有贷款</view>
+          wx:for="{{themeList}}"
+          wx:key="id"
+          class="theme-dot {{item.id}} {{theme === item.id ? 'active' : ''}}"
+          data-theme="{{item.id}}"
+          bindtap="onThemeChange"
+          aria-role="button"
+          aria-label="{{item.name}}皮肤"
+        ></view>
       </view>
     </view>
 
@@ -92,7 +81,20 @@
         catchtap="onToggleFeaturedTools"
         aria-role="button"
         aria-label="{{featuredToolsOpen ? '收起常用工具' : '展开常用工具'}}"
-      >{{featuredToolsOpen ? '▼' : '▲'}}</view>
+      >{{featuredToolsOpen ? '收起' : '工具'}}</view>
+    </view>
+
+    <view class="segment segment-row mode-segment">
+      <view
+        class="segment-item {{calcMode === 'new' ? 'active' : ''}}"
+        data-mode="new"
+        bindtap="onCalcModeChange"
+      >新贷款</view>
+      <view
+        class="segment-item {{calcMode === 'remaining' ? 'active' : ''}}"
+        data-mode="remaining"
+        bindtap="onCalcModeChange"
+      >已有贷款</view>
     </view>
   </view>
 

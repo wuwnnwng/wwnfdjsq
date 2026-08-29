@@ -27,9 +27,9 @@
   ],
   "window": {
     "navigationBarTitleText": "置居试算计算器",
-    "navigationBarBackgroundColor": "#0B3D2E",
+    "navigationBarBackgroundColor": "#070D18",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#F3F6F4",
+    "backgroundColor": "#0B1220",
     "backgroundTextStyle": "dark"
   },
   "permission": {

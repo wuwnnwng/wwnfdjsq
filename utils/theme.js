@@ -1,12 +1,22 @@
 /**
  * 皮肤主题
- * forest 青绿（默认）/ ocean 商务蓝 / amber 琥珀金 / crimson 中国红 / rose 经典粉
+ * nexus 星核（默认，科技感）/ forest 青绿 / ocean 商务蓝 / amber 琥珀金 / crimson 中国红 / rose 经典粉
  */
 
-const STORAGE_KEY = 'app_theme_v1'
-const DEFAULT_THEME = 'forest'
+const STORAGE_KEY = 'app_theme_v2'
+const DEFAULT_THEME = 'nexus'
 
 const THEMES = {
+  nexus: {
+    id: 'nexus',
+    name: '星核',
+    navBar: '#070D18',
+    pageBg: '#0B1220',
+    principal: '#22D3EE',
+    interest: '#A78BFA',
+    dialog: '#121A2A',
+    ink: '#E7EEF8'
+  },
   forest: {
     id: 'forest',
     name: '青绿',
@@ -60,6 +70,7 @@ const THEMES = {
 }
 
 const THEME_LIST = [
+  { id: 'nexus', name: '星核' },
   { id: 'forest', name: '青绿' },
   { id: 'ocean', name: '商务蓝' },
   { id: 'amber', name: '琥珀金' },

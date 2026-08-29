@@ -6,8 +6,8 @@ const FEATURED_IDS = ['calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'f
 const FEATURED_PAGE_SIZE = 3
 
 const CATEGORIES = [
-  { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax', 'pension'] },
-  { id: 'daily', name: '日常工具', toolIds: ['calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'duedate', 'safeperiod', 'canvas', 'puzzle'] },
+  { id: 'daily', name: '日常工具', toolIds: ['duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
+  { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] }
 ]
@@ -286,7 +286,7 @@ function getFeaturedToolPages() {
     iconType: 'random',
     isRandom: true
   }
-  const extra = ['bmi', 'rmb', 'compound', 'pension', 'duedate', 'safeperiod']
+  const extra = ['bmi', 'compound', 'pension', 'duedate', 'safeperiod']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
   const list = getFeaturedTools().concat(extra, random)

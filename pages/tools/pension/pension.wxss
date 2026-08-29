@@ -170,6 +170,15 @@
   color: var(--color-muted);
 }
 
+.region-hint {
+  margin: -4rpx 0 8rpx;
+  padding-left: 220rpx;
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: var(--color-muted);
+  text-align: right;
+}
+
 .field-stack {
   display: flex;
   flex-direction: column;

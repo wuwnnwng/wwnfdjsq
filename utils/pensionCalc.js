@@ -49,16 +49,8 @@ const SALARY_BANDS = [
   { id: 'cap', name: '封顶档', maxIndex: Infinity, hint: '基数达到或超过社平 300%，按缴费上限计算', color: '#f87171' }
 ]
 
-const RESIDENT_GRADES = [
-  { fee: 200, subsidy: 40, band: '基础档' },
-  { fee: 300, subsidy: 50, band: '基础档' },
-  { fee: 500, subsidy: 60, band: '普通档' },
-  { fee: 1000, subsidy: 80, band: '普通档' },
-  { fee: 2000, subsidy: 120, band: '中等档' },
-  { fee: 3000, subsidy: 160, band: '中等档' },
-  { fee: 5000, subsidy: 200, band: '较高档' },
-  { fee: 8000, subsidy: 200, band: '高档' }
-]
+const { DEFAULT_SUBSIDIES, subsidyOfFee } = require('./pensionRegionData')
+const RESIDENT_GRADES = DEFAULT_SUBSIDIES
 
 const RESIDENT_BANDS = [
   { id: 'floor', name: '基础档', maxFee: 500 },
@@ -145,12 +137,8 @@ function futureValueAnnuity(annualDeposit, years, rate) {
   return annualDeposit * factor
 }
 
-function subsidyOf(fee) {
-  let found = RESIDENT_GRADES[0]
-  RESIDENT_GRADES.forEach((item) => {
-    if (fee >= item.fee) found = item
-  })
-  return found.subsidy
+function subsidyOf(fee, grades) {
+  return subsidyOfFee(fee, grades && grades.length ? grades : RESIDENT_GRADES)
 }
 
 function calculateEmployeeLike({ type, salaryText, averageText, yearsText, retireAge, returnText }) {
@@ -257,8 +245,8 @@ function calculateEmployeeLike({ type, salaryText, averageText, yearsText, retir
       { label: '替代率', value: formatPercent(replacement) }
     ],
     note: isFlexible
-      ? '灵活就业按各地规定以缴费基数的约 20% 自己缴纳（8% 进个人账户，其余进统筹）。未计入过渡性养老金和退休后调整，结果仅供参考。'
-      : '假设缴费基数、社平工资保持当前水平，未计入过渡性养老金、职业年金及退休后调整。各地政策不同，结果仅供参考。',
+      ? '灵活就业按各地规定以缴费基数的约 20% 自己缴纳（8% 进个人账户，其余进统筹）。已按所选省份填入社平工资和账户年化，数字可改。未计入过渡性养老金和退休后调整，结果仅供参考。'
+      : '假设缴费基数、社平工资保持当前水平，未计入过渡性养老金、职业年金及退休后调整。已按所选省份填入社平工资和账户年化，数字可改。',
     tipText: isFlexible
       ? '灵活就业人员参加职工养老保险，一般按当地社平工资的 60%–300% 自选缴费基数，自己承担约 20% 的缴费。养老金算法与职工相同：基础养老金 + 个人账户养老金。个人账户仍按基数的 8% 记账。'
       : '按城镇职工基本养老保险：月养老金 ≈ 基础养老金 + 个人账户养老金。基础养老金 =（社平工资 + 缴费基数）÷ 2 × 缴费年限 × 1%；个人账户按缴费基数 8% 逐年滚存后，再除以退休年龄对应的计发月数。缴费基数不得低于社平 60%、不得高于 300%。'
@@ -345,7 +333,7 @@ function calculateResident({
       { label: '计发月数', value: `${payoutMonths} 个月` },
       { label: '预估月养老金', value: `${formatMoney(monthly)} 元` }
     ],
-    note: '城乡居民养老按「当地基础养老金 + 个人账户÷计发月数」估算。年缴费档次、补贴和基础养老金请改成参保地当年标准。',
+    note: '城乡居民养老按「当地基础养老金 + 个人账户÷计发月数」估算。已按所选省份填入基础养老金、补贴和账户年化，县市标准可能更高，数字可改。',
     tipText:
       '城乡居民养老保险由个人按年缴费，政府给予补贴。领取时：月养老金 = 当地基础养老金 + 个人账户储存额 ÷ 计发月数。基础养老金由各地公布，个人账户为每年缴费加补贴后滚存。与职工养老不是同一套制度。'
   }

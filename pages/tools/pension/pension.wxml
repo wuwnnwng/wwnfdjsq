@@ -54,6 +54,16 @@
         </view>
       </view>
 
+      <view class="field">
+        <text class="field-label">参保省份</text>
+        <view class="field-control">
+          <picker mode="selector" range="{{regionNames}}" value="{{regionIndex}}" bindchange="onRegionChange">
+            <view class="picker-value">{{regionNames[regionIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="region-hint">{{regionHint}}</view>
+
       <block wx:if="{{type === 'resident'}}">
         <view class="field field-stack">
           <text class="field-label">年缴费档次</text>
@@ -113,7 +123,7 @@
             <text class="field-unit">%</text>
           </view>
         </view>
-        <view class="tool-note">城乡居民是自己按年交、政府给补贴。基础养老金和补贴请改成你县市公布的数字。</view>
+        <view class="tool-note">城乡居民是自己按年交、政府给补贴。已按省份填入基础养老金、政府补贴和账户年化，县市标准可能更高，数字可改。</view>
       </block>
 
       <block wx:else>
@@ -154,8 +164,8 @@
             <text class="field-unit">%</text>
           </view>
         </view>
-        <view class="tool-note" wx:if="{{type === 'flexible'}}">没单位、自己交社保一般走灵活就业。缴费基数按当地社平 60%–300% 自选，每月大约交基数的 20%。</view>
-        <view class="tool-note" wx:else>工资段按月工资相对当地社平工资划分：60% 保底、100% 社平、300% 封顶。请把社平工资改成你参保地公布的数字。</view>
+        <view class="tool-note" wx:if="{{type === 'flexible'}}">没单位、自己交社保一般走灵活就业。已按省份填入社平工资和账户年化。缴费基数按当地社平 60%–300% 自选，每月大约交基数的 20%。</view>
+        <view class="tool-note" wx:else>工资段按月工资相对当地社平工资划分：60% 保底、100% 社平、300% 封顶。已按省份填入社平工资和账户年化，数字可改。</view>
       </block>
     </view>
 

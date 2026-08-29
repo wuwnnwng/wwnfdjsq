@@ -286,7 +286,7 @@ function getFeaturedToolPages() {
     iconType: 'random',
     isRandom: true
   }
-  const extra = ['bmi', 'unit', 'rmb', 'compound', 'pension', 'canvas', 'puzzle']
+  const extra = ['bmi', 'rmb', 'compound', 'pension', 'duedate', 'safeperiod']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
   const list = getFeaturedTools().concat(extra, random)

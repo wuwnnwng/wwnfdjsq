@@ -12,53 +12,46 @@
 }
 
 .kind-period {
-  color: #e11d48;
+  color: #9f1239;
+  background: #fb7185;
 }
 
 .kind-fertile {
-  color: #ea580c;
+  color: #9a3412;
+  background: #fdba74;
 }
 
 .kind-ovulation {
-  color: #c026d3;
+  color: #86198f;
+  background: #e879f9;
 }
 
 .kind-safe {
-  color: #059669;
+  color: #047857;
+  background: #6ee7b7;
+}
+
+.conv-result.kind-period,
+.conv-result.kind-fertile,
+.conv-result.kind-ovulation,
+.conv-result.kind-safe {
+  background: transparent;
 }
 
 .cycle-legend {
   display: flex;
-  gap: 16rpx;
+  gap: 12rpx;
   margin: 8rpx 0 20rpx;
-  font-size: 22rpx;
-  color: var(--color-muted);
 }
 
-.cycle-legend-item::before {
-  content: '';
-  display: inline-block;
-  width: 16rpx;
-  height: 16rpx;
-  margin-right: 8rpx;
-  border-radius: 4rpx;
-  vertical-align: middle;
-}
-
-.cycle-legend-item.period::before {
-  background: #fb7185;
-}
-
-.cycle-legend-item.fertile::before {
-  background: #fdba74;
-}
-
-.cycle-legend-item.ovulation::before {
-  background: #e879f9;
-}
-
-.cycle-legend-item.safe::before {
-  background: #6ee7b7;
+.cycle-swatch {
+  flex: 1;
+  height: 48rpx;
+  line-height: 48rpx;
+  text-align: center;
+  border-radius: 12rpx;
+  font-size: 20rpx;
+  font-weight: 700;
 }
 
 .cycle-grid {
@@ -75,34 +68,99 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #ecfdf5;
-}
-
-.cycle-day.kind-period {
-  background: #ffe4e6;
-}
-
-.cycle-day.kind-fertile {
-  background: #ffedd5;
-}
-
-.cycle-day.kind-ovulation {
-  background: #fae8ff;
 }
 
 .cycle-day.is-today {
-  box-shadow: inset 0 0 0 3rpx var(--color-brand);
+  box-shadow: inset 0 0 0 4rpx rgba(20, 35, 28, 0.42);
+}
+
+.cycle-day-num,
+.cycle-day-date {
+  color: inherit;
 }
 
 .cycle-day-num {
   font-size: 26rpx;
   font-weight: 700;
-  color: var(--color-ink);
   line-height: 1.2;
 }
 
 .cycle-day-date {
   margin-top: 2rpx;
   font-size: 18rpx;
+  opacity: 0.78;
+}
+
+.tip-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx;
+  background: var(--color-mask);
+}
+
+.tip-dialog {
+  width: 100%;
+  max-width: 620rpx;
+  padding: 36rpx 32rpx 28rpx;
+  border-radius: 24rpx;
+  background: var(--color-dialog);
+  text-align: center;
+}
+
+.day-tip-swatch {
+  display: inline-block;
+  min-width: 96rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  padding: 0 20rpx;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.tip-title {
+  margin-top: 16rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+
+.day-tip-date {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.day-tip-meta {
+  margin-top: 6rpx;
+  font-size: 22rpx;
   color: var(--color-muted);
+}
+
+.tip-text {
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--color-muted);
+  text-align: left;
+}
+
+.tip-confirm {
+  margin-top: 32rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
 }

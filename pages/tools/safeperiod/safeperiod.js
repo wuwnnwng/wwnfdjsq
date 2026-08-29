@@ -11,7 +11,9 @@ Page({
     periodDays: '5',
     result: null,
     showDatePicker: false,
-    datePickerValue: ''
+    datePickerValue: '',
+    showDayTip: false,
+    selectedDay: null
   },
 
   onLoad() {
@@ -54,8 +56,25 @@ Page({
     )
   },
 
+  preventMove() {},
+
+  onDayDialogTap() {},
+
+  onSelectDay(e) {
+    const days = (this.data.result && this.data.result.days) || []
+    const index = Number(e.currentTarget.dataset.index)
+    const selectedDay = days[index]
+    if (!selectedDay) return
+    this.setData({ selectedDay, showDayTip: true })
+  },
+
+  onHideDayTip() {
+    this.setData({ showDayTip: false })
+  },
+
   recalculate() {
     this.setData({
+      showDayTip: false,
       result: calculateSafePeriod({
         lastPeriodText: this.data.lastPeriod,
         cycleText: this.data.cycle,

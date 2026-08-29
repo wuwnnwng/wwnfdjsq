@@ -6,10 +6,30 @@
 const { parseYMD, formatDateText, formatWeekday, formatYMD } = require('./datetimeCalc')
 
 const KINDS = {
-  period: { id: 'period', name: '月经期', short: '月经' },
-  fertile: { id: 'fertile', name: '易孕期', short: '易孕' },
-  ovulation: { id: 'ovulation', name: '排卵日', short: '排卵' },
-  safe: { id: 'safe', name: '相对安全期', short: '安全' }
+  period: {
+    id: 'period',
+    name: '月经期',
+    short: '月经',
+    detail: '月经期内一般不易受孕，但排卵可能提前，仍不能当成避孕依据。'
+  },
+  fertile: {
+    id: 'fertile',
+    name: '易孕期',
+    short: '易孕',
+    detail: '排卵前后这几天受孕几率较高。精子可存活数天，日历法不能当避孕手段。'
+  },
+  ovulation: {
+    id: 'ovulation',
+    name: '排卵日',
+    short: '排卵',
+    detail: '按周期天数减 14 估出的排卵日，受孕几率最高。实际排卵可能提前或延后。'
+  },
+  safe: {
+    id: 'safe',
+    name: '相对安全期',
+    short: '安全',
+    detail: '日历法认为这天相对不易受孕，失败率仍然不低，不能替代安全套等可靠方式。'
+  }
 }
 
 function startOfDay(date) {
@@ -97,9 +117,12 @@ function calculateSafePeriod({ lastPeriodText, cycleText, periodText, asOfText }
       day: i,
       ymd: formatYMD(date.getFullYear(), date.getMonth() + 1, date.getDate()),
       dateText: `${date.getMonth() + 1}/${date.getDate()}`,
+      dateFull: formatDateText(date),
       weekday: formatWeekday(date),
       kind: kind.id,
-      kindName: kind.short,
+      kindName: kind.name,
+      kindShort: kind.short,
+      detail: kind.detail,
       isToday: i === cycleDay
     })
   }

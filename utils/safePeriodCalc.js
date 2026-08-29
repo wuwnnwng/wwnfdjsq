@@ -158,6 +158,10 @@ function calculateSafePeriod({ lastPeriodText, cycleText, periodText, asOfText }
     remainToOvulation,
     remainToOvulationText:
       remainToOvulation === 0 ? '就是今天' : remainToOvulation > 0 ? `${remainToOvulation} 天` : `已过 ${-remainToOvulation} 天`,
+    ovulationShort: `${ovulationDate.getMonth() + 1}月${ovulationDate.getDate()}日`,
+    nextPeriodShort: `${nextPeriod.getMonth() + 1}月${nextPeriod.getDate()}日`,
+    periodSpanText: `第 1–${periodLength} 天`,
+    fertileSpanText: `第 ${fertileStart}–${fertileEnd} 天`,
     days
   }
 }

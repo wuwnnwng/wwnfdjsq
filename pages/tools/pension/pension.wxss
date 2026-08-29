@@ -164,6 +164,55 @@
   font-weight: 700;
 }
 
+.resident-hint {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.field-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12rpx;
+  min-height: 0;
+}
+
+.field-stack .field-label {
+  width: auto;
+}
+
+.grade-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.grade-chip {
+  min-width: 96rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  padding: 0 16rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1rpx solid var(--color-line);
+}
+
+.grade-chip.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+  border-color: transparent;
+}
+
+.seg-row.cols-3 .seg-item {
+  font-size: 22rpx;
+  padding: 0 4rpx;
+}
+
 .result-row-value {
   max-width: 62%;
 }

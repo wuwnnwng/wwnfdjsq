@@ -7,7 +7,7 @@
             <text class="tool-icon">🏦</text>
           </view>
           <view class="conv-hero-copy">
-            <view class="conv-kicker">职工养老 · 缴费档位</view>
+            <view class="conv-kicker">{{result && result.typeName ? result.typeName : '职工养老'}} · 缴费档位</view>
             <view class="section-title-row">
               <view class="conv-title">养老金估算</view>
               <view class="help-icon" catchtap="onShowTip" aria-role="button" aria-label="估算说明">!</view>
@@ -20,112 +20,159 @@
         <view class="conv-result">{{result.heroText}}</view>
         <view class="conv-result-unit">元 / 月 · {{result.heroSub}}</view>
         <view class="band-badge band-{{result.bandId}}">{{result.bandName}}</view>
-        <view class="band-track">
-          <view class="band-seg floor"></view>
-          <view class="band-seg basic"></view>
-          <view class="band-seg mid"></view>
-          <view class="band-seg upper"></view>
-          <view class="band-seg high"></view>
-          <view class="band-seg cap"></view>
-        </view>
-        <view class="band-marker-wrap">
-          <view class="band-marker" style="left: {{result.markerPercent}}%;"></view>
-        </view>
-        <view class="band-legend">
-          <text wx:for="{{result.bands}}" wx:key="id" class="band-legend-item {{item.active ? 'active' : ''}}">{{item.name}}</text>
-        </view>
+        <block wx:if="{{result.showSalaryTrack}}">
+          <view class="band-track">
+            <view class="band-seg floor"></view>
+            <view class="band-seg basic"></view>
+            <view class="band-seg mid"></view>
+            <view class="band-seg upper"></view>
+            <view class="band-seg high"></view>
+            <view class="band-seg cap"></view>
+          </view>
+          <view class="band-marker-wrap">
+            <view class="band-marker" style="left: {{result.markerPercent}}%;"></view>
+          </view>
+          <view class="band-legend">
+            <text wx:for="{{result.bands}}" wx:key="id" class="band-legend-item {{item.active ? 'active' : ''}}">{{item.name}}</text>
+          </view>
+        </block>
+        <view class="resident-hint" wx:else>{{result.bandHint}}</view>
       </block>
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
     <view class="panel">
-      <view class="field">
-        <text class="field-label">月工资</text>
-        <view class="field-control">
-          <input class="field-input" type="digit" value="{{salary}}" data-field="salary" bindinput="onInput" placeholder="税前应发" />
-          <text class="field-unit">元</text>
+      <view class="seg-row cols-3">
+        <view
+          wx:for="{{types}}"
+          wx:key="id"
+          class="seg-item {{type === item.id ? 'active' : ''}}"
+          bindtap="onSwitchType"
+          data-type="{{item.id}}"
+        >
+          {{item.name}}
         </view>
       </view>
-      <view class="field">
-        <text class="field-label">当地社平工资</text>
-        <view class="field-control">
-          <input class="field-input" type="digit" value="{{average}}" data-field="average" bindinput="onInput" placeholder="上年度全口径" />
-          <text class="field-unit">元</text>
+
+      <block wx:if="{{type === 'resident'}}">
+        <view class="field field-stack">
+          <text class="field-label">年缴费档次</text>
+          <view class="grade-chips">
+            <view
+              wx:for="{{residentGrades}}"
+              wx:key="fee"
+              class="grade-chip {{annualFee === item.feeText ? 'active' : ''}}"
+              bindtap="onSelectGrade"
+              data-fee="{{item.fee}}"
+              data-subsidy="{{item.subsidy}}"
+            >
+              {{item.label}}
+            </view>
+          </view>
         </view>
-      </view>
-      <view class="field">
-        <text class="field-label">缴费年限</text>
-        <view class="field-control">
-          <input class="field-input" type="digit" value="{{years}}" data-field="years" bindinput="onInput" placeholder="含视同缴费" />
-          <text class="field-unit">年</text>
+        <view class="field">
+          <text class="field-label">年缴费</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{annualFee}}" data-field="annualFee" bindinput="onInput" placeholder="自己交的那一档" />
+            <text class="field-unit">元</text>
+          </view>
         </view>
-      </view>
-      <view class="field">
-        <text class="field-label">退休年龄</text>
-        <view class="field-control">
-          <picker mode="selector" range="{{retireLabels}}" value="{{retireIndex}}" bindchange="onRetireChange">
-            <view class="picker-value">{{retireLabels[retireIndex]}}</view>
-          </picker>
+        <view class="field">
+          <text class="field-label">政府补贴</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{subsidy}}" data-field="subsidy" bindinput="onInput" placeholder="参保地当年补贴" />
+            <text class="field-unit">元/年</text>
+          </view>
         </view>
-      </view>
-      <view class="field">
-        <text class="field-label">账户年化</text>
-        <view class="field-control">
-          <input class="field-input" type="digit" value="{{returnRate}}" data-field="returnRate" bindinput="onInput" placeholder="个人账户记账利率" />
-          <text class="field-unit">%</text>
+        <view class="field">
+          <text class="field-label">基础养老金</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{basicPension}}" data-field="basicPension" bindinput="onInput" placeholder="当地公布标准" />
+            <text class="field-unit">元/月</text>
+          </view>
         </view>
-      </view>
-      <view class="tool-note">工资段按月工资相对当地社平工资划分：60% 保底、100% 社平、300% 封顶。请把社平工资改成你参保地公布的数字。</view>
+        <view class="field">
+          <text class="field-label">缴费年限</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{years}}" data-field="years" bindinput="onInput" placeholder="满 15 年可领" />
+            <text class="field-unit">年</text>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">领取年龄</text>
+          <view class="field-control">
+            <picker mode="selector" range="{{residentRetireLabels}}" value="{{residentRetireIndex}}" bindchange="onResidentRetireChange">
+              <view class="picker-value">{{residentRetireLabels[residentRetireIndex]}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">账户年化</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{returnRate}}" data-field="returnRate" bindinput="onInput" placeholder="个人账户记账利率" />
+            <text class="field-unit">%</text>
+          </view>
+        </view>
+        <view class="tool-note">城乡居民是自己按年交、政府给补贴。基础养老金和补贴请改成你县市公布的数字。</view>
+      </block>
+
+      <block wx:else>
+        <view class="field">
+          <text class="field-label">{{type === 'flexible' ? '缴费基数' : '月工资'}}</text>
+          <view class="field-control">
+            <input wx:if="{{type === 'flexible'}}" class="field-input" type="digit" value="{{salary}}" data-field="salary" bindinput="onInput" placeholder="自选缴费基数" />
+            <input wx:else class="field-input" type="digit" value="{{salary}}" data-field="salary" bindinput="onInput" placeholder="税前应发" />
+            <text class="field-unit">元</text>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">当地社平工资</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{average}}" data-field="average" bindinput="onInput" placeholder="上年度全口径" />
+            <text class="field-unit">元</text>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">缴费年限</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{years}}" data-field="years" bindinput="onInput" placeholder="含视同缴费" />
+            <text class="field-unit">年</text>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">退休年龄</text>
+          <view class="field-control">
+            <picker mode="selector" range="{{retireLabels}}" value="{{retireIndex}}" bindchange="onRetireChange">
+              <view class="picker-value">{{retireLabels[retireIndex]}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="field">
+          <text class="field-label">账户年化</text>
+          <view class="field-control">
+            <input class="field-input" type="digit" value="{{returnRate}}" data-field="returnRate" bindinput="onInput" placeholder="个人账户记账利率" />
+            <text class="field-unit">%</text>
+          </view>
+        </view>
+        <view class="tool-note" wx:if="{{type === 'flexible'}}">没单位、自己交社保一般走灵活就业。缴费基数按当地社平 60%–300% 自选，每月大约交基数的 20%。</view>
+        <view class="tool-note" wx:else>工资段按月工资相对当地社平工资划分：60% 保底、100% 社平、300% 封顶。请把社平工资改成你参保地公布的数字。</view>
+      </block>
     </view>
 
     <view class="panel" wx:if="{{result && result.valid}}">
       <view class="section-title">估算明细</view>
-      <view class="result-row">
-        <view class="result-row-label">工资段</view>
-        <view class="result-row-value">{{result.bandName}} · {{result.bandHint}}</view>
+      <view class="result-row" wx:for="{{result.rows}}" wx:key="label">
+        <view class="result-row-label">{{item.label}}</view>
+        <view class="result-row-value">{{item.value}}</view>
       </view>
-      <view class="result-row">
-        <view class="result-row-label">缴费基数</view>
-        <view class="result-row-value">{{result.contribBaseText}} 元 / 月</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">缴费指数</view>
-        <view class="result-row-value">{{result.indexText}}{{result.floored ? '（已保底）' : ''}}{{result.capped ? '（已封顶）' : ''}}</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">基础养老金</view>
-        <view class="result-row-value">{{result.basicText}} 元 / 月</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">个人账户养老金</view>
-        <view class="result-row-value">{{result.accountText}} 元 / 月</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">个人账户储存额</view>
-        <view class="result-row-value">{{result.accountBalanceText}} 元</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">计发月数</view>
-        <view class="result-row-value">{{result.payoutMonthsText}}</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">预估月养老金</view>
-        <view class="result-row-value">{{result.monthlyText}} 元</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">替代率</view>
-        <view class="result-row-value">{{result.replacementText}}</view>
-      </view>
-      <view class="tool-note">假设缴费基数、社平工资保持当前水平，未计入过渡性养老金、职业年金及退休后调整。各地政策不同，结果仅供参考。</view>
+      <view class="tool-note">{{result.note}}</view>
     </view>
   </scroll-view>
 
   <view wx:if="{{showTip}}" class="tip-mask" catchtap="onHideTip" catchtouchmove="preventMove">
     <view class="tip-dialog" catchtap="preventMove">
       <view class="tip-title">怎么估算</view>
-      <view class="tip-text">
-        按城镇职工基本养老保险：月养老金 ≈ 基础养老金 + 个人账户养老金。基础养老金 =（社平工资 + 缴费基数）÷ 2 × 缴费年限 × 1%；个人账户按月工资 8% 逐年滚存后，再除以退休年龄对应的计发月数。缴费基数不得低于社平 60%、不得高于 300%，并据此打上保底档到封顶档的工资段标签。
-      </view>
+      <view class="tip-text">{{result && result.tipText ? result.tipText : '按城镇职工基本养老保险估算，结果仅供参考。'}}</view>
       <view class="tip-confirm" catchtap="onHideTip">知道了</view>
     </view>
   </view>

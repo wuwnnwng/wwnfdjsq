@@ -85,11 +85,15 @@ function calculateDueDate({ mode, baseDateText, asOfText }) {
     return {
       ...item,
       ...info,
+      shortDate: `${info.month}月${info.day}日`,
       delta,
       status,
-      statusText: delta === 0 ? '就是今天' : delta > 0 ? `还有 ${delta} 天` : `已过 ${-delta} 天`
+      statusText: delta === 0 ? '就是今天' : delta > 0 ? `还有 ${delta} 天` : `已过 ${-delta} 天`,
+      etaText: delta === 0 ? '今天' : delta > 0 ? `${delta} 天` : `${-delta} 天`
     }
   })
+  const nextMilestone = milestones.find((item) => item.status === 'today') || milestones.find((item) => item.status === 'upcoming')
+  if (nextMilestone) nextMilestone.isNext = true
 
   const dueInfo = attachDateInfo(due)
   const lmpInfo = attachDateInfo(lmp)
@@ -113,8 +117,10 @@ function calculateDueDate({ mode, baseDateText, asOfText }) {
     trimesterId: trimester.id,
     trimesterName: trimester.name,
     lmpText: lmpInfo.dateText,
+    lmpShort: `${lmp.getMonth() + 1}月${lmp.getDate()}日`,
     lmpWeekday: lmpInfo.weekday,
     conceptionText: conceptionInfo.dateText,
+    conceptionShort: `${conception.getMonth() + 1}月${conception.getDate()}日`,
     conceptionWeekday: conceptionInfo.weekday,
     asOfText: formatDateText(asOf),
     milestones,

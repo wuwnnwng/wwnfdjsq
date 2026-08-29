@@ -156,7 +156,7 @@ const TOOLS = [
     shortName: '养老金',
     icon: '🏦',
     iconType: 'pension',
-    keywords: '养老金退休社保缴费基数社平工资替代率',
+    keywords: '养老金退休社保缴费基数社平工资替代率灵活就业城乡居民自己交社保',
     page: '/pages/tools/pension/pension'
   },
   {

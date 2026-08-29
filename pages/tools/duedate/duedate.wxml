@@ -46,37 +46,55 @@
 
     <view class="panel" wx:if="{{result && result.valid}}">
       <view class="section-title">孕期信息</view>
-      <view class="result-row">
-        <view class="result-row-label">预产期</view>
-        <view class="result-row-value">{{result.dueText}} · {{result.dueWeekday}}</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">农历</view>
-        <view class="result-row-value">{{result.dueLunar}}</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">当前孕周</view>
-        <view class="result-row-value">{{result.gestText}} · {{result.trimesterName}}</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">距离预产期</view>
-        <view class="result-row-value">{{result.remainText}}</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">末次月经</view>
-        <view class="result-row-value">{{result.lmpText}}</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">估算受孕日</view>
-        <view class="result-row-value">{{result.conceptionText}}</view>
+      <view class="info-grid">
+        <view class="info-card featured">
+          <view class="info-card-label">距离预产期</view>
+          <view class="info-card-value">{{result.remainText}}</view>
+          <view class="info-card-sub">{{result.dueText}} · {{result.dueWeekday}} · 农历{{result.dueLunar}}</view>
+        </view>
+        <view class="info-card">
+          <view class="info-card-label">当前孕周</view>
+          <view class="info-card-value">{{result.gestText}}</view>
+          <view class="info-card-sub trimester-{{result.trimesterId}}">{{result.trimesterName}}</view>
+        </view>
+        <view class="info-card">
+          <view class="info-card-label">预产期</view>
+          <view class="info-card-value">{{result.heroText}}</view>
+          <view class="info-card-sub">{{result.dueWeekday}}</view>
+        </view>
+        <view class="info-card">
+          <view class="info-card-label">末次月经</view>
+          <view class="info-card-value">{{result.lmpShort}}</view>
+          <view class="info-card-sub">{{result.lmpText}}</view>
+        </view>
+        <view class="info-card">
+          <view class="info-card-label">估算受孕日</view>
+          <view class="info-card-value">{{result.conceptionShort}}</view>
+          <view class="info-card-sub">{{result.conceptionWeekday}}</view>
+        </view>
       </view>
     </view>
 
     <view class="panel" wx:if="{{result && result.valid}}">
       <view class="section-title">关键节点</view>
-      <view class="result-row" wx:for="{{result.milestones}}" wx:key="name">
-        <view class="result-row-label">{{item.name}} · {{item.hint}}</view>
-        <view class="result-row-value milestone-{{item.status}}">{{item.dateText}} · {{item.statusText}}</view>
+      <view class="timeline">
+        <view
+          wx:for="{{result.milestones}}"
+          wx:key="name"
+          class="timeline-item status-{{item.status}} {{item.isNext ? 'is-next' : ''}}"
+        >
+          <view class="timeline-rail">
+            <view class="timeline-dot"></view>
+            <view class="timeline-line"></view>
+          </view>
+          <view class="timeline-body">
+            <view class="timeline-top">
+              <view class="timeline-name">{{item.name}}</view>
+              <view class="timeline-eta">{{item.statusText}}</view>
+            </view>
+            <view class="timeline-meta">{{item.hint}} · {{item.shortDate}}</view>
+          </view>
+        </view>
       </view>
       <view class="tool-note">{{result.note}}</view>
     </view>

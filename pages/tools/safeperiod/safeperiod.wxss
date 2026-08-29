@@ -91,6 +91,34 @@
   opacity: 0.78;
 }
 
+.info-card.kind-period,
+.info-card.kind-fertile,
+.info-card.kind-ovulation,
+.info-card.kind-safe,
+.info-card.kind-next {
+  border-color: transparent;
+}
+
+.info-card.kind-next {
+  color: #1d4ed8;
+  background: #93c5fd;
+}
+
+.info-card .info-card-label,
+.info-card .info-card-value,
+.info-card .info-card-sub {
+  color: inherit;
+}
+
+.info-card .info-card-label,
+.info-card .info-card-sub {
+  opacity: 0.82;
+}
+
+.info-card .info-card-value {
+  font-size: 32rpx;
+}
+
 .tip-mask {
   position: fixed;
   left: 0;

@@ -85,6 +85,53 @@
   grid-template-columns: 1fr 1fr 1fr;
 }
 
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+
+.info-card {
+  padding: 22rpx 18rpx 20rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1rpx solid var(--color-line);
+  min-height: 140rpx;
+  box-sizing: border-box;
+}
+
+.info-card.featured {
+  grid-column: 1 / -1;
+  background:
+    linear-gradient(160deg, rgba(244, 114, 182, 0.16) 0%, rgba(255, 255, 255, 0.55) 72%),
+    rgba(255, 255, 255, 0.7);
+}
+
+.info-card-label {
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.info-card-value {
+  margin-top: 8rpx;
+  font-size: 36rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  line-height: 1.25;
+  word-break: break-all;
+}
+
+.info-card.featured .info-card-value {
+  font-size: 48rpx;
+}
+
+.info-card-sub {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
 .seg-item {
   height: 72rpx;
   line-height: 72rpx;

@@ -1,6 +1,6 @@
 /**
- * 城镇职工基本养老金估算
- * 基础养老金 + 个人账户养老金，并按工资相对社平工资打档位标签
+ * 养老金估算：职工养老、灵活就业、城乡居民
+ * 职工 / 灵活就业按城镇职工公式；城乡居民按年缴费 + 基础养老金
  */
 
 const PAYOUT_MONTHS = {
@@ -28,21 +28,49 @@ const PAYOUT_MONTHS = {
 }
 
 const RETIRE_AGES = [50, 55, 60, 63, 65]
+const RESIDENT_RETIRE_AGES = [60, 65]
 const PERSONAL_RATE = 0.08
+const FLEXIBLE_RATE = 0.2
 const MIN_INDEX = 0.6
 const MAX_INDEX = 3
 
+const PENSION_TYPES = [
+  { id: 'employee', name: '职工养老', kicker: '单位缴 · 个人缴' },
+  { id: 'flexible', name: '灵活就业', kicker: '自己缴社保' },
+  { id: 'resident', name: '城乡居民', kicker: '按年缴费' }
+]
+
 const SALARY_BANDS = [
-  { id: 'floor', name: '保底档', maxIndex: 0.6, hint: '工资不高于社平 60%，按缴费下限计算', color: '#94a3b8' },
-  { id: 'basic', name: '普通档', maxIndex: 1, hint: '工资不高于当地社平工资', color: '#60a5fa' },
-  { id: 'mid', name: '中等档', maxIndex: 1.5, hint: '工资略高于社平工资', color: '#34d399' },
-  { id: 'upper', name: '中高档', maxIndex: 2, hint: '工资明显高于社平工资', color: '#fbbf24' },
-  { id: 'high', name: '较高档', maxIndex: 3, hint: '工资接近缴费上限', color: '#fb923c' },
-  { id: 'cap', name: '封顶档', maxIndex: Infinity, hint: '工资达到或超过社平 300%，按缴费上限计算', color: '#f87171' }
+  { id: 'floor', name: '保底档', maxIndex: 0.6, hint: '基数不高于社平 60%，按缴费下限计算', color: '#94a3b8' },
+  { id: 'basic', name: '普通档', maxIndex: 1, hint: '基数不高于当地社平工资', color: '#60a5fa' },
+  { id: 'mid', name: '中等档', maxIndex: 1.5, hint: '基数略高于社平工资', color: '#34d399' },
+  { id: 'upper', name: '中高档', maxIndex: 2, hint: '基数明显高于社平工资', color: '#fbbf24' },
+  { id: 'high', name: '较高档', maxIndex: 3, hint: '基数接近缴费上限', color: '#fb923c' },
+  { id: 'cap', name: '封顶档', maxIndex: Infinity, hint: '基数达到或超过社平 300%，按缴费上限计算', color: '#f87171' }
+]
+
+const RESIDENT_GRADES = [
+  { fee: 200, subsidy: 40, band: '基础档' },
+  { fee: 300, subsidy: 50, band: '基础档' },
+  { fee: 500, subsidy: 60, band: '普通档' },
+  { fee: 1000, subsidy: 80, band: '普通档' },
+  { fee: 2000, subsidy: 120, band: '中等档' },
+  { fee: 3000, subsidy: 160, band: '中等档' },
+  { fee: 5000, subsidy: 200, band: '较高档' },
+  { fee: 8000, subsidy: 200, band: '高档' }
+]
+
+const RESIDENT_BANDS = [
+  { id: 'floor', name: '基础档', maxFee: 500 },
+  { id: 'basic', name: '普通档', maxFee: 1000 },
+  { id: 'mid', name: '中等档', maxFee: 3000 },
+  { id: 'upper', name: '较高档', maxFee: 5000 },
+  { id: 'high', name: '高档', maxFee: Infinity }
 ]
 
 const TRACK_MIN = 0.3
 const TRACK_MAX = 3.4
+const RESIDENT_TRACK_MAX = 9000
 
 function parseNumber(text) {
   const raw = String(text == null ? '' : text)
@@ -78,13 +106,26 @@ function formatPercent(value) {
   return `${n.toFixed(1)}%`
 }
 
+function typeMeta(type) {
+  return PENSION_TYPES.find((item) => item.id === type) || PENSION_TYPES[0]
+}
+
 function bandOf(rawIndex) {
   if (rawIndex >= MAX_INDEX) return SALARY_BANDS[SALARY_BANDS.length - 1]
   return SALARY_BANDS.find((item) => rawIndex <= item.maxIndex) || SALARY_BANDS[SALARY_BANDS.length - 1]
 }
 
+function residentBandOf(fee) {
+  return RESIDENT_BANDS.find((item) => fee <= item.maxFee) || RESIDENT_BANDS[RESIDENT_BANDS.length - 1]
+}
+
 function markerPercentOf(rawIndex) {
   const pct = ((Number(rawIndex) - TRACK_MIN) / (TRACK_MAX - TRACK_MIN)) * 100
+  return Math.round(Math.max(0, Math.min(100, pct)) * 10) / 10
+}
+
+function residentMarkerOf(fee) {
+  const pct = (Number(fee) / RESIDENT_TRACK_MAX) * 100
   return Math.round(Math.max(0, Math.min(100, pct)) * 10) / 10
 }
 
@@ -104,25 +145,31 @@ function futureValueAnnuity(annualDeposit, years, rate) {
   return annualDeposit * factor
 }
 
-function calculatePension({
-  salaryText,
-  averageText,
-  yearsText,
-  retireAge,
-  returnText
-}) {
+function subsidyOf(fee) {
+  let found = RESIDENT_GRADES[0]
+  RESIDENT_GRADES.forEach((item) => {
+    if (fee >= item.fee) found = item
+  })
+  return found.subsidy
+}
+
+function calculateEmployeeLike({ type, salaryText, averageText, yearsText, retireAge, returnText }) {
+  const isFlexible = type === 'flexible'
   const salary = parseNumber(salaryText)
   const average = parseNumber(averageText)
   const years = parseNumber(yearsText)
   const returnRaw = returnText == null || String(returnText).trim() === '' ? 0 : parseNumber(returnText)
+  const meta = typeMeta(type)
 
   if (salary === null || average === null || years === null) {
-    return { valid: false, message: '请输入月工资、社平工资和缴费年限' }
+    return { valid: false, message: isFlexible ? '请输入缴费基数、社平工资和缴费年限' : '请输入月工资、社平工资和缴费年限' }
   }
   if (!Number.isFinite(salary) || !Number.isFinite(average) || !Number.isFinite(years)) {
     return { valid: false, message: '请输入有效数字' }
   }
-  if (salary <= 0 || salary > 1e7) return { valid: false, message: '月工资请输入合理金额' }
+  if (salary <= 0 || salary > 1e7) {
+    return { valid: false, message: isFlexible ? '缴费基数请输入合理金额' : '月工资请输入合理金额' }
+  }
   if (average < 1000 || average > 1e6) return { valid: false, message: '社平工资请输入 1000 元以上' }
   if (years < 15 || years > 50) return { valid: false, message: '缴费年限请输入 15–50 年（满 15 年才能按月领取）' }
   if (returnRaw === null || !Number.isFinite(returnRaw) || returnRaw < 0 || returnRaw > 12) {
@@ -144,9 +191,13 @@ function calculatePension({
   const accountPension = accountBalance / payoutMonths
   const monthly = basicPension + accountPension
   const replacement = (monthly / salary) * 100
+  const selfPay = contribBase * FLEXIBLE_RATE
 
   return {
     valid: true,
+    type,
+    typeName: meta.name,
+    showSalaryTrack: true,
     salary,
     average,
     years,
@@ -167,9 +218,12 @@ function calculatePension({
     monthly,
     replacement,
     payoutMonths,
+    selfPay,
     heroText: formatMoney(monthly),
-    formulaText: `${band.name} · 缴费指数 ${formatIndex(contribIndex)}`,
-    heroSub: `替代率约 ${formatPercent(replacement)}（相对当前月工资）`,
+    formulaText: `${meta.name} · ${band.name} · 缴费指数 ${formatIndex(contribIndex)}`,
+    heroSub: isFlexible
+      ? `每月自缴约 ${formatMoney(selfPay)} 元 · 替代率 ${formatPercent(replacement)}`
+      : `替代率约 ${formatPercent(replacement)}（相对当前月工资）`,
     salaryText: formatMoney(salary),
     averageText: formatMoney(average),
     contribBaseText: formatMoney(contribBase),
@@ -183,20 +237,137 @@ function calculatePension({
     payoutMonthsText: `${payoutMonths} 个月`,
     yearsText: `${years} 年`,
     returnText: formatPercent(returnRaw),
+    selfPayText: formatMoney(selfPay),
+    payRateText: `${Math.round(FLEXIBLE_RATE * 100)}%`,
     bands: SALARY_BANDS.map((item) => ({
       id: item.id,
       name: item.name,
       active: item.id === band.id
-    }))
+    })),
+    rows: [
+      { label: isFlexible ? '缴费基数' : '月工资', value: `${formatMoney(salary)} 元` },
+      { label: '缴费基数（核定）', value: `${formatMoney(contribBase)} 元 / 月` },
+      { label: '缴费指数', value: `${formatIndex(contribIndex)}${floored ? '（已保底）' : ''}${capped ? '（已封顶）' : ''}` },
+      { label: '基础养老金', value: `${formatMoney(basicPension)} 元 / 月` },
+      { label: '个人账户养老金', value: `${formatMoney(accountPension)} 元 / 月` },
+      { label: '个人账户储存额', value: `${formatMoney(accountBalance)} 元` },
+      ...(isFlexible ? [{ label: '每月自己缴纳', value: `${formatMoney(selfPay)} 元（约 ${Math.round(FLEXIBLE_RATE * 100)}%）` }] : []),
+      { label: '计发月数', value: `${payoutMonths} 个月` },
+      { label: '预估月养老金', value: `${formatMoney(monthly)} 元` },
+      { label: '替代率', value: formatPercent(replacement) }
+    ],
+    note: isFlexible
+      ? '灵活就业按各地规定以缴费基数的约 20% 自己缴纳（8% 进个人账户，其余进统筹）。未计入过渡性养老金和退休后调整，结果仅供参考。'
+      : '假设缴费基数、社平工资保持当前水平，未计入过渡性养老金、职业年金及退休后调整。各地政策不同，结果仅供参考。',
+    tipText: isFlexible
+      ? '灵活就业人员参加职工养老保险，一般按当地社平工资的 60%–300% 自选缴费基数，自己承担约 20% 的缴费。养老金算法与职工相同：基础养老金 + 个人账户养老金。个人账户仍按基数的 8% 记账。'
+      : '按城镇职工基本养老保险：月养老金 ≈ 基础养老金 + 个人账户养老金。基础养老金 =（社平工资 + 缴费基数）÷ 2 × 缴费年限 × 1%；个人账户按缴费基数 8% 逐年滚存后，再除以退休年龄对应的计发月数。缴费基数不得低于社平 60%、不得高于 300%。'
   }
+}
+
+function calculateResident({
+  annualFeeText,
+  subsidyText,
+  basicText,
+  yearsText,
+  retireAge,
+  returnText
+}) {
+  const annualFee = parseNumber(annualFeeText)
+  const years = parseNumber(yearsText)
+  const basicRaw = parseNumber(basicText)
+  const subsidyRaw = subsidyText == null || String(subsidyText).trim() === '' ? null : parseNumber(subsidyText)
+  const returnRaw = returnText == null || String(returnText).trim() === '' ? 0 : parseNumber(returnText)
+  const meta = typeMeta('resident')
+
+  if (annualFee === null || years === null || basicRaw === null) {
+    return { valid: false, message: '请输入年缴费、基础养老金和缴费年限' }
+  }
+  if (!Number.isFinite(annualFee) || !Number.isFinite(years) || !Number.isFinite(basicRaw)) {
+    return { valid: false, message: '请输入有效数字' }
+  }
+  if (annualFee < 100 || annualFee > 50000) return { valid: false, message: '年缴费请输入 100–50000 元' }
+  if (basicRaw < 50 || basicRaw > 5000) return { valid: false, message: '当地基础养老金请输入合理金额' }
+  if (years < 15 || years > 50) return { valid: false, message: '缴费年限请输入 15–50 年（满 15 年才能按月领取）' }
+  if (returnRaw === null || !Number.isFinite(returnRaw) || returnRaw < 0 || returnRaw > 12) {
+    return { valid: false, message: '账户年化请输入 0–12' }
+  }
+  const subsidy = subsidyRaw == null || !Number.isFinite(subsidyRaw) ? subsidyOf(annualFee) : subsidyRaw
+  if (subsidy < 0 || subsidy > 2000) return { valid: false, message: '政府补贴请输入合理金额' }
+
+  const age = Number(retireAge) || 60
+  const band = residentBandOf(annualFee)
+  const annualIn = annualFee + subsidy
+  const accountBalance = futureValueAnnuity(annualIn, years, returnRaw / 100)
+  const payoutMonths = payoutMonthsOf(age)
+  const accountPension = accountBalance / payoutMonths
+  const monthly = basicRaw + accountPension
+
+  return {
+    valid: true,
+    type: 'resident',
+    typeName: meta.name,
+    showSalaryTrack: false,
+    years,
+    retireAge: age,
+    bandId: band.id,
+    bandName: band.name,
+    bandHint: `年缴费 ${formatMoney(annualFee)} 元，对应${band.name}`,
+    markerPercent: residentMarkerOf(annualFee),
+    basicPension: basicRaw,
+    accountBalance,
+    accountPension,
+    monthly,
+    payoutMonths,
+    heroText: formatMoney(monthly),
+    formulaText: `${meta.name} · ${band.name}`,
+    heroSub: `基础养老金 ${formatMoney(basicRaw)} 元 + 个人账户 ${formatMoney(accountPension)} 元`,
+    basicText: formatMoney(basicRaw),
+    accountText: formatMoney(accountPension),
+    accountBalanceText: formatMoney(accountBalance),
+    monthlyText: formatMoney(monthly),
+    payoutMonthsText: `${payoutMonths} 个月`,
+    yearsText: `${years} 年`,
+    returnText: formatPercent(returnRaw),
+    subsidyText: formatMoney(subsidy),
+    annualFeeText: formatMoney(annualFee),
+    bands: RESIDENT_BANDS.map((item) => ({
+      id: item.id,
+      name: item.name,
+      active: item.id === band.id
+    })),
+    rows: [
+      { label: '年缴费档次', value: `${formatMoney(annualFee)} 元` },
+      { label: '政府补贴', value: `${formatMoney(subsidy)} 元 / 年` },
+      { label: '当地基础养老金', value: `${formatMoney(basicRaw)} 元 / 月` },
+      { label: '个人账户养老金', value: `${formatMoney(accountPension)} 元 / 月` },
+      { label: '个人账户储存额', value: `${formatMoney(accountBalance)} 元` },
+      { label: '计发月数', value: `${payoutMonths} 个月` },
+      { label: '预估月养老金', value: `${formatMoney(monthly)} 元` }
+    ],
+    note: '城乡居民养老按「当地基础养老金 + 个人账户÷计发月数」估算。年缴费档次、补贴和基础养老金请改成参保地当年标准。',
+    tipText:
+      '城乡居民养老保险由个人按年缴费，政府给予补贴。领取时：月养老金 = 当地基础养老金 + 个人账户储存额 ÷ 计发月数。基础养老金由各地公布，个人账户为每年缴费加补贴后滚存。与职工养老不是同一套制度。'
+  }
+}
+
+function calculatePension(input) {
+  const type = (input && input.type) || 'employee'
+  if (type === 'resident') return calculateResident(input)
+  return calculateEmployeeLike({ ...input, type: type === 'flexible' ? 'flexible' : 'employee' })
 }
 
 module.exports = {
   SALARY_BANDS,
+  RESIDENT_BANDS,
+  RESIDENT_GRADES,
+  PENSION_TYPES,
   RETIRE_AGES,
+  RESIDENT_RETIRE_AGES,
   PAYOUT_MONTHS,
   TRACK_MIN,
   TRACK_MAX,
   calculatePension,
+  subsidyOf,
   bandOf
 }

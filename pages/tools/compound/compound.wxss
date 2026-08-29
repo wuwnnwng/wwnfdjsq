@@ -1,0 +1,38 @@
+@import "../tool-common.wxss";
+@import "../calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(16, 185, 129, 0.16) 0%, rgba(255, 255, 255, 0.55) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-compound {
+  background: linear-gradient(135deg, #d1fae5, #10b981);
+}
+
+.field-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12rpx;
+  min-height: 0;
+}
+
+.field-stack .field-label {
+  width: auto;
+}
+
+.field-seg {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.seg-row.cols-4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.seg-row.cols-4 .seg-item {
+  font-size: 22rpx;
+  padding: 0 4rpx;
+}

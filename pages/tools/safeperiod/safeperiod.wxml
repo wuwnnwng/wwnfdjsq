@@ -1,0 +1,106 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-safeperiod">
+            <text class="tool-icon">🌙</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">周期 · 排卵 · 日历法</view>
+            <view class="conv-title">安全期计算器</view>
+          </view>
+        </view>
+      </view>
+      <block wx:if="{{result && result.valid}}">
+        <view class="conv-eq">{{result.formulaText}}</view>
+        <view class="conv-result kind-{{result.todayKind}}">{{result.heroText}}</view>
+        <view class="conv-result-unit">{{result.heroSub}}</view>
+      </block>
+      <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
+    </view>
+
+    <view class="panel">
+      <view class="field">
+        <text class="field-label">末次月经</text>
+        <view class="field-control">
+          <view class="picker-value" bindtap="onOpenDatePicker">{{lastPeriod}}</view>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">月经周期</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{cycle}}" data-field="cycle" bindinput="onInput" placeholder="例如 28" />
+          <text class="field-unit">天</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">经期天数</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{periodDays}}" data-field="periodDays" bindinput="onInput" placeholder="例如 5" />
+          <text class="field-unit">天</text>
+        </view>
+      </view>
+      <view class="tool-note warn">日历法失败率很高，不能替代安全套等可靠避孕方式，也不能预防性传播疾病。周期不规律时更不适用。</view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">本周期日历</view>
+      <view class="cycle-legend">
+        <text class="cycle-legend-item period">月经</text>
+        <text class="cycle-legend-item fertile">易孕</text>
+        <text class="cycle-legend-item ovulation">排卵</text>
+        <text class="cycle-legend-item safe">安全</text>
+      </view>
+      <view class="cycle-grid">
+        <view
+          wx:for="{{result.days}}"
+          wx:key="day"
+          class="cycle-day kind-{{item.kind}} {{item.isToday ? 'is-today' : ''}}"
+        >
+          <text class="cycle-day-num">{{item.day}}</text>
+          <text class="cycle-day-date">{{item.dateText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">日期参考</view>
+      <view class="result-row">
+        <view class="result-row-label">月经期</view>
+        <view class="result-row-value">{{result.periodRangeText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">排卵日</view>
+        <view class="result-row-value">{{result.ovulationText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">距排卵日</view>
+        <view class="result-row-value">{{result.remainToOvulationText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">易孕期</view>
+        <view class="result-row-value">{{result.fertileRangeText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">下次月经</view>
+        <view class="result-row-value">{{result.nextPeriodText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">距下次月经</view>
+        <view class="result-row-value">{{result.remainToPeriodText}}</view>
+      </view>
+      <view class="tool-note">按「排卵日 = 周期天数 − 14」估算，易孕期为排卵前 5 天至排卵后 1 天。规律周期仅供了解生理节奏。</view>
+    </view>
+  </scroll-view>
+
+  <date-picker
+    show="{{showDatePicker}}"
+    title="选择末次月经第一天"
+    value="{{datePickerValue}}"
+    start="1900-01-01"
+    end="2100-12-31"
+    bindconfirm="onDatePickerConfirm"
+    bindcancel="onHideDatePicker"
+  />
+</view>

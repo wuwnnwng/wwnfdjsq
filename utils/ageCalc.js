@@ -13,6 +13,7 @@ const {
   leapDays,
   monthDays
 } = require('./lunar')
+const { getConstellationMatch } = require('./constellationMatch')
 
 function daysInMonth(year, month) {
   return new Date(year, month, 0).getDate()
@@ -156,6 +157,9 @@ function calculateAge(birthdayText, asOfText, options) {
 
   const yearText = `${lived.years}岁`
   const detailText = `${lived.years}岁 ${lived.months}个月 ${lived.days}天`
+  const constellation = getConstellation(birth.month, birth.day)
+  const match = getConstellationMatch(constellation)
+  const constellationMeta = match.self || { name: constellation, symbol: '', rangeText: '' }
 
   return {
     valid: true,
@@ -164,7 +168,9 @@ function calculateAge(birthdayText, asOfText, options) {
     birthdayLunar: formatLunarDate(birthLunar),
     asOfText: formatDateText(asOfDate),
     zodiac: getZodiac(birthLunar.lunarYear),
-    constellation: getConstellation(birth.month, birth.day),
+    constellation,
+    constellationSymbol: constellationMeta.symbol,
+    constellationRange: constellationMeta.rangeText,
     yearAge: lived.years,
     yearText,
     detailText,
@@ -176,8 +182,14 @@ function calculateAge(birthdayText, asOfText, options) {
     lifeDayNumberText: formatCount(livedDays + 1),
     isBirthday,
     nextBirthdayText: formatSolarDate(next.year, next.month, next.day),
+    nextBirthdayShort: `${next.month}月${next.day}日`,
     nextDays,
     nextDaysText: isBirthday ? '今天就是生日' : `还有 ${nextDays} 天`,
+    nextHeroText: isBirthday ? '今天就是生日' : `下次生日 ${next.month}月${next.day}日 · 还有 ${nextDays} 天`,
+    loveMatches: match.love,
+    friendMatches: match.friends,
+    loveNames: match.loveNames,
+    friendNames: match.friendNames,
     ...buildLifeProgress(livedDays)
   }
 }

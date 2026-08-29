@@ -1,0 +1,49 @@
+@import "../tool-common.wxss";
+@import "../calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(244, 114, 182, 0.16) 0%, rgba(255, 255, 255, 0.55) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-duedate {
+  background: linear-gradient(135deg, #fce7f3, #f472b6);
+}
+
+.due-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.due-chip {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #9d174d;
+  background: rgba(244, 114, 182, 0.16);
+}
+
+.trimester-early {
+  color: #db2777;
+}
+
+.trimester-mid {
+  color: #059669;
+}
+
+.trimester-late {
+  color: #d97706;
+}
+
+.milestone-today {
+  color: var(--color-brand);
+}
+
+.milestone-passed {
+  color: var(--color-muted);
+  font-weight: 500;
+}

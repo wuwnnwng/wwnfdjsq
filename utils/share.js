@@ -320,6 +320,38 @@ function getPuzzleToolShare() {
   }
 }
 
+function getCompoundToolShare() {
+  const path = '/pages/tools/compound/compound'
+  return {
+    appMessage: buildToolShareAppMessage(path, '复利计算器'),
+    timeline: buildToolShareTimeline(path, '复利计算器')
+  }
+}
+
+function getDueDateToolShare() {
+  const path = '/pages/tools/duedate/duedate'
+  return {
+    appMessage: buildToolShareAppMessage(path, '预产期计算器'),
+    timeline: buildToolShareTimeline(path, '预产期计算器')
+  }
+}
+
+function getSafePeriodToolShare() {
+  const path = '/pages/tools/safeperiod/safeperiod'
+  return {
+    appMessage: buildToolShareAppMessage(path, '安全期计算器'),
+    timeline: buildToolShareTimeline(path, '安全期计算器')
+  }
+}
+
+function getPensionToolShare() {
+  const path = '/pages/tools/pension/pension'
+  return {
+    appMessage: buildToolShareAppMessage(path, '养老金估算'),
+    timeline: buildToolShareTimeline(path, '养老金估算')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
@@ -604,6 +636,10 @@ module.exports = {
   getBmiToolShare,
   getCanvasToolShare,
   getPuzzleToolShare,
+  getCompoundToolShare,
+  getDueDateToolShare,
+  getSafePeriodToolShare,
+  getPensionToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

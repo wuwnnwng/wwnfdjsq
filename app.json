@@ -17,6 +17,10 @@
     "pages/tools/percent/percent",
     "pages/tools/age/age",
     "pages/tools/bmi/bmi",
+    "pages/tools/compound/compound",
+    "pages/tools/duedate/duedate",
+    "pages/tools/safeperiod/safeperiod",
+    "pages/tools/pension/pension",
     "pages/tools/canvas/canvas",
     "pages/tools/puzzle/puzzle",
     "pages/result/result"

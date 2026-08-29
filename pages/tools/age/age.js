@@ -213,12 +213,23 @@ Page({
   syncBirthdayDisplay() {
     const solar = parseYMDParts(this.data.birthday) || parseYMDParts(defaultBirthday())
     const asOf = parseYMDParts(this.data.asOf) || this.todayParts()
+    const today = this.todayParts()
+    const asOfIsToday =
+      asOf && today && asOf.year === today.year && asOf.month === today.month && asOf.day === today.day
     const lunarState = buildLunarPickerState(solar)
     this.setData({
       birthdayDisplay: formatDisplayYMD(solar),
-      asOfDisplay: formatDisplayYMD(asOf),
+      asOfDisplay: asOfIsToday ? '今天' : formatDisplayYMD(asOf),
       lunarBirthdayText: lunarState.lunarBirthdayText
     })
+  },
+
+  onOpenBirthPicker() {
+    if (this.data.birthCalendar === 'lunar') {
+      this.onOpenLunarPicker()
+      return
+    }
+    this.onOpenBirthdayPicker()
   },
 
   solarPickerBounds(target) {

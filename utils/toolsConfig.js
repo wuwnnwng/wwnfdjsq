@@ -6,9 +6,9 @@ const FEATURED_IDS = ['calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'f
 const FEATURED_PAGE_SIZE = 3
 
 const CATEGORIES = [
-  { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
-  { id: 'daily', name: '日常工具', toolIds: ['calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
-  { id: 'calc', name: '计算工具', toolIds: ['calc', 'rmb', 'percent', 'base'] },
+  { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax', 'pension'] },
+  { id: 'daily', name: '日常工具', toolIds: ['calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'duedate', 'safeperiod', 'canvas', 'puzzle'] },
+  { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] }
 ]
 
@@ -111,7 +111,7 @@ const TOOLS = [
     shortName: '年龄',
     icon: '🎂',
     iconType: 'age',
-    keywords: '年龄周岁虚岁生日天数生肖星座',
+    keywords: '年龄周岁虚岁生日天数生肖星座恋爱交心配对',
     page: '/pages/tools/age/age'
   },
   {
@@ -122,6 +122,42 @@ const TOOLS = [
     iconType: 'bmi',
     keywords: 'BMI体重身高肥胖超重健康',
     page: '/pages/tools/bmi/bmi'
+  },
+  {
+    id: 'compound',
+    name: '复利计算器',
+    shortName: '复利',
+    icon: '📈',
+    iconType: 'compound',
+    keywords: '复利理财本金年利率存款投资利息滚存',
+    page: '/pages/tools/compound/compound'
+  },
+  {
+    id: 'duedate',
+    name: '预产期计算器',
+    shortName: '预产期',
+    icon: '🍼',
+    iconType: 'duedate',
+    keywords: '预产期孕周怀孕末次月经分娩产检',
+    page: '/pages/tools/duedate/duedate'
+  },
+  {
+    id: 'safeperiod',
+    name: '安全期计算器',
+    shortName: '安全期',
+    icon: '🌙',
+    iconType: 'safeperiod',
+    keywords: '安全期排卵易孕月经周期生理期避孕',
+    page: '/pages/tools/safeperiod/safeperiod'
+  },
+  {
+    id: 'pension',
+    name: '养老金估算',
+    shortName: '养老金',
+    icon: '🏦',
+    iconType: 'pension',
+    keywords: '养老金退休社保缴费基数社平工资替代率',
+    page: '/pages/tools/pension/pension'
   },
   {
     id: 'canvas',
@@ -250,7 +286,7 @@ function getFeaturedToolPages() {
     iconType: 'random',
     isRandom: true
   }
-  const extra = ['bmi', 'unit', 'rmb', 'canvas', 'puzzle']
+  const extra = ['bmi', 'unit', 'rmb', 'compound', 'pension', 'canvas', 'puzzle']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
   const list = getFeaturedTools().concat(extra, random)

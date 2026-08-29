@@ -89,6 +89,26 @@
     },
     {
       "action": "allow",
+      "page": "pages/tools/compound/compound",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/duedate/duedate",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/safeperiod/safeperiod",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/pension/pension",
+      "priority": 60
+    },
+    {
+      "action": "allow",
       "page": "pages/tools/base/base",
       "priority": 50
     },

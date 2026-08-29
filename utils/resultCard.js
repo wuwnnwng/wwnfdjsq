@@ -415,10 +415,10 @@ function drawAgeCard(ctx, width, height, result) {
   const rowW = width - 48
   const rows = [
     ['公历生日', `${result.birthdayText} · ${result.birthdayWeek}`],
-    ['农历生日', result.birthdayLunar],
     ['生肖 / 星座', `${result.zodiac} · ${result.constellation}`],
-    ['虚岁', result.nominalText],
-    ['下次生日', result.nextBirthdayText]
+    ['下次生日', result.nextBirthdayText],
+    ['恋爱最配', result.loveNames || '—'],
+    ['交心最配', result.friendNames || '—']
   ]
   rows.forEach((row, index) => {
     drawMetaRow(ctx, 24, y + index * 30, rowW, row[0], row[1], ink, muted)

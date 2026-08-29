@@ -12,35 +12,222 @@
   background: linear-gradient(135deg, #fce7f3, #f472b6);
 }
 
-.conv-stats {
+.age-hero-top {
   display: flex;
   align-items: flex-start;
-  gap: 0;
+  justify-content: space-between;
+  gap: 16rpx;
 }
 
-.conv-stat {
-  flex: 1;
-  min-width: 0;
+.age-cal-seg {
+  flex-shrink: 0;
+  display: flex;
+  padding: 4rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1rpx solid var(--color-line);
 }
 
-.conv-stat + .conv-stat {
-  margin-left: 24rpx;
-  padding-left: 24rpx;
-  border-left: 1rpx solid var(--color-line);
+.age-cal-item {
+  min-width: 72rpx;
+  height: 52rpx;
+  line-height: 52rpx;
+  padding: 0 16rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-muted);
 }
 
-.conv-stats .conv-result {
-  font-size: 40rpx;
+.age-cal-item.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
 }
 
-.conv-result-suffix {
-  margin-left: 6rpx;
+.age-pick-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  min-height: 72rpx;
+  margin-top: 8rpx;
+  padding: 4rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.age-pick-label {
   font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.age-pick-value {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.age-pick-caret {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+.age-pick-hint {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.age-hero-num {
+  margin-top: 28rpx;
+  font-family: var(--font-display);
+  font-size: 96rpx;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -4rpx;
+  color: var(--color-brand);
+}
+
+.age-hero-unit {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.age-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.age-chip {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #9d174d;
+  background: rgba(244, 114, 182, 0.16);
+}
+
+.age-next {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.age-glance {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+
+.age-glance-item {
+  padding: 20rpx 18rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1rpx solid var(--color-line);
+}
+
+.age-glance-label {
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.age-glance-value {
+  margin-top: 8rpx;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  line-height: 1.2;
+  word-break: break-all;
+}
+
+.age-glance-value-sm {
+  font-size: 26rpx;
+}
+
+.age-glance-unit {
+  margin-left: 4rpx;
+  font-size: 22rpx;
   font-weight: 700;
 }
 
-.conv-stat .conv-eq {
-  margin-top: 28rpx;
+.life-progress-panel {
+  margin-top: 8rpx;
+  padding: 18rpx 0 0;
+  border-top: none;
+}
+
+.match-panel {
+  padding-bottom: 12rpx;
+}
+
+.match-head {
+  margin-bottom: 8rpx;
+}
+
+.match-sub {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+
+.match-card {
+  margin-top: 16rpx;
+  padding: 22rpx 20rpx;
+  border-radius: 20rpx;
+  background:
+    linear-gradient(160deg, rgba(244, 114, 182, 0.12) 0%, rgba(255, 255, 255, 0.55) 70%),
+    rgba(255, 255, 255, 0.5);
+  border: 1rpx solid var(--color-line);
+}
+
+.match-card.friend {
+  background:
+    linear-gradient(160deg, rgba(99, 102, 241, 0.12) 0%, rgba(255, 255, 255, 0.55) 70%),
+    rgba(255, 255, 255, 0.5);
+}
+
+.match-card-top {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.match-symbol {
+  width: 72rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  border-radius: 20rpx;
+  font-size: 36rpx;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.match-name {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+}
+
+.match-range {
+  margin-top: 4rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.match-hint {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.45;
+  color: var(--color-muted);
 }
 
 .date-picker-mask {
@@ -227,14 +414,12 @@
   color: var(--color-muted);
 }
 
-.life-progress-panel {
-  margin-top: 8rpx;
-  padding: 18rpx 0 8rpx;
-  border-top: 1rpx solid var(--color-line);
-}
-
 .life-progress-panel .life-progress-value {
   color: var(--color-brand);
+}
+
+.life-progress-panel .life-progress {
+  margin-top: 0;
 }
 
 .lived-confirm {

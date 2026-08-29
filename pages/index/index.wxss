@@ -245,6 +245,22 @@
   background: linear-gradient(135deg, #fce7f3, #e879f9);
 }
 
+.tool-icon-compound {
+  background: linear-gradient(135deg, #d1fae5, #10b981);
+}
+
+.tool-icon-duedate {
+  background: linear-gradient(135deg, #fce7f3, #f472b6);
+}
+
+.tool-icon-safeperiod {
+  background: linear-gradient(135deg, #ede9fe, #a78bfa);
+}
+
+.tool-icon-pension {
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+}
+
 .theme-switch {
   display: flex;
   align-items: center;

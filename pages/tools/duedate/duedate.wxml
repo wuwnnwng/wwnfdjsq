@@ -1,0 +1,94 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-duedate">
+            <text class="tool-icon">🍼</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">孕周 · 预产 · 节点</view>
+            <view class="conv-title">预产期计算器</view>
+          </view>
+        </view>
+      </view>
+      <block wx:if="{{result && result.valid}}">
+        <view class="conv-eq">{{result.formulaText}}</view>
+        <view class="conv-result">{{result.heroText}}</view>
+        <view class="conv-result-unit trimester-{{result.trimesterId}}">{{result.heroSub}}</view>
+        <view class="due-chips">
+          <view class="due-chip">{{result.gestText}}</view>
+          <view class="due-chip">{{result.trimesterName}}</view>
+        </view>
+      </block>
+      <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
+    </view>
+
+    <view class="panel">
+      <view class="seg-row">
+        <view class="seg-item {{mode === 'lmp' ? 'active' : ''}}" bindtap="onSwitchMode" data-mode="lmp">末次月经</view>
+        <view class="seg-item {{mode === 'conception' ? 'active' : ''}}" bindtap="onSwitchMode" data-mode="conception">受孕日期</view>
+      </view>
+      <view class="field">
+        <text class="field-label">{{mode === 'conception' ? '受孕日期' : '末次月经'}}</text>
+        <view class="field-control">
+          <view class="picker-value" bindtap="onOpenDatePicker" data-field="baseDate">{{baseDate}}</view>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">计算到</text>
+        <view class="field-control">
+          <view class="picker-value" bindtap="onOpenDatePicker" data-field="asOf">{{asOf}}</view>
+        </view>
+      </view>
+      <view class="tool-note">末次月经按第一天加 280 天；受孕日按加 266 天。结果仅供参考，不能替代医院超声预产期。</view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">孕期信息</view>
+      <view class="result-row">
+        <view class="result-row-label">预产期</view>
+        <view class="result-row-value">{{result.dueText}} · {{result.dueWeekday}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">农历</view>
+        <view class="result-row-value">{{result.dueLunar}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">当前孕周</view>
+        <view class="result-row-value">{{result.gestText}} · {{result.trimesterName}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">距离预产期</view>
+        <view class="result-row-value">{{result.remainText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">末次月经</view>
+        <view class="result-row-value">{{result.lmpText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">估算受孕日</view>
+        <view class="result-row-value">{{result.conceptionText}}</view>
+      </view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">关键节点</view>
+      <view class="result-row" wx:for="{{result.milestones}}" wx:key="name">
+        <view class="result-row-label">{{item.name}} · {{item.hint}}</view>
+        <view class="result-row-value milestone-{{item.status}}">{{item.dateText}} · {{item.statusText}}</view>
+      </view>
+      <view class="tool-note">{{result.note}}</view>
+    </view>
+  </scroll-view>
+
+  <date-picker
+    show="{{showDatePicker}}"
+    title="{{datePickerTitle}}"
+    value="{{datePickerValue}}"
+    start="{{datePickerStart}}"
+    end="{{datePickerEnd}}"
+    bindconfirm="onDatePickerConfirm"
+    bindcancel="onHideDatePicker"
+  />
+</view>

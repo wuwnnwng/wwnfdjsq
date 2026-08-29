@@ -2,7 +2,7 @@
   margin-top: 0;
   padding: 32rpx 28rpx 36rpx;
   background:
-    linear-gradient(160deg, rgba(31, 107, 82, 0.12) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, rgba(31, 107, 82, 0.12) 0%, var(--color-hero-fade) 58%),
     var(--color-surface);
 }
 
@@ -94,7 +94,7 @@
 .info-card {
   padding: 22rpx 18rpx 20rpx;
   border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.62);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
   min-height: 140rpx;
   box-sizing: border-box;
@@ -103,8 +103,8 @@
 .info-card.featured {
   grid-column: 1 / -1;
   background:
-    linear-gradient(160deg, rgba(244, 114, 182, 0.16) 0%, rgba(255, 255, 255, 0.55) 72%),
-    rgba(255, 255, 255, 0.7);
+    linear-gradient(160deg, rgba(244, 114, 182, 0.16) 0%, var(--color-hero-fade) 72%),
+    var(--color-soft);
 }
 
 .info-card-label {
@@ -140,12 +140,12 @@
   font-size: 24rpx;
   font-weight: 700;
   color: var(--color-muted);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .seg-item.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   border-color: transparent;
 }

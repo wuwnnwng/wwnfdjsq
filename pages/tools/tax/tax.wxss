@@ -4,7 +4,7 @@
   margin-top: 0;
   padding: 32rpx 28rpx 36rpx;
   background:
-    linear-gradient(160deg, rgba(251, 191, 36, 0.18) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, rgba(251, 191, 36, 0.18) 0%, var(--color-hero-fade) 58%),
     var(--color-surface);
 }
 
@@ -111,12 +111,12 @@
   font-size: 26rpx;
   font-weight: 700;
   color: var(--color-muted);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .seg-item.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   border-color: transparent;
 }
@@ -166,6 +166,6 @@
   border-radius: 999rpx;
   font-size: 28rpx;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
 }

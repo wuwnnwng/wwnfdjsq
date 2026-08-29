@@ -4,7 +4,7 @@
 
 .conv-hero {
   background:
-    linear-gradient(160deg, var(--bg-glow-1) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, var(--bg-glow-1) 0%, var(--color-hero-fade) 58%),
     var(--color-surface);
 }
 
@@ -24,7 +24,7 @@
   display: flex;
   padding: 4rpx;
   border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
@@ -41,7 +41,7 @@
 }
 
 .age-cal-item.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
 }
 
@@ -110,7 +110,7 @@
   border-radius: 999rpx;
   font-size: 22rpx;
   font-weight: 700;
-  color: #9d174d;
+  color: var(--color-ink);
   background: rgba(244, 114, 182, 0.16);
 }
 
@@ -129,7 +129,7 @@
 .age-glance-item {
   padding: 20rpx 18rpx;
   border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.62);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
@@ -183,15 +183,15 @@
   padding: 22rpx 20rpx;
   border-radius: 20rpx;
   background:
-    linear-gradient(160deg, rgba(244, 114, 182, 0.12) 0%, rgba(255, 255, 255, 0.55) 70%),
-    rgba(255, 255, 255, 0.5);
+    linear-gradient(160deg, rgba(244, 114, 182, 0.12) 0%, var(--color-hero-fade) 70%),
+    var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .match-card.friend {
   background:
-    linear-gradient(160deg, rgba(99, 102, 241, 0.12) 0%, rgba(255, 255, 255, 0.55) 70%),
-    rgba(255, 255, 255, 0.5);
+    linear-gradient(160deg, rgba(99, 102, 241, 0.12) 0%, var(--color-hero-fade) 70%),
+    var(--color-soft);
 }
 
 .match-card-top {
@@ -207,7 +207,7 @@
   text-align: center;
   border-radius: 20rpx;
   font-size: 36rpx;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--color-soft);
 }
 
 .match-name {
@@ -429,7 +429,7 @@
   border-radius: 999rpx;
   font-size: 28rpx;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   box-shadow: 0 10rpx 24rpx var(--color-shadow);
 }

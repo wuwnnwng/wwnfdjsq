@@ -4,7 +4,7 @@
   margin-top: 0;
   padding: 32rpx 28rpx 36rpx;
   background:
-    linear-gradient(160deg, rgba(31, 107, 82, 0.16) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, rgba(31, 107, 82, 0.16) 0%, var(--color-hero-fade) 58%),
     var(--color-surface);
 }
 
@@ -103,7 +103,7 @@
   border-radius: 999rpx;
   font-size: 24rpx;
   color: var(--color-brand-soft);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
@@ -157,12 +157,12 @@
   font-size: 24rpx;
   font-weight: 700;
   color: var(--color-muted);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .unit-tab.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   border-color: transparent;
 }
@@ -170,13 +170,13 @@
 .conv-card {
   padding: 24rpx 20rpx 20rpx;
   border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .conv-card-to {
   background: var(--bg-glow-1);
-  border-color: rgba(255, 255, 255, 0.55);
+  border-color: var(--color-card-border);
 }
 
 .conv-card-label {
@@ -202,7 +202,7 @@
   margin-top: 14rpx;
   padding: 20rpx 24rpx;
   border-radius: 18rpx;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
   box-sizing: border-box;
 }
@@ -254,7 +254,7 @@
   justify-content: center;
   border-radius: 50%;
   font-size: 32rpx;
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   box-shadow: 0 10rpx 22rpx var(--color-shadow);
 }
@@ -285,7 +285,7 @@
 }
 
 .conv-chip.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   border-color: transparent;
 }
@@ -422,7 +422,7 @@
   padding: 0 28rpx;
   line-height: 96rpx;
   border-radius: 16rpx;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
   font-size: 32rpx;
   color: var(--color-ink);

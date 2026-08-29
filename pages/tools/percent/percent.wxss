@@ -3,7 +3,7 @@
 
 .conv-hero {
   background:
-    linear-gradient(160deg, rgba(99, 102, 241, 0.14) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, rgba(99, 102, 241, 0.14) 0%, var(--color-hero-fade) 58%),
     var(--color-surface);
 }
 

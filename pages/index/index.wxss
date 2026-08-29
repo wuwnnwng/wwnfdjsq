@@ -470,7 +470,7 @@
   border-radius: 999rpx;
   font-size: 28rpx;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   transition: background 0.32s ease, color 0.32s ease;
 }
@@ -605,7 +605,7 @@
   border-radius: 16rpx;
   font-size: 28rpx;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 

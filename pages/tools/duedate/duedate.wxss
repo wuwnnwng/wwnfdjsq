@@ -3,7 +3,7 @@
 
 .conv-hero {
   background:
-    linear-gradient(160deg, rgba(244, 114, 182, 0.16) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, rgba(244, 114, 182, 0.16) 0%, var(--color-hero-fade) 58%),
     var(--color-surface);
 }
 
@@ -23,7 +23,7 @@
   border-radius: 999rpx;
   font-size: 22rpx;
   font-weight: 700;
-  color: #9d174d;
+  color: var(--color-ink);
   background: rgba(244, 114, 182, 0.16);
 }
 
@@ -91,7 +91,7 @@
   margin-bottom: 16rpx;
   padding: 16rpx 18rpx;
   border-radius: 18rpx;
-  background: rgba(255, 255, 255, 0.58);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
@@ -139,8 +139,8 @@
 .timeline-item.status-today .timeline-body,
 .timeline-item.is-next .timeline-body {
   background:
-    linear-gradient(160deg, rgba(244, 114, 182, 0.18) 0%, rgba(255, 255, 255, 0.7) 70%),
-    rgba(255, 255, 255, 0.8);
+    linear-gradient(160deg, rgba(244, 114, 182, 0.18) 0%, var(--color-hero-fade) 70%),
+    var(--color-soft);
   border-color: rgba(244, 114, 182, 0.35);
 }
 

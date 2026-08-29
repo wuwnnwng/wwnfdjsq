@@ -4,7 +4,7 @@
 
 .conv-hero {
   background:
-    linear-gradient(160deg, rgba(244, 114, 182, 0.16) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, rgba(244, 114, 182, 0.16) 0%, var(--color-hero-fade) 58%),
     var(--color-surface);
 }
 
@@ -181,12 +181,12 @@
   font-size: 24rpx;
   font-weight: 600;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .type-chip.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   border-color: transparent;
 }
@@ -205,12 +205,12 @@
   font-size: 24rpx;
   font-weight: 700;
   color: var(--color-muted);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .mini-seg-item.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: var(--color-brand);
   border-color: transparent;
 }
@@ -301,7 +301,7 @@
   border-radius: 999rpx;
   font-size: 28rpx;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   box-shadow: 0 10rpx 24rpx var(--color-shadow);
 }

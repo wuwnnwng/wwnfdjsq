@@ -4,7 +4,7 @@
   margin-top: 0;
   padding: 32rpx 28rpx 36rpx;
   background:
-    linear-gradient(160deg, rgba(99, 102, 241, 0.16) 0%, rgba(255, 255, 255, 0.55) 58%),
+    linear-gradient(160deg, rgba(99, 102, 241, 0.16) 0%, var(--color-hero-fade) 58%),
     var(--color-surface);
 }
 
@@ -96,12 +96,12 @@
   font-size: 24rpx;
   font-weight: 700;
   color: var(--color-muted);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .seg-item.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   border-color: transparent;
 }
@@ -118,7 +118,7 @@
   min-width: 0;
   padding: 20rpx 18rpx 22rpx;
   border-radius: 20rpx;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
@@ -168,7 +168,7 @@
   line-height: 56rpx;
   text-align: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
   color: var(--color-brand);
   font-size: 28rpx;
@@ -196,12 +196,12 @@
   font-size: 24rpx;
   font-weight: 700;
   color: var(--color-muted);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .mini-seg-item.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: var(--color-brand);
   border-color: transparent;
 }
@@ -219,7 +219,7 @@
   font-size: 24rpx;
   font-weight: 600;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 

@@ -182,12 +182,12 @@
   border-radius: 999rpx;
   font-size: 24rpx;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .auspicious-tag.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: var(--color-brand-soft);
   border-color: var(--color-brand-soft);
 }
@@ -221,7 +221,7 @@
   min-height: 80rpx;
   padding: 10rpx 4rpx;
   border-radius: 16rpx;
-  background: rgba(255, 255, 255, 0.45);
+  background: var(--color-soft);
   border: 1rpx solid transparent;
   box-sizing: border-box;
 }
@@ -433,7 +433,7 @@
   border-radius: 999rpx;
   font-size: 28rpx;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
 }
 
@@ -492,7 +492,7 @@
   justify-content: center;
   min-height: 72rpx;
   border-radius: 14rpx;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
@@ -527,7 +527,7 @@
   padding: 18rpx;
   border-radius: 16rpx;
   border: 1rpx solid var(--color-line);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--color-soft);
 }
 
 .hour-item.lucky {
@@ -550,7 +550,7 @@
   padding: 2rpx 10rpx;
   border-radius: 999rpx;
   font-size: 18rpx;
-  color: #fff;
+  color: var(--color-on-brand);
   background: var(--color-brand-soft);
 }
 

@@ -59,7 +59,7 @@
   border-radius: 16rpx;
   font-weight: 600;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
   box-sizing: border-box;
 }
@@ -79,7 +79,7 @@
 
 .calc-key.tone-fn {
   color: var(--color-brand);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--color-soft);
 }
 
 .calc-key.tone-fn .calc-key-main {
@@ -91,7 +91,7 @@
 }
 
 .calc-key.tone-switch {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
   border-color: transparent;
 }
@@ -101,7 +101,7 @@
 }
 
 .calc-key.tone-mode {
-  color: #fff;
+  color: var(--color-on-brand);
   background: linear-gradient(135deg, var(--color-brand-soft) 0%, var(--color-brand) 100%);
   border-color: transparent;
 }

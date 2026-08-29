@@ -42,12 +42,12 @@
   font-size: 22rpx;
   font-weight: 600;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .session-chip.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: var(--color-brand);
   border-color: transparent;
 }
@@ -126,13 +126,13 @@
   font-size: 22rpx;
   font-weight: 600;
   color: var(--color-ink);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--color-soft);
   border: 1rpx solid var(--color-line);
 }
 
 .size-chip.active,
 .mode-chip.active {
-  color: #fff;
+  color: var(--color-on-brand);
   background: var(--color-brand);
   border-color: transparent;
 }

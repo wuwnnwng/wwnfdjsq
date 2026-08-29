@@ -68,27 +68,10 @@
 
     <view class="panel" wx:if="{{result && result.valid}}">
       <view class="section-title">日期参考</view>
-      <view class="info-grid">
-        <view class="info-card kind-period">
-          <view class="info-card-label">月经期</view>
-          <view class="info-card-value">{{result.periodSpanText}}</view>
-          <view class="info-card-sub">{{result.periodRangeText}}</view>
-        </view>
-        <view class="info-card kind-ovulation">
-          <view class="info-card-label">排卵日</view>
-          <view class="info-card-value">{{result.remainToOvulationText}}</view>
-          <view class="info-card-sub">{{result.ovulationText}}</view>
-        </view>
-        <view class="info-card kind-fertile">
-          <view class="info-card-label">易孕期</view>
-          <view class="info-card-value">{{result.fertileSpanText}}</view>
-          <view class="info-card-sub">{{result.fertileRangeText}}</view>
-        </view>
-        <view class="info-card kind-next">
-          <view class="info-card-label">下次月经</view>
-          <view class="info-card-value">{{result.remainToPeriodText}}</view>
-          <view class="info-card-sub">{{result.nextPeriodText}}</view>
-        </view>
+      <view class="info-card kind-next next-card">
+        <view class="info-card-label">下次月经</view>
+        <view class="info-card-value">{{result.remainToPeriodText}}</view>
+        <view class="info-card-sub">{{result.nextPeriodText}}</view>
       </view>
       <view class="tool-note">按「排卵日 = 周期天数 − 14」估算，易孕期为排卵前 5 天至排卵后 1 天。规律周期仅供了解生理节奏。</view>
     </view>

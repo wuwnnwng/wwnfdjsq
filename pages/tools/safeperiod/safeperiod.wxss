@@ -104,6 +104,10 @@
   background: #93c5fd;
 }
 
+.next-card .info-card-value {
+  font-size: 48rpx;
+}
+
 .info-card .info-card-label,
 .info-card .info-card-value,
 .info-card .info-card-sub {

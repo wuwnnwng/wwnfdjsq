@@ -73,6 +73,39 @@ function parseNumber(text) {
   return Number.isFinite(value) ? value : NaN
 }
 
+function salaryBoundsOf(average) {
+  const avg = Number(average)
+  if (!Number.isFinite(avg) || avg <= 0) return null
+  return {
+    min: Math.round(avg * MIN_INDEX),
+    max: Math.round(avg * MAX_INDEX)
+  }
+}
+
+function clampSalaryToBounds(salaryText, averageText) {
+  const salary = parseNumber(salaryText)
+  const average = parseNumber(averageText)
+  const bounds = salaryBoundsOf(average)
+  if (salary === null || !Number.isFinite(salary) || !bounds) {
+    return { changed: false }
+  }
+  if (salary < bounds.min) {
+    return { changed: true, side: 'floor', salary: bounds.min, salaryText: String(bounds.min), ...bounds }
+  }
+  if (salary > bounds.max) {
+    return { changed: true, side: 'cap', salary: bounds.max, salaryText: String(bounds.max), ...bounds }
+  }
+  return { changed: false, salary, ...bounds }
+}
+
+function salaryRangeTip(type, side, value) {
+  const field = type === 'flexible' ? '缴费基数' : '月工资'
+  if (side === 'floor') {
+    return `${field}不能低于当地社平工资的 60%（保底档），已调整为 ${formatMoney(value)} 元`
+  }
+  return `${field}不能高于当地社平工资的 300%（封顶档），已调整为 ${formatMoney(value)} 元`
+}
+
 function formatMoney(value, digits) {
   const n = Number(value)
   if (!Number.isFinite(n)) return '—'
@@ -355,7 +388,12 @@ module.exports = {
   PAYOUT_MONTHS,
   TRACK_MIN,
   TRACK_MAX,
+  MIN_INDEX,
+  MAX_INDEX,
   calculatePension,
   subsidyOf,
-  bandOf
+  bandOf,
+  salaryBoundsOf,
+  clampSalaryToBounds,
+  salaryRangeTip
 }

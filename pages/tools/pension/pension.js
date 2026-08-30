@@ -1,4 +1,11 @@
-const { RETIRE_AGES, RESIDENT_RETIRE_AGES, PENSION_TYPES, calculatePension } = require('../../../utils/pensionCalc')
+const {
+  RETIRE_AGES,
+  RESIDENT_RETIRE_AGES,
+  PENSION_TYPES,
+  calculatePension,
+  clampSalaryToBounds,
+  salaryRangeTip
+} = require('../../../utils/pensionCalc')
 const {
   PROVINCES,
   PROVINCE_NAMES,
@@ -45,7 +52,9 @@ Page({
     regionNames: PROVINCE_NAMES,
     regionHint: regionHintText(DEFAULT_REGION, 'employee'),
     result: null,
-    showTip: false
+    showTip: false,
+    showRangeTip: false,
+    rangeTipText: ''
   },
 
   onLoad() {
@@ -77,7 +86,11 @@ Page({
         regionHint: regionHintText(region, type),
         ...fill
       },
-      () => this.recalculate()
+      () => {
+        const promptRange = options && options.promptRange === true
+        if (type !== 'resident' && this.applySalaryRange({ prompt: promptRange })) return
+        this.recalculate()
+      }
     )
     if (persist) saveRegionId(region.id)
   },
@@ -86,7 +99,7 @@ Page({
     const index = Number(e.detail.value)
     const region = PROVINCES[index]
     if (!region) return
-    this.applyRegion(region.id)
+    this.applyRegion(region.id, { promptRange: true })
   },
 
   onSwitchType(e) {
@@ -97,9 +110,32 @@ Page({
     )
   },
 
+  applySalaryRange({ prompt = true, salaryText, averageText } = {}) {
+    if (this.data.type === 'resident') return false
+    const result = clampSalaryToBounds(
+      salaryText != null ? salaryText : this.data.salary,
+      averageText != null ? averageText : this.data.average
+    )
+    if (!result.changed) return false
+    const patch = { salary: result.salaryText }
+    if (prompt) {
+      patch.showRangeTip = true
+      patch.rangeTipText = salaryRangeTip(this.data.type, result.side, result.salary)
+    }
+    this.setData(patch, () => this.recalculate())
+    return true
+  },
+
   onInput(e) {
     const field = e.currentTarget.dataset.field
     if (!field) return
+    if (field === 'salary' && this.data.type !== 'resident') {
+      const result = clampSalaryToBounds(e.detail.value, this.data.average)
+      if (result.changed && result.side === 'cap') {
+        this.applySalaryRange({ prompt: true, salaryText: e.detail.value })
+        return result.salaryText
+      }
+    }
     const patch = { [field]: e.detail.value }
     if (field === 'annualFee') {
       const fee = Number(String(e.detail.value).trim())
@@ -109,6 +145,15 @@ Page({
       }
     }
     this.setData(patch, () => this.recalculate())
+  },
+
+  onRangeBlur(e) {
+    const field = e.currentTarget.dataset.field
+    const value = e.detail && e.detail.value != null ? e.detail.value : ''
+    const patch = field ? { [field]: value } : {}
+    this.setData(patch, () => {
+      if (!this.applySalaryRange({ prompt: true })) this.recalculate()
+    })
   },
 
   onSelectGrade(e) {
@@ -138,6 +183,10 @@ Page({
 
   onHideTip() {
     this.setData({ showTip: false })
+  },
+
+  onHideRangeTip() {
+    this.setData({ showRangeTip: false })
   },
 
   recalculate() {

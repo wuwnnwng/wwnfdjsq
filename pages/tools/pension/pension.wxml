@@ -130,15 +130,15 @@
         <view class="field">
           <text class="field-label">{{type === 'flexible' ? '缴费基数' : '月工资'}}</text>
           <view class="field-control">
-            <input wx:if="{{type === 'flexible'}}" class="field-input" type="digit" value="{{salary}}" data-field="salary" bindinput="onInput" placeholder="自选缴费基数" />
-            <input wx:else class="field-input" type="digit" value="{{salary}}" data-field="salary" bindinput="onInput" placeholder="税前应发" />
+            <input wx:if="{{type === 'flexible'}}" class="field-input" type="digit" value="{{salary}}" data-field="salary" bindinput="onInput" bindblur="onRangeBlur" placeholder="自选缴费基数" />
+            <input wx:else class="field-input" type="digit" value="{{salary}}" data-field="salary" bindinput="onInput" bindblur="onRangeBlur" placeholder="税前应发" />
             <text class="field-unit">元</text>
           </view>
         </view>
         <view class="field">
           <text class="field-label">当地社平工资</text>
           <view class="field-control">
-            <input class="field-input" type="digit" value="{{average}}" data-field="average" bindinput="onInput" placeholder="上年度全口径" />
+            <input class="field-input" type="digit" value="{{average}}" data-field="average" bindinput="onInput" bindblur="onRangeBlur" placeholder="上年度全口径" />
             <text class="field-unit">元</text>
           </view>
         </view>
@@ -164,8 +164,8 @@
             <text class="field-unit">%</text>
           </view>
         </view>
-        <view class="tool-note" wx:if="{{type === 'flexible'}}">没单位、自己交社保一般走灵活就业。已按省份填入社平工资和账户年化。缴费基数按当地社平 60%–300% 自选，每月大约交基数的 20%。</view>
-        <view class="tool-note" wx:else>工资段按月工资相对当地社平工资划分：60% 保底、100% 社平、300% 封顶。已按省份填入社平工资和账户年化，数字可改。</view>
+        <view class="tool-note" wx:if="{{type === 'flexible'}}">没单位、自己交社保一般走灵活就业。已按省份填入社平工资和账户年化。缴费基数须在当地社平 60%–300%，超出将按对应档位调整，每月大约交基数的 20%。</view>
+        <view class="tool-note" wx:else>工资段按月工资相对当地社平工资划分：60% 保底、100% 社平、300% 封顶。月工资须在此区间，超出将按对应档位调整。已按省份填入社平工资和账户年化，数字可改。</view>
       </block>
     </view>
 
@@ -184,6 +184,14 @@
       <view class="tip-title">怎么估算</view>
       <view class="tip-text">{{result && result.tipText ? result.tipText : '按城镇职工基本养老保险估算，结果仅供参考。'}}</view>
       <view class="tip-confirm" catchtap="onHideTip">知道了</view>
+    </view>
+  </view>
+
+  <view wx:if="{{showRangeTip}}" class="tip-mask" catchtap="onHideRangeTip" catchtouchmove="preventMove">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">已按缴费上下限调整</view>
+      <view class="tip-text">{{rangeTipText}}</view>
+      <view class="tip-confirm" catchtap="onHideRangeTip">知道了</view>
     </view>
   </view>
 </view>

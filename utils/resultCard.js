@@ -1,7 +1,7 @@
 /**
  * 年龄 / BMI 结果卡片：绘制并保存到相册
  */
-const { LEVELS, trackFlex } = require('./bmiCalc')
+const { LEVELS, trackFlex, markerPercentOf } = require('./bmiCalc')
 
 const APP_BRAND = '置居试算计算器'
 const SAVE_FILE = 'result-card.png'
@@ -240,6 +240,26 @@ function handleSaveError(err) {
   wx.showToast({ title: '保存失败，请稍后重试', icon: 'none' })
 }
 
+function hexToRgba(hex, alpha) {
+  const raw = String(hex || '').replace('#', '')
+  const full = raw.length === 3 ? raw.split('').map((c) => c + c).join('') : raw
+  const n = parseInt(full, 16)
+  if (!Number.isFinite(n) || full.length < 6) return `rgba(20, 35, 28, ${alpha})`
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`
+}
+
+function cardPalette(theme) {
+  const from = (theme && (theme.brandSoft || theme.principal)) || '#22D3EE'
+  const to = (theme && (theme.brand || theme.navBar)) || '#0B1220'
+  return {
+    from,
+    to,
+    accent: from,
+    header: [from, to],
+    track: hexToRgba(from, 0.18)
+  }
+}
+
 function drawHeader(ctx, width, headerH, title, colors) {
   const gradient = ctx.createLinearGradient(0, 0, width, headerH)
   gradient.addColorStop(0, colors[0])
@@ -349,23 +369,17 @@ function drawBmiCard(ctx, width, height, result) {
 
   y += 100
   drawBmiTrack(ctx, 24, y, rowW, 10, result.markerPercent)
-  y += 22
-  const labels = [
-    { text: '过低', flex: 4.5 },
-    { text: '正常', flex: 5.5 },
-    { text: '超重', flex: 4 },
-    { text: '肥胖', flex: 8 }
-  ]
-  ctx.font = '400 10px sans-serif'
+  y += 20
+  const ticks = result.scaleTicks || [18.5, 24, 28].map((value) => ({
+    label: String(value),
+    percent: markerPercentOf(value)
+  }))
+  ctx.font = '600 10px sans-serif'
   ctx.fillStyle = muted
   ctx.textBaseline = 'top'
-  let lx = 24
-  const trackTotal = 4.5 + 5.5 + 4 + 8
-  labels.forEach((item) => {
-    const lw = (item.flex / trackTotal) * rowW
-    ctx.textAlign = 'center'
-    ctx.fillText(item.text, lx + lw / 2, y)
-    lx += lw
+  ctx.textAlign = 'center'
+  ticks.forEach((item) => {
+    ctx.fillText(item.label, 24 + (item.percent / 100) * rowW, y)
   })
 
   y += 36
@@ -381,10 +395,11 @@ function drawBmiCard(ctx, width, height, result) {
   drawFooter(ctx, width, height, '依据 WS/T 428 · 仅供参考')
 }
 
-function drawAgeCard(ctx, width, height, result) {
+function drawAgeCard(ctx, width, height, result, theme) {
+  const palette = cardPalette(theme)
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, width, height)
-  drawHeader(ctx, width, 88, '年龄', ['#f9a8d4', '#db2777'])
+  drawHeader(ctx, width, 88, '年龄', palette.header)
 
   const ink = '#14231c'
   const muted = '#64748b'
@@ -395,7 +410,7 @@ function drawAgeCard(ctx, width, height, result) {
   ctx.textAlign = 'left'
   ctx.fillText('周岁', 24, y)
 
-  ctx.fillStyle = '#db2777'
+  ctx.fillStyle = palette.accent
   ctx.font = '800 48px sans-serif'
   ctx.fillText(result.yearText, 24, y + 54)
 
@@ -425,7 +440,7 @@ function drawAgeCard(ctx, width, height, result) {
   })
 
   y += rows.length * 30 + 18
-  ctx.fillStyle = '#db2777'
+  ctx.fillStyle = palette.accent
   ctx.font = '700 13px sans-serif'
   ctx.textAlign = 'left'
   ctx.textBaseline = 'middle'
@@ -434,11 +449,11 @@ function drawAgeCard(ctx, width, height, result) {
   ctx.fillText(result.lifeProgressText, width - 24, y)
 
   y += 18
-  fillRoundRect(ctx, 24, y, rowW, 10, 5, 'rgba(244, 114, 182, 0.18)')
+  fillRoundRect(ctx, 24, y, rowW, 10, 5, palette.track)
   const barW = Math.max(6, (Math.max(0, Math.min(100, Number(result.lifeProgressBar) || 0)) / 100) * rowW)
   const barGrad = ctx.createLinearGradient(24, y, 24 + barW, y)
-  barGrad.addColorStop(0, '#f9a8d4')
-  barGrad.addColorStop(1, '#db2777')
+  barGrad.addColorStop(0, palette.from)
+  barGrad.addColorStop(1, palette.to)
   fillRoundRect(ctx, 24, y, barW, 10, 5, barGrad)
 
   drawFooter(ctx, width, height, '趣味计算，好好生活')

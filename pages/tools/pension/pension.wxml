@@ -16,10 +16,18 @@
         </view>
       </view>
       <block wx:if="{{result && result.valid}}">
-        <view class="conv-eq">{{result.formulaText}}</view>
-        <view class="conv-result">{{result.heroText}}</view>
-        <view class="conv-result-unit">元 / 月 · {{result.heroSub}}</view>
-        <view class="band-badge band-{{result.bandId}}">{{result.bandName}}</view>
+        <view class="hero-metric">
+          <view class="hero-metric-label">预估每月领取</view>
+          <view class="hero-metric-row">
+            <text class="hero-metric-num">{{result.heroText}}</text>
+            <text class="hero-metric-unit">元</text>
+          </view>
+          <view class="hero-metric-sub">{{result.heroSub}}</view>
+        </view>
+        <view class="hero-chips">
+          <view class="band-badge band-{{result.bandId}}">{{result.bandName}}</view>
+          <view class="hero-chip" wx:if="{{result.showSalaryTrack}}">缴费指数 {{result.indexText}}</view>
+        </view>
         <block wx:if="{{result.showSalaryTrack}}">
           <view class="band-track">
             <view class="band-seg floor"></view>
@@ -31,6 +39,11 @@
           </view>
           <view class="band-marker-wrap">
             <view class="band-marker" style="left: {{result.markerPercent}}%;"></view>
+          </view>
+          <view class="scale-ticks">
+            <view wx:for="{{result.trackTicks}}" wx:key="label" class="scale-tick" style="left: {{item.percent}}%;">
+              <text class="scale-tick-label">{{item.label}}</text>
+            </view>
           </view>
           <view class="band-legend">
             <text wx:for="{{result.bands}}" wx:key="id" class="band-legend-item {{item.active ? 'active' : ''}}">{{item.name}}</text>
@@ -170,10 +183,19 @@
     </view>
 
     <view class="panel" wx:if="{{result && result.valid}}">
-      <view class="section-title">估算明细</view>
-      <view class="result-row" wx:for="{{result.rows}}" wx:key="label">
-        <view class="result-row-label">{{item.label}}</view>
-        <view class="result-row-value">{{item.value}}</view>
+      <view class="section-title">养老金构成</view>
+      <view class="info-grid pension-compose">
+        <view class="info-card" wx:for="{{result.composeCards}}" wx:key="label">
+          <view class="info-card-label">{{item.label}}</view>
+          <view class="info-card-value">{{item.value}}</view>
+          <view class="info-card-sub">{{item.unit}}</view>
+        </view>
+      </view>
+      <view class="stat-list">
+        <view class="result-row" wx:for="{{result.statRows}}" wx:key="label">
+          <view class="result-row-label">{{item.label}}</view>
+          <view class="result-row-value">{{item.value}}</view>
+        </view>
       </view>
       <view class="tool-note">{{result.note}}</view>
     </view>

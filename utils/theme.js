@@ -1,6 +1,6 @@
 /**
  * 皮肤主题
- * nexus 星核（默认，科技感）/ forest 青绿 / ocean 商务蓝 / amber 琥珀金 / crimson 中国红 / rose 经典粉
+ * nexus 星核（默认，科技感）/ forest 青绿 / ocean 商务蓝 / amber 琥珀金 / crimson 中国红
  */
 
 const STORAGE_KEY = 'app_theme_v2'
@@ -15,7 +15,9 @@ const THEMES = {
     principal: '#22D3EE',
     interest: '#A78BFA',
     dialog: '#121A2A',
-    ink: '#E7EEF8'
+    ink: '#E7EEF8',
+    brand: '#5EEAD4',
+    brandSoft: '#22D3EE'
   },
   forest: {
     id: 'forest',
@@ -25,7 +27,9 @@ const THEMES = {
     principal: '#1f6b52',
     interest: '#b86232',
     dialog: '#f7f8f6',
-    ink: '#14231c'
+    ink: '#14231c',
+    brand: '#0b3d2e',
+    brandSoft: '#1f6b52'
   },
   ocean: {
     id: 'ocean',
@@ -35,7 +39,9 @@ const THEMES = {
     principal: '#3A73A6',
     interest: '#C4843A',
     dialog: '#F5F8FC',
-    ink: '#13233A'
+    ink: '#13233A',
+    brand: '#1A3F66',
+    brandSoft: '#3A73A6'
   },
   amber: {
     id: 'amber',
@@ -45,7 +51,9 @@ const THEMES = {
     principal: '#A67C38',
     interest: '#B05C38',
     dialog: '#FBF7F0',
-    ink: '#2B2116'
+    ink: '#2B2116',
+    brand: '#6E4A22',
+    brandSoft: '#A67C38'
   },
   crimson: {
     id: 'crimson',
@@ -55,17 +63,9 @@ const THEMES = {
     principal: '#B3384A',
     interest: '#C4A040',
     dialog: '#FBF6F6',
-    ink: '#2A1418'
-  },
-  rose: {
-    id: 'rose',
-    name: '经典粉',
-    navBar: '#8E3B55',
-    pageBg: '#F7F1F3',
-    principal: '#C45C7A',
-    interest: '#A67C38',
-    dialog: '#FBF6F7',
-    ink: '#2A171C'
+    ink: '#2A1418',
+    brand: '#6B1E28',
+    brandSoft: '#B3384A'
   }
 }
 
@@ -74,8 +74,7 @@ const THEME_LIST = [
   { id: 'forest', name: '青绿' },
   { id: 'ocean', name: '商务蓝' },
   { id: 'amber', name: '琥珀金' },
-  { id: 'crimson', name: '中国红' },
-  { id: 'rose', name: '经典粉' }
+  { id: 'crimson', name: '中国红' }
 ]
 
 function normalizeThemeId(id) {

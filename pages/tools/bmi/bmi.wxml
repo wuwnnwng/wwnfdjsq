@@ -16,20 +16,22 @@
         <view class="conv-eq">身体质量指数 BMI</view>
         <view class="conv-result">{{result.bmiText}}</view>
         <view class="conv-result-unit level-{{result.levelId}}">{{result.levelName}}</view>
-        <view class="bmi-track">
-          <view class="bmi-seg under"></view>
-          <view class="bmi-seg normal"></view>
-          <view class="bmi-seg over"></view>
-          <view class="bmi-seg obese"></view>
-        </view>
-        <view class="bmi-marker-wrap">
-          <view class="bmi-marker" style="left: {{result.markerPercent}}%;"></view>
-        </view>
-        <view class="bmi-legend">
-          <text class="bmi-legend-item under">过低</text>
-          <text class="bmi-legend-item normal">正常</text>
-          <text class="bmi-legend-item over">超重</text>
-          <text class="bmi-legend-item obese">肥胖</text>
+        <view class="bmi-range">健康体重 {{result.rangeText}}</view>
+        <view class="bmi-scale">
+          <view class="bmi-track">
+            <view class="bmi-seg under"></view>
+            <view class="bmi-seg normal"></view>
+            <view class="bmi-seg over"></view>
+            <view class="bmi-seg obese"></view>
+          </view>
+          <view class="bmi-scale-ticks">
+            <view wx:for="{{result.scaleTicks}}" wx:key="label" class="bmi-scale-tick" style="left: {{item.percent}}%;">
+              <text class="bmi-scale-label">{{item.label}}</text>
+            </view>
+          </view>
+          <view class="bmi-marker-wrap">
+            <view class="bmi-marker" style="left: {{result.markerPercent}}%;"></view>
+          </view>
         </view>
       </block>
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
@@ -52,22 +54,7 @@
       </view>
     </view>
 
-    <view class="panel" wx:if="{{result && result.valid}}">
-      <view class="section-title">体重参考</view>
-      <view class="result-row">
-        <view class="result-row-label">健康体重范围</view>
-        <view class="result-row-value">{{result.rangeText}}</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">当前体重</view>
-        <view class="result-row-value">{{result.weightText}} 公斤</view>
-      </view>
-      <view class="result-row">
-        <view class="result-row-label">建议</view>
-        <view class="result-row-value">{{result.hint}}</view>
-      </view>
-      <view class="tool-note">成人标准依据卫生行业标准 WS/T 428：BMI &lt; 18.5 过低，18.5–23.9 正常，24.0–27.9 超重，≥ 28 肥胖。结果仅供参考，不能替代医疗意见。</view>
-    </view>
+    <view class="tool-note bmi-disclaimer" wx:if="{{result && result.valid}}">结果仅供参考，不能替代医疗意见。</view>
     <view class="save-bar-spacer" wx:if="{{result && result.valid}}"></view>
   </scroll-view>
   <view class="save-card-bar" wx:if="{{result && result.valid}}">

@@ -7,7 +7,7 @@ const {
   getLunarMonthOptions,
   getLunarDayOptions
 } = require('../../../utils/lunar')
-const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
+const { getThemeId, getTheme, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getAgeToolShare } = require('../../../utils/share')
 const { createPickerTick } = require('../../../utils/pickerTick')
 const { createConfettiPieces } = require('../../../utils/confetti')
@@ -534,7 +534,7 @@ Page({
     this.setData({ savingCard: true })
     wx.showLoading({ title: '正在生成', mask: true })
     saveResultCard(this, 'resultCard', (ctx, width, height) => {
-      drawAgeCard(ctx, width, height, result)
+      drawAgeCard(ctx, width, height, result, getTheme(this.data.theme))
     })
       .then(() => {
         wx.hideLoading()

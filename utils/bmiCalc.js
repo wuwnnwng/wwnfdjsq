@@ -27,6 +27,7 @@ const LEVELS = [
 /** 色条与指针共用刻度：14–36，与页面 flex 分段一致 */
 const TRACK_MIN = 14
 const TRACK_MAX = 36
+const SCALE_TICKS = [18.5, 24, 28]
 
 function levelOf(bmi) {
   return LEVELS.find((item) => bmi < item.max) || LEVELS[LEVELS.length - 1]
@@ -41,6 +42,14 @@ function trackFlex(item) {
 function markerPercentOf(bmi) {
   const pct = ((Number(bmi) - TRACK_MIN) / (TRACK_MAX - TRACK_MIN)) * 100
   return Math.round(Math.max(0, Math.min(100, pct)) * 10) / 10
+}
+
+function scaleTicksOf() {
+  return SCALE_TICKS.map((value) => ({
+    value,
+    label: String(value),
+    percent: markerPercentOf(value)
+  }))
 }
 
 function calculateBmi(heightText, weightText) {
@@ -77,7 +86,8 @@ function calculateBmi(heightText, weightText) {
     rangeText: `${formatNumber(minWeight, 1)} – ${formatNumber(maxWeight, 1)} 公斤`,
     minWeightText: formatNumber(minWeight, 1),
     maxWeightText: formatNumber(maxWeight, 1),
-    markerPercent: markerPercentOf(bmi)
+    markerPercent: markerPercentOf(bmi),
+    scaleTicks: scaleTicksOf()
   }
 }
 

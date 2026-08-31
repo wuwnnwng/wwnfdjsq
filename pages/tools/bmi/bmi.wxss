@@ -26,3 +26,56 @@
 .level-obese {
   color: #dc2626;
 }
+
+.bmi-range {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.bmi-scale {
+  position: relative;
+  margin-top: 24rpx;
+}
+
+.bmi-scale .bmi-track {
+  margin-top: 0;
+  height: 28rpx;
+}
+
+.bmi-scale-ticks {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 28rpx;
+  pointer-events: none;
+}
+
+.bmi-scale-tick {
+  position: absolute;
+  top: 0;
+  height: 28rpx;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bmi-scale-label {
+  font-size: 18rpx;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 1rpx 3rpx rgba(15, 23, 42, 0.45);
+}
+
+.bmi-scale .bmi-marker-wrap {
+  height: 20rpx;
+  margin-top: 6rpx;
+}
+
+.bmi-disclaimer {
+  margin-top: 20rpx;
+  padding: 0 8rpx;
+}

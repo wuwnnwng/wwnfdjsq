@@ -315,10 +315,6 @@
   background: linear-gradient(135deg, #6b1e28, #b3384a);
 }
 
-.theme-dot.rose {
-  background: linear-gradient(135deg, #8e3b55, #c45c7a);
-}
-
 .brand-wrap {
   flex: 1;
   min-width: 0;

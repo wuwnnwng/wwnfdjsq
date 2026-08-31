@@ -60,8 +60,15 @@ const RESIDENT_BANDS = [
   { id: 'high', name: '高档', maxFee: Infinity }
 ]
 
-const TRACK_MIN = 0.3
-const TRACK_MAX = 3.4
+const TRACK_SEGS = [
+  { id: 'floor', flex: 3, from: MIN_INDEX, to: MIN_INDEX },
+  { id: 'basic', flex: 4, from: MIN_INDEX, to: 1 },
+  { id: 'mid', flex: 5, from: 1, to: 1.5 },
+  { id: 'upper', flex: 5, from: 1.5, to: 2 },
+  { id: 'high', flex: 8, from: 2, to: MAX_INDEX },
+  { id: 'cap', flex: 4, from: MAX_INDEX, to: MAX_INDEX }
+]
+const TRACK_FLEX_TOTAL = TRACK_SEGS.reduce((sum, item) => sum + item.flex, 0)
 const RESIDENT_TRACK_MAX = 9000
 
 function parseNumber(text) {
@@ -140,13 +147,64 @@ function bandOf(rawIndex) {
   return SALARY_BANDS.find((item) => rawIndex <= item.maxIndex) || SALARY_BANDS[SALARY_BANDS.length - 1]
 }
 
+function resolveSalaryIndex(salary, average) {
+  const bounds = salaryBoundsOf(average)
+  const rawIndex = salary / average
+  if (bounds && salary >= bounds.max) {
+    return { rawIndex, displayIndex: MAX_INDEX, atFloor: false, atCap: true }
+  }
+  if (bounds && salary <= bounds.min) {
+    return { rawIndex, displayIndex: MIN_INDEX, atFloor: true, atCap: false }
+  }
+  return {
+    rawIndex,
+    displayIndex: Math.min(MAX_INDEX, Math.max(MIN_INDEX, rawIndex)),
+    atFloor: rawIndex < MIN_INDEX,
+    atCap: rawIndex > MAX_INDEX
+  }
+}
+
 function residentBandOf(fee) {
   return RESIDENT_BANDS.find((item) => fee <= item.maxFee) || RESIDENT_BANDS[RESIDENT_BANDS.length - 1]
 }
 
+function flexPercent(flexPos) {
+  return Math.round((flexPos / TRACK_FLEX_TOTAL) * 1000) / 10
+}
+
 function markerPercentOf(rawIndex) {
-  const pct = ((Number(rawIndex) - TRACK_MIN) / (TRACK_MAX - TRACK_MIN)) * 100
-  return Math.round(Math.max(0, Math.min(100, pct)) * 10) / 10
+  const index = Number(rawIndex)
+  if (!Number.isFinite(index) || index <= MIN_INDEX) {
+    return flexPercent(TRACK_SEGS[0].flex / 2)
+  }
+  if (index >= MAX_INDEX) {
+    const cap = TRACK_SEGS[TRACK_SEGS.length - 1]
+    return flexPercent(TRACK_FLEX_TOTAL - cap.flex / 2)
+  }
+
+  let offset = TRACK_SEGS[0].flex
+  for (let i = 1; i < TRACK_SEGS.length - 1; i += 1) {
+    const seg = TRACK_SEGS[i]
+    const inHigh = seg.id === 'high' && index > seg.from && index < seg.to
+    const inMid = seg.id !== 'high' && index > seg.from && index <= seg.to
+    if (inHigh || inMid) {
+      const span = seg.to - seg.from
+      let t = span ? (index - seg.from) / span : 0
+      if (seg.id === 'high') t = Math.min(0.96, t)
+      t = Math.max(0, Math.min(1, t))
+      return flexPercent(offset + t * seg.flex)
+    }
+    offset += seg.flex
+  }
+  return flexPercent(offset)
+}
+
+function trackTicksOf() {
+  return [
+    { label: '60%', percent: markerPercentOf(MIN_INDEX) },
+    { label: '100%', percent: markerPercentOf(1) },
+    { label: '300%', percent: markerPercentOf(MAX_INDEX) }
+  ]
 }
 
 function residentMarkerOf(fee) {
@@ -198,12 +256,12 @@ function calculateEmployeeLike({ type, salaryText, averageText, yearsText, retir
   }
 
   const age = Number(retireAge) || 60
-  const rawIndex = salary / average
-  const contribIndex = Math.min(MAX_INDEX, Math.max(MIN_INDEX, rawIndex))
+  const { rawIndex, displayIndex, atFloor, atCap } = resolveSalaryIndex(salary, average)
+  const contribIndex = displayIndex
   const contribBase = contribIndex * average
-  const floored = rawIndex < MIN_INDEX
-  const capped = rawIndex > MAX_INDEX
-  const band = bandOf(rawIndex)
+  const floored = atFloor
+  const capped = atCap
+  const band = bandOf(displayIndex)
 
   const basicPension = ((average + contribBase) / 2) * years * 0.01
   const annualPersonal = contribBase * PERSONAL_RATE * 12
@@ -227,7 +285,20 @@ function calculateEmployeeLike({ type, salaryText, averageText, yearsText, retir
     bandName: band.name,
     bandHint: band.hint,
     bandColor: band.color,
-    markerPercent: markerPercentOf(rawIndex),
+    markerPercent: markerPercentOf(displayIndex),
+    trackTicks: trackTicksOf(),
+    composeCards: [
+      { label: '基础养老金', value: formatMoney(basicPension), unit: '元 / 月' },
+      { label: '个人账户养老金', value: formatMoney(accountPension), unit: '元 / 月' }
+    ],
+    statRows: [
+      { label: isFlexible ? '缴费基数' : '月工资', value: `${formatMoney(salary)} 元` },
+      { label: '缴费基数（核定）', value: `${formatMoney(contribBase)} 元 / 月` },
+      { label: '缴费指数', value: `${formatIndex(contribIndex)}${floored ? '（已保底）' : ''}${capped ? '（已封顶）' : ''}` },
+      { label: '个人账户储存额', value: `${formatMoney(accountBalance)} 元` },
+      ...(isFlexible ? [{ label: '每月自己缴纳', value: `${formatMoney(selfPay)} 元（约 ${Math.round(FLEXIBLE_RATE * 100)}%）` }] : []),
+      { label: '计发月数', value: `${payoutMonths} 个月` }
+    ],
     rawIndex,
     contribIndex,
     contribBase,
@@ -241,10 +312,10 @@ function calculateEmployeeLike({ type, salaryText, averageText, yearsText, retir
     payoutMonths,
     selfPay,
     heroText: formatMoney(monthly),
-    formulaText: `${meta.name} · ${band.name} · 缴费指数 ${formatIndex(contribIndex)}`,
+    formulaText: `${meta.name} · ${band.name}`,
     heroSub: isFlexible
       ? `每月自缴约 ${formatMoney(selfPay)} 元 · 替代率 ${formatPercent(replacement)}`
-      : `替代率约 ${formatPercent(replacement)}（相对当前月工资）`,
+      : `替代率 ${formatPercent(replacement)} · 相对当前月工资`,
     salaryText: formatMoney(salary),
     averageText: formatMoney(average),
     contribBaseText: formatMoney(contribBase),
@@ -343,6 +414,16 @@ function calculateResident({
     heroText: formatMoney(monthly),
     formulaText: `${meta.name} · ${band.name}`,
     heroSub: `基础养老金 ${formatMoney(basicRaw)} 元 + 个人账户 ${formatMoney(accountPension)} 元`,
+    composeCards: [
+      { label: '基础养老金', value: formatMoney(basicRaw), unit: '元 / 月' },
+      { label: '个人账户养老金', value: formatMoney(accountPension), unit: '元 / 月' }
+    ],
+    statRows: [
+      { label: '年缴费档次', value: `${formatMoney(annualFee)} 元` },
+      { label: '政府补贴', value: `${formatMoney(subsidy)} 元 / 年` },
+      { label: '个人账户储存额', value: `${formatMoney(accountBalance)} 元` },
+      { label: '计发月数', value: `${payoutMonths} 个月` }
+    ],
     basicText: formatMoney(basicRaw),
     accountText: formatMoney(accountPension),
     accountBalanceText: formatMoney(accountBalance),
@@ -386,8 +467,7 @@ module.exports = {
   RETIRE_AGES,
   RESIDENT_RETIRE_AGES,
   PAYOUT_MONTHS,
-  TRACK_MIN,
-  TRACK_MAX,
+  TRACK_SEGS,
   MIN_INDEX,
   MAX_INDEX,
   calculatePension,

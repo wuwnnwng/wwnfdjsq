@@ -30,12 +30,68 @@
   font-weight: 700;
 }
 
+.hero-metric {
+  margin-top: 28rpx;
+}
+
+.hero-metric-label {
+  font-size: 22rpx;
+  letter-spacing: 2rpx;
+  color: var(--color-muted);
+}
+
+.hero-metric-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-top: 6rpx;
+}
+
+.hero-metric-num {
+  font-size: 72rpx;
+  font-weight: 800;
+  letter-spacing: -2rpx;
+  line-height: 1.1;
+  color: var(--color-brand);
+  word-break: break-all;
+}
+
+.hero-metric-unit {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.hero-metric-sub {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.hero-chip {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+}
+
 .band-badge {
   display: inline-flex;
-  margin-top: 16rpx;
   padding: 8rpx 20rpx;
   border-radius: 999rpx;
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 700;
 }
 
@@ -102,7 +158,7 @@
 }
 
 .band-seg.high {
-  flex: 10;
+  flex: 8;
   background: #fb923c;
 }
 
@@ -152,11 +208,39 @@
 }
 
 .band-legend-item:nth-child(5) {
-  flex: 10;
+  flex: 8;
 }
 
 .band-legend-item:nth-child(6) {
   flex: 4;
+}
+
+.scale-ticks {
+  position: relative;
+  height: 32rpx;
+  margin-top: 2rpx;
+}
+
+.scale-tick {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.scale-tick-label {
+  font-size: 18rpx;
+  color: var(--color-muted);
+}
+
+.pension-compose {
+  margin-top: 20rpx;
+}
+
+.pension-compose .info-card-value {
+  font-size: 40rpx;
+}
+
+.stat-list {
+  margin-top: 8rpx;
 }
 
 .band-legend-item.active {

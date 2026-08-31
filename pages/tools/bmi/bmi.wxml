@@ -54,7 +54,22 @@
       </view>
     </view>
 
-    <view class="tool-note bmi-disclaimer" wx:if="{{result && result.valid}}">结果仅供参考，不能替代医疗意见。</view>
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">体重参考</view>
+      <view class="result-row">
+        <view class="result-row-label">健康体重范围</view>
+        <view class="result-row-value">{{result.rangeText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">当前体重</view>
+        <view class="result-row-value">{{result.weightText}} 公斤</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">建议</view>
+        <view class="result-row-value">{{result.hint}}</view>
+      </view>
+      <view class="tool-note">依据卫生行业标准 WS/T 428。结果仅供参考，不能替代医疗意见。</view>
+    </view>
     <view class="save-bar-spacer" wx:if="{{result && result.valid}}"></view>
   </scroll-view>
   <view class="save-card-bar" wx:if="{{result && result.valid}}">

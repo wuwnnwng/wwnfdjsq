@@ -74,8 +74,3 @@
   height: 20rpx;
   margin-top: 6rpx;
 }
-
-.bmi-disclaimer {
-  margin-top: 20rpx;
-  padding: 0 8rpx;
-}

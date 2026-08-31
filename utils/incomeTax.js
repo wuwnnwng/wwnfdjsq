@@ -52,6 +52,75 @@ function formatPercent(rate) {
   return `${Math.round(rate * 100)}%`
 }
 
+const INSURANCE_ITEMS = [
+  { key: 'pension', field: 'pensionRate', label: '养老保险', short: '养老', defaultRate: '8' },
+  { key: 'medical', field: 'medicalRate', label: '医疗保险', short: '医疗', defaultRate: '2' },
+  { key: 'unemployment', field: 'unemploymentRate', label: '失业保险', short: '失业', defaultRate: '0.5' },
+  { key: 'housing', field: 'housingRate', label: '住房公积金', short: '公积金', defaultRate: '12' }
+]
+
+const DEFAULT_INSURANCE_RATES = {
+  pensionRate: '8',
+  medicalRate: '2',
+  unemploymentRate: '0.5',
+  housingRate: '12'
+}
+
+function formatRateText(value) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return '0'
+  if (Math.abs(n - Math.round(n)) < 1e-8) return String(Math.round(n))
+  return String(Math.round(n * 1000) / 1000)
+}
+
+function formatInsuranceInput(value) {
+  const n = round2(value)
+  if (!Number.isFinite(n)) return '0'
+  if (Math.abs(n - Math.round(n)) < 1e-8) return String(Math.round(n))
+  return n.toFixed(2)
+}
+
+function parseRate(text) {
+  if (text === '' || text == null) return 0
+  const n = Number(String(text).trim())
+  return Number.isFinite(n) ? n : NaN
+}
+
+function clampRate(value) {
+  const n = parseRate(value)
+  if (!Number.isFinite(n) || n < 0) return 0
+  return Math.min(40, n)
+}
+
+function calculateInsurance(gross, rates) {
+  const g = Math.max(0, toNumber(gross) || 0)
+  const source = rates || {}
+  const items = INSURANCE_ITEMS.map((meta) => {
+    const raw = source[meta.field]
+    const rateNum = clampRate(raw)
+    const amount = round2((g * rateNum) / 100)
+    return {
+      key: meta.key,
+      field: meta.field,
+      label: meta.label,
+      short: meta.short,
+      rate: raw == null || raw === '' ? '' : String(raw),
+      rateNum,
+      amount,
+      amountText: formatMoney(amount)
+    }
+  })
+  const total = round2(items.reduce((sum, item) => sum + item.amount, 0))
+  return {
+    items,
+    total,
+    totalText: formatMoney(total),
+    totalInput: formatInsuranceInput(total),
+    hint: items.map((item) => `${item.short} ${formatRateText(item.rateNum)}%`).join(' · '),
+    rateSumText: `${formatRateText(items.reduce((sum, item) => sum + item.rateNum, 0))}%`
+  }
+}
+
 function findBracket(amount, table) {
   const taxable = Math.max(0, Number(amount) || 0)
   for (let i = 0; i < table.length; i += 1) {
@@ -141,7 +210,22 @@ function calculateMonthlySalaryTax(input) {
     thisMonthTaxText: formatMoney(thisMonthTax),
     netPayText: formatMoney(netPay),
     cumulativeTaxableText: formatMoney(taxableN),
-    cumulativeTaxText: formatMoney(taxN.tax)
+    cumulativeTaxText: formatMoney(taxN.tax),
+    flowMonth: [
+      { label: '税前应发', value: formatMoney(gross), role: 'in' },
+      { label: '三险一金（个人）', value: formatMoney(insurance), role: 'minus' },
+      { label: '减除费用', value: formatMoney(MONTHLY_DEDUCTION), role: 'minus', hint: '5000 元 / 月' },
+      { label: '专项附加扣除', value: formatMoney(additional), role: 'minus' },
+      { label: '本月应纳税所得额', value: formatMoney(Math.max(0, monthlyTaxableBase)), role: 'sum' }
+    ],
+    flowYear: [
+      { label: `累计应纳税所得额（1–${monthIndex}月）`, value: formatMoney(taxableN), role: 'in' },
+      { label: '适用预扣率', value: formatPercent(taxN.rate), role: 'plain' },
+      { label: '速算扣除数', value: formatMoney(taxN.quick), role: 'plain' },
+      { label: '累计应纳税额', value: formatMoney(taxN.tax), role: 'in' },
+      { label: '累计已预扣税额', value: formatMoney(alreadyPaid), role: 'minus' },
+      { label: '本期应预扣预缴', value: formatMoney(thisMonthTax), role: 'hero' }
+    ]
   }
 }
 
@@ -238,8 +322,13 @@ module.exports = {
   MONTHLY_DEDUCTION,
   ANNUAL_BRACKETS,
   MONTHLY_BRACKETS,
+  INSURANCE_ITEMS,
+  DEFAULT_INSURANCE_RATES,
   formatMoney,
   formatPercent,
+  formatRateText,
+  clampRate,
+  calculateInsurance,
   calculateMonthlySalaryTax,
   calculateAnnualBonusSeparate,
   calculateAnnualBonusMerged,

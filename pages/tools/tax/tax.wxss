@@ -73,24 +73,40 @@
   font-weight: 700;
 }
 
-.conv-eq {
+.hero-metric {
   margin-top: 28rpx;
-  font-size: 24rpx;
+}
+
+.hero-metric-label {
+  font-size: 22rpx;
+  letter-spacing: 2rpx;
   color: var(--color-muted);
 }
 
-.conv-result {
-  margin-top: 8rpx;
-  font-size: 56rpx;
+.hero-metric-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-top: 6rpx;
+}
+
+.hero-metric-num {
+  font-size: 72rpx;
   font-weight: 800;
-  letter-spacing: -1rpx;
+  letter-spacing: -2rpx;
+  line-height: 1.1;
   color: var(--color-brand);
-  line-height: 1.15;
   word-break: break-all;
 }
 
-.conv-result-unit {
-  margin-top: 8rpx;
+.hero-metric-unit {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.hero-metric-sub {
+  margin-top: 10rpx;
   font-size: 26rpx;
   font-weight: 600;
   color: var(--color-ink);
@@ -121,6 +137,192 @@
   border-color: transparent;
 }
 
+.field-tap .field-value {
+  font-size: 30rpx;
+  color: var(--color-ink);
+}
+
+.field-caret {
+  margin-left: 4rpx;
+  font-size: 32rpx;
+  line-height: 1;
+  color: var(--color-muted);
+}
+
+.ins-inline-hint {
+  margin: -8rpx 0 8rpx;
+  padding-left: 220rpx;
+  font-size: 20rpx;
+  line-height: 1.5;
+  color: var(--color-muted);
+  text-align: right;
+}
+
+.flow-block {
+  margin-top: 20rpx;
+  padding: 8rpx 4rpx 4rpx;
+}
+
+.flow-block + .flow-block {
+  margin-top: 12rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx dashed var(--color-line);
+}
+
+.flow-kicker {
+  margin-bottom: 8rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  color: var(--color-brand);
+}
+
+.flow-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 14rpx 0;
+}
+
+.flow-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.flow-label {
+  font-size: 26rpx;
+  color: var(--color-muted);
+}
+
+.flow-hint {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 20rpx;
+  color: var(--color-muted);
+  opacity: 0.8;
+}
+
+.flow-value {
+  flex-shrink: 0;
+  max-width: 48%;
+  text-align: right;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.flow-row.role-minus .flow-value {
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.flow-row.role-sum {
+  margin-top: 4rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.flow-row.role-sum .flow-label,
+.flow-row.role-hero .flow-label {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.flow-row.role-sum .flow-value {
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.flow-row.role-hero {
+  margin-top: 8rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 20rpx;
+  background:
+    linear-gradient(160deg, rgba(251, 191, 36, 0.16) 0%, var(--color-hero-fade) 72%),
+    var(--color-soft);
+}
+
+.flow-row.role-hero .flow-label,
+.flow-row.role-hero .flow-value {
+  color: var(--color-brand);
+  font-weight: 800;
+}
+
+.flow-row.role-hero .flow-value {
+  font-size: 34rpx;
+}
+
+.rule-card {
+  margin-top: 24rpx;
+  padding: 24rpx 22rpx 22rpx;
+  border-radius: 20rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+}
+
+.rule-card-kicker {
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  color: var(--color-brand);
+}
+
+.rule-card-title {
+  margin-top: 8rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.rule-card-text {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.compare-card {
+  padding: 22rpx 18rpx 20rpx;
+  border-radius: 20rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+}
+
+.compare-card.is-better {
+  border-color: transparent;
+  background:
+    linear-gradient(160deg, rgba(251, 191, 36, 0.16) 0%, var(--color-hero-fade) 72%),
+    var(--color-soft);
+}
+
+.compare-label {
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.compare-value {
+  margin-top: 8rpx;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  word-break: break-all;
+}
+
+.compare-sub {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
 .tip-mask {
   position: fixed;
   left: 0;
@@ -135,12 +337,17 @@
   background: var(--color-mask);
 }
 
-.tip-dialog {
+.tip-dialog,
+.ins-dialog {
   width: 100%;
-  max-width: 620rpx;
+  max-width: 640rpx;
   padding: 36rpx 32rpx 28rpx;
   border-radius: 24rpx;
   background: var(--color-dialog);
+}
+
+.ins-dialog {
+  max-height: 80vh;
 }
 
 .tip-title {
@@ -150,12 +357,113 @@
   text-align: center;
 }
 
-.tip-text {
-  margin-top: 24rpx;
-  font-size: 24rpx;
-  line-height: 1.7;
+.ins-lead {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
   color: var(--color-muted);
+}
+
+.ins-row {
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.ins-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.ins-label {
+  font-size: 28rpx;
+  color: var(--color-ink);
+}
+
+.ins-rate {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.ins-input {
+  width: 120rpx;
+  height: 64rpx;
+  padding: 0 8rpx;
+  text-align: right;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.ins-unit {
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.ins-amount {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  text-align: right;
+  color: var(--color-muted);
+}
+
+.ins-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 8rpx;
+  padding: 20rpx 0 4rpx;
+}
+
+.ins-total-label {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.ins-total-value {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+}
+
+.tip-steps {
+  margin-top: 24rpx;
+}
+
+.tip-step {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.tip-step-idx {
+  flex-shrink: 0;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
   text-align: center;
+  border-radius: 50%;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-on-brand);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+}
+
+.tip-step-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.tip-step-text {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--color-muted);
 }
 
 .tip-confirm {

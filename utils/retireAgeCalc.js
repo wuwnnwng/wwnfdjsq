@@ -154,13 +154,14 @@ function formatMonthText(year, month) {
 
 /**
  * 原法定退休所在月相对 2025 年 1 月的序号（2025 年 1 月 = 1）。
- * 延迟月数 = min(上限, ceil((n + 节奏 - 1) / 节奏))
- * 与人社部对照表一致：首月延迟 1 个月，其后按节奏分组。
+ * 延迟月数 = min(上限, ceil(n / 节奏))
+ * 与人社部对照表一致：从改革首月起按节奏分组，每组延迟递增 1 个月。
+ * 例如男职工每 4 个月延迟 1 个月：2025 年 1–4 月原法定对应延迟 1 个月，5–8 月延迟 2 个月。
  */
 function delayMonthsOf(originalYear, originalMonth, step, maxDelay) {
   const n = (originalYear - REFORM_YEAR) * 12 + originalMonth
   if (n <= 0) return 0
-  return Math.min(maxDelay, Math.ceil((n + step - 1) / step))
+  return Math.min(maxDelay, Math.ceil(n / step))
 }
 
 function minContributionOf(retireYear) {

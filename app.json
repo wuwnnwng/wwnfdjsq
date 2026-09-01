@@ -44,5 +44,6 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "subPackages": [],
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "navigateToMiniProgramAppIdList": ["wx663931c101197d69"]
 }

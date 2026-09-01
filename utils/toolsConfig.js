@@ -5,6 +5,18 @@ const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
 const FEATURED_IDS = ['calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'fitout', 'housetax', 'age']
 const FEATURED_PAGE_SIZE = 3
 
+/** 仅首页轮播展示，不进入工具箱 */
+const HOME_FEATURED_MINI_PROGRAMS = [
+  {
+    id: 'ershou',
+    name: '同城二手',
+    shortName: '同城二手',
+    icon: '🛍️',
+    iconType: 'ershou',
+    miniProgramAppId: 'wx663931c101197d69'
+  }
+]
+
 const CATEGORIES = [
   { id: 'daily', name: '日常工具', toolIds: ['duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
   { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
@@ -250,14 +262,18 @@ function searchTools(keyword) {
 
 function toFeaturedChip(item) {
   if (!item) return null
-  return {
+  const chip = {
     id: item.id,
     name: item.name,
     shortName: item.shortName || item.name,
     icon: item.icon,
     iconType: item.iconType,
-    page: item.page
+    page: item.page || ''
   }
+  if (item.miniProgramAppId) {
+    chip.miniProgramAppId = item.miniProgramAppId
+  }
+  return chip
 }
 
 function getFeaturedTools() {
@@ -289,7 +305,8 @@ function getFeaturedToolPages() {
   const extra = ['bmi', 'compound', 'pension', 'duedate', 'safeperiod']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
-  const list = getFeaturedTools().concat(extra, random)
+  const homeMiniPrograms = HOME_FEATURED_MINI_PROGRAMS.map(toFeaturedChip).filter(Boolean)
+  const list = homeMiniPrograms.concat(getFeaturedTools(), extra, random)
   const pages = []
   for (let i = 0; i < list.length; i += FEATURED_PAGE_SIZE) {
     const index = i / FEATURED_PAGE_SIZE

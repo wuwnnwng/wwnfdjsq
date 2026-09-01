@@ -258,6 +258,19 @@ Page({
       this.onOpenRandomTool()
       return
     }
+    const appId = e.currentTarget.dataset.appid
+    if (appId) {
+      wx.navigateToMiniProgram({
+        appId,
+        envVersion: 'release',
+        fail(err) {
+          const msg = (err && err.errMsg) || ''
+          if (msg.indexOf('cancel') >= 0) return
+          wx.showToast({ title: '暂无法打开该小程序', icon: 'none' })
+        }
+      })
+      return
+    }
     const page = e.currentTarget.dataset.page
     if (!page) return
     wx.navigateTo({ url: page })

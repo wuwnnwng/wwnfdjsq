@@ -40,6 +40,7 @@
                     bindtap="onOpenFeaturedTool"
                     data-id="{{item.id}}"
                     data-page="{{item.page}}"
+                    data-appid="{{item.miniProgramAppId}}"
                     aria-role="button"
                     aria-label="{{item.name}}"
                   >

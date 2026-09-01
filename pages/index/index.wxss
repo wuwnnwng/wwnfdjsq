@@ -273,6 +273,10 @@
   background: linear-gradient(135deg, #fef3c7, #f59e0b);
 }
 
+.tool-icon-ershou {
+  background: linear-gradient(135deg, #ffedd5, #fb923c);
+}
+
 .theme-switch {
   display: flex;
   align-items: center;

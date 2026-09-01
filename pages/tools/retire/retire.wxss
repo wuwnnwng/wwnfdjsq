@@ -136,65 +136,11 @@
 }
 
 .retire-grid {
-  margin-top: 20rpx;
-}
-
-.retire-grid .info-card.featured {
-  background:
-    linear-gradient(160deg, rgba(99, 102, 241, 0.16) 0%, var(--color-hero-fade) 72%),
-    var(--color-soft);
+  margin-top: 0;
 }
 
 .retire-grid .info-card-value {
   font-size: 36rpx;
-}
-
-.stat-list {
-  margin-top: 8rpx;
-}
-
-.result-row-value {
-  max-width: 62%;
-}
-
-.pension-cta-panel {
-  padding: 32rpx 28rpx 28rpx;
-  background:
-    linear-gradient(160deg, rgba(245, 158, 11, 0.18) 0%, var(--color-hero-fade) 62%),
-    var(--color-surface);
-}
-
-.pension-cta-kicker {
-  font-size: 22rpx;
-  letter-spacing: 2rpx;
-  color: var(--color-muted);
-}
-
-.pension-cta-title {
-  margin-top: 8rpx;
-  font-size: 34rpx;
-  font-weight: 800;
-  color: var(--color-brand);
-  line-height: 1.35;
-}
-
-.pension-cta-sub {
-  margin-top: 10rpx;
-  font-size: 24rpx;
-  line-height: 1.5;
-  color: var(--color-muted);
-}
-
-.pension-cta-btn {
-  margin-top: 24rpx;
-  height: 80rpx;
-  line-height: 80rpx;
-  text-align: center;
-  border-radius: 999rpx;
-  font-size: 28rpx;
-  font-weight: 700;
-  color: var(--color-on-brand);
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
 }
 
 .tip-mask {

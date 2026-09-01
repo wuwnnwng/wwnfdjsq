@@ -2,7 +2,7 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FEATURED_IDS = ['calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'fitout', 'housetax', 'age']
+const FEATURED_IDS = ['retire', 'calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'fitout', 'housetax', 'age']
 const FEATURED_PAGE_SIZE = 3
 
 /** 仅首页轮播展示，不进入工具箱 */
@@ -18,7 +18,7 @@ const HOME_FEATURED_MINI_PROGRAMS = [
 ]
 
 const CATEGORIES = [
-  { id: 'daily', name: '日常工具', toolIds: ['duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
+  { id: 'daily', name: '日常工具', toolIds: ['retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
   { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] }
@@ -161,6 +161,15 @@ const TOOLS = [
     iconType: 'safeperiod',
     keywords: '安全期排卵易孕月经周期生理期避孕',
     page: '/pages/tools/safeperiod/safeperiod'
+  },
+  {
+    id: 'retire',
+    name: '退休年龄',
+    shortName: '退休年龄',
+    icon: '⏰',
+    iconType: 'retire',
+    keywords: '退休年龄延迟退休法定退休社保缴费年限女干部女职工灵活就业企业男职工养老金',
+    page: '/pages/tools/retire/retire'
   },
   {
     id: 'pension',

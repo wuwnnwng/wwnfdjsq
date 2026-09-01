@@ -21,6 +21,7 @@
     "pages/tools/duedate/duedate",
     "pages/tools/safeperiod/safeperiod",
     "pages/tools/pension/pension",
+    "pages/tools/retire/retire",
     "pages/tools/canvas/canvas",
     "pages/tools/puzzle/puzzle",
     "pages/result/result"

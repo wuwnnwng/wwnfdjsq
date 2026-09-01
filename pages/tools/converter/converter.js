@@ -21,6 +21,7 @@ const {
   listenKeyboardHeight,
   unlistenKeyboardHeight
 } = require('../../../utils/pickerKeyboard')
+const { createLastInput, readLastInput } = require('../../../utils/toolLastInput')
 
 function parseUnitLabel(label) {
   const text = String(label || '').trim()
@@ -66,6 +67,8 @@ function toolMeta(type) {
   }
 }
 
+const lastInput = createLastInput('converter', ['lastType', 'inputValue', 'states'])
+
 Page({
   data: {
     theme: getThemeId(),
@@ -110,8 +113,14 @@ Page({
 
   onLoad(options) {
     enableShareMenu()
-    const type = options.type || 'length'
-    this.initConverter(isUnitType(type) || type === 'currency' ? type : 'length')
+    const saved = readLastInput('converter') || {}
+    this._unitState = saved.states && typeof saved.states === 'object' ? saved.states : {}
+    const queryType = options && options.type
+    let type = 'length'
+    if (queryType === 'currency') type = 'currency'
+    else if (isUnitType(queryType)) type = queryType
+    else if (saved.lastType && isUnitType(saved.lastType)) type = saved.lastType
+    this.initConverter(type)
   },
 
   onShow() {
@@ -124,9 +133,30 @@ Page({
     this._currencyShownOnce = true
   },
 
+  onHide() {
+    this.persistConverter()
+    lastInput.flush(this, {
+      lastType: this.data.type,
+      inputValue: this.data.inputValue,
+      states: this._unitState
+    })
+  },
+
+  onUnload() {
+    this.onHide()
+  },
+
   preventMove() {},
 
   getDefaultCurrencyIndices(units) {
+    const saved = this._unitState && this._unitState.currency
+    if (saved && saved.fromKey && saved.toKey) {
+      const fromIndex = findUnitIndex(units, saved.fromKey)
+      const toIndex = findUnitIndex(units, saved.toKey)
+      if (fromIndex >= 0 && toIndex >= 0) {
+        return { fromIndex, toIndex }
+      }
+    }
     const fromIndex = findUnitIndex(units, 'cny')
     const toIndex = findUnitIndex(units, 'usd')
     return {
@@ -168,13 +198,32 @@ Page({
   },
 
   rememberUnitState() {
-    if (!isUnitType(this.data.type)) return
     this._unitState = this._unitState || {}
+    if (this.data.type === 'currency') {
+      const from = this.data.units[this.data.fromIndex]
+      const to = this.data.units[this.data.toIndex]
+      this._unitState.currency = {
+        fromKey: from && from.key,
+        toKey: to && to.key,
+        inputValue: this.data.inputValue
+      }
+      return
+    }
+    if (!isUnitType(this.data.type)) return
     this._unitState[this.data.type] = {
       fromIndex: this.data.fromIndex,
       toIndex: this.data.toIndex,
       inputValue: this.data.inputValue
     }
+  },
+
+  persistConverter() {
+    this.rememberUnitState()
+    lastInput.save(this, {
+      lastType: this.data.type,
+      inputValue: this.data.inputValue,
+      states: this._unitState
+    })
   },
 
   restoreUnitState(type, units) {
@@ -217,6 +266,8 @@ Page({
         const defaults = this.getDefaultCurrencyIndices(units)
         fromIndex = defaults.fromIndex
         toIndex = defaults.toIndex
+        const saved = this._unitState && this._unitState.currency
+        if (saved && saved.inputValue != null) inputValue = saved.inputValue
       } else {
         const saved = this.restoreUnitState(type, units)
         fromIndex = saved.fromIndex
@@ -431,6 +482,7 @@ Page({
   },
 
   recalculate() {
+    this.persistConverter()
     const { type, units, fromIndex, toIndex, inputValue, digits, showAll } = this.data
     const value = parseInput(inputValue)
     const fromUnit = units[fromIndex]

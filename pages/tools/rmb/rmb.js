@@ -1,6 +1,9 @@
 const { toRmbUpper } = require('../../../utils/rmbUpper')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getRmbToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('rmb', ['amount'])
 
 Page({
   data: {
@@ -11,7 +14,7 @@ Page({
 
   onLoad() {
     enableShareMenu()
-    this.recalculate()
+    this.setData(lastInput.restore(), () => this.recalculate())
   },
 
   onShow() {
@@ -20,12 +23,20 @@ Page({
     applyThemeChrome(theme)
   },
 
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
+  },
+
   onInput(e) {
     this.setData({ amount: e.detail.value }, () => this.recalculate())
   },
 
   recalculate() {
-    this.setData({ result: toRmbUpper(this.data.amount) })
+    this.setData({ result: toRmbUpper(this.data.amount) }, () => lastInput.save(this))
   },
 
   onCopy() {

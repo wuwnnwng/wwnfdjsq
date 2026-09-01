@@ -10,9 +10,22 @@ const {
 const { solarToLunar, formatLunarDate } = require('../../../utils/lunar')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getDatetimeToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
 
 const TIME_LABELS = TIME_UNITS.map((item) => item.name)
 const OFFSET_LABELS = OFFSET_UNITS.map((item) => item.name)
+const lastInput = createLastInput('datetime', [
+  'tab',
+  'inputValue',
+  'fromIndex',
+  'toIndex',
+  'startDate',
+  'endDate',
+  'baseDate',
+  'offsetValue',
+  'offsetUnitIndex',
+  'offsetDirection'
+])
 
 function attachLunar(result) {
   if (!result || !result.valid || !result.date) return result
@@ -53,11 +66,26 @@ Page({
   onLoad() {
     enableShareMenu()
     const today = todayYMD()
+    const saved = lastInput.restore()
+    const fromIndex = Number.isFinite(Number(saved.fromIndex)) ? Number(saved.fromIndex) : this.data.fromIndex
+    const toIndex = Number.isFinite(Number(saved.toIndex)) ? Number(saved.toIndex) : this.data.toIndex
+    const from = TIME_UNITS[fromIndex] || TIME_UNITS[this.data.fromIndex]
+    const to = TIME_UNITS[toIndex] || TIME_UNITS[this.data.toIndex]
     this.setData(
       {
-        startDate: today,
-        endDate: addDaysYMD(today, 30),
-        baseDate: today
+        tab: saved.tab || this.data.tab,
+        inputValue: saved.inputValue != null ? saved.inputValue : this.data.inputValue,
+        fromIndex,
+        toIndex,
+        fromName: from ? from.name : this.data.fromName,
+        toName: to ? to.name : this.data.toName,
+        startDate: saved.startDate || today,
+        endDate: saved.endDate || addDaysYMD(today, 30),
+        baseDate: saved.baseDate || today,
+        offsetValue: saved.offsetValue != null ? saved.offsetValue : this.data.offsetValue,
+        offsetUnitIndex:
+          saved.offsetUnitIndex != null ? Number(saved.offsetUnitIndex) : this.data.offsetUnitIndex,
+        offsetDirection: saved.offsetDirection || this.data.offsetDirection
       },
       () => this.recalculate()
     )
@@ -67,6 +95,14 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   onSwitchTab(e) {
@@ -207,7 +243,7 @@ Page({
       offsetResult: attachLunar(
         addOffset(this.data.baseDate, this.data.offsetValue, offsetUnit.key, this.data.offsetDirection)
       )
-    })
+    }, () => lastInput.save(this))
   },
 
   onShareAppMessage() {

@@ -12,6 +12,7 @@ const { enableShareMenu, getAgeToolShare } = require('../../../utils/share')
 const { createPickerTick } = require('../../../utils/pickerTick')
 const { createConfettiPieces } = require('../../../utils/confetti')
 const { saveResultCard, handleSaveError, drawAgeCard } = require('../../../utils/resultCard')
+const { createLastInput } = require('../../../utils/toolLastInput')
 
 const LUNAR_YEAR_START = 1900
 const LUNAR_YEAR_END = 2100
@@ -53,6 +54,7 @@ function lunarYears() {
 const PICKER_LUNAR_YEARS = lunarYears()
 const SOLAR_YEAR_START = 1900
 const SOLAR_YEAR_END = 2100
+const lastInput = createLastInput('age', ['birthday', 'birthCalendar'])
 
 function compareYMD(a, b) {
   if (!a) return -1
@@ -195,8 +197,17 @@ Page({
   onLoad() {
     enableShareMenu()
     this._pickerTick = createPickerTick()
-    this.syncBirthdayDisplay()
-    this.recalculate()
+    const saved = lastInput.restore()
+    const today = todayYMD()
+    const patch = { today, asOf: today }
+    if (saved.birthday) patch.birthday = saved.birthday
+    if (saved.birthCalendar === 'lunar' || saved.birthCalendar === 'solar') {
+      patch.birthCalendar = saved.birthCalendar
+    }
+    this.setData(patch, () => {
+      this.syncBirthdayDisplay()
+      this.recalculate()
+    })
   },
 
   onShow() {
@@ -494,6 +505,7 @@ Page({
   preventMove() {},
 
   recalculate(options) {
+    lastInput.save(this)
     const result = calculateAge(this.data.birthday, this.data.asOf, {
       birthdayCalendar: this.data.birthCalendar
     })
@@ -550,7 +562,12 @@ Page({
       })
   },
 
+  onHide() {
+    lastInput.flush(this)
+  },
+
   onUnload() {
+    lastInput.flush(this)
     if (this._livedPopupTimer) {
       clearTimeout(this._livedPopupTimer)
       this._livedPopupTimer = null

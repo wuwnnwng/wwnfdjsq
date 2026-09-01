@@ -2,6 +2,9 @@ const { todayYMD, addDaysYMD } = require('../../../utils/datetimeCalc')
 const { calculateSafePeriod } = require('../../../utils/safePeriodCalc')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getSafePeriodToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('safeperiod', ['lastPeriod', 'cycle', 'periodDays'])
 
 Page({
   data: {
@@ -19,13 +22,29 @@ Page({
   onLoad() {
     enableShareMenu()
     const today = todayYMD()
-    this.setData({ lastPeriod: addDaysYMD(today, -8) }, () => this.recalculate())
+    const saved = lastInput.restore()
+    this.setData(
+      {
+        lastPeriod: saved.lastPeriod || addDaysYMD(today, -8),
+        cycle: saved.cycle || this.data.cycle,
+        periodDays: saved.periodDays || this.data.periodDays
+      },
+      () => this.recalculate()
+    )
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   onInput(e) {
@@ -81,7 +100,7 @@ Page({
         periodText: this.data.periodDays,
         asOfText: todayYMD()
       })
-    })
+    }, () => lastInput.save(this))
   },
 
   onShareAppMessage() {

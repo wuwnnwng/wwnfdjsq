@@ -8,10 +8,22 @@ const {
 } = require('../../../utils/incomeTax')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getTaxToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
 
 const MONTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => `${n}月`)
 const INITIAL_GROSS = '15000'
 const INITIAL_INSURANCE = calculateInsurance(INITIAL_GROSS, DEFAULT_INSURANCE_RATES)
+const lastInput = createLastInput('tax', [
+  'tab',
+  'monthIndex',
+  'gross',
+  'additional',
+  'bonus',
+  'pensionRate',
+  'medicalRate',
+  'unemploymentRate',
+  'housingRate'
+])
 
 function currentMonthIndex() {
   return new Date().getMonth()
@@ -52,13 +64,21 @@ Page({
 
   onLoad() {
     enableShareMenu()
-    this.syncInsurance()
+    this.setData(lastInput.restore(), () => this.syncInsurance())
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   preventMove() {},
@@ -127,6 +147,7 @@ Page({
   },
 
   recalculate() {
+    lastInput.save(this)
     if (this.data.tab === 'bonus') {
       this.setData({
         result: null,

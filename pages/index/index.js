@@ -31,6 +31,7 @@ const {
   hasSeenToolsHub,
   markToolsHubSeen
 } = require('../../utils/toolsConfig')
+const { createLastInput } = require('../../utils/toolLastInput')
 
 const FEATURED_TOOLS_OPEN_KEY = 'featuredToolsOpen'
 
@@ -49,6 +50,28 @@ function writeFeaturedToolsOpen(open) {
     wx.setStorageSync(FEATURED_TOOLS_OPEN_KEY, open ? 1 : 0)
   } catch (e) {}
 }
+
+const lastInput = createLastInput('mortgage', [
+  'calcMode',
+  'loanType',
+  'method',
+  'commercialAmount',
+  'commercialYears',
+  'commercialRate',
+  'providentAmount',
+  'providentYears',
+  'providentRate',
+  'originalYears',
+  'firstRepaymentDate',
+  'manualAnnualRate',
+  'monthPrincipal',
+  'monthInterest',
+  'remainingPrincipal',
+  'earlyRepayment',
+  'prepayType',
+  'prepayAmountWan',
+  'adjustMode'
+])
 
 Page({
   data: {
@@ -120,12 +143,12 @@ Page({
     const now = new Date()
     const mm = String(now.getMonth() + 1).padStart(2, '0')
     const dd = String(now.getDate()).padStart(2, '0')
-    this.setData(
-      {
-        firstRepaymentDate: `${now.getFullYear()}-${mm}-${dd}`
-      },
-      () => this.refreshDerived()
-    )
+    const today = `${now.getFullYear()}-${mm}-${dd}`
+    const saved = lastInput.restore()
+    const patch = Object.assign({ firstRepaymentDate: today }, saved)
+    if (patch.loanType) Object.assign(patch, this.loanTypePatch(patch.loanType))
+    patch.hasManualRate = String(patch.manualAnnualRate || '').trim() !== ''
+    this.setData(patch, () => this.refreshDerived())
   },
 
   onShow() {
@@ -169,10 +192,19 @@ Page({
   },
 
   onUnload() {
+    lastInput.flush(this)
     if (this._themeFadeTimer) {
       clearTimeout(this._themeFadeTimer)
       this._themeFadeTimer = null
     }
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  persistForm() {
+    lastInput.save(this)
   },
 
   async refreshLpr() {
@@ -363,6 +395,7 @@ Page({
       ...this.buildFormPatch(input)
     }
     this.setData(patch, () => {
+      this.persistForm()
       if (patch.calcMode === 'remaining') {
         this.refreshDerived()
       }
@@ -449,6 +482,7 @@ Page({
     }
 
     this.setData(patch)
+    this.persistForm()
     if (calcMode === 'remaining') {
       this.refreshDerived()
     }
@@ -461,6 +495,7 @@ Page({
       return
     }
     this.setData(this.loanTypePatch(loanType))
+    this.persistForm()
   },
 
   onMethodChange(e) {
@@ -473,6 +508,7 @@ Page({
       }
     }
     this.setData(patch, () => {
+      this.persistForm()
       if (this.data.calcMode === 'remaining') {
         this.refreshDerived()
       }
@@ -484,6 +520,7 @@ Page({
     this.setData({
       [field]: e.detail.value
     })
+    this.persistForm()
   },
 
   onRemainingInput(e) {
@@ -499,7 +536,10 @@ Page({
       patch.hasManualRate = String(value || '').trim() !== ''
     }
 
-    this.setData(patch, () => this.refreshDerived())
+    this.setData(patch, () => {
+      this.persistForm()
+      this.refreshDerived()
+    })
   },
 
   onOpenFirstDatePicker() {
@@ -517,25 +557,31 @@ Page({
         firstRepaymentDate: value,
         showFirstDatePicker: false
       },
-      () => this.refreshDerived()
+      () => {
+        this.persistForm()
+        this.refreshDerived()
+      }
     )
   },
 
   onEarlyRepaymentToggle(e) {
     const enabled = e.currentTarget.dataset.enabled === '1' || e.currentTarget.dataset.enabled === 1
     this.setData({ earlyRepayment: !!enabled })
+    this.persistForm()
   },
 
   onPrepayTypeChange(e) {
     this.setData({
       prepayType: e.currentTarget.dataset.type
     })
+    this.persistForm()
   },
 
   onAdjustModeChange(e) {
     this.setData({
       adjustMode: e.currentTarget.dataset.mode
     })
+    this.persistForm()
   },
 
   onPrepayAmountInput(e) {
@@ -543,6 +589,7 @@ Page({
     const raw = String(e.detail.value || '')
     const digits = raw.replace(/\D/g, '')
     this.setData({ prepayAmountWan: digits })
+    this.persistForm()
   },
 
   refreshDerived() {

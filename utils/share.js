@@ -352,6 +352,14 @@ function getPensionToolShare() {
   }
 }
 
+function getRetireToolShare() {
+  const path = '/pages/tools/retire/retire'
+  return {
+    appMessage: buildToolShareAppMessage(path, '退休年龄'),
+    timeline: buildToolShareTimeline(path, '退休年龄')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
@@ -640,6 +648,7 @@ module.exports = {
   getDueDateToolShare,
   getSafePeriodToolShare,
   getPensionToolShare,
+  getRetireToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

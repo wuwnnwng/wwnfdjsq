@@ -1,6 +1,9 @@
 const { encodeQr, buildQrContent } = require('../../../utils/qrcode')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getQrcodeToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('qrcode', ['mode', 'urlScheme', 'inputValue'])
 
 const CANVAS_CSS = 280
 const SAVE_FILE = 'qrcode-save.png'
@@ -19,6 +22,14 @@ Page({
 
   onLoad() {
     enableShareMenu()
+    const saved = lastInput.restore()
+    const patch = {}
+    if (saved.mode) patch.mode = saved.mode
+    if (saved.urlScheme) patch.urlScheme = saved.urlScheme
+    if (saved.inputValue != null) patch.inputValue = saved.inputValue
+    if (Object.keys(patch).length) {
+      this.setData(patch, () => this.scheduleGenerate())
+    }
   },
 
   onReady() {
@@ -29,6 +40,14 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   prepareCanvas() {
@@ -72,9 +91,11 @@ Page({
       generating: false
     })
     this._encoded = null
+    lastInput.flush(this)
   },
 
   scheduleGenerate() {
+    lastInput.save(this)
     if (this._timer) clearTimeout(this._timer)
     this._timer = setTimeout(() => {
       this.generate()

@@ -27,7 +27,7 @@ const PAYOUT_MONTHS = {
   70: 56
 }
 
-const RETIRE_AGES = [50, 55, 60, 63, 65]
+const RETIRE_AGES = [50, 55, 58, 60, 63, 65]
 const RESIDENT_RETIRE_AGES = [60, 65]
 const PERSONAL_RATE = 0.08
 const FLEXIBLE_RATE = 0.2

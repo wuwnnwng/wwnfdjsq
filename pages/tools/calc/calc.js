@@ -1,6 +1,7 @@
 const { evaluateScientificExpression } = require('../../../utils/calcEngine')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCalcToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
 
 function buildKeys(keyboardMode, invOn) {
   const switchKey =
@@ -109,6 +110,8 @@ function buildKeys(keyboardMode, invOn) {
   ]
 }
 
+const lastInput = createLastInput('calc', ['keyboardMode', 'invOn', 'expression', 'displayValue'])
+
 Page({
   data: {
     theme: getThemeId(),
@@ -122,12 +125,34 @@ Page({
 
   onLoad() {
     enableShareMenu()
+    const saved = lastInput.restore()
+    const keyboardMode = saved.keyboardMode === 'scientific' ? 'scientific' : 'basic'
+    const invOn = !!saved.invOn
+    this.setData({
+      keyboardMode,
+      invOn,
+      keys: buildKeys(keyboardMode, invOn),
+      expression: saved.expression != null ? saved.expression : '',
+      displayValue: saved.displayValue != null ? saved.displayValue : saved.expression || '0'
+    })
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
+  },
+
+  persistCalc() {
+    lastInput.save(this)
   },
 
   refreshKeys() {
@@ -145,24 +170,33 @@ Page({
     }
     if (action === 'toggleKeyboard') {
       const keyboardMode = this.data.keyboardMode === 'basic' ? 'scientific' : 'basic'
-      this.setData({ keyboardMode }, () => this.refreshKeys())
+      this.setData({ keyboardMode }, () => {
+        this.refreshKeys()
+        this.persistCalc()
+      })
       return
     }
     if (action === 'toggleInv') {
-      this.setData({ invOn: !this.data.invOn }, () => this.refreshKeys())
+      this.setData({ invOn: !this.data.invOn }, () => {
+        this.refreshKeys()
+        this.persistCalc()
+      })
       return
     }
     if (action === 'clear') {
-      this.setData({ expression: '', displayValue: '0', errorText: '' })
+      this.setData({ expression: '', displayValue: '0', errorText: '' }, () => this.persistCalc())
       return
     }
     if (action === 'backspace') {
       const expression = this.data.expression.slice(0, -1)
-      this.setData({
-        expression,
-        displayValue: expression || '0',
-        errorText: ''
-      })
+      this.setData(
+        {
+          expression,
+          displayValue: expression || '0',
+          errorText: ''
+        },
+        () => this.persistCalc()
+      )
       return
     }
     if (action === 'equal') {
@@ -172,11 +206,14 @@ Page({
 
   appendInput(value) {
     const expression = `${this.data.expression}${value}`
-    this.setData({
-      expression,
-      displayValue: expression,
-      errorText: ''
-    })
+    this.setData(
+      {
+        expression,
+        displayValue: expression,
+        errorText: ''
+      },
+      () => this.persistCalc()
+    )
   },
 
   calculate() {
@@ -185,14 +222,14 @@ Page({
       this.setData({
         errorText: result.error || '无法计算',
         displayValue: '错误'
-      })
+      }, () => this.persistCalc())
       return
     }
     this.setData({
       expression: result.value,
       displayValue: result.value,
       errorText: ''
-    })
+    }, () => this.persistCalc())
   },
 
   onShareAppMessage() {

@@ -1,6 +1,9 @@
 const { convertBase, sanitizeBaseInput } = require('../../../utils/converters')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getBaseToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('base', ['baseIndex', 'inputValue'])
 
 const BASE_OPTIONS = [
   { key: 2, label: '二进制', short: 'BIN' },
@@ -25,7 +28,16 @@ Page({
 
   onLoad() {
     enableShareMenu()
-    this.recalculate()
+    const saved = lastInput.restore()
+    if (saved.baseIndex != null) {
+      const index = Number(saved.baseIndex)
+      if (Number.isFinite(index) && index >= 0 && index < BASE_OPTIONS.length) {
+        saved.baseIndex = index
+      } else {
+        delete saved.baseIndex
+      }
+    }
+    this.setData(saved, () => this.recalculate())
   },
 
   onShow() {
@@ -34,7 +46,16 @@ Page({
     applyThemeChrome(theme)
   },
 
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
+  },
+
   recalculate() {
+    lastInput.save(this)
     const base = BASE_OPTIONS[this.data.baseIndex].key
     const result = convertBase(this.data.inputValue, base)
 

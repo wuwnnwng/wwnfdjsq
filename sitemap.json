@@ -109,6 +109,11 @@
     },
     {
       "action": "allow",
+      "page": "pages/tools/retire/retire",
+      "priority": 60
+    },
+    {
+      "action": "allow",
       "page": "pages/tools/base/base",
       "priority": 50
     },

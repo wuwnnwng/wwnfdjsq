@@ -234,6 +234,10 @@
   background: linear-gradient(135deg, #fef3c7, #f59e0b);
 }
 
+.tool-icon-retire {
+  background: linear-gradient(135deg, #e0e7ff, #818cf8);
+}
+
 .tool-card-name {
   font-size: 26rpx;
   font-weight: 600;

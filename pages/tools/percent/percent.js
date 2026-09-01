@@ -1,6 +1,9 @@
 const { percentOf, isPercent, percentChange } = require('../../../utils/percentCalc')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getPercentToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('percent', ['tab', 'base', 'percent', 'part', 'whole', 'fromValue', 'toValue'])
 
 Page({
   data: {
@@ -17,13 +20,21 @@ Page({
 
   onLoad() {
     enableShareMenu()
-    this.recalculate()
+    this.setData(lastInput.restore(), () => this.recalculate())
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   onSwitchTab(e) {
@@ -44,7 +55,7 @@ Page({
     if (tab === 'of') result = percentOf(base, percent)
     else if (tab === 'is') result = isPercent(part, whole)
     else result = percentChange(fromValue, toValue)
-    this.setData({ result })
+    this.setData({ result }, () => lastInput.save(this))
   },
 
   onShareAppMessage() {

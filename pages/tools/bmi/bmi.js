@@ -2,6 +2,9 @@ const { calculateBmi } = require('../../../utils/bmiCalc')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getBmiToolShare } = require('../../../utils/share')
 const { saveResultCard, handleSaveError, drawBmiCard } = require('../../../utils/resultCard')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('bmi', ['height', 'weight'])
 
 Page({
   data: {
@@ -14,13 +17,21 @@ Page({
 
   onLoad() {
     enableShareMenu()
-    this.recalculate()
+    this.setData(lastInput.restore(), () => this.recalculate())
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   onInput(e) {
@@ -30,7 +41,7 @@ Page({
   },
 
   recalculate() {
-    this.setData({ result: calculateBmi(this.data.height, this.data.weight) })
+    this.setData({ result: calculateBmi(this.data.height, this.data.weight) }, () => lastInput.save(this))
   },
 
   onSaveCard() {

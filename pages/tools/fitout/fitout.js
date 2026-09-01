@@ -1,8 +1,10 @@
 const { MATERIALS, calculateFitout } = require('../../../utils/fitout')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getFitoutToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
 
 const TOTAL_KEY = 'fitoutTotalCost'
+const lastInput = createLastInput('fitout', ['type', 'forms', 'includeCeiling'])
 
 const DEFAULTS = {
   tile: { length: '4.2', width: '3.6', tileW: '800', tileH: '800', perBox: '3', loss: '8', price: '' },
@@ -85,7 +87,15 @@ Page({
   onLoad() {
     enableShareMenu()
     const totalCost = readTotalCost()
+    const saved = lastInput.restore()
+    const type = DEFAULTS[saved.type] ? saved.type : 'tile'
+    const forms = saved.forms && typeof saved.forms === 'object' ? saved.forms : {}
+    const form = Object.assign({}, DEFAULTS[type], forms[type] || {})
+    this._forms = Object.assign({}, forms, { [type]: form })
     this.setData({
+      type,
+      form,
+      includeCeiling: form.includeCeiling != null ? !!form.includeCeiling : !!DEFAULTS[type].includeCeiling,
       totalCost,
       totalCostText: formatCost(totalCost)
     })
@@ -96,6 +106,16 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  persistForm() {
+    this._forms = this._forms || {}
+    this._forms[this.data.type] = Object.assign({}, this.data.form)
+    lastInput.save(this, {
+      type: this.data.type,
+      forms: this._forms,
+      includeCeiling: this.data.includeCeiling
+    })
   },
 
   preventMove() {},
@@ -146,7 +166,10 @@ Page({
   },
 
   applyType(type) {
-    const form = Object.assign({}, DEFAULTS[type] || DEFAULTS.tile)
+    this._forms = this._forms || {}
+    this._forms[this.data.type] = Object.assign({}, this.data.form)
+    const form = Object.assign({}, DEFAULTS[type] || DEFAULTS.tile, this._forms[type] || {})
+    this._forms[type] = form
     this._handledSig = ''
     this.setData(
       {
@@ -229,7 +252,20 @@ Page({
       ...form,
       includeCeiling: this.data.includeCeiling
     })
-    this.setData({ result })
+    this.setData({ result }, () => this.persistForm())
+  },
+
+  onHide() {
+    this.persistForm()
+    lastInput.flush(this, {
+      type: this.data.type,
+      forms: this._forms,
+      includeCeiling: this.data.includeCeiling
+    })
+  },
+
+  onUnload() {
+    this.onHide()
   },
 
   onShareAppMessage() {

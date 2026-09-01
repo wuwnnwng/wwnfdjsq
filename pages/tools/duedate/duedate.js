@@ -2,6 +2,9 @@ const { todayYMD } = require('../../../utils/datetimeCalc')
 const { calculateDueDate } = require('../../../utils/dueDateCalc')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getDueDateToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('duedate', ['mode', 'baseDate'])
 
 Page({
   data: {
@@ -20,13 +23,30 @@ Page({
   onLoad() {
     enableShareMenu()
     const today = todayYMD()
-    this.setData({ baseDate: today, asOf: today }, () => this.recalculate())
+    const saved = lastInput.restore()
+    const mode = saved.mode === 'conception' ? 'conception' : 'lmp'
+    this.setData(
+      {
+        mode,
+        baseDate: saved.baseDate || today,
+        asOf: today
+      },
+      () => this.recalculate()
+    )
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   onSwitchMode(e) {
@@ -81,7 +101,7 @@ Page({
         baseDateText: this.data.baseDate,
         asOfText: this.data.asOf
       })
-    })
+    }, () => lastInput.save(this))
   },
 
   onShareAppMessage() {

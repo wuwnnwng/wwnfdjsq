@@ -21,6 +21,7 @@ const {
 } = require('../../../utils/pensionRegionData')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getPensionToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
 
 const RETIRE_LABELS = RETIRE_AGES.map((age) => `${age} 岁`)
 const RESIDENT_RETIRE_LABELS = RESIDENT_RETIRE_AGES.map((age) => `${age} 岁`)
@@ -28,6 +29,35 @@ const RESIDENT_RETIRE_LABELS = RESIDENT_RETIRE_AGES.map((age) => `${age} 岁`)
 const DEFAULT_REGION = getProvince(DEFAULT_PROVINCE_ID)
 const INITIAL_EMPLOYEE = regionFill(DEFAULT_REGION, 'employee')
 const INITIAL_RESIDENT = regionFill(DEFAULT_REGION, 'resident', { annualFee: '2000' })
+const lastInput = createLastInput('pension', [
+  'type',
+  'salary',
+  'average',
+  'years',
+  'returnRate',
+  'annualFee',
+  'subsidy',
+  'basicPension',
+  'retireIndex',
+  'residentRetireIndex'
+])
+
+function nearestIndex(list, value) {
+  const age = Number(value)
+  if (!Array.isArray(list) || !list.length || !Number.isFinite(age)) return 0
+  const exact = list.indexOf(age)
+  if (exact >= 0) return exact
+  let best = 0
+  let bestDiff = Infinity
+  list.forEach((item, index) => {
+    const diff = Math.abs(item - age)
+    if (diff < bestDiff) {
+      bestDiff = diff
+      best = index
+    }
+  })
+  return best
+}
 
 Page({
   data: {
@@ -44,7 +74,7 @@ Page({
     residentGrades: INITIAL_RESIDENT.residentGrades,
     retireAges: RETIRE_AGES,
     retireLabels: RETIRE_LABELS,
-    retireIndex: 2,
+    retireIndex: 3,
     residentRetireLabels: RESIDENT_RETIRE_LABELS,
     residentRetireIndex: 0,
     regionId: DEFAULT_REGION.id,
@@ -57,16 +87,51 @@ Page({
     rangeTipText: ''
   },
 
-  onLoad() {
+  onLoad(options) {
     enableShareMenu()
+    const saved = lastInput.restore()
+    const patch = Object.assign({}, saved)
+    const type = options && options.type
+    if (type === 'employee' || type === 'flexible' || type === 'resident') {
+      patch.type = type
+    }
+    const retireAge = Number(options && options.retireAge)
+    if (Number.isFinite(retireAge) && retireAge > 0) {
+      if (patch.type === 'resident' || type === 'resident') {
+        patch.residentRetireIndex = nearestIndex(RESIDENT_RETIRE_AGES, retireAge)
+      } else {
+        patch.retireIndex = nearestIndex(RETIRE_AGES, retireAge)
+      }
+    }
+    if (patch.retireIndex != null) {
+      const idx = Number(patch.retireIndex)
+      patch.retireIndex = idx >= 0 && idx < RETIRE_AGES.length ? idx : 3
+    }
+    if (patch.residentRetireIndex != null) {
+      const idx = Number(patch.residentRetireIndex)
+      patch.residentRetireIndex = idx >= 0 && idx < RESIDENT_RETIRE_AGES.length ? idx : 0
+    }
     const regionId = readSavedRegionId()
-    this.applyRegion(regionId, { persist: false })
+    const apply = () => this.applyRegion(regionId, { persist: false, snapFee: false, preserve: saved })
+    if (Object.keys(patch).length) {
+      this.setData(patch, apply)
+      return
+    }
+    apply()
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   preventMove() {},
@@ -79,6 +144,12 @@ Page({
       annualFee: this.data.annualFee,
       snapFee: !options || options.snapFee !== false
     })
+    const preserve = options && options.preserve
+    if (preserve) {
+      ;['salary', 'average', 'years', 'returnRate', 'annualFee', 'subsidy', 'basicPension'].forEach((key) => {
+        if (preserve[key] != null && preserve[key] !== '') fill[key] = preserve[key]
+      })
+    }
     this.setData(
       {
         regionId: region.id,
@@ -207,7 +278,7 @@ Page({
         subsidyText: this.data.subsidy,
         basicText: this.data.basicPension
       })
-    })
+    }, () => lastInput.save(this))
   },
 
   onShareAppMessage() {

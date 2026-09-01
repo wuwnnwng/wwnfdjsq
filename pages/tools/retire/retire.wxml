@@ -1,0 +1,142 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll {{result && result.valid ? 'has-save-bar' : ''}}" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-retire">
+            <text class="tool-icon">⏰</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">{{result && result.typeName ? result.typeName : '法定退休'}} · 延迟对照</view>
+            <view class="section-title-row">
+              <view class="conv-title">退休年龄</view>
+              <view class="help-icon" catchtap="onShowTip" aria-role="button" aria-label="计算说明">!</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <block wx:if="{{result && result.valid}}">
+        <view class="hero-metric">
+          <view class="hero-metric-label">{{result.status === 'retired' ? '法定退休日' : result.status === 'today' ? '今天退休' : '将在这天退休'}}</view>
+          <view class="hero-metric-row">
+            <text class="hero-metric-num">{{result.heroText}}</text>
+          </view>
+          <view class="hero-metric-sub">{{result.retireWeekday}} · {{result.heroSub}}</view>
+        </view>
+        <view class="hero-chips">
+          <view class="hero-chip">退休时 {{result.statutoryText}}</view>
+          <view class="hero-chip">{{result.delayText}}</view>
+        </view>
+      </block>
+      <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
+    </view>
+
+    <view class="panel">
+      <view class="type-grid">
+        <view
+          wx:for="{{types}}"
+          wx:key="id"
+          class="type-chip {{type === item.id ? 'active' : ''}}"
+          bindtap="onSwitchType"
+          data-type="{{item.id}}"
+        >
+          <text class="type-chip-name">{{item.name}}</text>
+          <text class="type-chip-kicker">{{item.kicker}}</text>
+        </view>
+      </view>
+      <view class="type-hint">{{typeHint}}</view>
+
+      <view class="field">
+        <text class="field-label">出生年月</text>
+        <view class="field-control">
+          <view class="picker-value" bindtap="onOpenBirthPicker">{{birthDisplay}}</view>
+        </view>
+      </view>
+      <view class="tool-note">对照表按出生年月；具体哪一天退休，按你的出生日顺延到对应月份。</view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">退休测算</view>
+      <view class="info-grid retire-grid">
+        <view class="info-card featured">
+          <view class="info-card-label">{{result.status === 'upcoming' ? '距离法定退休' : result.status === 'today' ? '今天退休' : '已过法定退休'}}</view>
+          <view class="info-card-value">{{result.remainHero}}</view>
+          <view class="info-card-sub">{{result.retireText}} · {{result.retireWeekday}}</view>
+        </view>
+        <view class="info-card">
+          <view class="info-card-label">退休时年龄</view>
+          <view class="info-card-value">{{result.statutoryText}}</view>
+          <view class="info-card-sub">原法定 {{result.originalAge}} 周岁</view>
+        </view>
+        <view class="info-card">
+          <view class="info-card-label">最少缴社保</view>
+          <view class="info-card-value">{{result.contribText}}</view>
+          <view class="info-card-sub">才能按月领养老金</view>
+        </view>
+      </view>
+      <view class="stat-list">
+        <view class="result-row">
+          <view class="result-row-label">身份类型</view>
+          <view class="result-row-value">{{result.typeName}}</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">出生年月</view>
+          <view class="result-row-value">{{result.birthMonthText}}</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">法定退休日</view>
+          <view class="result-row-value">{{result.retireText}} {{result.retireWeekday}}</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">距离退休</view>
+          <view class="result-row-value">{{result.status === 'upcoming' ? result.remainText : result.remainHero}}</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">原法定退休</view>
+          <view class="result-row-value">{{result.originalRetireMonthText}}</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">延迟月数</view>
+          <view class="result-row-value">{{result.delayMonths}} 个月</view>
+        </view>
+        <view class="result-row">
+          <view class="result-row-label">最少缴费年限</view>
+          <view class="result-row-value">{{result.contribText}}</view>
+        </view>
+      </view>
+      <view class="tool-note">{{result.contribHint}}</view>
+      <view class="tool-note">{{result.note}}</view>
+    </view>
+
+    <view class="panel pension-cta-panel" wx:if="{{result && result.valid}}" bindtap="onGoPension">
+      <view class="pension-cta-kicker">算完退休日</view>
+      <view class="pension-cta-title">接着测算能领多少养老金</view>
+      <view class="pension-cta-sub">已按你的身份和退休年龄带入估算页，填缴费基数即可。</view>
+      <view class="pension-cta-btn">去测算养老金</view>
+    </view>
+
+    <view class="save-bar-spacer" wx:if="{{result && result.valid}}"></view>
+  </scroll-view>
+
+  <view class="save-card-bar" wx:if="{{result && result.valid}}">
+    <view class="primary-btn save-card-btn" bindtap="onGoPension">去测算养老金</view>
+  </view>
+
+  <view wx:if="{{showTip}}" class="tip-mask" catchtap="onHideTip" catchtouchmove="preventMove">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">怎么算退休年龄</view>
+      <view class="tip-text">{{result && result.tipText ? result.tipText : '按 2025 年起渐进式延迟法定退休年龄办法估算，结果仅供参考。'}}</view>
+      <view class="tip-confirm" catchtap="onHideTip">知道了</view>
+    </view>
+  </view>
+
+  <date-picker
+    show="{{showDatePicker}}"
+    title="{{datePickerTitle}}"
+    value="{{datePickerValue}}"
+    start="{{datePickerStart}}"
+    end="{{datePickerEnd}}"
+    bindconfirm="onDatePickerConfirm"
+    bindcancel="onHideDatePicker"
+  />
+</view>

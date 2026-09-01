@@ -1,6 +1,18 @@
 const { calculateHouseTax } = require('../../../utils/houseTax')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getHouseTaxToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('housetax', [
+  'tab',
+  'priceWan',
+  'area',
+  'homeSet',
+  'hold',
+  'onlyHome',
+  'pitMethod',
+  'originalWan'
+])
 
 Page({
   data: {
@@ -19,13 +31,21 @@ Page({
 
   onLoad() {
     enableShareMenu()
-    this.recalculate()
+    this.setData(lastInput.restore(), () => this.recalculate())
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   preventMove() {},
@@ -70,7 +90,7 @@ Page({
         pitMethod: this.data.pitMethod,
         originalWan: this.data.originalWan
       })
-    })
+    }, () => lastInput.save(this))
   },
 
   onShareAppMessage() {

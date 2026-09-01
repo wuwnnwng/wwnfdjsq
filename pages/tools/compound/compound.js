@@ -1,6 +1,9 @@
 const { FREQUENCIES, calculateCompound } = require('../../../utils/compoundCalc')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCompoundToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
+
+const lastInput = createLastInput('compound', ['principal', 'rate', 'years', 'monthly', 'frequencyKey'])
 
 Page({
   data: {
@@ -16,13 +19,21 @@ Page({
 
   onLoad() {
     enableShareMenu()
-    this.recalculate()
+    this.setData(lastInput.restore(), () => this.recalculate())
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+  },
+
+  onHide() {
+    lastInput.flush(this)
+  },
+
+  onUnload() {
+    lastInput.flush(this)
   },
 
   onInput(e) {
@@ -38,15 +49,18 @@ Page({
   },
 
   recalculate() {
-    this.setData({
-      result: calculateCompound({
-        principalText: this.data.principal,
-        rateText: this.data.rate,
-        yearsText: this.data.years,
-        frequencyKey: this.data.frequencyKey,
-        monthlyText: this.data.monthly
-      })
-    })
+    this.setData(
+      {
+        result: calculateCompound({
+          principalText: this.data.principal,
+          rateText: this.data.rate,
+          yearsText: this.data.years,
+          frequencyKey: this.data.frequencyKey,
+          monthlyText: this.data.monthly
+        })
+      },
+      () => lastInput.save(this)
+    )
   },
 
   onShareAppMessage() {

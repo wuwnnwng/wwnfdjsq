@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'add_mini_program_tip_seen'
-const AUTO_HIDE_MS = 8000
+const AUTO_HIDE_MS = 30000
 
 function getWindowWidth() {
   try {
@@ -44,16 +44,30 @@ Component({
     }
   },
 
+  pageLifetimes: {
+    show() {
+      this.maybeShow()
+    },
+    hide() {
+      this.pauseWithoutDismiss()
+    }
+  },
+
   methods: {
     maybeShow() {
-      if (this.data.visible || this._shown || hasSeenTip()) return
+      if (this.data.visible || hasSeenTip()) return
       this.layout()
-      this._shown = true
       this.setData({ visible: true })
       setTimeout(() => {
         if (this.data.visible) this.layout()
       }, 50)
+      this.clearHideTimer()
       this._hideTimer = setTimeout(() => this.dismiss(), AUTO_HIDE_MS)
+    },
+
+    pauseWithoutDismiss() {
+      this.clearHideTimer()
+      if (this.data.visible) this.setData({ visible: false })
     },
 
     layout() {

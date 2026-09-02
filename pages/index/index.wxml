@@ -557,4 +557,6 @@
     bindconfirm="onFirstDateConfirm"
     bindcancel="onHideFirstDatePicker"
   />
+
+  <add-mini-tip />
 </view>

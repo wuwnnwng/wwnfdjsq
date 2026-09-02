@@ -2,6 +2,7 @@
   "navigationBarTitleText": "置居试算计算器",
   "disableScroll": true,
   "usingComponents": {
-    "date-picker": "/components/date-picker/date-picker"
+    "date-picker": "/components/date-picker/date-picker",
+    "add-mini-tip": "/components/add-mini-tip/add-mini-tip"
   }
 }

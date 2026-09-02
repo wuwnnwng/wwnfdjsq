@@ -1,0 +1,17 @@
+<view
+  wx:if="{{visible}}"
+  class="add-mini-tip"
+  style="{{wrapStyle}}"
+  catchtap="onDismiss"
+  aria-role="button"
+  aria-label="添加到我的小程序，方便下次查找，点击关闭"
+>
+  <view class="add-mini-tip-arrow" style="{{arrowStyle}}"></view>
+  <view class="add-mini-tip-body">
+    <view class="add-mini-tip-copy">
+      <text class="add-mini-tip-title">添加到我的小程序</text>
+      <text class="add-mini-tip-sub">方便下次查找</text>
+    </view>
+    <view class="add-mini-tip-close" aria-hidden="true">×</view>
+  </view>
+</view>

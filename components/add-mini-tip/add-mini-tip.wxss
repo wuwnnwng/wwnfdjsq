@@ -1,0 +1,92 @@
+.add-mini-tip {
+  position: fixed;
+  z-index: 1300;
+  max-width: 420rpx;
+  overflow: visible;
+  pointer-events: auto;
+  animation: add-mini-tip-in 2.4s ease both;
+}
+
+.add-mini-tip-arrow {
+  position: absolute;
+  top: -8rpx;
+  z-index: 0;
+  width: 18rpx;
+  height: 18rpx;
+  background: var(--color-brand);
+  transform: rotate(45deg);
+  border-radius: 4rpx;
+}
+
+.add-mini-tip-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 18rpx 16rpx 22rpx;
+  border-radius: 18rpx;
+  background: var(--color-brand);
+  box-shadow: 0 12rpx 28rpx var(--color-shadow-strong);
+}
+
+.add-mini-tip-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.add-mini-tip-title,
+.add-mini-tip-sub {
+  color: var(--color-on-brand);
+  line-height: 1.35;
+}
+
+.add-mini-tip-title {
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.add-mini-tip-sub {
+  font-size: 22rpx;
+  opacity: 0.88;
+}
+
+.add-mini-tip-close {
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 34rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--color-on-brand);
+  opacity: 0.72;
+}
+
+@keyframes add-mini-tip-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-8rpx);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  28% {
+    transform: translateY(8rpx);
+  }
+  42% {
+    transform: translateY(0);
+  }
+  58% {
+    transform: translateY(8rpx);
+  }
+  72% {
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

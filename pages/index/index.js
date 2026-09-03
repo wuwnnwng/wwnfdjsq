@@ -30,6 +30,7 @@ const {
 } = require('../../utils/plans')
 const {
   getFeaturedToolPages,
+  flattenFeaturedToolIds,
   getFavoriteToolsKey,
   pickRandomTool,
   hasSeenToolsHub,
@@ -135,11 +136,14 @@ Page({
     showToolsNew: !hasSeenToolsHub(),
     toolsIndicator: getTheme(getThemeId()).principal,
     toolsSwiperCurrent: 0,
+    toolsSwiperAutoplay: readFeaturedToolsOpen(),
+    toolsSwiperKeys: [0],
     showFirstDatePicker: false
   },
 
   onLoad() {
     this._favoriteToolsKey = getFavoriteToolsKey()
+    this._featuredPagesKey = flattenFeaturedToolIds(this.data.featuredToolPages)
     if (consumeShareEnter('pages/index/index')) return
     enableShareMenu()
     this.applyTheme(getThemeId())
@@ -160,28 +164,37 @@ Page({
     if (consumeShareEnter('pages/index/index')) return
     this.applyTheme(getThemeId())
     const favoriteToolsKey = getFavoriteToolsKey()
-    const patch = {
-      showToolsNew: !hasSeenToolsHub(),
-      featuredToolPages: getFeaturedToolPages()
+    const featuredToolPages = getFeaturedToolPages()
+    const pagesKey = flattenFeaturedToolIds(featuredToolPages)
+    const showToolsNew = !hasSeenToolsHub()
+    const patch = {}
+    if (showToolsNew !== this.data.showToolsNew) {
+      patch.showToolsNew = showToolsNew
+    }
+    if (pagesKey !== this._featuredPagesKey) {
+      this._featuredPagesKey = pagesKey
+      patch.featuredToolPages = featuredToolPages
     }
     if (favoriteToolsKey !== this._favoriteToolsKey) {
       this._favoriteToolsKey = favoriteToolsKey
       patch.toolsSwiperCurrent = 0
+      patch.toolsSwiperKeys = [(this.data.toolsSwiperKeys[0] || 0) + 1]
     }
-    const maxIndex = Math.max(0, patch.featuredToolPages.length - 1)
-    if ((patch.toolsSwiperCurrent === undefined ? this.data.toolsSwiperCurrent : patch.toolsSwiperCurrent) > maxIndex) {
-      patch.toolsSwiperCurrent = 0
+    if (this.data.featuredToolsOpen && !this.data.toolsSwiperAutoplay) {
+      patch.toolsSwiperAutoplay = true
     }
-    this.setData(patch)
+    if (Object.keys(patch).length) this.setData(patch)
   },
 
   applyTheme(themeId) {
     const theme = setThemeId(themeId)
     const palette = getTheme(theme)
-    this.setData({
-      theme,
-      toolsIndicator: palette.principal
-    })
+    if (theme !== this.data.theme || this.data.toolsIndicator !== palette.principal) {
+      this.setData({
+        theme,
+        toolsIndicator: palette.principal
+      })
+    }
     applyThemeChrome(theme)
   },
 
@@ -217,6 +230,9 @@ Page({
 
   onHide() {
     lastInput.flush(this)
+    if (this.data.toolsSwiperAutoplay) {
+      this.setData({ toolsSwiperAutoplay: false })
+    }
   },
 
   persistForm() {
@@ -287,12 +303,17 @@ Page({
   onToggleFeaturedTools() {
     const featuredToolsOpen = !this.data.featuredToolsOpen
     writeFeaturedToolsOpen(featuredToolsOpen)
-    this.setData({ featuredToolsOpen })
+    this.setData({
+      featuredToolsOpen,
+      toolsSwiperAutoplay: featuredToolsOpen
+    })
   },
 
   onFeaturedSwiperChange(e) {
     const current = e.detail && e.detail.current
+    const source = e.detail && e.detail.source
     if (typeof current !== 'number' || current === this.data.toolsSwiperCurrent) return
+    if (source && source !== 'autoplay' && source !== 'touch') return
     this.setData({ toolsSwiperCurrent: current })
   },
 

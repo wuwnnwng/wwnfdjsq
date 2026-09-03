@@ -306,7 +306,18 @@ function padFeaturedPage(page, size) {
 }
 
 function isPinnedHomeTool(id) {
-  return HOME_FEATURED_MINI_PROGRAMS.some((item) => item.id === id)
+  return id === 'random' || HOME_FEATURED_MINI_PROGRAMS.some((item) => item.id === id)
+}
+
+function getHomeRandomTool() {
+  return {
+    id: 'random',
+    name: '随机工具',
+    shortName: '随机',
+    icon: '🎲',
+    iconType: 'random',
+    isRandom: true
+  }
 }
 
 function capHomeCarousel(list, max) {
@@ -374,15 +385,14 @@ function withFavoriteState(item, favoriteIds) {
   return Object.assign({}, item, { favorited: ids.has(item.id) })
 }
 
+function flattenFeaturedToolIds(pages) {
+  return (pages || [])
+    .map((page) => (page.tools || []).filter((item) => item && !item.isPad).map((item) => item.id).join(','))
+    .join('|')
+}
+
 function getFeaturedToolPages() {
-  const random = {
-    id: 'random',
-    name: '随机工具',
-    shortName: '随机',
-    icon: '🎲',
-    iconType: 'random',
-    isRandom: true
-  }
+  const random = getHomeRandomTool()
   const extra = ['bmi', 'compound', 'pension', 'duedate', 'safeperiod']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
@@ -392,9 +402,10 @@ function getFeaturedToolPages() {
     .filter(Boolean)
   const used = new Set(favorites.map((item) => item.id))
   const rest = homeMiniPrograms
-    .concat(getFeaturedTools(), extra, random)
+    .concat(getFeaturedTools(), extra)
     .filter((item) => item && !used.has(item.id))
-  const list = capHomeCarousel(favorites.concat(rest))
+  const body = capHomeCarousel(favorites.concat(rest), HOME_CAROUSEL_MAX - 1)
+  const list = body.concat(random)
   const pages = []
   for (let i = 0; i < list.length; i += FEATURED_PAGE_SIZE) {
     const index = i / FEATURED_PAGE_SIZE
@@ -475,6 +486,7 @@ module.exports = {
   groupTools,
   getFeaturedTools,
   getFeaturedToolPages,
+  flattenFeaturedToolIds,
   getFavoriteToolIds,
   getFavoriteToolsKey,
   toggleFavoriteTool,

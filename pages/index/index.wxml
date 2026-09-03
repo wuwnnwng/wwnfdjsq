@@ -21,39 +21,40 @@
     <view class="tools-entry {{featuredToolsOpen ? '' : 'collapsed'}}">
       <view class="tools-main" wx:if="{{featuredToolsOpen}}">
         <view class="tools-swiper-wrap">
-          <swiper
-            class="tools-swiper"
-            current="{{toolsSwiperCurrent}}"
-            circular
-            autoplay
-            interval="4800"
-            duration="420"
-            easing-function="easeOutCubic"
-            bindchange="onFeaturedSwiperChange"
-          >
-            <swiper-item wx:for="{{featuredToolPages}}" wx:for-item="page" wx:key="key">
-              <view class="tools-page">
-                <block wx:for="{{page.tools}}" wx:for-item="item" wx:key="id">
-                  <view wx:if="{{item.isPad}}" class="tools-chip tools-chip-pad"></view>
-                  <view
-                    wx:else
-                    class="tools-chip"
-                    bindtap="onOpenFeaturedTool"
-                    data-id="{{item.id}}"
-                    data-page="{{item.page}}"
-                    data-appid="{{item.miniProgramAppId}}"
-                    aria-role="button"
-                    aria-label="{{item.name}}"
-                  >
-                    <view class="tools-chip-icon tool-icon-{{item.iconType}}">
-                      <text class="tools-chip-emoji">{{item.icon}}</text>
+          <block wx:for="{{toolsSwiperKeys}}" wx:for-item="swiperEpoch" wx:key="*this">
+            <swiper
+              class="tools-swiper"
+              circular
+              autoplay="{{toolsSwiperAutoplay}}"
+              interval="4800"
+              duration="420"
+              easing-function="easeOutCubic"
+              bindchange="onFeaturedSwiperChange"
+            >
+              <swiper-item wx:for="{{featuredToolPages}}" wx:for-item="page" wx:key="key">
+                <view class="tools-page">
+                  <block wx:for="{{page.tools}}" wx:for-item="item" wx:key="id">
+                    <view wx:if="{{item.isPad}}" class="tools-chip tools-chip-pad"></view>
+                    <view
+                      wx:else
+                      class="tools-chip"
+                      bindtap="onOpenFeaturedTool"
+                      data-id="{{item.id}}"
+                      data-page="{{item.page}}"
+                      data-appid="{{item.miniProgramAppId}}"
+                      aria-role="button"
+                      aria-label="{{item.name}}"
+                    >
+                      <view class="tools-chip-icon tool-icon-{{item.iconType}}">
+                        <text class="tools-chip-emoji">{{item.icon}}</text>
+                      </view>
+                      <text class="tools-chip-name">{{item.shortName}}</text>
                     </view>
-                    <text class="tools-chip-name">{{item.shortName}}</text>
-                  </view>
-                </block>
-              </view>
-            </swiper-item>
-          </swiper>
+                  </block>
+                </view>
+              </swiper-item>
+            </swiper>
+          </block>
           <view class="tools-dots" aria-hidden="true">
             <view
               wx:for="{{featuredToolPages}}"

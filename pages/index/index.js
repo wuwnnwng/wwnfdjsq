@@ -1,7 +1,10 @@
 const {
   calculateMortgage,
   calculateRemainingMortgage,
-  deriveRemainingLoanInfo
+  deriveRemainingLoanInfo,
+  isValidLoanYears,
+  MIN_LOAN_YEARS,
+  MAX_LOAN_YEARS
 } = require('../../utils/mortgage')
 const {
   enableShareMenu,
@@ -673,8 +676,7 @@ Page({
   },
 
   isValidYears(years) {
-    const n = Number(years)
-    return Number.isInteger(n) && n >= 1 && n <= 30
+    return isValidLoanYears(years)
   },
 
   validateNewLoan() {
@@ -702,7 +704,7 @@ Page({
         return false
       }
       if (!this.isValidYears(commercialYears)) {
-        wx.showToast({ title: '商贷年限请填 1-30 的整数', icon: 'none' })
+        wx.showToast({ title: `商贷年限请填 ${MIN_LOAN_YEARS}-${MAX_LOAN_YEARS} 的整数`, icon: 'none' })
         return false
       }
       if (!(Number(commercialRate) >= 0)) {
@@ -717,7 +719,7 @@ Page({
         return false
       }
       if (!this.isValidYears(providentYears)) {
-        wx.showToast({ title: '公积金年限请填 1-30 的整数', icon: 'none' })
+        wx.showToast({ title: `公积金年限请填 ${MIN_LOAN_YEARS}-${MAX_LOAN_YEARS} 的整数`, icon: 'none' })
         return false
       }
       if (!(Number(providentRate) >= 0)) {

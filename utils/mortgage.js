@@ -28,7 +28,14 @@ function formatMoneyWithComma(n) {
   return `${withComma}.${decimal}`
 }
 
+const MIN_LOAN_YEARS = 1
+const MAX_LOAN_YEARS = 40
 const METHOD_LIST = ['equalInterest', 'equalPrincipal', 'interestFirst']
+
+function isValidLoanYears(years) {
+  const n = Number(years)
+  return Number.isInteger(n) && n >= MIN_LOAN_YEARS && n <= MAX_LOAN_YEARS
+}
 
 function normalizeMethod(method) {
   return METHOD_LIST.indexOf(method) >= 0 ? method : 'equalInterest'
@@ -348,8 +355,8 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     String(manualRateRaw).trim() !== ''
   const manualAnnualRate = toNumber(manualRateRaw)
 
-  if (!(originalYears >= 1 && originalYears <= 30) || !Number.isInteger(originalYears)) {
-    return { ok: false, message: '首次贷款期限请填 1-30 的整数' }
+  if (!isValidLoanYears(originalYears)) {
+    return { ok: false, message: `首次贷款期限请填 ${MIN_LOAN_YEARS}-${MAX_LOAN_YEARS} 的整数` }
   }
 
   if (!parseDateParts(firstRepaymentDate)) {
@@ -733,6 +740,9 @@ module.exports = {
   calculateLoan,
   calculateLoanByYuan,
   normalizeMethod,
+  isValidLoanYears,
+  MIN_LOAN_YEARS,
+  MAX_LOAN_YEARS,
   METHOD_LIST,
   formatMoney,
   formatMoneyWithComma,

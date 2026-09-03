@@ -27,6 +27,7 @@ const {
 } = require('../../utils/plans')
 const {
   getFeaturedToolPages,
+  getFavoriteToolsKey,
   pickRandomTool,
   hasSeenToolsHub,
   markToolsHubSeen
@@ -135,6 +136,7 @@ Page({
   },
 
   onLoad() {
+    this._favoriteToolsKey = getFavoriteToolsKey()
     if (consumeShareEnter('pages/index/index')) return
     enableShareMenu()
     this.applyTheme(getThemeId())
@@ -154,9 +156,20 @@ Page({
   onShow() {
     if (consumeShareEnter('pages/index/index')) return
     this.applyTheme(getThemeId())
-    this.setData({
-      showToolsNew: !hasSeenToolsHub()
-    })
+    const favoriteToolsKey = getFavoriteToolsKey()
+    const patch = {
+      showToolsNew: !hasSeenToolsHub(),
+      featuredToolPages: getFeaturedToolPages()
+    }
+    if (favoriteToolsKey !== this._favoriteToolsKey) {
+      this._favoriteToolsKey = favoriteToolsKey
+      patch.toolsSwiperCurrent = 0
+    }
+    const maxIndex = Math.max(0, patch.featuredToolPages.length - 1)
+    if ((patch.toolsSwiperCurrent === undefined ? this.data.toolsSwiperCurrent : patch.toolsSwiperCurrent) > maxIndex) {
+      patch.toolsSwiperCurrent = 0
+    }
+    this.setData(patch)
   },
 
   applyTheme(themeId) {

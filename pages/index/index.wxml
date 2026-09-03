@@ -23,6 +23,7 @@
         <view class="tools-swiper-wrap">
           <swiper
             class="tools-swiper"
+            current="{{toolsSwiperCurrent}}"
             circular
             autoplay
             interval="4800"

@@ -28,6 +28,17 @@
           >
             <view class="tool-icon-wrap tool-icon-{{item.iconType}}">
               <text class="tool-icon">{{item.icon}}</text>
+              <view
+                class="tool-fav {{item.favorited ? 'is-on' : ''}}"
+                catchtap="onToggleFavorite"
+                data-id="{{item.id}}"
+                hover-class="none"
+                hover-stop-propagation
+                aria-role="button"
+                aria-label="{{item.favorited ? '取消收藏' : '收藏'}}"
+              >
+                <text class="tool-fav-star">★</text>
+              </view>
             </view>
             <view class="tool-card-name">{{item.name}}</view>
           </view>

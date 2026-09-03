@@ -99,6 +99,7 @@
 }
 
 .tool-icon-wrap {
+  position: relative;
   width: 96rpx;
   height: 96rpx;
   border-radius: 28rpx;
@@ -107,6 +108,43 @@
   justify-content: center;
   margin-bottom: 16rpx;
   box-shadow: 0 10rpx 22rpx rgba(0, 0, 0, 0.12);
+}
+
+.tool-fav {
+  position: absolute;
+  top: -16rpx;
+  right: -16rpx;
+  z-index: 2;
+  width: 52rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-card);
+  border: 1rpx solid var(--color-card-border);
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.16);
+}
+
+.tool-fav:active {
+  transform: scale(0.92);
+}
+
+.tool-fav-star {
+  font-size: 24rpx;
+  line-height: 1;
+  color: var(--color-muted);
+  opacity: 0.72;
+}
+
+.tool-fav.is-on {
+  border-color: rgba(245, 185, 66, 0.55);
+  background: rgba(245, 185, 66, 0.16);
+}
+
+.tool-fav.is-on .tool-fav-star {
+  color: #f5b942;
+  opacity: 1;
 }
 
 .tool-icon {

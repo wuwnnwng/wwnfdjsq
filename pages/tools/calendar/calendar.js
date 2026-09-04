@@ -4,7 +4,11 @@ const {
   todayParts,
   pad2,
   solarToLunar,
-  formatLunarCell
+  lunarToSolar,
+  formatLunarCell,
+  formatLunarYearDate,
+  getLunarMonthOptions,
+  getLunarDayOptions
 } = require('../../../utils/lunar')
 const {
   AUSPICIOUS_EVENTS,
@@ -13,6 +17,7 @@ const {
   buildHuangliDetail
 } = require('../../../utils/almanac')
 const { buildFestivalGroups, getDayFestivalLabel, attachCountdownList } = require('../../../utils/festivals')
+const { getDayHolidayRecord } = require('../../../utils/holidayApi')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCalendarToolShare } = require('../../../utils/share')
 const { createPickerTick } = require('../../../utils/pickerTick')
@@ -41,7 +46,8 @@ const lastInput = createLastInput('calendar', [
   'viewMonth',
   'selectedYear',
   'selectedMonth',
-  'selectedDay'
+  'selectedDay',
+  'pickerCalendar'
 ])
 
 function daysInMonth(year, month) {
@@ -68,6 +74,55 @@ function clampPickerDate(year, month, day) {
 function pickerValueFromDate(year, month, day) {
   const picked = clampPickerDate(year, month, day)
   return [picked.year - PICKER_YEAR_START, picked.month - 1, picked.day - 1]
+}
+
+function solarPickerHint(picked) {
+  const lunar = solarToLunar(picked.year, picked.month, picked.day)
+  return `农历${formatLunarYearDate(lunar)}`
+}
+
+function buildLunarPickerState(solarParts) {
+  const lunar = solarToLunar(solarParts.year, solarParts.month, solarParts.day)
+  const year = Math.min(PICKER_YEAR_END, Math.max(PICKER_YEAR_START, lunar.lunarYear))
+  const months = getLunarMonthOptions(year)
+  let monthIndex = months.findIndex((item) => item.month === lunar.lunarMonth && !!item.isLeap === !!lunar.isLeap)
+  if (monthIndex < 0) monthIndex = months.findIndex((item) => item.month === lunar.lunarMonth)
+  if (monthIndex < 0) monthIndex = 0
+  const month = months[monthIndex]
+  const days = getLunarDayOptions(year, month.month, month.isLeap)
+  const dayIndex = Math.min(days.length - 1, Math.max(0, (lunar.lunarDay || 1) - 1))
+  return {
+    lunarMonths: months,
+    lunarDays: days,
+    lunarPickerValue: [year - PICKER_YEAR_START, monthIndex, dayIndex]
+  }
+}
+
+function lunarPendingToSolar(pending) {
+  const year = Math.min(
+    PICKER_YEAR_END,
+    Math.max(PICKER_YEAR_START, Number(pending && pending.year) || PICKER_YEAR_START)
+  )
+  const months = getLunarMonthOptions(year)
+  const month = months[Math.min(months.length - 1, Math.max(0, Number(pending && pending.monthIndex) || 0))]
+  if (!month) return clampPickerDate(year, 1, 1)
+  const days = getLunarDayOptions(year, month.month, month.isLeap)
+  const day = Math.min(days.length, Math.max(1, (Number(pending && pending.dayIndex) || 0) + 1))
+  const solar = lunarToSolar(year, month.month, day, month.isLeap)
+  return clampPickerDate(solar.year, solar.month, solar.day)
+}
+
+function lunarPickerHint(pending) {
+  const solar = lunarPendingToSolar(pending)
+  return `对应公历 ${solar.year}年${solar.month}月${solar.day}日`
+}
+
+function lunarPendingFromValue(value) {
+  return {
+    year: PICKER_YEARS[value && value[0]] || PICKER_YEAR_START,
+    monthIndex: Number(value && value[1]) || 0,
+    dayIndex: Number(value && value[2]) || 0
+  }
 }
 
 function buildMonthCells(
@@ -121,6 +176,14 @@ function buildMonthCells(
     const isSelected = isSameDate({ year, month, day }, selected)
     const isAuspicious =
       inMonth && month === viewMonth && auspiciousEvent && auspiciousDays.indexOf(day) >= 0
+    const holidayRecord = getDayHolidayRecord(holidayDayMap, year, month, day)
+    const isRestDay = !!(holidayRecord && holidayRecord.holiday)
+    const isWorkDay = !!(
+      holidayRecord &&
+      !holidayRecord.holiday &&
+      (holidayRecord.after || /补班/.test(holidayRecord.name || ''))
+    )
+    const tagFestival = festivalShort === '班' ? '' : festivalShort
 
     cells.push({
       key: formatDateKey(year, month, day),
@@ -131,9 +194,11 @@ function buildMonthCells(
       isToday,
       isSelected,
       isAuspicious,
-      festivalShort,
+      isRestDay,
+      isWorkDay,
+      festivalShort: tagFestival,
       lunarShort,
-      daySub: festivalShort || lunarShort
+      daySub: tagFestival || lunarShort
     })
   }
 
@@ -152,10 +217,15 @@ Page({
     selectedDay: 0,
     pickerDate: '',
     showDatePicker: false,
+    pickerCalendar: 'solar',
+    pickerHint: '',
     pickerYears: PICKER_YEARS,
     pickerMonths: PICKER_MONTHS,
     pickerDays: [],
     datePickerValue: [0, 0, 0],
+    lunarMonths: [],
+    lunarDays: [],
+    lunarPickerValue: [0, 0, 0],
     monthCells: [],
     selectedInfo: null,
     huangliDetail: null,
@@ -200,7 +270,8 @@ Page({
         viewMonth: saved.viewMonth || picked.month,
         selectedYear: picked.year,
         selectedMonth: picked.month,
-        selectedDay: picked.day
+        selectedDay: picked.day,
+        pickerCalendar: saved.pickerCalendar === 'lunar' ? 'lunar' : 'solar'
       },
       () => {
         this.loadFestivalData(picked.year, () => this.refreshCalendarView())
@@ -363,20 +434,76 @@ Page({
     const day = Number(this.data.selectedDay) || 1
     const picked = clampPickerDate(year, month, day)
     this._pendingPickerDate = picked
+    if (this.data.pickerCalendar === 'lunar') {
+      this.openLunarPickerFromSolar(picked)
+      return
+    }
+    this.openSolarPickerFromDate(picked)
+  },
+
+  openSolarPickerFromDate(picked) {
+    this._pendingPickerDate = picked
     this._datePickerReady = false
+    this._syncingPicker = false
     if (this._pickerTick) this._pickerTick.prepare()
     this.setData(
       {
         showDatePicker: true,
+        pickerCalendar: 'solar',
         pickerDays: buildPickerDays(picked.year, picked.month),
-        datePickerValue: pickerValueFromDate(picked.year, picked.month, picked.day)
+        datePickerValue: pickerValueFromDate(picked.year, picked.month, picked.day),
+        pickerHint: solarPickerHint(picked)
       },
       () => {
+        lastInput.save(this)
         setTimeout(() => {
           this._datePickerReady = true
         }, 180)
       }
     )
+  },
+
+  openLunarPickerFromSolar(picked) {
+    const state = buildLunarPickerState(picked)
+    this._pendingLunar = lunarPendingFromValue(state.lunarPickerValue)
+    this._lunarPickerReady = false
+    this._syncingLunarPicker = false
+    if (this._pickerTick) this._pickerTick.prepare()
+    this.setData(
+      {
+        showDatePicker: true,
+        pickerCalendar: 'lunar',
+        lunarMonths: state.lunarMonths,
+        lunarDays: state.lunarDays,
+        lunarPickerValue: state.lunarPickerValue,
+        pickerHint: lunarPickerHint(this._pendingLunar)
+      },
+      () => {
+        lastInput.save(this)
+        setTimeout(() => {
+          this._lunarPickerReady = true
+        }, 180)
+      }
+    )
+  },
+
+  onSwitchPickerCalendar(e) {
+    const next = e.currentTarget.dataset.cal
+    if (next !== 'solar' && next !== 'lunar') return
+    if (next === this.data.pickerCalendar) return
+    if (next === 'lunar') {
+      const solar = this._pendingPickerDate || clampPickerDate(
+        this.data.selectedYear,
+        this.data.selectedMonth,
+        this.data.selectedDay
+      )
+      this.openLunarPickerFromSolar(solar)
+      return
+    }
+    const solar = lunarPendingToSolar(
+      this._pendingLunar || lunarPendingFromValue(this.data.lunarPickerValue)
+    )
+    this.openSolarPickerFromDate(solar)
   },
 
   onDatePickerChange(e) {
@@ -391,6 +518,7 @@ Page({
     if (day > nextDays.length) day = nextDays.length
     const picked = clampPickerDate(year, month, day)
     this._pendingPickerDate = picked
+    const hint = solarPickerHint(picked)
     if (this._syncingPicker) return
     if (this._datePickerReady && this._pickerTick) {
       this._pickerTick.play()
@@ -400,21 +528,76 @@ Page({
       this.setData(
         {
           pickerDays: nextDays,
-          datePickerValue: pickerValueFromDate(picked.year, picked.month, picked.day)
+          datePickerValue: pickerValueFromDate(picked.year, picked.month, picked.day),
+          pickerHint: hint
         },
         () => {
           this._syncingPicker = false
         }
       )
+      return
+    }
+    if (hint !== this.data.pickerHint) {
+      this.setData({ pickerHint: hint })
+    }
+  },
+
+  onLunarPickerChange(e) {
+    const value = (e.detail && e.detail.value) || []
+    const year = PICKER_YEARS[value[0]] || PICKER_YEAR_START
+    const currentMonths = this.data.lunarMonths && this.data.lunarMonths.length
+      ? this.data.lunarMonths
+      : getLunarMonthOptions(year)
+    const nextMonths = getLunarMonthOptions(year)
+    let monthIndex = Math.min(nextMonths.length - 1, Math.max(0, value[1] || 0))
+    if (currentMonths[value[1]] && nextMonths.length === currentMonths.length) {
+      monthIndex = value[1]
+    } else if (currentMonths[value[1]]) {
+      const prev = currentMonths[value[1]]
+      const found = nextMonths.findIndex((item) => item.month === prev.month && !!item.isLeap === !!prev.isLeap)
+      monthIndex = found >= 0 ? found : Math.min(monthIndex, nextMonths.length - 1)
+    }
+    const month = nextMonths[monthIndex]
+    const nextDays = getLunarDayOptions(year, month.month, month.isLeap)
+    const currentDays = this.data.lunarDays && this.data.lunarDays.length ? this.data.lunarDays : nextDays
+    let dayIndex = Math.min(nextDays.length - 1, Math.max(0, value[2] || 0))
+    const yearChanged = year !== (PICKER_YEARS[this.data.lunarPickerValue[0]] || 0)
+    this._pendingLunar = { year, monthIndex, dayIndex }
+    const hint = lunarPickerHint(this._pendingLunar)
+    if (this._syncingLunarPicker) return
+    if (this._lunarPickerReady && this._pickerTick) this._pickerTick.play()
+    if (
+      yearChanged ||
+      nextMonths.length !== currentMonths.length ||
+      nextDays.length !== currentDays.length
+    ) {
+      this._syncingLunarPicker = true
+      this.setData(
+        {
+          lunarMonths: nextMonths,
+          lunarDays: nextDays,
+          lunarPickerValue: [year - PICKER_YEAR_START, monthIndex, dayIndex],
+          pickerHint: hint
+        },
+        () => {
+          this._syncingLunarPicker = false
+        }
+      )
+      return
+    }
+    if (hint !== this.data.pickerHint) {
+      this.setData({ pickerHint: hint })
     }
   },
 
   onConfirmDatePicker() {
-    const picked = this._pendingPickerDate || {
-      year: this.data.selectedYear,
-      month: this.data.selectedMonth,
-      day: this.data.selectedDay
-    }
+    const picked = this.data.pickerCalendar === 'lunar'
+      ? lunarPendingToSolar(this._pendingLunar || lunarPendingFromValue(this.data.lunarPickerValue))
+      : this._pendingPickerDate || {
+          year: this.data.selectedYear,
+          month: this.data.selectedMonth,
+          day: this.data.selectedDay
+        }
     this.applyPickedDate(picked)
   },
 

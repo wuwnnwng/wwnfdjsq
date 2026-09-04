@@ -117,6 +117,45 @@
   text-align: right;
 }
 
+.date-picker-cal-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 8rpx 28rpx 4rpx;
+}
+
+.date-picker-cal-seg {
+  display: flex;
+  padding: 4rpx;
+  border-radius: 999rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+}
+
+.date-picker-cal-item {
+  min-width: 120rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  padding: 0 28rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.date-picker-cal-item.active {
+  color: var(--color-on-brand);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+}
+
+.date-picker-hint {
+  margin: 8rpx 28rpx 0;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
 .date-picker-view {
   width: 100%;
   height: 440rpx;
@@ -218,12 +257,30 @@
 }
 
 .day-cell {
+  position: relative;
   min-height: 80rpx;
   padding: 10rpx 4rpx;
   border-radius: 16rpx;
   background: var(--color-soft);
   border: 1rpx solid transparent;
   box-sizing: border-box;
+}
+
+.day-mark {
+  position: absolute;
+  top: 2rpx;
+  right: 4rpx;
+  font-size: 16rpx;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.day-mark.rest {
+  color: var(--color-accent);
+}
+
+.day-mark.work {
+  color: var(--color-muted);
 }
 
 .day-cell.other-month {

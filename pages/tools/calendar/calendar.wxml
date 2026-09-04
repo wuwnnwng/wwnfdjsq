@@ -69,6 +69,8 @@
               data-day="{{item.day}}"
               data-inmonth="{{item.inMonth}}"
             >
+              <view class="day-mark rest" wx:if="{{item.isRestDay}}">休</view>
+              <view class="day-mark work" wx:if="{{item.isWorkDay}}">班</view>
               <view class="day-num">{{item.day}}</view>
               <view class="day-tag {{item.festivalShort ? 'festival' : ''}}">{{item.daySub}}</view>
             </view>
@@ -240,7 +242,27 @@
         <view class="date-picker-title">选择日期</view>
         <view class="date-picker-action confirm" catchtap="onConfirmDatePicker">确定</view>
       </view>
+      <view class="date-picker-cal-wrap">
+        <view class="date-picker-cal-seg">
+          <view
+            class="date-picker-cal-item {{pickerCalendar === 'solar' ? 'active' : ''}}"
+            catchtap="onSwitchPickerCalendar"
+            data-cal="solar"
+          >
+            公历
+          </view>
+          <view
+            class="date-picker-cal-item {{pickerCalendar === 'lunar' ? 'active' : ''}}"
+            catchtap="onSwitchPickerCalendar"
+            data-cal="lunar"
+          >
+            农历
+          </view>
+        </view>
+      </view>
+      <view class="date-picker-hint" wx:if="{{pickerHint}}">{{pickerHint}}</view>
       <picker-view
+        wx:if="{{pickerCalendar === 'solar'}}"
         class="date-picker-view"
         value="{{datePickerValue}}"
         immediate-change="{{true}}"
@@ -256,6 +278,25 @@
         </picker-view-column>
         <picker-view-column>
           <view class="date-picker-item" wx:for="{{pickerDays}}" wx:key="*this">{{item}}日</view>
+        </picker-view-column>
+      </picker-view>
+      <picker-view
+        wx:else
+        class="date-picker-view"
+        value="{{lunarPickerValue}}"
+        immediate-change="{{true}}"
+        bindchange="onLunarPickerChange"
+        indicator-style="height: 72rpx;"
+        indicator-class="date-picker-indicator"
+      >
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{pickerYears}}" wx:key="*this">{{item}}年</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{lunarMonths}}" wx:key="label">{{item.label}}</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view class="date-picker-item" wx:for="{{lunarDays}}" wx:key="*this">{{item}}</view>
         </picker-view-column>
       </picker-view>
     </view>

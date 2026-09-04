@@ -295,15 +295,6 @@
   text-align: center;
 }
 
-.reward-dialog .reward-qr {
-  display: block;
-  width: 420rpx;
-  max-width: 100%;
-  margin: 28rpx auto 8rpx;
-  border-radius: 16rpx;
-  background: #fff;
-}
-
 .tip-confirm.ghost {
   margin-top: 16rpx;
   color: var(--color-brand);

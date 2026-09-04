@@ -122,8 +122,8 @@
         </view>
         <view class="huangli-ganzhi">
           {{huangliDetail.ganZhiYear}}年 {{huangliDetail.ganZhiMonth}}月 {{huangliDetail.ganZhiDay}}日 · {{huangliDetail.zodiac}}年
+          <text wx:if="{{huangliDetail.solarTerm}}"> · 节气 {{huangliDetail.solarTerm}}</text>
         </view>
-        <view class="huangli-term" wx:if="{{huangliDetail.solarTerm}}">节气 {{huangliDetail.solarTerm}}</view>
 
         <view class="yi-ji-block huangli-yiji">
           <view class="yi-ji-row">
@@ -140,45 +140,117 @@
           </view>
         </view>
 
-        <view class="hl-glance">
-          <view class="hl-glance-card">
-            <view class="hl-glance-label">建除十二神</view>
-            <view class="hl-glance-value">{{huangliDetail.jianChu}}日</view>
-            <view class="hl-glance-sub {{huangliDetail.jianChuLucky ? 'good' : 'bad'}}">
-              {{huangliDetail.jianChuLuckText}} · {{huangliDetail.jianChuDesc}}
+        <view class="hl-sheet">
+          <view class="hl-meta">
+            <view class="hl-meta-cell">
+              <view class="hl-label">五行</view>
+              <view class="hl-value">{{huangliDetail.nayin}}</view>
+            </view>
+            <view class="hl-meta-cell">
+              <view class="hl-label">冲煞</view>
+              <view class="hl-value">{{huangliDetail.chongShaCompact}}</view>
+            </view>
+            <view class="hl-meta-cell">
+              <view class="hl-label">值神</view>
+              <view class="hl-value">{{huangliDetail.tianShen}}</view>
             </view>
           </view>
-          <view class="hl-glance-card">
-            <view class="hl-glance-label">值神</view>
-            <view class="hl-glance-value">{{huangliDetail.tianShen}}</view>
-            <view class="hl-glance-sub {{huangliDetail.tianShenLucky ? 'good' : 'bad'}}">
-              {{huangliDetail.tianShenType}} · {{huangliDetail.tianShenLuckText}}
+
+          <view class="hl-hour">
+            <view class="hl-hour-side">
+              <view class="hl-vtext">
+                <text>时</text><text>辰</text><text>吉</text><text>凶</text>
+              </view>
+            </view>
+            <view class="hl-hour-cols">
+              <view
+                class="hl-hour-col {{item.zhi === selectedHourZhi ? 'is-on' : ''}}"
+                wx:for="{{huangliDetail.hourLuckList}}"
+                wx:key="zhi"
+                bindtap="onSelectHuangliHour"
+                data-zhi="{{item.zhi}}"
+                aria-role="button"
+                aria-label="{{item.label}}{{item.luckText}}"
+              >
+                <view class="hl-hour-gz">
+                  <text>{{item.gan}}</text>
+                  <text>{{item.zhi}}</text>
+                </view>
+                <view class="hl-hour-branch">{{item.zhi}}</view>
+                <view class="hl-hour-luck">{{item.luckText}}</view>
+              </view>
             </view>
           </view>
-          <view class="hl-glance-card">
-            <view class="hl-glance-label">五行</view>
-            <view class="hl-glance-value">{{huangliDetail.wuXing}}</view>
-            <view class="hl-glance-sub">纳音 {{huangliDetail.nayin}}</view>
+
+          <view class="hl-body">
+            <view class="hl-rail hl-rail-left">
+              <view class="hl-vtext">
+                <text>建</text><text>除</text><text>十</text><text>二</text><text>神</text>
+              </view>
+              <view class="hl-rail-value">{{huangliDetail.jianChu}}日</view>
+            </view>
+
+            <view class="hl-mid">
+              <view class="hl-gods">
+                <view class="hl-god-col">
+                  <view class="hl-label">吉神宜趋</view>
+                  <view class="hl-god-list" wx:if="{{huangliDetail.jiShenList.length}}">
+                    <view class="hl-god-item" wx:for="{{huangliDetail.jiShenList}}" wx:key="*this">{{item}}</view>
+                  </view>
+                  <view class="hl-god-empty" wx:else>无</view>
+                </view>
+                <view class="hl-god-col hl-god-center">
+                  <view class="hl-label">今日胎神</view>
+                  <view class="hl-taishen">
+                    <view>{{huangliDetail.taiShenPlace || huangliDetail.taiShen}}</view>
+                    <view wx:if="{{huangliDetail.taiShenDir}}">{{huangliDetail.taiShenDir}}</view>
+                  </view>
+                </view>
+                <view class="hl-god-col">
+                  <view class="hl-label">凶神宜忌</view>
+                  <view class="hl-god-list" wx:if="{{huangliDetail.xiongShaList.length}}">
+                    <view class="hl-god-item" wx:for="{{huangliDetail.xiongShaList}}" wx:key="*this">{{item}}</view>
+                  </view>
+                  <view class="hl-god-empty" wx:else>无</view>
+                </view>
+              </view>
+              <view class="hl-pengzu">
+                <view class="hl-label">彭祖百忌</view>
+                <view class="hl-pengzu-text">{{huangliDetail.pengzuText}}</view>
+              </view>
+            </view>
+
+            <view class="hl-rail hl-rail-right">
+              <view class="hl-vtext">
+                <text>二</text><text>十</text><text>八</text><text>星</text><text>宿</text>
+              </view>
+              <view class="hl-rail-star">
+                <view class="hl-rail-value">{{huangliDetail.xiuFull}}</view>
+                <view class="hl-rail-sub">宿星</view>
+              </view>
+            </view>
           </view>
-          <view class="hl-glance-card">
-            <view class="hl-glance-label">冲煞</view>
-            <view class="hl-glance-value">冲{{huangliDetail.chongAnimal}}</view>
-            <view class="hl-glance-sub">{{huangliDetail.chong}} · {{huangliDetail.shaText}}</view>
+        </view>
+
+        <view class="hl-hour-detail" wx:if="{{selectedHour}}">
+          <view class="hl-hour-detail-kicker">所选时辰</view>
+          <view class="hl-hour-detail-row">
+            <view class="hl-hour-detail-main">
+              {{selectedHour.label}} {{selectedHour.range}}
+              <text class="hl-now-dot" wx:if="{{selectedHour.isNow}}">当前</text>
+            </view>
+            <view class="hl-hour-detail-luck {{selectedHour.lucky ? 'good' : 'bad'}}">
+              {{selectedHour.luckText}} · {{selectedHour.deity}}
+            </view>
           </view>
-          <view class="hl-glance-card">
-            <view class="hl-glance-label">今日胎神</view>
-            <view class="hl-glance-value hl-glance-value-sm">{{huangliDetail.taiShen}}</view>
-            <view class="hl-glance-sub">动土安床宜避此方</view>
-          </view>
-          <view class="hl-glance-card">
-            <view class="hl-glance-label">二十八星宿</view>
-            <view class="hl-glance-value">{{huangliDetail.xiuFull}}</view>
-            <view class="hl-glance-sub {{huangliDetail.xiuLucky ? 'good' : 'bad'}}">{{huangliDetail.xiuLuckText}}宿</view>
-          </view>
+          <view class="hl-hour-detail-hint">点按上表时辰可切换，查看黄道十二神与时段</view>
         </view>
 
         <view class="huangli-section">
           <view class="huangli-section-title">建除十二神</view>
+          <view class="jianchu-note {{huangliDetail.jianChuLucky ? 'good' : 'bad'}}">
+            {{huangliDetail.jianChu}}日 · {{huangliDetail.jianChuLuckText}} · {{huangliDetail.jianChuDesc}}
+          </view>
           <view class="jianchu-grid">
             <view
               class="jianchu-item {{item.active ? 'active' : ''}} {{item.lucky ? 'lucky' : 'unlucky'}}"
@@ -191,64 +263,30 @@
           </view>
         </view>
 
-        <view class="hl-block">
-          <view class="hl-block-label">彭祖百忌</view>
-          <view class="hl-block-line" wx:for="{{huangliDetail.pengzuLines}}" wx:key="*this">{{item}}</view>
-        </view>
-
         <view class="huangli-section">
-          <view class="huangli-section-head" bindtap="onToggleHuangliSection" data-key="hourLuck">
-            <view class="huangli-section-title">时辰吉凶</view>
-            <text class="festival-section-arrow">{{huangliSectionOpen.hourLuck ? '收起详情' : '查看详情'}}</text>
-          </view>
-          <view class="hour-now-bar" wx:if="{{huangliDetail.currentHour}}">
-            <view class="hour-now-main">
-              当前 {{huangliDetail.currentHour.label}} {{huangliDetail.currentHour.range}}
+          <view class="huangli-section-title">日神备注</view>
+          <view class="hl-note-list">
+            <view class="hl-note-row">
+              <view class="hl-note-label">值神</view>
+              <view class="hl-note-value">{{huangliDetail.tianShen}} · {{huangliDetail.tianShenType}} · {{huangliDetail.tianShenLuckText}}</view>
             </view>
-            <view class="hour-now-luck {{huangliDetail.currentHour.lucky ? 'good' : 'bad'}}">
-              {{huangliDetail.currentHour.luckText}} · {{huangliDetail.currentHour.deity}}
+            <view class="hl-note-row">
+              <view class="hl-note-label">星宿</view>
+              <view class="hl-note-value">{{huangliDetail.xiuFull}} · {{huangliDetail.xiuLuckText}}宿</view>
             </view>
-          </view>
-          <view class="hour-chips">
-            <view
-              class="hour-chip {{item.lucky ? 'lucky' : 'unlucky'}} {{item.isNow ? 'now' : ''}}"
-              wx:for="{{huangliDetail.hourLuckList}}"
-              wx:key="zhi"
-            >
-              {{item.zhi}}{{item.luckText}}
+            <view class="hl-note-row">
+              <view class="hl-note-label">纳音</view>
+              <view class="hl-note-value">{{huangliDetail.nayin}} · 属{{huangliDetail.wuXing}}</view>
             </view>
-          </view>
-          <view class="hour-grid" wx:if="{{huangliSectionOpen.hourLuck}}">
-            <view
-              class="hour-item {{item.lucky ? 'lucky' : 'unlucky'}} {{item.isNow ? 'now' : ''}}"
-              wx:for="{{huangliDetail.hourLuckList}}"
-              wx:key="zhi"
-            >
-              <view class="hour-top">
-                <view class="hour-label">{{item.label}}</view>
-                <view class="hour-luck">{{item.luckText}}</view>
-              </view>
-              <view class="hour-range">{{item.range}}</view>
-              <view class="hour-deity">{{item.deity}}</view>
-              <view class="hour-now-tag" wx:if="{{item.isNow}}">当前</view>
+            <view class="hl-note-row">
+              <view class="hl-note-label">冲煞</view>
+              <view class="hl-note-value">{{huangliDetail.chongShaText}}</view>
+            </view>
+            <view class="hl-note-row">
+              <view class="hl-note-label">胎神</view>
+              <view class="hl-note-value">{{huangliDetail.taiShen}}</view>
             </view>
           </view>
-        </view>
-
-        <view class="huangli-section">
-          <view class="huangli-section-title">吉神宜趋</view>
-          <view class="hl-tags" wx:if="{{huangliDetail.jiShenList.length}}">
-            <view class="hl-tag good" wx:for="{{huangliDetail.jiShenList}}" wx:key="*this">{{item}}</view>
-          </view>
-          <view class="hl-empty" wx:else>今日无特别吉神</view>
-        </view>
-
-        <view class="huangli-section">
-          <view class="huangli-section-title">凶神宜忌</view>
-          <view class="hl-tags" wx:if="{{huangliDetail.xiongShaList.length}}">
-            <view class="hl-tag bad" wx:for="{{huangliDetail.xiongShaList}}" wx:key="*this">{{item}}</view>
-          </view>
-          <view class="hl-empty" wx:else>今日无特别凶神</view>
         </view>
 
         <view class="hl-footnote">宜忌依《协纪辨方书》铺注，星宿按日支配星期，仅供生活查阅，不作专业择日依据。</view>

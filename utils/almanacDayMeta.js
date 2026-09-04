@@ -191,6 +191,18 @@ function getXiuByZhiWeek(zhi, week) {
   return row[idx]
 }
 
+function splitTaiShen(text) {
+  const raw = text || ''
+  const matched = raw.match(/(正[东南西北]|东南|西南|西北|东北|房内[中北南西东])$/)
+  if (!matched) {
+    return { taiShenPlace: raw, taiShenDir: '' }
+  }
+  return {
+    taiShenPlace: raw.slice(0, raw.length - matched[1].length),
+    taiShenDir: matched[1]
+  }
+}
+
 function attachFlagGods(xiong, flags) {
   const list = xiong.slice()
   if (!flags) return list
@@ -297,6 +309,8 @@ function buildDayMeta(ganZhiDay, monthZhiIndex, _lunar, solar, flags) {
   const gods = buildDayGods(monthZhiIndex, ganZhiDay)
   const pengzuGan = PENGZU_GAN_TEXT[gan] || ''
   const pengzuZhi = PENGZU_ZHI_TEXT[zhi] || ''
+  const taiShen = TAI_SHEN[idx60] || ''
+  const taiShenParts = splitTaiShen(taiShen)
 
   return {
     nayin,
@@ -307,11 +321,14 @@ function buildDayMeta(ganZhiDay, monthZhiIndex, _lunar, solar, flags) {
     sha,
     shaText: `煞${sha}`,
     chongShaText: `冲${chongAnimal}(${chong}) 煞${sha}`,
+    chongShaCompact: `冲${chongAnimal}煞${sha}`,
     tianShen,
     tianShenType: tianShenLucky ? '黄道' : '黑道',
     tianShenLucky,
     tianShenLuckText: tianShenLucky ? '吉' : '凶',
-    taiShen: TAI_SHEN[idx60] || '',
+    taiShen,
+    taiShenPlace: taiShenParts.taiShenPlace,
+    taiShenDir: taiShenParts.taiShenDir,
     xiu,
     xiuFull: `${xiu}${XIU_ELEM[xiuIndex]}${XIU_BEAST[xiuIndex]}`,
     xiuLucky,

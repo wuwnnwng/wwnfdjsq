@@ -11,7 +11,6 @@ const {
   isShareLanding
 } = require('../../utils/share')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
-const { getRewardQrPath, saveRewardQrToAlbum } = require('../../utils/reward')
 const {
   MAX_PLANS,
   NAME_MAX_LEN,
@@ -92,7 +91,6 @@ Page({
     visibleSchedule: [],
     fullSchedule: [],
     showSplitTip: false,
-    showRewardTip: false,
     showSavePlanTip: false,
     showInterestPopup: false,
     interestPopup: {
@@ -106,7 +104,6 @@ Page({
     confettiPieces: [],
     planNameDraft: '',
     planNameMaxLen: NAME_MAX_LEN,
-    rewardQrPath: getRewardQrPath(),
     fromShare: false,
     canExport: false,
     splitDetail: {
@@ -467,18 +464,6 @@ Page({
     }
     this.setData({ showSavePlanTip: false })
     wx.showToast({ title: '方案已保存', icon: 'success' })
-  },
-
-  onShowRewardTip() {
-    this.setData({ showRewardTip: true })
-  },
-
-  onHideRewardTip() {
-    this.setData({ showRewardTip: false })
-  },
-
-  onSaveRewardQr() {
-    saveRewardQrToAlbum()
   },
 
   onShow() {

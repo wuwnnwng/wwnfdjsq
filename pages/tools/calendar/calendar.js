@@ -246,9 +246,8 @@ Page({
       terms: false,
       popular: false
     },
-    huangliSectionOpen: {
-      hourLuck: false
-    },
+    selectedHourZhi: '',
+    selectedHour: null,
     showHuangliTip: false
   },
 
@@ -379,8 +378,16 @@ Page({
     })
     const almanac = getAlmanac(selectedYear, selectedMonth, selectedDay)
     const huangliDetail = buildHuangliDetail(dayInfo, new Date())
+    const hourList = huangliDetail.hourLuckList || []
+    let selectedHourZhi = this.data.selectedHourZhi
+    if (!selectedHourZhi) {
+      selectedHourZhi = (huangliDetail.currentHour && huangliDetail.currentHour.zhi) || '子'
+    }
+    const selectedHour = hourList.find((item) => item.zhi === selectedHourZhi) || hourList[0] || null
 
     this.setData({
+      selectedHourZhi,
+      selectedHour,
       monthCells: buildMonthCells(
         viewYear,
         viewMonth,
@@ -709,7 +716,8 @@ Page({
         viewMonth: today.month,
         selectedYear: today.year,
         selectedMonth: today.month,
-        selectedDay: today.day
+        selectedDay: today.day,
+        selectedHourZhi: ''
       },
       () => this.refreshCalendarView()
     )
@@ -747,12 +755,15 @@ Page({
     })
   },
 
-  onToggleHuangliSection(e) {
-    const key = e.currentTarget.dataset.key
-    if (!key) return
-    const open = this.data.huangliSectionOpen[key]
+  onSelectHuangliHour(e) {
+    const zhi = e.currentTarget.dataset.zhi
+    if (!zhi) return
+    const list = (this.data.huangliDetail && this.data.huangliDetail.hourLuckList) || []
+    const selectedHour = list.find((item) => item.zhi === zhi)
+    if (!selectedHour) return
     this.setData({
-      [`huangliSectionOpen.${key}`]: !open
+      selectedHourZhi: zhi,
+      selectedHour
     })
   },
 

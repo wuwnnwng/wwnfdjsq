@@ -218,8 +218,30 @@ function getCurrentHourZhiIndex(date) {
   return Math.floor((hour + 1) / 2)
 }
 
+/** 五鼠遁：甲己还加甲，乙庚丙作初，丙辛从戊起，丁壬庚子居，戊癸何方发壬子是真途 */
+const HOUR_GAN_START = {
+  甲: 0,
+  己: 0,
+  乙: 2,
+  庚: 2,
+  丙: 4,
+  辛: 4,
+  丁: 6,
+  壬: 6,
+  戊: 8,
+  癸: 8
+}
+const HOUR_GAN = '甲乙丙丁戊己庚辛壬癸'
+
+function getHourGan(dayGan, zhiIdx) {
+  const start = HOUR_GAN_START[dayGan] || 0
+  return HOUR_GAN.charAt((start + zhiIdx) % 10)
+}
+
 function buildHourLuckList(year, month, day, now) {
-  const dayZhi = getGanZhiDay(year, month, day).charAt(1)
+  const ganZhiDay = getGanZhiDay(year, month, day)
+  const dayGan = ganZhiDay.charAt(0)
+  const dayZhi = ganZhiDay.charAt(1)
   const qingLongZhi = QING_LONG_HOUR_BY_DAY[dayZhi] || '子'
   const start = '子丑寅卯辰巳午未申酉戌亥'.indexOf(qingLongZhi)
   const currentZhi = now ? getCurrentHourZhiIndex(now) : -1
@@ -227,8 +249,11 @@ function buildHourLuckList(year, month, day, now) {
   return HOUR_SLOTS.map((slot, zhiIdx) => {
     const deity = HOUR_DEITIES[(zhiIdx - start + 12) % 12]
     const lucky = !!LUCKY_HOUR_DEITIES[deity]
+    const gan = getHourGan(dayGan, zhiIdx)
     return {
+      gan,
       zhi: slot.zhi,
+      ganZhi: gan + slot.zhi,
       label: slot.label,
       range: slot.range,
       deity,

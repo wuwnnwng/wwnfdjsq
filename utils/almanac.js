@@ -62,8 +62,24 @@ const LUCKY_HOUR_DEITIES = {
   司命: true
 }
 
-/** 时神起例：子午、丑未、寅申、卯酉、辰戌、巳亥同局，与日值神同一张偏移表 */
-const HOUR_TIAN_SHEN_OFFSET = [4, 2, 0, 10, 8, 6, 4, 2, 0, 10, 8, 6]
+/**
+ * 时辰青龙所在：六冲同局（子午、丑未、寅申、卯酉、辰戌、巳亥）
+ * 巳亥日午时起青龙，故辛巳日：巳时勾陈（凶）、未时明堂（吉）
+ */
+const QING_LONG_HOUR_BY_DAY = {
+  子: '申',
+  午: '申',
+  丑: '戌',
+  未: '戌',
+  寅: '子',
+  申: '子',
+  卯: '寅',
+  酉: '寅',
+  辰: '辰',
+  戌: '辰',
+  巳: '午',
+  亥: '午'
+}
 
 const YANG_GONG_DAYS = [
   [1, 13],
@@ -181,12 +197,13 @@ function getCurrentHourZhiIndex(date) {
 }
 
 function buildHourLuckList(year, month, day, now) {
-  const dayZhiIndex = getDayZhiIndex(year, month, day)
-  const offset = HOUR_TIAN_SHEN_OFFSET[dayZhiIndex] || 0
+  const dayZhi = getGanZhiDay(year, month, day).charAt(1)
+  const qingLongZhi = QING_LONG_HOUR_BY_DAY[dayZhi] || '子'
+  const start = '子丑寅卯辰巳午未申酉戌亥'.indexOf(qingLongZhi)
   const currentZhi = now ? getCurrentHourZhiIndex(now) : -1
 
   return HOUR_SLOTS.map((slot, zhiIdx) => {
-    const deity = HOUR_DEITIES[(zhiIdx + offset) % 12]
+    const deity = HOUR_DEITIES[(zhiIdx - start + 12) % 12]
     const lucky = !!LUCKY_HOUR_DEITIES[deity]
     return {
       zhi: slot.zhi,

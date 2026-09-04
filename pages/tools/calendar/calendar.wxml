@@ -245,7 +245,7 @@
           <view class="hl-empty" wx:else>今日无特别凶神</view>
         </view>
 
-        <view class="hl-footnote">内容按民间通书规则整理，仅供生活查阅，不作专业择日依据。</view>
+        <view class="hl-footnote">宜忌依《协纪辨方书》铺注，星宿按日支配星期，仅供生活查阅，不作专业择日依据。</view>
       </view>
     </view>
 
@@ -379,7 +379,7 @@
     <view class="tip-dialog" catchtap="preventMove">
       <view class="tip-title">黄历怎么看</view>
       <view class="tip-text tip-single">
-        宜忌看今日能做什么；冲煞看生肖与方位；胎神供动土安床回避；时辰看什么时候更合适。建除、值神、五行、星宿和神煞为通书日值，仅供生活参考。
+        宜忌按《协纪辨方书》神煞铺注；二十八宿按日支与星期轮值。冲煞看生肖与方位，胎神供动土安床回避，时辰看黄道十二神。内容仅供生活参考。
       </view>
       <view class="tip-confirm" bindtap="onHideHuangliTip">我知道了</view>
     </view>

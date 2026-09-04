@@ -1,8 +1,9 @@
 /**
- * 黄历：建除十二神、宜忌、吉日筛选（离线规则，仅供参考）
+ * 黄历：建除十二神、协纪辨方书宜忌、吉日筛选（离线规则，仅供参考）
  */
 const { getGanZhiDay, solarToLunar, getSolarTermDate, getJieMonthZhiIndex } = require('./lunar')
 const { buildDayMeta } = require('./almanacDayMeta')
+const { buildXieJiYiJi } = require('./almanacYiJi')
 
 const JIAN_CHU = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭']
 
@@ -60,86 +61,6 @@ const LUCKY_HOUR_DEITIES = {
   司命: true
 }
 
-/** 通胜建除用事（事项名与手机黄历、中华万年历常用口径一致） */
-const JIAN_CHU_YI_JI = {
-  建: {
-    yi: '出行 上任 会亲友 上书 见贵 求职 开市 交易 立券 纳财 栽种 牧养 开光 求嗣 祭祀 祈福 嫁娶 订盟 入学',
-    ji: '动土 破土 开仓 乘船 安葬 行丧 盖屋 作灶 安门 开渠'
-  },
-  除: {
-    yi: '解除 沐浴 整容 剃头 理发 求医 治病 扫舍 破屋 坏垣 拆卸 出货 开市 交易 祭祀 祈福',
-    ji: '嫁娶 入宅 远行 出行 栽种 安葬 移徙 开业 搬家 立券'
-  },
-  满: {
-    yi: '祭祀 祈福 开光 求嗣 嫁娶 订盟 纳采 开市 立券 交易 纳财 栽种 牧养 开仓 入宅 会亲友',
-    ji: '破土 安葬 行丧 服药 针灸 出师 求医 盖屋'
-  },
-  平: {
-    yi: '修饰垣墙 平治道涂 修造 装修 补垣 塞穴 拆卸 开池 祭祀 扫舍 栽种',
-    ji: '开市 交易 嫁娶 破土 安葬 出行 开业 入宅 立券 搬家'
-  },
-  定: {
-    yi: '订盟 纳采 嫁娶 祭祀 祈福 求嗣 开光 开市 立券 交易 纳财 栽种 牧养 开业 安床 会亲友',
-    ji: '词讼 诉讼 出行 求医 安葬 行丧 破土 开仓 乘船'
-  },
-  执: {
-    yi: '捕捉 畋猎 取鱼 结网 纳财 栽种 牧养 订盟 纳采 开仓 纳畜 进人口 会亲友 祭祀',
-    ji: '搬家 远行 开市 破土 安葬 出行 入宅 开业 嫁娶 移徙'
-  },
-  破: {
-    yi: '破屋 坏垣 求医 治病 解除 拆卸 扫舍 沐浴',
-    ji: '嫁娶 订盟 出行 开市 开业 入宅 安葬 立券 交易 栽种 搬家 求嗣'
-  },
-  危: {
-    yi: '祭祀 祈福 安床 入殓 移柩 成服 除服 纳畜 栽种 牧养',
-    ji: '登高 行船 乘船 嫁娶 开市 出行 开业 入宅 立券 搬家'
-  },
-  成: {
-    yi: '嫁娶 开业 入学 交易 求嗣 出行 入宅 移徙 开市 立券 纳财 栽种 牧养 订盟 纳采 祭祀 祈福 搬家 开光',
-    ji: '诉讼 词讼 破土 安葬 行丧 开仓 掘井 乘船'
-  },
-  收: {
-    yi: '纳畜 进人口 入学 开仓 纳财 捕捉 畋猎 牧养 栽种 祭祀 祈福 入宅 安床',
-    ji: '开业 求医 出行 安葬 开市 嫁娶 破土 搬家 立券 开光'
-  },
-  开: {
-    yi: '开业 出行 嫁娶 搬家 求嗣 入宅 移徙 开市 立券 交易 纳财 祭祀 祈福 开光 上任 入学 会亲友',
-    ji: '安葬 破土 伐木 行丧 开生坟 合寿木 入殓 乘船'
-  },
-  闭: {
-    yi: '筑堤 补垣 塞穴 安葬 破土 入殓 移柩 成服 除服 纳畜 祭祀',
-    ji: '开业 出行 嫁娶 开市 入宅 开光 上任 求嗣 搬家 立券 交易 栽种'
-  }
-}
-
-const PENGZU_GAN = {
-  甲: ['开仓', '出货'],
-  乙: ['栽种', '纳畜'],
-  丙: ['作灶'],
-  丁: ['剃头', '理发', '整容'],
-  戊: ['耕种'],
-  己: ['立券', '交易'],
-  庚: ['经络'],
-  辛: ['酝酿'],
-  壬: ['开渠', '穿井', '乘船', '行船'],
-  癸: ['词讼', '诉讼']
-}
-
-const PENGZU_ZHI = {
-  子: ['问卜'],
-  丑: ['冠带'],
-  寅: ['祭祀', '祈福'],
-  卯: ['穿井', '掘井'],
-  辰: ['哭泣', '行丧'],
-  巳: ['远行', '出行'],
-  午: ['苫盖', '盖屋'],
-  未: ['服药', '求医', '治病'],
-  申: ['安床'],
-  酉: ['会亲友'],
-  戌: ['吃犬'],
-  亥: ['嫁娶', '纳采']
-}
-
 const YANG_GONG_DAYS = [
   [1, 13],
   [2, 11],
@@ -158,47 +79,18 @@ const YANG_GONG_DAYS = [
 
 const SI_JUE_TERMS = [2, 8, 14, 20]
 const SI_LI_TERMS = [5, 11, 17, 23]
-const YUE_PO_EXTRA_JI = ['修造', '动土', '嫁娶', '开市', '安葬', '移徙', '入宅', '开业']
 
-function splitYiJiItems(text) {
-  if (Array.isArray(text)) return text.filter(Boolean)
-  return String(text || '')
-    .split(/[\s、,，]+/)
-    .filter(Boolean)
-}
-
-function uniqueYiJiItems(list) {
-  const seen = {}
-  const out = []
-  list.forEach((item) => {
-    if (!item || seen[item]) return
-    seen[item] = true
-    out.push(item)
-  })
-  return out
-}
-
-function mergeYiJi(parts) {
-  let yi = []
-  let ji = []
-  parts.forEach((part) => {
-    if (!part) return
-    yi = yi.concat(splitYiJiItems(part.yi))
-    ji = ji.concat(splitYiJiItems(part.ji))
-  })
-  yi = uniqueYiJiItems(yi)
-  ji = uniqueYiJiItems(ji)
-  const jiSet = {}
-  ji.forEach((item) => {
-    jiSet[item] = true
-  })
-  yi = yi.filter((item) => !jiSet[item])
-  return {
-    yi,
-    ji,
-    yiText: yi.join('、'),
-    jiText: ji.join('、')
-  }
+const EVENT_ACTS = {
+  marriage: ['嫁娶'],
+  travel: ['出行'],
+  move: ['移徙', '入宅'],
+  alliance: ['结婚姻', '纳采'],
+  haircut: ['剃头'],
+  business: ['开市'],
+  contract: ['立券', '交易'],
+  renovation: ['修造', '动土'],
+  pray: ['祈福'],
+  medical: ['求医']
 }
 
 const AUSPICIOUS_EVENTS = [
@@ -243,25 +135,13 @@ function isYuePoDay(year, month, day) {
   return dayZhi === (monthZhi + 6) % 12
 }
 
-function pengzuForbidden(gan, zhi) {
-  return uniqueYiJiItems([].concat(PENGZU_GAN[gan] || [], PENGZU_ZHI[zhi] || []))
-}
-
-function buildTongShuYiJi(year, month, day, jianChu, ganZhi, lunar) {
-  if (isYangGongDay(lunar) || isSiJueDay(year, month, day) || isSiLiDay(year, month, day)) {
-    return {
-      yi: ['余事勿取'],
-      ji: ['诸事不宜'],
-      yiText: '余事勿取',
-      jiText: '诸事不宜'
-    }
+function getDayFlags(year, month, day, lunar) {
+  return {
+    yangGong: isYangGongDay(lunar),
+    siJue: isSiJueDay(year, month, day),
+    siLi: isSiLiDay(year, month, day),
+    yuePo: isYuePoDay(year, month, day)
   }
-
-  const base = JIAN_CHU_YI_JI[jianChu] || { yi: '', ji: '' }
-  const gan = ganZhi.charAt(0)
-  const zhi = ganZhi.charAt(1)
-  const extraJi = pengzuForbidden(gan, zhi).concat(isYuePoDay(year, month, day) ? YUE_PO_EXTRA_JI : [])
-  return mergeYiJi([{ yi: base.yi, ji: `${base.ji} ${extraJi.join(' ')}` }])
 }
 
 function getMonthZhiIndex(year, month, day) {
@@ -330,34 +210,42 @@ function getAlmanac(year, month, day) {
   const jianChu = getJianChu(year, month, day)
   const ganZhi = getGanZhiDay(year, month, day)
   const lunar = solarToLunar(year, month, day)
-  const merged = buildTongShuYiJi(year, month, day, jianChu, ganZhi, lunar)
+  const monthZhiIndex = getJieMonthZhiIndex(year, month, day)
+  const flags = getDayFlags(year, month, day, lunar)
+  const meta = buildDayMeta(ganZhi, monthZhiIndex, lunar, { year, month, day }, flags)
+  const merged = buildXieJiYiJi({
+    jianChu,
+    ganZhi,
+    monthZhiIndex,
+    meta,
+    flags
+  })
   return {
     jianChu,
     yi: merged.yiText || '诸事皆宜',
-    ji: merged.jiText || '诸事不宜',
+    ji: merged.jiText || '无',
     yiList: merged.yi.length ? merged.yi : ['诸事皆宜'],
-    jiList: merged.ji.length ? merged.ji : ['诸事不宜'],
-    lunar
+    jiList: merged.ji.length ? merged.ji : ['无'],
+    lunar,
+    meta
   }
 }
 
 function isAuspiciousDay(year, month, day, eventId) {
-  const event = AUSPICIOUS_EVENTS.find((item) => item.id === eventId)
-  if (!event) return false
-  const jianChu = getJianChu(year, month, day)
-  if (event.jianChu.indexOf(jianChu) < 0) return false
-  const ji = getAlmanac(year, month, day).ji || ''
-  if (ji.indexOf('诸事不宜') >= 0) return false
-  const conflict = {
-    marriage: '嫁娶',
-    travel: '出行',
-    move: '搬家',
-    business: '开业',
-    haircut: '理发'
-  }
-  const key = conflict[eventId]
-  if (key && ji.indexOf(key) >= 0) return false
-  return true
+  const keys = EVENT_ACTS[eventId]
+  if (!keys) return false
+  const almanac = getAlmanac(year, month, day)
+  if (almanac.jiList.indexOf('诸事不宜') >= 0) return false
+  const yiSet = {}
+  const jiSet = {}
+  almanac.yiList.forEach((item) => {
+    yiSet[item] = true
+  })
+  almanac.jiList.forEach((item) => {
+    jiSet[item] = true
+  })
+  if (keys.some((key) => jiSet[key])) return false
+  return keys.some((key) => yiSet[key])
 }
 
 function getAuspiciousDaysInMonth(year, month, eventId) {
@@ -381,9 +269,7 @@ function buildHuangliDetail(dayInfo, now) {
     now.getMonth() + 1 === dayInfo.solarMonth &&
     now.getDate() === dayInfo.solarDay
   )
-  const monthZhiIndex = getJieMonthZhiIndex(dayInfo.solarYear, dayInfo.solarMonth, dayInfo.solarDay)
-  const lunar = dayInfo.lunar || solarToLunar(dayInfo.solarYear, dayInfo.solarMonth, dayInfo.solarDay)
-  const meta = buildDayMeta(dayInfo.ganZhiDay, monthZhiIndex, lunar)
+  const meta = almanac.meta || {}
   const hourLuckList = buildHourLuckList(
     dayInfo.solarYear,
     dayInfo.solarMonth,

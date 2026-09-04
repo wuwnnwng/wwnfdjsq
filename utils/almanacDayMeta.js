@@ -1,6 +1,6 @@
 /**
  * 黄历日值：五行、冲煞、值神、胎神、二十八宿、彭祖百忌、吉神凶神
- * 按通书常用规则离线推算，仅供生活参考
+ * 星宿按日支配星期；神煞依协纪辨方书月日神。仅供生活参考
  */
 
 const GAN = '甲乙丙丁戊己庚辛壬癸'
@@ -54,8 +54,22 @@ const TAI_SHEN = [
 const XIU = ['角', '亢', '氐', '房', '心', '尾', '箕', '斗', '牛', '女', '虚', '危', '室', '壁', '奎', '娄', '胃', '昴', '毕', '觜', '参', '井', '鬼', '柳', '星', '张', '翼', '轸']
 const XIU_ELEM = ['木', '金', '土', '日', '月', '火', '水', '木', '金', '土', '日', '月', '火', '水', '木', '金', '土', '日', '月', '火', '水', '木', '金', '土', '日', '月', '火', '水']
 const XIU_BEAST = ['蛟', '龙', '貉', '兔', '狐', '虎', '豹', '獬', '牛', '蝠', '鼠', '燕', '猪', '犴', '狼', '狗', '雉', '鸡', '乌', '猴', '猿', '犴', '羊', '獐', '马', '鹿', '蛇', '蚓']
-const XIU_LUCK = [1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1]
-const XIU_OFFSET = [11, 13, 15, 17, 19, 21, 23, 25, 27, 1, 3, 5]
+const XIU_LUCK = [1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1]
+/** 通书二十八宿：日支三合局 + 星期，周日为虚房星昴 */
+const XIU_WEEK_TABLE = {
+  子: ['虚', '毕', '翼', '箕', '奎', '鬼', '氐'],
+  丑: ['房', '危', '觜', '轸', '斗', '娄', '柳'],
+  寅: ['星', '心', '室', '参', '角', '牛', '胃'],
+  卯: ['昴', '张', '尾', '壁', '井', '亢', '女'],
+  辰: ['虚', '毕', '翼', '箕', '奎', '鬼', '氐'],
+  巳: ['房', '危', '觜', '轸', '斗', '娄', '柳'],
+  午: ['星', '心', '室', '参', '角', '牛', '胃'],
+  未: ['昴', '张', '尾', '壁', '井', '亢', '女'],
+  申: ['虚', '毕', '翼', '箕', '奎', '鬼', '氐'],
+  酉: ['房', '危', '觜', '轸', '斗', '娄', '柳'],
+  戌: ['星', '心', '室', '参', '角', '牛', '胃'],
+  亥: ['昴', '张', '尾', '壁', '井', '亢', '女']
+}
 
 const PENGZU_GAN_TEXT = {
   甲: '甲不开仓财物耗散',
@@ -90,6 +104,17 @@ const GAN_HE = { 甲: '己', 乙: '庚', 丙: '辛', 丁: '壬', 戊: '癸', 己
 const ZHI_HE = { 子: '丑', 丑: '子', 寅: '亥', 亥: '寅', 卯: '戌', 戌: '卯', 辰: '酉', 酉: '辰', 巳: '申', 申: '巳', 午: '未', 未: '午' }
 const ZHI_HAI = { 子: '未', 丑: '午', 寅: '巳', 卯: '辰', 辰: '卯', 巳: '寅', 午: '丑', 未: '子', 申: '亥', 酉: '戌', 戌: '酉', 亥: '申' }
 const YUE_DE = ['壬', '庚', '丙', '甲']
+const YUE_EN = ['甲', '辛', '甲', '乙', '庚', '丙', '丁', '己', '壬', '癸', '庚', '乙']
+const YUE_XING = [3, 10, 5, 0, 4, 8, 6, 1, 2, 9, 7, 11]
+const SHI_DE_ZHI = [6, 4, 0, 2]
+const TIAN_XI_ZHI = [10, 1, 4, 7]
+const TIAN_LI_ZHI = [9, 0, 3, 6]
+const SAN_HE_GROUP = [
+  [0, 4, 8],
+  [1, 5, 9],
+  [2, 6, 10],
+  [3, 7, 11]
+]
 const TIAN_SHE = ['戊寅', '甲午', '戊申', '甲子']
 const TIAN_YUAN = ['甲子', '甲午', '甲寅', '壬午', '戊午', '己未', '丙子', '丁丑', '戊寅', '辛卯', '壬辰', '癸巳']
 const SI_XIANG = [['甲', '乙'], ['丙', '丁'], ['庚', '辛'], ['壬', '癸']]
@@ -151,6 +176,29 @@ function tianZeiZhi(monthZhiIndex) {
   return (5 - monthZhiIndex + 12) % 12
 }
 
+function sameSanHe(monthZhiIndex, dayZhiIndex) {
+  if (monthZhiIndex === dayZhiIndex) return false
+  return SAN_HE_GROUP.some((group) => {
+    return group.indexOf(monthZhiIndex) >= 0 && group.indexOf(dayZhiIndex) >= 0
+  })
+}
+
+function getXiuByZhiWeek(zhi, week) {
+  const row = XIU_WEEK_TABLE[zhi]
+  if (!row) return XIU[0]
+  const idx = Math.min(6, Math.max(0, Number(week) || 0))
+  return row[idx]
+}
+
+function attachFlagGods(xiong, flags) {
+  const list = xiong.slice()
+  if (!flags) return list
+  if (flags.yangGong) pushUnique(list, '杨公忌')
+  if (flags.siJue) pushUnique(list, '四绝')
+  if (flags.siLi) pushUnique(list, '四离')
+  return list
+}
+
 function buildDayGods(monthZhiIndex, ganZhi) {
   const dayGan = ganZhi.charAt(0)
   const dayZhi = ganZhi.charAt(1)
@@ -175,12 +223,17 @@ function buildDayGods(monthZhiIndex, ganZhi) {
   if (TIAN_SHE[season] === ganZhi) pushUnique(ji, '天赦')
   if (TIAN_YUAN[yinOffset] === ganZhi) pushUnique(ji, '天愿')
   if (TIAN_EN[ganZhi]) pushUnique(ji, '天恩')
+  if (dayGan === YUE_EN[monthZhiIndex]) pushUnique(ji, '月恩')
   if (MU_CANG[season].indexOf(dayZhi) >= 0) pushUnique(ji, '母仓')
   if (SI_XIANG[season].indexOf(dayGan) >= 0) pushUnique(ji, '四相')
+  if (dayZhiIndex === SHI_DE_ZHI[season]) pushUnique(ji, '时德')
   if (dayZhiIndex === (monthZhiIndex + 10) % 12) pushUnique(ji, '生气')
   if (dayZhi === '申' || dayZhi === '酉') pushUnique(ji, '除神')
   if (dayZhiIndex === (monthZhiIndex + 5) % 12) pushUnique(ji, '阳德')
+  if (dayZhiIndex === (7 - monthZhiIndex + 12) % 12) pushUnique(ji, '阴德')
   if (dayZhi === ZHI_HE[ZHI.charAt(monthZhiIndex)]) pushUnique(ji, '六合')
+  if (sameSanHe(monthZhiIndex, dayZhiIndex)) pushUnique(ji, '三合')
+  if (dayZhiIndex === TIAN_XI_ZHI[season]) pushUnique(ji, '天喜')
 
   const yiMaGroup = monthZhiIndex % 4
   const yiMaZhi = yiMaGroup === 0 ? 2 : yiMaGroup === 1 ? 11 : yiMaGroup === 2 ? 8 : 5
@@ -201,8 +254,10 @@ function buildDayGods(monthZhiIndex, ganZhi) {
   const sha = SAN_HE[monthZhiIndex % 4]
   if (dayZhiIndex === sha.jie) pushUnique(xiong, '劫煞')
   if (dayZhiIndex === sha.zai) pushUnique(xiong, '灾煞')
-  if (dayZhiIndex === sha.tian) pushUnique(xiong, '天煞')
+  if (dayZhiIndex === sha.tian) pushUnique(xiong, '月煞')
   if (dayZhiIndex === sha.daShi) pushUnique(xiong, '大时')
+  if (dayZhiIndex === TIAN_LI_ZHI[season]) pushUnique(xiong, '天吏')
+  if (dayZhiIndex === YUE_XING[monthZhiIndex]) pushUnique(xiong, '月刑')
 
   if (dayZhiIndex === (monthZhiIndex + 3) % 12) pushUnique(xiong, '死神')
   if (dayZhiIndex === (monthZhiIndex + 4) % 12) pushUnique(xiong, '死气')
@@ -219,7 +274,7 @@ function buildDayGods(monthZhiIndex, ganZhi) {
   return { jiShenList: ji, xiongShaList: xiong }
 }
 
-function buildDayMeta(ganZhiDay, monthZhiIndex, lunar) {
+function buildDayMeta(ganZhiDay, monthZhiIndex, _lunar, solar, flags) {
   const gan = ganZhiDay.charAt(0)
   const zhi = ganZhiDay.charAt(1)
   const dayZhiIndex = zhiIndex(zhi)
@@ -232,10 +287,11 @@ function buildDayMeta(ganZhiDay, monthZhiIndex, lunar) {
   const sha = SHA_DIR[dayZhiIndex] || ''
   const tianShen = TIAN_SHEN[(dayZhiIndex + TIAN_SHEN_OFFSET[monthZhiIndex]) % 12]
   const tianShenLucky = !!HUANG_DAO[tianShen]
-  const lunarMonth = Math.min(12, Math.max(1, Number(lunar && lunar.lunarMonth) || 1))
-  const lunarDay = Math.min(30, Math.max(1, Number(lunar && lunar.lunarDay) || 1))
-  const xiuIndex = (XIU_OFFSET[lunarMonth - 1] + lunarDay - 1) % 28
-  const xiu = XIU[xiuIndex]
+  const week = solar
+    ? new Date(solar.year, solar.month - 1, solar.day).getDay()
+    : 0
+  const xiu = getXiuByZhiWeek(zhi, week)
+  const xiuIndex = Math.max(0, XIU.indexOf(xiu))
   const xiuLucky = !!XIU_LUCK[xiuIndex]
   const gods = buildDayGods(monthZhiIndex, ganZhiDay)
   const pengzuGan = PENGZU_GAN_TEXT[gan] || ''
@@ -264,10 +320,11 @@ function buildDayMeta(ganZhiDay, monthZhiIndex, lunar) {
     pengzuText: [pengzuGan, pengzuZhi].filter(Boolean).join(' '),
     pengzuLines: [pengzuGan, pengzuZhi].filter(Boolean),
     jiShenList: gods.jiShenList,
-    xiongShaList: gods.xiongShaList
+    xiongShaList: attachFlagGods(gods.xiongShaList, flags)
   }
 }
 
 module.exports = {
-  buildDayMeta
+  buildDayMeta,
+  getXiuByZhiWeek
 }

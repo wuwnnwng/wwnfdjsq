@@ -22,6 +22,22 @@ const JIAN_CHU_DESC = {
   闭: '闭日闭塞收藏，宜筑堤安葬'
 }
 
+/** 建满平收黑，除危定执黄，成开皆可用，闭破不相当 */
+const JIAN_CHU_LUCK = {
+  建: false,
+  除: true,
+  满: false,
+  平: false,
+  定: true,
+  执: true,
+  破: false,
+  危: true,
+  成: true,
+  收: false,
+  开: true,
+  闭: false
+}
+
 const HOUR_SLOTS = [
   { zhi: '子', label: '子时', range: '23:00-00:59' },
   { zhi: '丑', label: '丑时', range: '01:00-02:59' },
@@ -183,11 +199,16 @@ function getJianChu(year, month, day) {
 }
 
 function buildJianChuList(current) {
-  return JIAN_CHU.map((name) => ({
-    name,
-    desc: JIAN_CHU_DESC[name] || '',
-    active: name === current
-  }))
+  return JIAN_CHU.map((name) => {
+    const lucky = !!JIAN_CHU_LUCK[name]
+    return {
+      name,
+      desc: JIAN_CHU_DESC[name] || '',
+      lucky,
+      luckText: lucky ? '吉' : '凶',
+      active: name === current
+    }
+  })
 }
 
 function getCurrentHourZhiIndex(date) {
@@ -304,6 +325,8 @@ function buildHuangliDetail(dayInfo, now) {
       isToday,
       jianChu: almanac.jianChu,
       jianChuDesc: JIAN_CHU_DESC[almanac.jianChu] || '',
+      jianChuLucky: !!JIAN_CHU_LUCK[almanac.jianChu],
+      jianChuLuckText: JIAN_CHU_LUCK[almanac.jianChu] ? '吉' : '凶',
       jianChuList: buildJianChuList(almanac.jianChu),
       hourLuckList,
       currentHour,

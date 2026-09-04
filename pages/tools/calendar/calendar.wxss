@@ -778,9 +778,12 @@
 
 .jianchu-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 72rpx;
+  gap: 4rpx;
+  min-height: 88rpx;
+  padding: 8rpx 0;
   border-radius: 14rpx;
   background: var(--color-soft);
   border: 1rpx solid var(--color-line);
@@ -795,6 +798,19 @@
   font-size: 28rpx;
   font-weight: 700;
   color: var(--color-ink);
+}
+
+.jianchu-luck {
+  font-size: 20rpx;
+  color: var(--color-muted);
+}
+
+.jianchu-item.lucky .jianchu-luck {
+  color: #1f6b52;
+}
+
+.jianchu-item.unlucky .jianchu-luck {
+  color: #b42318;
 }
 
 .jianchu-item.active .jianchu-name {

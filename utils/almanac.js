@@ -2,6 +2,7 @@
  * 黄历：建除十二神、宜忌、吉日筛选（离线规则，仅供参考）
  */
 const { getGanZhiDay, solarToLunar, getSolarTermDate, getJieMonthZhiIndex } = require('./lunar')
+const { buildDayMeta } = require('./almanacDayMeta')
 
 const JIAN_CHU = ['建', '除', '满', '平', '定', '执', '破', '危', '成', '收', '开', '闭']
 
@@ -370,37 +371,52 @@ function getAuspiciousDaysInMonth(year, month, eventId) {
   return days
 }
 
+const WEEKDAY_FULL = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+
 function buildHuangliDetail(dayInfo, now) {
   const almanac = getAlmanac(dayInfo.solarYear, dayInfo.solarMonth, dayInfo.solarDay)
-  const isToday =
+  const isToday = !!(
     now &&
     now.getFullYear() === dayInfo.solarYear &&
     now.getMonth() + 1 === dayInfo.solarMonth &&
     now.getDate() === dayInfo.solarDay
-  return {
-    solarText: dayInfo.solarText,
-    lunarText: dayInfo.lunarText,
-    ganZhiYear: dayInfo.ganZhiYear,
-    ganZhiMonth: dayInfo.ganZhiMonth,
-    ganZhiDay: dayInfo.ganZhiDay,
-    zodiac: dayInfo.zodiac,
-    weekday: dayInfo.weekday,
-    weekText: dayInfo.weekText,
-    jianChu: almanac.jianChu,
-    jianChuDesc: JIAN_CHU_DESC[almanac.jianChu] || '',
-    jianChuList: buildJianChuList(almanac.jianChu),
-    hourLuckList: buildHourLuckList(
-      dayInfo.solarYear,
-      dayInfo.solarMonth,
-      dayInfo.solarDay,
-      isToday ? now : null
-    ),
-    yi: almanac.yi,
-    ji: almanac.ji,
-    yiList: almanac.yiList,
-    jiList: almanac.jiList,
-    solarTerm: dayInfo.solarTerm
-  }
+  )
+  const monthZhiIndex = getJieMonthZhiIndex(dayInfo.solarYear, dayInfo.solarMonth, dayInfo.solarDay)
+  const lunar = dayInfo.lunar || solarToLunar(dayInfo.solarYear, dayInfo.solarMonth, dayInfo.solarDay)
+  const meta = buildDayMeta(dayInfo.ganZhiDay, monthZhiIndex, lunar)
+  const hourLuckList = buildHourLuckList(
+    dayInfo.solarYear,
+    dayInfo.solarMonth,
+    dayInfo.solarDay,
+    isToday ? now : null
+  )
+  const currentHour = hourLuckList.find((item) => item.isNow) || null
+  const weekdayIndex = new Date(dayInfo.solarYear, dayInfo.solarMonth - 1, dayInfo.solarDay).getDay()
+  return Object.assign(
+    {
+      solarText: dayInfo.solarText,
+      lunarText: dayInfo.lunarText,
+      ganZhiYear: dayInfo.ganZhiYear,
+      ganZhiMonth: dayInfo.ganZhiMonth,
+      ganZhiDay: dayInfo.ganZhiDay,
+      zodiac: dayInfo.zodiac,
+      weekday: dayInfo.weekday,
+      weekdayText: WEEKDAY_FULL[weekdayIndex] || '',
+      weekText: dayInfo.weekText,
+      isToday,
+      jianChu: almanac.jianChu,
+      jianChuDesc: JIAN_CHU_DESC[almanac.jianChu] || '',
+      jianChuList: buildJianChuList(almanac.jianChu),
+      hourLuckList,
+      currentHour,
+      yi: almanac.yi,
+      ji: almanac.ji,
+      yiList: almanac.yiList,
+      jiList: almanac.jiList,
+      solarTerm: dayInfo.solarTerm
+    },
+    meta
+  )
 }
 
 module.exports = {

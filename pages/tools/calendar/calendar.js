@@ -247,7 +247,6 @@ Page({
       popular: false
     },
     huangliSectionOpen: {
-      jianChu: false,
       hourLuck: false
     },
     showHuangliTip: false
@@ -337,6 +336,9 @@ Page({
     if (this.data.activeTab === 'festival' && this.data.festivalGroups) {
       this.refreshFestivalCountdown()
     }
+    if (this.data.activeTab === 'almanac' && this.data.selectedYear) {
+      this.refreshCalendarView()
+    }
   },
 
   onHide() {
@@ -376,8 +378,7 @@ Page({
       includeTerm: false
     })
     const almanac = getAlmanac(selectedYear, selectedMonth, selectedDay)
-    const huangliDay = buildDayInfo(today.year, today.month, today.day)
-    const huangliDetail = buildHuangliDetail(huangliDay, new Date())
+    const huangliDetail = buildHuangliDetail(dayInfo, new Date())
 
     this.setData({
       monthCells: buildMonthCells(
@@ -616,6 +617,9 @@ Page({
       if (tab === 'festival') {
         this.refreshFestivalCountdown()
       }
+      if (tab === 'almanac') {
+        this.refreshCalendarView()
+      }
     })
   },
 
@@ -644,6 +648,25 @@ Page({
         this.ensureFestivalYear(year, () => this.refreshCalendarView())
       }
     )
+  },
+
+  shiftSelectedDay(delta) {
+    const date = new Date(
+      Number(this.data.selectedYear),
+      Number(this.data.selectedMonth) - 1,
+      Number(this.data.selectedDay) + Number(delta)
+    )
+    this.applyPickedDate(
+      clampPickerDate(date.getFullYear(), date.getMonth() + 1, date.getDate())
+    )
+  },
+
+  onHuangliPrevDay() {
+    this.shiftSelectedDay(-1)
+  },
+
+  onHuangliNextDay() {
+    this.shiftSelectedDay(1)
   },
 
   onPrevMonth() {

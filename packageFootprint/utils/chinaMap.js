@@ -4,6 +4,44 @@ const { PROVINCES, PROVINCE_MAP, TINY_IDS, HIT_ORDER, DRAW_ORDER, hexToRgba } = 
 const MAIN = { minLng: 73.2, maxLng: 135.2, minLat: 17.6, maxLat: 54.4 }
 const SEA = { minLng: 107.8, maxLng: 121.6, minLat: 3.4, maxLat: 17.8 }
 
+/** 标注用经纬度，避免质心落到细长省或直辖市叠字 */
+const LABEL_POS = {
+  xinjiang: [84.2, 41.4],
+  xizang: [88.8, 31.6],
+  qinghai: [96.2, 35.6],
+  gansu: [104.2, 37.2],
+  ningxia: [106.2, 37.2],
+  neimenggu: [111.4, 42.2],
+  heilongjiang: [127.6, 48.2],
+  jilin: [126.4, 43.4],
+  liaoning: [122.6, 41.3],
+  beijing: [116.4, 40.2],
+  tianjin: [117.4, 39.0],
+  hebei: [115.0, 38.2],
+  shanxi: [112.4, 37.5],
+  shaanxi: [108.8, 35.0],
+  shandong: [118.2, 36.4],
+  henan: [113.6, 33.8],
+  jiangsu: [119.6, 32.9],
+  shanghai: [121.6, 31.1],
+  anhui: [117.2, 31.8],
+  hubei: [112.4, 31.0],
+  zhejiang: [120.2, 29.1],
+  jiangxi: [115.8, 27.5],
+  fujian: [118.0, 26.0],
+  taiwan: [121.0, 23.6],
+  hunan: [111.6, 27.4],
+  guangdong: [113.4, 23.6],
+  guangxi: [108.4, 23.7],
+  hainan: [109.7, 19.2],
+  chongqing: [107.6, 30.0],
+  sichuan: [102.7, 30.6],
+  guizhou: [106.8, 26.7],
+  yunnan: [101.4, 24.8],
+  hongkong: [115.1, 21.9],
+  macao: [112.7, 21.6]
+}
+
 function ringCentroid(ring) {
   let x = 0
   let y = 0
@@ -56,9 +94,10 @@ function dist2(a, b) {
 }
 
 function layoutMap(width, height, pad) {
-  const padding = pad || 10
-  const insetW = Math.min(92, width * 0.26)
-  const insetH = Math.min(108, height * 0.34)
+  const padding = pad == null ? 6 : pad
+  const insetW = Math.min(44, Math.max(36, width * 0.125))
+  const insetH = Math.min(52, Math.max(42, height * 0.14))
+  const insetGap = 6
   const main = {
     x: padding,
     y: padding,
@@ -70,8 +109,8 @@ function layoutMap(width, height, pad) {
     maxLat: MAIN.maxLat
   }
   const inset = {
-    x: width - padding - insetW,
-    y: height - padding - insetH,
+    x: width - insetGap - insetW,
+    y: height - insetGap - insetH,
     w: insetW,
     h: insetH,
     minLng: SEA.minLng,
@@ -132,6 +171,39 @@ function drawRing(ctx, pts, fill, stroke, lineWidth) {
   }
 }
 
+function getLabelPoint(id, box) {
+  const pos = LABEL_POS[id]
+  if (pos) return project(pos[0], pos[1], box)
+  const ring = GEO[id]
+  if (!ring) return null
+  const c = ringCentroid(ring)
+  return project(c[0], c[1], box)
+}
+
+function drawProvinceLabels(ctx, main, visited, focusId, palette, mapWidth) {
+  const size = Math.max(7, Math.min(10, Math.round(mapWidth / 40)))
+  ctx.font = `600 ${size}px sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  DRAW_ORDER.forEach((id) => {
+    const item = PROVINCE_MAP[id]
+    if (!item) return
+    const pt = getLabelPoint(id, main)
+    if (!pt) return
+    const selected = !!visited[id] || id === focusId
+    if (selected) {
+      ctx.lineJoin = 'round'
+      ctx.lineWidth = 2.2
+      ctx.strokeStyle = 'rgba(15, 23, 32, 0.5)'
+      ctx.strokeText(item.name, pt[0], pt[1])
+      ctx.fillStyle = '#ffffff'
+    } else {
+      ctx.fillStyle = palette.ink
+    }
+    ctx.fillText(item.name, pt[0], pt[1])
+  })
+}
+
 function drawSouthSea(ctx, inset, palette) {
   const { x, y, w, h } = inset
   ctx.fillStyle = palette.sea
@@ -153,10 +225,10 @@ function drawSouthSea(ctx, inset, palette) {
   if (typeof ctx.setLineDash === 'function') ctx.setLineDash([])
 
   ctx.fillStyle = palette.muted
-  ctx.font = '600 9px sans-serif'
+  ctx.font = '600 7px sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText('南海诸岛', x + w / 2, y + h - 12)
+  ctx.fillText('南海诸岛', x + w / 2, y + h - 8)
 }
 
 function drawChinaMap(ctx, x, y, width, height, options) {
@@ -192,6 +264,7 @@ function drawChinaMap(ctx, x, y, width, height, options) {
   }
 
   drawSouthSea(ctx, inset, palette)
+  drawProvinceLabels(ctx, main, visited, focusId, palette, width)
   ctx.restore()
 }
 

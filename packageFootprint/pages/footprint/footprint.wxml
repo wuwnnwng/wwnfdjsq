@@ -23,16 +23,10 @@
       </view>
     </view>
 
-    <view class="panel foot-map-panel">
-      <view class="section-title">中国地图</view>
+    <view class="panel foot-board">
       <view class="foot-map-wrap" catchtouchmove="preventMove">
         <canvas type="2d" id="chinaMap" class="foot-map" bindtouchstart="onMapTouch"></canvas>
       </view>
-      <view class="tool-note">点地图或下方名称点亮省份，再点一次取消。未点亮只显示轮廓。</view>
-    </view>
-
-    <view class="panel foot-list-panel">
-      <view class="section-title">省份名称</view>
       <view class="foot-chip-grid">
         <view
           class="foot-chip {{item.selected ? 'is-on' : ''}} {{item.focused ? 'is-focus' : ''}}"
@@ -42,7 +36,6 @@
           data-id="{{item.id}}"
           style="{{item.chipStyle}}"
         >
-          <view class="foot-chip-dot" wx:if="{{item.selected}}" style="background: {{item.color}};"></view>
           <text>{{item.name}}</text>
         </view>
       </view>

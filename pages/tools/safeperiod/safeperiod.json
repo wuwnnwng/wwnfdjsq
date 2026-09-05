@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "安全期｜置居试算计算器",
+  "navigationBarTitleText": "安全期｜小小便便民工具箱",
   "disableScroll": true,
   "usingComponents": {
     "date-picker": "/components/date-picker/date-picker"

@@ -2,7 +2,7 @@
   <view class="panel hero-panel">
     <view class="hero-head">
       <view class="brand-wrap">
-        <view class="brand">置居试算</view>
+        <view class="brand">小小便便民</view>
         <view class="brand-kicker">公积金 · 商贷 · 组合贷</view>
       </view>
       <view class="theme-switch" aria-label="切换皮肤">

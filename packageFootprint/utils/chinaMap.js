@@ -1,76 +1,46 @@
 const GEO = require('./chinaGeo')
 const { CHIP_ORDER, PROVINCE_MAP, TINY_IDS, HIT_ORDER, DRAW_ORDER, hexToRgba } = require('./provinces')
 
-const MAIN = { minLng: 73.2, maxLng: 135.2, minLat: 17.6, maxLat: 54.4 }
-const SEA = { minLng: 107.8, maxLng: 121.6, minLat: 3.4, maxLat: 17.8 }
+const DEG = Math.PI / 180
+const PHI1 = 25 * DEG
+const PHI2 = 47 * DEG
+const LAM0 = 105 * DEG
+const PHI0 = 12 * DEG
+const ALBERS_N = (Math.sin(PHI1) + Math.sin(PHI2)) / 2
+const ALBERS_C = Math.cos(PHI1) * Math.cos(PHI1) + 2 * ALBERS_N * Math.sin(PHI1)
+const ALBERS_RHO0 = Math.sqrt(ALBERS_C - 2 * ALBERS_N * Math.sin(PHI0)) / ALBERS_N
 
-/** 标注用经纬度，避免质心落到细长省或直辖市叠字 */
-const LABEL_POS = {
-  xinjiang: [84.2, 41.4],
-  xizang: [88.8, 31.6],
-  qinghai: [96.2, 35.6],
-  gansu: [104.2, 37.2],
-  ningxia: [106.2, 37.2],
-  neimenggu: [111.4, 42.2],
-  heilongjiang: [127.6, 48.2],
-  jilin: [126.4, 43.4],
-  liaoning: [122.6, 41.3],
-  beijing: [116.4, 40.2],
-  tianjin: [117.4, 39.0],
-  hebei: [115.0, 38.2],
-  shanxi: [112.4, 37.5],
-  shaanxi: [108.8, 35.0],
-  shandong: [118.2, 36.4],
-  henan: [113.6, 33.8],
-  jiangsu: [119.6, 32.9],
-  shanghai: [121.6, 31.1],
-  anhui: [117.2, 31.8],
-  hubei: [112.4, 31.0],
-  zhejiang: [120.2, 29.1],
-  jiangxi: [115.8, 27.5],
-  fujian: [118.0, 26.0],
-  taiwan: [121.0, 23.6],
-  hunan: [111.6, 27.4],
-  guangdong: [113.4, 23.6],
-  guangxi: [108.4, 23.7],
-  hainan: [109.7, 19.2],
-  chongqing: [107.6, 30.0],
-  sichuan: [102.7, 30.6],
-  guizhou: [106.8, 26.7],
-  yunnan: [101.4, 24.8],
-  hongkong: [115.1, 21.9],
-  macao: [112.7, 21.6]
+function albersRaw(lng, lat) {
+  const lam = lng * DEG
+  const phi = lat * DEG
+  const theta = ALBERS_N * (lam - LAM0)
+  const rho = Math.sqrt(Math.max(0, ALBERS_C - 2 * ALBERS_N * Math.sin(phi))) / ALBERS_N
+  return [rho * Math.sin(theta), ALBERS_RHO0 - rho * Math.cos(theta)]
+}
+
+function getEntry(id) {
+  return GEO[id] || null
+}
+
+function getRings(id) {
+  const entry = getEntry(id)
+  if (!entry) return []
+  if (Array.isArray(entry.rings)) return entry.rings
+  if (Array.isArray(entry) && entry.length && typeof entry[0][0] === 'number') return [entry]
+  return []
 }
 
 function ringCentroid(ring) {
   let x = 0
   let y = 0
-  const n = ring.length - (samePoint(ring[0], ring[ring.length - 1]) ? 1 : 0)
+  const closed = ring.length > 1 && ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]
+  const n = closed ? ring.length - 1 : ring.length
+  if (n <= 0) return [0, 0]
   for (let i = 0; i < n; i += 1) {
     x += ring[i][0]
     y += ring[i][1]
   }
   return [x / n, y / n]
-}
-
-function samePoint(a, b) {
-  return a && b && a[0] === b[0] && a[1] === b[1]
-}
-
-function project(lng, lat, box) {
-  return [
-    box.x + ((lng - box.minLng) / (box.maxLng - box.minLng)) * box.w,
-    box.y + ((box.maxLat - lat) / (box.maxLat - box.minLat)) * box.h
-  ]
-}
-
-function projectRing(ring, box) {
-  return ring.map((pt) => project(pt[0], pt[1], box))
-}
-
-function expandRing(ring, scale) {
-  const c = ringCentroid(ring)
-  return ring.map((pt) => [c[0] + (pt[0] - c[0]) * scale, c[1] + (pt[1] - c[1]) * scale])
 }
 
 function pointInRing(x, y, ring) {
@@ -93,42 +63,62 @@ function dist2(a, b) {
   return dx * dx + dy * dy
 }
 
-function layoutMap(width, height, pad) {
-  const padding = pad == null ? 6 : pad
-  const insetW = Math.min(44, Math.max(36, width * 0.125))
-  const insetH = Math.min(52, Math.max(42, height * 0.14))
-  const insetGap = 6
-  const main = {
-    x: padding,
-    y: padding,
-    w: width - padding * 2,
-    h: height - padding * 2,
-    minLng: MAIN.minLng,
-    maxLng: MAIN.maxLng,
-    minLat: MAIN.minLat,
-    maxLat: MAIN.maxLat
-  }
-  const inset = {
-    x: width - insetGap - insetW,
-    y: height - insetGap - insetH,
-    w: insetW,
-    h: insetH,
-    minLng: SEA.minLng,
-    maxLng: SEA.maxLng,
-    minLat: SEA.minLat,
-    maxLat: SEA.maxLat
-  }
-  return { main, inset }
+function computeBBox() {
+  let minX = Infinity
+  let maxX = -Infinity
+  let minY = Infinity
+  let maxY = -Infinity
+  Object.keys(GEO).forEach((id) => {
+    getRings(id).forEach((ring) => {
+      ring.forEach((pt) => {
+        if (pt[1] < 17.7) return
+        const xy = albersRaw(pt[0], pt[1])
+        if (xy[0] < minX) minX = xy[0]
+        if (xy[0] > maxX) maxX = xy[0]
+        if (xy[1] < minY) minY = xy[1]
+        if (xy[1] > maxY) maxY = xy[1]
+      })
+    })
+  })
+  return { minX, maxX, minY, maxY }
 }
 
-function getRing(id) {
-  const ring = GEO[id]
-  if (!ring || ring.length < 3) return null
-  if (TINY_IDS.indexOf(id) >= 0) {
-    const scale = id === 'macao' ? 2.8 : id === 'hongkong' ? 1.8 : id === 'shanghai' ? 1.35 : 1.15
-    return expandRing(ring, scale)
+const BBOX = computeBBox()
+
+function createView(x, y, width, height) {
+  const pad = 8
+  const insetW = Math.min(42, Math.max(34, width * 0.12))
+  const insetH = Math.min(50, Math.max(40, height * 0.13))
+  const insetGap = 6
+  const innerW = width - pad * 2
+  const innerH = height - pad * 2
+  const bw = BBOX.maxX - BBOX.minX
+  const bh = BBOX.maxY - BBOX.minY
+  const scale = Math.min(innerW / bw, innerH / bh)
+  const ox = x + pad + (innerW - bw * scale) / 2
+  const oy = y + pad + (innerH - bh * scale) / 2
+  return {
+    ox,
+    oy,
+    scale,
+    minX: BBOX.minX,
+    maxY: BBOX.maxY,
+    inset: {
+      x: x + width - insetGap - insetW,
+      y: y + height - insetGap - insetH,
+      w: insetW,
+      h: insetH
+    }
   }
-  return ring
+}
+
+function project(lng, lat, view) {
+  const xy = albersRaw(lng, lat)
+  return [view.ox + (xy[0] - view.minX) * view.scale, view.oy + (view.maxY - xy[1]) * view.scale]
+}
+
+function projectRing(ring, view) {
+  return ring.map((pt) => project(pt[0], pt[1], view))
 }
 
 function themePalette() {
@@ -172,16 +162,16 @@ function drawRing(ctx, pts, fill, stroke, lineWidth) {
   }
 }
 
-function getLabelPoint(id, box) {
-  const pos = LABEL_POS[id]
-  if (pos) return project(pos[0], pos[1], box)
-  const ring = GEO[id]
-  if (!ring) return null
-  const c = ringCentroid(ring)
-  return project(c[0], c[1], box)
+function getLabelPoint(id, view) {
+  const entry = getEntry(id)
+  if (entry && entry.label) return project(entry.label[0], entry.label[1], view)
+  const rings = getRings(id)
+  if (!rings.length) return null
+  const c = ringCentroid(rings[0])
+  return project(c[0], c[1], view)
 }
 
-function drawProvinceLabels(ctx, main, visited, focusId, palette, mapWidth) {
+function drawProvinceLabels(ctx, view, visited, focusId, palette, mapWidth) {
   const size = Math.max(7, Math.min(10, Math.round(mapWidth / 40)))
   ctx.font = `600 ${size}px sans-serif`
   ctx.textAlign = 'center'
@@ -189,7 +179,7 @@ function drawProvinceLabels(ctx, main, visited, focusId, palette, mapWidth) {
   DRAW_ORDER.forEach((id) => {
     const item = PROVINCE_MAP[id]
     if (!item) return
-    const pt = getLabelPoint(id, main)
+    const pt = getLabelPoint(id, view)
     if (!pt) return
     const selected = !!visited[id] || id === focusId
     if (selected) {
@@ -209,12 +199,11 @@ function drawSouthSea(ctx, inset, palette) {
   const { x, y, w, h } = inset
   ctx.fillStyle = palette.sea
   ctx.strokeStyle = palette.frame
-  ctx.lineWidth = 1.2
+  ctx.lineWidth = 1
   ctx.beginPath()
   ctx.rect(x, y, w, h)
   ctx.fill()
   ctx.stroke()
-
   ctx.strokeStyle = palette.frame
   if (typeof ctx.setLineDash === 'function') ctx.setLineDash([3, 3])
   ctx.beginPath()
@@ -229,52 +218,52 @@ function drawSouthSea(ctx, inset, palette) {
 function drawChinaMap(ctx, x, y, width, height, options) {
   const visited = options.visited || {}
   const focusId = options.focusId || ''
-  const palette = themePalette(options.theme)
-  const layout = layoutMap(width, height)
-  const shift = { x: x + layout.main.x, y: y + layout.main.y }
-  const main = Object.assign({}, layout.main, { x: shift.x, y: shift.y })
-  const inset = Object.assign({}, layout.inset, {
-    x: x + layout.inset.x,
-    y: y + layout.inset.y
-  })
+  const palette = themePalette()
+  const view = createView(x, y, width, height)
 
   ctx.save()
   ctx.fillStyle = palette.mapBg
   ctx.fillRect(x, y, width, height)
 
   DRAW_ORDER.forEach((id) => {
-    const ring = getRing(id)
-    if (!ring) return
+    const rings = getRings(id)
+    if (!rings.length) return
     const selected = !!visited[id]
-    const pts = projectRing(ring, main)
+    const fill = fillColor(id, selected, palette)
     const stroke = selected ? hexToRgba('#111111', 0.28) : palette.idleStroke
-    drawRing(ctx, pts, fillColor(id, selected, palette), stroke, selected ? 1.2 : 1)
+    rings.forEach((ring) => {
+      drawRing(ctx, projectRing(ring, view), fill, stroke, selected ? 1.15 : 0.95)
+    })
   })
 
-  if (focusId && GEO[focusId]) {
-    const ring = getRing(focusId)
-    const pts = projectRing(ring, main)
-    drawRing(ctx, pts, null, '#fff7ed', 2.4)
-    drawRing(ctx, pts, null, (PROVINCE_MAP[focusId] && PROVINCE_MAP[focusId].color) || '#f59e0b', 1.4)
+  if (focusId && getRings(focusId).length) {
+    getRings(focusId).forEach((ring) => {
+      const pts = projectRing(ring, view)
+      drawRing(ctx, pts, null, '#fff7ed', 2.2)
+      drawRing(ctx, pts, null, (PROVINCE_MAP[focusId] && PROVINCE_MAP[focusId].color) || '#f59e0b', 1.2)
+    })
   }
 
-  drawSouthSea(ctx, inset, palette)
-  drawProvinceLabels(ctx, main, visited, focusId, palette, width)
+  drawSouthSea(ctx, view.inset, palette)
+  drawProvinceLabels(ctx, view, visited, focusId, palette, width)
   ctx.restore()
 }
 
 function hitTest(px, py, width, height) {
-  const layout = layoutMap(width, height)
-  const main = layout.main
+  const view = createView(0, 0, width, height)
   for (let i = 0; i < HIT_ORDER.length; i += 1) {
     const id = HIT_ORDER[i]
-    const ring = getRing(id)
-    if (!ring) continue
-    const pts = projectRing(ring, main)
-    if (pointInRing(px, py, pts)) return id
-    if (TINY_IDS.indexOf(id) >= 0) {
-      const c = ringCentroid(pts)
-      const radius = id === 'macao' || id === 'hongkong' ? 16 : 12
+    const rings = getRings(id)
+    let hit = false
+    rings.forEach((ring) => {
+      if (hit) return
+      const pts = projectRing(ring, view)
+      if (pointInRing(px, py, pts)) hit = true
+    })
+    if (hit) return id
+    if (TINY_IDS.indexOf(id) >= 0 && rings[0]) {
+      const c = ringCentroid(projectRing(rings[0], view))
+      const radius = id === 'macao' || id === 'hongkong' ? 14 : 11
       if (dist2([px, py], c) <= radius * radius) return id
     }
   }

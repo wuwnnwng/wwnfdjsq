@@ -281,6 +281,10 @@
   background: linear-gradient(135deg, #ffedd5, #fb923c);
 }
 
+.tool-icon-footprint {
+  background: linear-gradient(135deg, #ccfbf1, #2dd4bf);
+}
+
 .theme-switch {
   display: flex;
   align-items: center;

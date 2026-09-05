@@ -38,13 +38,27 @@
       "desc": "用于获取你所在城市的天气"
     },
     "scope.writePhotosAlbum": {
-      "desc": "用于把生成的二维码、画布、拼图和结果卡片保存到相册"
+      "desc": "用于把生成的二维码、画布、拼图、足迹和结果卡片保存到相册"
     }
   },
   "requiredPrivateInfos": ["getLocation"],
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "subPackages": [],
+  "subPackages": [
+    {
+      "root": "packageFootprint",
+      "name": "footprint",
+      "pages": [
+        "pages/footprint/footprint"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/tools/index": {
+      "network": "all",
+      "packages": ["footprint"]
+    }
+  },
   "lazyCodeLoading": "requiredComponents",
   "navigateToMiniProgramAppIdList": ["wx663931c101197d69"]
 }

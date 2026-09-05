@@ -360,6 +360,14 @@ function getRetireToolShare() {
   }
 }
 
+function getFootprintToolShare() {
+  const path = '/packageFootprint/pages/footprint/footprint'
+  return {
+    appMessage: buildToolShareAppMessage(path, '足迹'),
+    timeline: buildToolShareTimeline(path, '足迹')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
@@ -649,6 +657,7 @@ module.exports = {
   getSafePeriodToolShare,
   getPensionToolShare,
   getRetireToolShare,
+  getFootprintToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

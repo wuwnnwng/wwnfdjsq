@@ -16,13 +16,6 @@
   min-height: 0;
 }
 
-.tool-note {
-  margin-top: 16rpx;
-  font-size: 22rpx;
-  line-height: 1.5;
-  color: var(--color-muted);
-}
-
 .conv-hero {
   margin-top: 0;
   padding: 32rpx 28rpx 36rpx;
@@ -102,71 +95,13 @@
   color: var(--color-muted);
 }
 
-.foot-stats {
-  display: flex;
-  align-items: flex-end;
-  gap: 24rpx;
-  margin-top: 24rpx;
-}
-
-.foot-stat-num {
-  font-family: var(--font-display);
-  font-size: 56rpx;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -2rpx;
-  color: var(--color-brand);
-}
-
-.foot-stat-label {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: var(--color-muted);
-}
-
-.foot-stat-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 12rpx;
-}
-
-.foot-mini-btn {
-  min-width: 88rpx;
-  height: 56rpx;
-  line-height: 56rpx;
-  padding: 0 18rpx;
-  text-align: center;
-  border-radius: 999rpx;
-  font-size: 22rpx;
-  font-weight: 700;
-  color: var(--color-on-brand);
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
-}
-
-.foot-mini-btn.ghost {
-  color: var(--color-brand);
-  background: var(--color-soft);
-  border: 1rpx solid var(--color-line);
-}
-
-.foot-map-panel,
-.foot-list-panel {
-  padding: 24rpx 22rpx 28rpx;
-}
-
-.section-title {
-  font-size: 26rpx;
-  font-weight: 700;
-  color: var(--color-brand);
+.foot-board {
+  padding: 0 0 22rpx;
+  overflow: hidden;
 }
 
 .foot-map-wrap {
-  margin-top: 16rpx;
-  height: 560rpx;
-  border-radius: 24rpx;
-  overflow: hidden;
-  background: var(--color-soft);
-  border: 1rpx solid var(--color-line);
+  height: 720rpx;
 }
 
 .foot-map {
@@ -178,19 +113,19 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12rpx;
-  margin-top: 18rpx;
+  padding: 18rpx 20rpx 0;
 }
 
 .foot-chip {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  justify-content: center;
   min-width: 120rpx;
   padding: 10rpx 16rpx;
   border-radius: 999rpx;
   font-size: 24rpx;
   font-weight: 600;
-  color: var(--color-ink);
+  color: var(--color-muted);
   background: var(--color-soft);
   border: 1rpx solid var(--color-line);
   box-sizing: border-box;
@@ -198,13 +133,6 @@
 
 .foot-chip.is-focus {
   box-shadow: 0 0 0 4rpx var(--color-brand-soft);
-}
-
-.foot-chip-dot {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
-  flex-shrink: 0;
 }
 
 .save-card-bar {

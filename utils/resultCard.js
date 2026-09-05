@@ -3,7 +3,7 @@
  */
 const { LEVELS, trackFlex, markerPercentOf } = require('./bmiCalc')
 
-const APP_BRAND = '小小便便民工具箱'
+const APP_BRAND = '小小便民工具箱'
 const SAVE_FILE = 'result-card.png'
 
 const BMI_LEVEL_STYLE = {
@@ -481,7 +481,7 @@ function drawArtworkCard(ctx, width, height, view) {
   }
   ctx.restore()
 
-  drawFooter(ctx, width, height, view.note || '小小便便民工具箱')
+  drawFooter(ctx, width, height, view.note || '小小便民工具箱')
 }
 
 function saveResultCard(page, canvasId, painter) {

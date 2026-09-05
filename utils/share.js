@@ -3,7 +3,7 @@ const {
   calculateRemainingMortgage
 } = require('./mortgage')
 
-const APP_BRAND = '小小便便民工具箱'
+const APP_BRAND = '小小便民工具箱'
 const TOOL_NAV_BRAND = APP_BRAND
 const TOOLS_HUB_PATH = '/pages/tools/index'
 const TOOLS_HUB_TITLE = `更多实用工具｜${APP_BRAND}`
@@ -389,7 +389,7 @@ function buildResultShareTitle({
     .join(' ')
   if (typePart && payPart) return `${typePart}｜${payPart}`
   if (payPart) return `房贷计算结果｜${payPart}`
-  return '查看我的计算结果｜小小便便民工具箱'
+  return '查看我的计算结果｜小小便民工具箱'
 }
 
 /**

@@ -366,7 +366,7 @@ Page({
   onShareAppMessage() {
     if (!this.data.ready) {
       return {
-        title: '公积金、商贷、组合贷一键算清｜小小便便民工具箱',
+        title: '公积金、商贷、组合贷一键算清｜小小便民工具箱',
         path: '/pages/index/index'
       }
     }
@@ -376,7 +376,7 @@ Page({
   onShareTimeline() {
     if (!this.data.ready) {
       return {
-        title: '公积金、商贷、组合贷一键算清｜小小便便民工具箱',
+        title: '公积金、商贷、组合贷一键算清｜小小便民工具箱',
         query: ''
       }
     }

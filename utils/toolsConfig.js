@@ -21,7 +21,7 @@ const HOME_FEATURED_MINI_PROGRAMS = [
 ]
 
 const CATEGORIES = [
-  { id: 'daily', name: '日常工具', toolIds: ['retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle', 'footprint'] },
+  { id: 'daily', name: '日常工具', toolIds: ['retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
   { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] }
@@ -200,15 +200,6 @@ const TOOLS = [
     iconType: 'puzzle',
     keywords: '拼图游戏切图益智卡片',
     page: '/pages/tools/puzzle/puzzle'
-  },
-  {
-    id: 'footprint',
-    name: '足迹',
-    shortName: '足迹',
-    icon: '🗺️',
-    iconType: 'footprint',
-    keywords: '足迹共足迹旅行去过省份地图打卡旅游点亮中国',
-    page: '/packageFootprint/pages/footprint/footprint'
   },
   {
     id: 'currency',

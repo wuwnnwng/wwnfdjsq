@@ -1,13 +1,12 @@
 const { PROVINCES } = require('../../utils/provinces')
 const { drawChinaMap, hitTest, toVisitedMap, buildProvinceViews } = require('../../utils/chinaMap')
 const { drawFootprintCard } = require('../../utils/footprintCard')
-const { getThemeId, getTheme, applyThemeChrome } = require('../../../utils/theme')
+const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getFootprintToolShare } = require('../../../utils/share')
 const { saveResultCard, handleSaveError } = require('../../../utils/resultCard')
 const { createLastInput } = require('../../../utils/toolLastInput')
 
-const TITLE_MAX_LEN = 12
-const lastInput = createLastInput('footprint', ['visitedIds', 'title'])
+const lastInput = createLastInput('footprint', ['visitedIds'])
 
 function normalizeIds(ids) {
   if (!Array.isArray(ids)) return []
@@ -25,8 +24,6 @@ function normalizeIds(ids) {
 Page({
   data: {
     theme: getThemeId(),
-    title: '我的足迹',
-    titleMaxLen: TITLE_MAX_LEN,
     visitedIds: [],
     focusId: '',
     provinces: buildProvinceViews([], ''),
@@ -36,9 +33,7 @@ Page({
   onLoad() {
     enableShareMenu()
     const saved = lastInput.restore()
-    const visitedIds = normalizeIds(saved.visitedIds)
-    const title = String(saved.title || '').trim().slice(0, TITLE_MAX_LEN) || '我的足迹'
-    this.applyVisited(visitedIds, this.data.focusId, { title })
+    this.applyVisited(normalizeIds(saved.visitedIds), this.data.focusId)
   },
 
   onReady() {
@@ -63,20 +58,19 @@ Page({
     lastInput.flush(this)
   },
 
-  applyVisited(visitedIds, focusId, extra) {
+  applyVisited(visitedIds, focusId) {
     const ids = normalizeIds(visitedIds)
-    const next = Object.assign(
+    this.setData(
       {
         visitedIds: ids,
         focusId: focusId || '',
         provinces: buildProvinceViews(ids, focusId || '')
       },
-      extra || {}
+      () => {
+        lastInput.save(this)
+        this.redrawMap()
+      }
     )
-    this.setData(next, () => {
-      lastInput.save(this)
-      this.redrawMap()
-    })
   },
 
   prepareMap() {
@@ -105,8 +99,7 @@ Page({
     if (!this._mapCtx) return
     drawChinaMap(this._mapCtx, 0, 0, this._mapW, this._mapH, {
       visited: toVisitedMap(this.data.visitedIds),
-      focusId: this.data.focusId,
-      theme: getTheme(this.data.theme)
+      focusId: this.data.focusId
     })
   },
 
@@ -131,11 +124,6 @@ Page({
     this.toggleProvince(e.currentTarget.dataset.id)
   },
 
-  onTitleInput(e) {
-    const title = String((e.detail && e.detail.value) || '').slice(0, TITLE_MAX_LEN)
-    this.setData({ title }, () => lastInput.save(this))
-  },
-
   preventMove() {},
 
   onSaveCard() {
@@ -144,10 +132,8 @@ Page({
     this.setData({ savingCard: true })
     wx.showLoading({ title: '正在生成', mask: true })
     const payload = {
-      title: this.data.title || '我的足迹',
       visitedIds: this.data.visitedIds,
-      focusId: this.data.focusId,
-      theme: getTheme(this.data.theme)
+      focusId: this.data.focusId
     }
     saveResultCard(this, 'resultCard', (ctx, width, height) => {
       drawFootprintCard(ctx, width, height, payload)

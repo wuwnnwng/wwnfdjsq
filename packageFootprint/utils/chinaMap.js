@@ -1,5 +1,5 @@
 const GEO = require('./chinaGeo')
-const { PROVINCES, PROVINCE_MAP, TINY_IDS, HIT_ORDER, DRAW_ORDER, hexToRgba } = require('./provinces')
+const { CHIP_ORDER, PROVINCE_MAP, TINY_IDS, HIT_ORDER, DRAW_ORDER, hexToRgba } = require('./provinces')
 
 const MAIN = { minLng: 73.2, maxLng: 135.2, minLat: 17.6, maxLat: 54.4 }
 const SEA = { minLng: 107.8, maxLng: 121.6, minLat: 3.4, maxLat: 17.8 }
@@ -131,24 +131,25 @@ function getRing(id) {
   return ring
 }
 
-function themePalette(theme) {
-  const dark = !theme || theme.id === 'nexus'
+function themePalette() {
   return {
-    dark,
-    mapBg: dark ? '#0c1526' : '#f4f7f5',
-    idleFill: dark ? 'rgba(148, 163, 184, 0.16)' : 'rgba(100, 116, 139, 0.14)',
-    idleStroke: dark ? 'rgba(226, 232, 240, 0.42)' : 'rgba(71, 85, 105, 0.42)',
-    ink: dark ? '#e2e8f0' : '#1e293b',
-    muted: dark ? '#94a3b8' : '#64748b',
-    frame: dark ? 'rgba(94, 234, 212, 0.45)' : 'rgba(15, 61, 46, 0.35)',
-    sea: dark ? 'rgba(14, 116, 144, 0.22)' : 'rgba(14, 116, 144, 0.12)'
+    dark: true,
+    mapBg: '#111111',
+    idleFill: '#4b4b4b',
+    idleStroke: '#2a2a2a',
+    ink: '#1a1a1a',
+    muted: '#8a8a8a',
+    frame: '#6b6b6b',
+    sea: '#2c2c2c'
   }
 }
 
-function fillColor(id, selected) {
-  if (!selected) return null
-  const item = PROVINCE_MAP[id]
-  return item ? item.color : null
+function fillColor(id, selected, palette) {
+  if (selected) {
+    const item = PROVINCE_MAP[id]
+    return item ? item.color : palette.idleFill
+  }
+  return palette.idleFill
 }
 
 function drawRing(ctx, pts, fill, stroke, lineWidth) {
@@ -194,7 +195,7 @@ function drawProvinceLabels(ctx, main, visited, focusId, palette, mapWidth) {
     if (selected) {
       ctx.lineJoin = 'round'
       ctx.lineWidth = 2.2
-      ctx.strokeStyle = 'rgba(15, 23, 32, 0.5)'
+      ctx.strokeStyle = 'rgba(15, 23, 32, 0.45)'
       ctx.strokeText(item.name, pt[0], pt[1])
       ctx.fillStyle = '#ffffff'
     } else {
@@ -223,12 +224,6 @@ function drawSouthSea(ctx, inset, palette) {
   ctx.lineTo(x + w * 0.38, y + h * 0.82)
   ctx.stroke()
   if (typeof ctx.setLineDash === 'function') ctx.setLineDash([])
-
-  ctx.fillStyle = palette.muted
-  ctx.font = '600 7px sans-serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText('南海诸岛', x + w / 2, y + h - 8)
 }
 
 function drawChinaMap(ctx, x, y, width, height, options) {
@@ -252,8 +247,8 @@ function drawChinaMap(ctx, x, y, width, height, options) {
     if (!ring) return
     const selected = !!visited[id]
     const pts = projectRing(ring, main)
-    const stroke = selected ? hexToRgba('#ffffff', 0.7) : palette.idleStroke
-    drawRing(ctx, pts, fillColor(id, selected), stroke, selected ? 1.45 : 1.05)
+    const stroke = selected ? hexToRgba('#111111', 0.28) : palette.idleStroke
+    drawRing(ctx, pts, fillColor(id, selected, palette), stroke, selected ? 1.2 : 1)
   })
 
   if (focusId && GEO[focusId]) {
@@ -296,7 +291,9 @@ function toVisitedMap(ids) {
 
 function buildProvinceViews(visitedIds, focusId) {
   const visited = toVisitedMap(visitedIds)
-  return PROVINCES.map((item) => {
+  return CHIP_ORDER.map((id) => {
+    const item = PROVINCE_MAP[id]
+    if (!item) return null
     const selected = !!visited[item.id]
     return {
       id: item.id,
@@ -304,11 +301,9 @@ function buildProvinceViews(visitedIds, focusId) {
       color: item.color,
       selected,
       focused: item.id === focusId,
-      chipStyle: selected
-        ? `color:${item.color};background:${hexToRgba(item.color, 0.18)};border-color:${item.color};`
-        : ''
+      chipStyle: selected ? `color:#fff;background:${item.color};border-color:${item.color};` : ''
     }
-  })
+  }).filter(Boolean)
 }
 
 module.exports = {

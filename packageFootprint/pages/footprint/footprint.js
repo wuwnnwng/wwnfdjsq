@@ -29,8 +29,6 @@ Page({
     titleMaxLen: TITLE_MAX_LEN,
     visitedIds: [],
     focusId: '',
-    selectedCount: 0,
-    totalCount: PROVINCES.length,
     provinces: buildProvinceViews([], ''),
     savingCard: false
   },
@@ -71,7 +69,6 @@ Page({
       {
         visitedIds: ids,
         focusId: focusId || '',
-        selectedCount: ids.length,
         provinces: buildProvinceViews(ids, focusId || '')
       },
       extra || {}
@@ -137,22 +134,6 @@ Page({
   onTitleInput(e) {
     const title = String((e.detail && e.detail.value) || '').slice(0, TITLE_MAX_LEN)
     this.setData({ title }, () => lastInput.save(this))
-  },
-
-  onSelectAll() {
-    this.applyVisited(PROVINCES.map((item) => item.id), this.data.focusId)
-  },
-
-  onClear() {
-    if (!this.data.visitedIds.length) return
-    wx.showModal({
-      title: '清空足迹',
-      content: '确定取消全部点亮的省份吗？',
-      confirmText: '清空',
-      success: (res) => {
-        if (res.confirm) this.applyVisited([], '')
-      }
-    })
   },
 
   preventMove() {},

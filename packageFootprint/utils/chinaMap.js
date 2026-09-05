@@ -98,7 +98,7 @@ function themePalette(theme) {
     dark,
     mapBg: dark ? '#0c1526' : '#f4f7f5',
     idleFill: dark ? 'rgba(148, 163, 184, 0.16)' : 'rgba(100, 116, 139, 0.14)',
-    idleStroke: dark ? 'rgba(226, 232, 240, 0.22)' : 'rgba(71, 85, 105, 0.28)',
+    idleStroke: dark ? 'rgba(226, 232, 240, 0.42)' : 'rgba(71, 85, 105, 0.42)',
     ink: dark ? '#e2e8f0' : '#1e293b',
     muted: dark ? '#94a3b8' : '#64748b',
     frame: dark ? 'rgba(94, 234, 212, 0.45)' : 'rgba(15, 61, 46, 0.35)',
@@ -106,11 +106,10 @@ function themePalette(theme) {
   }
 }
 
-function fillColor(id, selected, palette) {
+function fillColor(id, selected) {
+  if (!selected) return null
   const item = PROVINCE_MAP[id]
-  if (!item) return palette.idleFill
-  if (selected) return item.color
-  return hexToRgba(item.color, palette.dark ? 0.34 : 0.42)
+  return item ? item.color : null
 }
 
 function drawRing(ctx, pts, fill, stroke, lineWidth) {
@@ -182,7 +181,7 @@ function drawChinaMap(ctx, x, y, width, height, options) {
     const selected = !!visited[id]
     const pts = projectRing(ring, main)
     const stroke = selected ? hexToRgba('#ffffff', 0.7) : palette.idleStroke
-    drawRing(ctx, pts, fillColor(id, selected, palette), stroke, selected ? 1.35 : 0.9)
+    drawRing(ctx, pts, fillColor(id, selected), stroke, selected ? 1.45 : 1.05)
   })
 
   if (focusId && GEO[focusId]) {

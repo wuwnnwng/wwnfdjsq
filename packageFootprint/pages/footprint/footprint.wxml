@@ -21,20 +21,6 @@
           bindinput="onTitleInput"
         />
       </view>
-      <view class="foot-stats">
-        <view class="foot-stat">
-          <view class="foot-stat-num">{{selectedCount}}</view>
-          <view class="foot-stat-label">已点亮</view>
-        </view>
-        <view class="foot-stat">
-          <view class="foot-stat-num">{{totalCount}}</view>
-          <view class="foot-stat-label">省级行政区</view>
-        </view>
-        <view class="foot-stat-actions">
-          <view class="foot-mini-btn" bindtap="onSelectAll">全选</view>
-          <view class="foot-mini-btn ghost" bindtap="onClear">清空</view>
-        </view>
-      </view>
     </view>
 
     <view class="panel foot-map-panel">
@@ -42,7 +28,7 @@
       <view class="foot-map-wrap" catchtouchmove="preventMove">
         <canvas type="2d" id="chinaMap" class="foot-map" bindtouchstart="onMapTouch"></canvas>
       </view>
-      <view class="tool-note">点地图区块或下方名称，点亮该省；再点一次取消。每个省份颜色不同。</view>
+      <view class="tool-note">点地图或下方名称点亮省份，再点一次取消。未点亮只显示轮廓。</view>
     </view>
 
     <view class="panel foot-list-panel">
@@ -56,7 +42,7 @@
           data-id="{{item.id}}"
           style="{{item.chipStyle}}"
         >
-          <view class="foot-chip-dot" style="background: {{item.color}};"></view>
+          <view class="foot-chip-dot" wx:if="{{item.selected}}" style="background: {{item.color}};"></view>
           <text>{{item.name}}</text>
         </view>
       </view>

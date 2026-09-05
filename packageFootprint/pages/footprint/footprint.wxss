@@ -102,53 +102,6 @@
   color: var(--color-muted);
 }
 
-.foot-stats {
-  display: flex;
-  align-items: flex-end;
-  gap: 24rpx;
-  margin-top: 24rpx;
-}
-
-.foot-stat-num {
-  font-family: var(--font-display);
-  font-size: 56rpx;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -2rpx;
-  color: var(--color-brand);
-}
-
-.foot-stat-label {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  color: var(--color-muted);
-}
-
-.foot-stat-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 12rpx;
-}
-
-.foot-mini-btn {
-  min-width: 88rpx;
-  height: 56rpx;
-  line-height: 56rpx;
-  padding: 0 18rpx;
-  text-align: center;
-  border-radius: 999rpx;
-  font-size: 22rpx;
-  font-weight: 700;
-  color: var(--color-on-brand);
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
-}
-
-.foot-mini-btn.ghost {
-  color: var(--color-brand);
-  background: var(--color-soft);
-  border: 1rpx solid var(--color-line);
-}
-
 .foot-map-panel,
 .foot-list-panel {
   padding: 24rpx 22rpx 28rpx;

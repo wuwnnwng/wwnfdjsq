@@ -1,5 +1,7 @@
 {
   "description": "置居计算器",
+  "miniprogramRoot": "./",
+  "srcMiniprogramRoot": "./",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -42,7 +44,6 @@
     "localPlugins": false,
     "disableUseStrict": false,
     "useCompilerPlugins": [],
-    "condition": false,
     "swc": false,
     "disableSWC": true
   },
@@ -50,7 +51,11 @@
   "libVersion": "3.5.5",
   "appid": "wx84bc1eadae698ea3",
   "projectname": "wwnfdjsq",
-  "condition": {},
+  "condition": {
+    "miniprogram": {
+      "list": []
+    }
+  },
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2

@@ -47,18 +47,11 @@
   "subPackages": [
     {
       "root": "packageFootprint",
-      "name": "footprint",
       "pages": [
         "pages/footprint/footprint"
       ]
     }
   ],
-  "preloadRule": {
-    "pages/tools/index": {
-      "network": "all",
-      "packages": ["footprint"]
-    }
-  },
   "lazyCodeLoading": "requiredComponents",
   "navigateToMiniProgramAppIdList": ["wx663931c101197d69"]
 }

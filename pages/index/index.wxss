@@ -237,6 +237,10 @@
   background: linear-gradient(135deg, #ffe4e6, #fb7185);
 }
 
+.tool-icon-footprint {
+  background: linear-gradient(135deg, #e0f2fe, #38bdf8);
+}
+
 .tool-icon-currency {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
 }

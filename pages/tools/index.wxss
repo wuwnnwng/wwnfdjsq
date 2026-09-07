@@ -260,6 +260,10 @@
   background: linear-gradient(135deg, #ffe4e6, #fb7185);
 }
 
+.tool-icon-footprint {
+  background: linear-gradient(135deg, #e0f2fe, #38bdf8);
+}
+
 .tool-icon-anniversary {
   background: linear-gradient(135deg, #fce7f3, #e879f9);
 }

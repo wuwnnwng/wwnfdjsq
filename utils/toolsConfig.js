@@ -25,7 +25,7 @@ const CATEGORIES = [
   { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
-  { id: 'fun', name: '娱乐', toolIds: ['chance', 'drinkwheel'] }
+  { id: 'fun', name: '娱乐', toolIds: ['chance', 'drinkwheel', 'footprint'] }
 ]
 
 const TOOLS = [
@@ -244,6 +244,15 @@ const TOOLS = [
     iconType: 'drinkwheel',
     keywords: '喝酒转盘酒桌游戏真心话大冒险惩罚转盘聚会娱乐',
     page: '/pages/tools/drinkwheel/drinkwheel'
+  },
+  {
+    id: 'footprint',
+    name: '足迹地图',
+    shortName: '足迹',
+    icon: '🗺️',
+    iconType: 'footprint',
+    keywords: '足迹地图点亮省份去过旅行中国地图高德',
+    page: '/packageFootprint/pages/footprint/footprint'
   }
 ]
 

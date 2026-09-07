@@ -139,6 +139,11 @@
     },
     {
       "action": "allow",
+      "page": "packageFootprint/pages/footprint/footprint",
+      "priority": 40
+    },
+    {
+      "action": "allow",
       "page": "*",
       "priority": 20
     }

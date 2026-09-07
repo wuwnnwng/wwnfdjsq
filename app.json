@@ -51,12 +51,17 @@
       "root": "packageFootprint",
       "name": "footprint",
       "pages": ["pages/footprint/footprint"]
+    },
+    {
+      "root": "packageExam",
+      "name": "exam",
+      "pages": ["pages/exam/exam"]
     }
   ],
   "preloadRule": {
     "pages/tools/index": {
       "network": "wifi",
-      "packages": ["footprint"]
+      "packages": ["footprint", "exam"]
     }
   },
   "lazyCodeLoading": "requiredComponents",

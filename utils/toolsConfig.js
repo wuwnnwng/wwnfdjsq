@@ -21,7 +21,7 @@ const HOME_FEATURED_MINI_PROGRAMS = [
 ]
 
 const CATEGORIES = [
-  { id: 'daily', name: '日常工具', toolIds: ['retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
+  { id: 'daily', name: '日常工具', toolIds: ['retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle', 'exam'] },
   { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
@@ -253,6 +253,15 @@ const TOOLS = [
     iconType: 'footprint',
     keywords: '足迹地图点亮省份去过旅行中国地图高德',
     page: '/packageFootprint/pages/footprint/footprint'
+  },
+  {
+    id: 'exam',
+    name: '公考题型技巧',
+    shortName: '公考技巧',
+    icon: '📘',
+    iconType: 'exam',
+    keywords: '公考行测申论常识言语数量判断资料概括对策公文大作文答题技巧',
+    page: '/packageExam/pages/exam/exam'
   }
 ]
 

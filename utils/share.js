@@ -384,6 +384,14 @@ function getFootprintToolShare() {
   }
 }
 
+function getExamTipsToolShare() {
+  const path = '/packageExam/pages/exam/exam'
+  return {
+    appMessage: buildToolShareAppMessage(path, '公考题型技巧'),
+    timeline: buildToolShareTimeline(path, '公考题型技巧')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
@@ -676,6 +684,7 @@ module.exports = {
   getChanceToolShare,
   getDrinkWheelToolShare,
   getFootprintToolShare,
+  getExamTipsToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

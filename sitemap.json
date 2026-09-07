@@ -144,6 +144,11 @@
     },
     {
       "action": "allow",
+      "page": "packageExam/pages/exam/exam",
+      "priority": 40
+    },
+    {
+      "action": "allow",
       "page": "*",
       "priority": 20
     }

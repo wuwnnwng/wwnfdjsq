@@ -6,6 +6,7 @@ const {
   solarToLunar,
   lunarToSolar,
   formatLunarDate,
+  formatLunarYearDate,
   formatSolarDate,
   getZodiac,
   getConstellation,
@@ -163,9 +164,11 @@ function calculateAge(birthdayText, asOfText, options) {
 
   return {
     valid: true,
+    birthdayCalendar: useLunarBirthday ? 'lunar' : 'solar',
     birthdayText: formatSolarDate(birth.year, birth.month, birth.day),
     birthdayWeek: formatWeekday(birthDate),
     birthdayLunar: formatLunarDate(birthLunar),
+    birthdayLunarFull: formatLunarYearDate(birthLunar),
     asOfText: formatDateText(asOfDate),
     zodiac: getZodiac(birthLunar.lunarYear),
     constellation,

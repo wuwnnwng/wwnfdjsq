@@ -252,6 +252,14 @@
   background: linear-gradient(135deg, #dbeafe, #60a5fa);
 }
 
+.tool-icon-chance {
+  background: linear-gradient(135deg, #ffedd5, #fb923c);
+}
+
+.tool-icon-drinkwheel {
+  background: linear-gradient(135deg, #ffe4e6, #fb7185);
+}
+
 .tool-icon-anniversary {
   background: linear-gradient(135deg, #fce7f3, #e879f9);
 }

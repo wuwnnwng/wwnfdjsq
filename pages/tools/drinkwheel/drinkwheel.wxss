@@ -1,0 +1,228 @@
+@import "../tool-common.wxss";
+@import "../calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(248, 113, 113, 0.16) 0%, var(--color-hero-fade) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-drinkwheel {
+  background: linear-gradient(135deg, #ffe4e6, #fb7185);
+}
+
+.wheel-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.wheel-stage {
+  position: relative;
+  width: 560rpx;
+  height: 560rpx;
+  margin: 8rpx auto 0;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -6rpx;
+  left: 50%;
+  z-index: 4;
+  width: 0;
+  height: 0;
+  margin-left: -18rpx;
+  border-left: 18rpx solid transparent;
+  border-right: 18rpx solid transparent;
+  border-top: 40rpx solid var(--color-accent);
+  filter: drop-shadow(0 6rpx 8rpx rgba(0, 0, 0, 0.28));
+}
+
+.wheel {
+  position: absolute;
+  left: 10rpx;
+  top: 10rpx;
+  width: 540rpx;
+  height: 540rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 10rpx solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18rpx 40rpx rgba(0, 0, 0, 0.28);
+  box-sizing: border-box;
+}
+
+.wheel-slice {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 0;
+  height: 50%;
+  transform-origin: 50% 100%;
+}
+
+.wheel-label {
+  position: absolute;
+  left: 50%;
+  top: 36rpx;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.45);
+}
+
+.wheel-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 92rpx;
+  height: 92rpx;
+  margin: -46rpx 0 0 -46rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #e2e8f0 62%, #94a3b8);
+  box-shadow: 0 8rpx 18rpx rgba(0, 0, 0, 0.25);
+}
+
+.history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 8rpx;
+}
+
+.history-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.history-clear {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.history-clear.is-off {
+  opacity: 0.4;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.option-row:last-child {
+  border-bottom: none;
+}
+
+.option-index {
+  width: 40rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.option-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.option-del {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  color: var(--color-accent);
+}
+
+.option-del.is-off,
+.add-btn.is-off {
+  opacity: 0.38;
+}
+
+.add-btn {
+  margin-top: 16rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+  border: 1rpx dashed var(--color-line);
+  background: var(--color-soft);
+}
+
+.editor-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1200;
+  background: var(--color-mask);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.editor-sheet {
+  width: 100%;
+  border-radius: 24rpx 24rpx 0 0;
+  background: var(--color-dialog);
+  padding: 12rpx 0 calc(12rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 28rpx 4rpx;
+}
+
+.editor-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.editor-cancel,
+.editor-ok {
+  min-width: 88rpx;
+  padding: 16rpx 8rpx;
+  font-size: 28rpx;
+}
+
+.editor-cancel {
+  color: var(--color-muted);
+}
+
+.editor-ok {
+  text-align: right;
+  color: var(--color-brand);
+  font-weight: 700;
+}
+
+.editor-body {
+  padding: 12rpx 28rpx 28rpx;
+}
+
+.editor-input {
+  height: 88rpx;
+  padding: 0 24rpx;
+  border-radius: 20rpx;
+  font-size: 30rpx;
+  color: var(--color-ink);
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+}
+
+.primary-btn[disabled] {
+  opacity: 0.55;
+}

@@ -129,6 +129,16 @@
     },
     {
       "action": "allow",
+      "page": "pages/tools/chance/chance",
+      "priority": 40
+    },
+    {
+      "action": "allow",
+      "page": "pages/tools/drinkwheel/drinkwheel",
+      "priority": 40
+    },
+    {
+      "action": "allow",
       "page": "*",
       "priority": 20
     }

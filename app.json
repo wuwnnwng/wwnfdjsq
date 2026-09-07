@@ -24,6 +24,8 @@
     "pages/tools/retire/retire",
     "pages/tools/canvas/canvas",
     "pages/tools/puzzle/puzzle",
+    "pages/tools/chance/chance",
+    "pages/tools/drinkwheel/drinkwheel",
     "pages/result/result"
   ],
   "window": {

@@ -428,8 +428,13 @@ function drawAgeCard(ctx, width, height, result, theme) {
 
   y += 26
   const rowW = width - 48
+  const useLunarBirthday = result.birthdayCalendar === 'lunar'
+  const birthdayLabel = useLunarBirthday ? '农历生日' : '公历生日'
+  const birthdayValue = useLunarBirthday
+    ? `${result.birthdayLunarFull || result.birthdayLunar} · ${result.birthdayWeek}`
+    : `${result.birthdayText} · ${result.birthdayWeek}`
   const rows = [
-    ['公历生日', `${result.birthdayText} · ${result.birthdayWeek}`],
+    [birthdayLabel, birthdayValue],
     ['生肖 / 星座', `${result.zodiac} · ${result.constellation}`],
     ['下次生日', result.nextBirthdayText],
     ['恋爱最配', result.loveNames || '—'],

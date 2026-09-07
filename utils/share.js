@@ -360,6 +360,22 @@ function getRetireToolShare() {
   }
 }
 
+function getChanceToolShare() {
+  const path = '/pages/tools/chance/chance'
+  return {
+    appMessage: buildToolShareAppMessage(path, '掷骰子/投硬币'),
+    timeline: buildToolShareTimeline(path, '掷骰子/投硬币')
+  }
+}
+
+function getDrinkWheelToolShare() {
+  const path = '/pages/tools/drinkwheel/drinkwheel'
+  return {
+    appMessage: buildToolShareAppMessage(path, '喝酒转盘'),
+    timeline: buildToolShareTimeline(path, '喝酒转盘')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
@@ -649,6 +665,8 @@ module.exports = {
   getSafePeriodToolShare,
   getPensionToolShare,
   getRetireToolShare,
+  getChanceToolShare,
+  getDrinkWheelToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

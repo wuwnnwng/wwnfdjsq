@@ -1,0 +1,73 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-drinkwheel">
+            <text class="tool-icon">🎡</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">酒桌 · 转盘 · 自定义</view>
+            <view class="conv-title">喝酒转盘</view>
+          </view>
+        </view>
+      </view>
+      <view class="conv-eq" wx:if="{{lastText}}">指针停在</view>
+      <view class="conv-result" wx:if="{{lastText}}">{{lastText}}</view>
+      <view class="conv-eq" wx:else>转一下，看谁喝、看谁表演</view>
+    </view>
+
+    <view class="panel wheel-panel">
+      <view class="wheel-stage">
+        <view class="wheel-pointer"></view>
+        <view class="wheel" style="{{wheelBg}}; {{wheelStyle}}">
+          <view class="wheel-slice" wx:for="{{slices}}" wx:key="id" style="{{item.style}}">
+            <text class="wheel-label">{{item.short}}</text>
+          </view>
+          <view class="wheel-hub"></view>
+        </view>
+      </view>
+      <button class="primary-btn" disabled="{{spinning}}" bindtap="onSpin">
+        {{spinning ? '转动中…' : '转一次'}}
+      </button>
+      <view class="tool-note">仅供聚会娱乐，请适量饮酒，不要酒驾。</view>
+    </view>
+
+    <view class="panel">
+      <view class="history-head">
+        <view class="history-title">转盘内容 {{optionCount}} / {{maxOptions}}</view>
+        <view class="history-clear {{isDefault ? 'is-off' : ''}}" bindtap="onResetDefault">恢复默认模板</view>
+      </view>
+      <view class="option-list">
+        <view class="option-row" wx:for="{{optionRows}}" wx:key="id">
+          <view class="option-index">{{item.index + 1}}</view>
+          <view class="option-text" bindtap="onOpenEdit" data-index="{{item.index}}">{{item.text}}</view>
+          <view class="option-del {{canRemove ? '' : 'is-off'}}" catchtap="onRemoveOption" data-index="{{item.index}}">删除</view>
+        </view>
+      </view>
+      <view class="add-btn {{canAdd ? '' : 'is-off'}}" bindtap="onOpenAdd">＋ 添加一条（{{minOptions}}–{{maxOptions}} 条）</view>
+      <view class="tool-note">点文字可改内容。默认 9 条会记住；你改过之后下次进来还是你的版本。</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{showEditor}}" class="editor-mask" catchtap="onCancelEditor" catchtouchmove="preventMove">
+    <view class="editor-sheet" catchtap="onSheetTap">
+      <view class="editor-head">
+        <view class="editor-cancel" catchtap="onCancelEditor">取消</view>
+        <view class="editor-title">{{editorTitle}}</view>
+        <view class="editor-ok" catchtap="onConfirmEditor">保存</view>
+      </view>
+      <view class="editor-body">
+        <input
+          class="editor-input"
+          maxlength="12"
+          value="{{editValue}}"
+          placeholder="最多 12 个字"
+          focus="{{showEditor}}"
+          bindinput="onEditInput"
+          bindconfirm="onConfirmEditor"
+        />
+      </view>
+    </view>
+  </view>
+</view>

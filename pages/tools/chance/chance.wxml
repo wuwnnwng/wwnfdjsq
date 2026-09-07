@@ -1,0 +1,73 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-chance">
+            <text class="tool-icon">🎲</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">聚会 · 随机 · 记录</view>
+            <view class="conv-title">掷骰子 / 投硬币</view>
+          </view>
+        </view>
+      </view>
+      <view class="conv-eq" wx:if="{{lastValue}}">本次 {{lastTitle}}</view>
+      <view class="conv-result" wx:if="{{lastValue}}">{{lastValue}}</view>
+      <view class="conv-eq" wx:else>点一下，当场出结果</view>
+    </view>
+
+    <view class="panel">
+      <view class="seg-row">
+        <view class="seg-item {{tab === 'dice' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="dice">掷骰子</view>
+        <view class="seg-item {{tab === 'coin' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="coin">投硬币</view>
+      </view>
+
+      <view class="stage {{shaking ? 'is-shake' : ''}} {{flipping ? 'is-flip' : ''}}">
+        <block wx:if="{{tab === 'dice'}}">
+          <view class="dice-row">
+            <view class="die" wx:for="{{dice}}" wx:key="index">
+              <view class="pip {{pip.on ? 'on' : ''}}" wx:for="{{item.pips}}" wx:for-item="pip" wx:key="key"></view>
+            </view>
+          </view>
+        </block>
+        <view class="coin {{coinHeads ? 'heads' : 'tails'}}" wx:else>
+          <text class="coin-face">{{coinFaceText}}</text>
+        </view>
+      </view>
+
+      <view class="count-row" wx:if="{{tab === 'dice'}}">
+        <text class="count-label">骰子数量</text>
+        <view class="count-pills">
+          <view
+            class="count-pill {{diceCount === item ? 'active' : ''}}"
+            wx:for="{{diceCounts}}"
+            wx:key="*this"
+            bindtap="onSelectDiceCount"
+            data-count="{{item}}"
+          >{{item}} 枚</view>
+        </view>
+      </view>
+      <view class="tool-note" wx:else>每次抛出正面或反面，公平随机。</view>
+
+      <button class="primary-btn" disabled="{{rolling}}" bindtap="onPlay">
+        {{rolling ? '进行中…' : (tab === 'dice' ? '掷一次' : '抛一次')}}
+      </button>
+    </view>
+
+    <view class="panel history-panel">
+      <view class="history-head">
+        <view class="history-title">历史记录</view>
+        <view class="history-clear {{records.length ? '' : 'is-off'}}" bindtap="onClearRecords">清空记录</view>
+      </view>
+      <view class="history-empty" wx:if="{{!records.length}}">还没有结果。掷过或抛过之后会出现在这里，下次进来也还在。</view>
+      <view class="history-list" wx:else>
+        <view class="history-row" wx:for="{{records}}" wx:key="id">
+          <view class="history-kind">{{item.title}}</view>
+          <view class="history-value">{{item.valueText}}</view>
+          <view class="history-time">{{item.timeText}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

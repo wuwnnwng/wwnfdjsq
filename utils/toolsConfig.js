@@ -24,7 +24,8 @@ const CATEGORIES = [
   { id: 'daily', name: '日常工具', toolIds: ['retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle'] },
   { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
-  { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] }
+  { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
+  { id: 'fun', name: '娱乐', toolIds: ['chance', 'drinkwheel'] }
 ]
 
 const TOOLS = [
@@ -225,6 +226,24 @@ const TOOLS = [
     icon: '🔢',
     iconType: 'base',
     page: '/pages/tools/base/base'
+  },
+  {
+    id: 'chance',
+    name: '掷骰子/投硬币',
+    shortName: '骰子硬币',
+    icon: '🎲',
+    iconType: 'chance',
+    keywords: '掷骰子投硬币抛硬币骰子点数正反面随机娱乐聚会',
+    page: '/pages/tools/chance/chance'
+  },
+  {
+    id: 'drinkwheel',
+    name: '喝酒转盘',
+    shortName: '喝酒转盘',
+    icon: '🎡',
+    iconType: 'drinkwheel',
+    keywords: '喝酒转盘酒桌游戏真心话大冒险惩罚转盘聚会娱乐',
+    page: '/pages/tools/drinkwheel/drinkwheel'
   }
 ]
 

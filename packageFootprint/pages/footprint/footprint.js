@@ -1,6 +1,8 @@
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getFootprintToolShare } = require('../../../utils/share')
+const { saveResultCard, handleSaveError } = require('../../../utils/resultCard')
 const { drawChinaMap, hitProvince } = require('../../utils/chinaMap')
+const { drawFootprintCard } = require('../../utils/footprintCard')
 const {
   PROVINCES,
   COLOR_MAP,
@@ -19,7 +21,8 @@ Page({
     theme: getThemeId(),
     chips: [],
     litCount: 0,
-    totalCount: PROVINCES.length
+    totalCount: PROVINCES.length,
+    savingCard: false
   },
 
   onLoad() {
@@ -96,6 +99,40 @@ Page({
   onToggleChip(e) {
     const name = e.currentTarget.dataset.name
     this.toggleProvince(name)
+  },
+
+  onSaveCard() {
+    if (!this.data.litCount) {
+      wx.showToast({ title: '先点亮至少一个省', icon: 'none' })
+      return
+    }
+    if (this._savingCard) return
+    this._savingCard = true
+    this.setData({ savingCard: true })
+    const litSet = this._litSet || {}
+    const litCount = this.data.litCount
+    const totalCount = this.data.totalCount
+    wx.showLoading({ title: '正在生成', mask: true })
+    saveResultCard(this, 'resultCard', (ctx, width, height) => {
+      drawFootprintCard(ctx, width, height, {
+        litSet,
+        colorMap: COLOR_MAP,
+        litCount,
+        totalCount
+      })
+    })
+      .then(() => {
+        wx.hideLoading()
+        wx.showToast({ title: '已保存到相册', icon: 'success' })
+      })
+      .catch((err) => {
+        wx.hideLoading()
+        handleSaveError(err)
+      })
+      .then(() => {
+        this._savingCard = false
+        this.setData({ savingCard: false })
+      })
   },
 
   onClearAll() {

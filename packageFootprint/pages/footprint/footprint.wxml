@@ -38,6 +38,13 @@
         >{{item.name}}</view>
       </view>
       <view class="tool-note">点灰色省名即可点亮，地图上对应区块会变成这个省自己的颜色。再点一次会熄灭。记录保存在这台手机上。</view>
+      <view class="save-bar-spacer"></view>
     </view>
   </scroll-view>
+
+  <view class="save-card-bar">
+    <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '导出卡片到相册'}}</view>
+  </view>
+
+  <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
 </view>

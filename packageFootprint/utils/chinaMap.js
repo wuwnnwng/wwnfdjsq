@@ -66,25 +66,30 @@ function unproject(x, y, width, height, pad) {
   return [lng, lat]
 }
 
-function drawChinaMap(ctx, width, height, litSet, colorMap, dark) {
-  const pad = 8
+function drawChinaMap(ctx, width, height, litSet, colorMap, dark, opt) {
+  const ox = (opt && opt.x) || 0
+  const oy = (opt && opt.y) || 0
+  const pad = opt && opt.pad != null ? opt.pad : 8
+  const lineWidth = opt && opt.lineWidth != null ? opt.lineWidth : 0.7
   const unlit = dark ? '#243044' : '#dbe3ee'
   const border = dark ? '#64748b' : '#94a3b8'
-  ctx.clearRect(0, 0, width, height)
+  if (!(opt && opt.skipClear)) ctx.clearRect(ox, oy, width, height)
   REGIONS.forEach((region) => {
     const fill = litSet[region.name] ? colorMap[region.name] || '#38bdf8' : unlit
     region.rings.forEach((ring) => {
       ctx.beginPath()
       ring.forEach((pt, i) => {
         const xy = project(pt[0], pt[1], width, height, pad)
-        if (i === 0) ctx.moveTo(xy[0], xy[1])
-        else ctx.lineTo(xy[0], xy[1])
+        const px = ox + xy[0]
+        const py = oy + xy[1]
+        if (i === 0) ctx.moveTo(px, py)
+        else ctx.lineTo(px, py)
       })
       ctx.closePath()
       ctx.fillStyle = fill
       ctx.fill()
       ctx.strokeStyle = border
-      ctx.lineWidth = 0.7
+      ctx.lineWidth = lineWidth
       ctx.stroke()
     })
   })

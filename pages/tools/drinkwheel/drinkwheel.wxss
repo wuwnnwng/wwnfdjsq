@@ -97,6 +97,13 @@
   color: var(--color-brand);
 }
 
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  flex-shrink: 0;
+}
+
 .history-clear {
   flex-shrink: 0;
   font-size: 24rpx;

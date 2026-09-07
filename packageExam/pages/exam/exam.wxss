@@ -100,12 +100,13 @@
 .tip-card {
   min-height: 92%;
   margin: 8rpx 4rpx 16rpx;
-  padding: 36rpx 32rpx 40rpx;
+  padding: 40rpx 36rpx 44rpx;
   border-radius: 28rpx;
   background: var(--color-surface);
   border: 1rpx solid var(--color-line);
   box-shadow: 0 16rpx 40rpx rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
+  border-left: 10rpx solid var(--color-brand);
 }
 
 .tip-meta {
@@ -116,33 +117,44 @@
 
 .tip-no {
   font-family: var(--font-display);
-  font-size: 40rpx;
+  font-size: 44rpx;
   font-weight: 800;
   color: var(--color-brand);
+  letter-spacing: 1rpx;
 }
 
 .tip-tag {
-  padding: 4rpx 14rpx;
+  padding: 6rpx 16rpx;
   border-radius: 999rpx;
-  font-size: 22rpx;
-  font-weight: 600;
-  color: var(--color-accent);
-  background: var(--color-soft);
+  font-size: 24rpx;
+  font-weight: 800;
+  color: #fff;
+  background: var(--color-accent);
 }
 
 .tip-title {
   margin-top: 28rpx;
-  font-size: 36rpx;
+  font-size: 44rpx;
   font-weight: 800;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--color-ink);
+  letter-spacing: 0.5rpx;
 }
 
 .tip-body {
-  margin-top: 20rpx;
-  font-size: 28rpx;
-  line-height: 1.75;
-  color: var(--color-muted);
+  margin-top: 24rpx;
+  font-size: 32rpx;
+  line-height: 1.85;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.tip-body .is-em {
+  color: var(--color-accent);
+  font-weight: 800;
+  background: rgba(251, 146, 60, 0.18);
+  padding: 0 4rpx;
+  border-radius: 6rpx;
 }
 
 .reader-nav {

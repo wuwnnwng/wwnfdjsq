@@ -9,6 +9,7 @@ const {
   readOptions,
   writeOptions,
   resetOptions,
+  shuffleOptions,
   buildWheelView,
   pickIndex,
   nextWheelDeg
@@ -207,6 +208,17 @@ Page({
     next.splice(index, 1)
     const saved = writeOptions(next)
     applyWheel(this, saved, { lastText: '' })
+  },
+
+  onShuffle() {
+    if (this.data.spinning) return
+    const shuffled = shuffleOptions(this.data.options)
+    applyWheel(this, shuffled, {
+      lastText: '',
+      wheelDeg: 0,
+      wheelStyle: 'transform: rotate(0deg); transition: none;'
+    })
+    if (wx.vibrateShort) wx.vibrateShort({ type: 'light' })
   },
 
   onResetDefault() {

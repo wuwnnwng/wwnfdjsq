@@ -36,7 +36,10 @@
     <view class="panel">
       <view class="history-head">
         <view class="history-title">转盘内容 {{optionCount}} / {{maxOptions}}</view>
-        <view class="history-clear {{isDefault ? 'is-off' : ''}}" bindtap="onResetDefault">恢复默认模板</view>
+        <view class="history-actions">
+          <view class="history-clear" bindtap="onShuffle">打乱顺序</view>
+          <view class="history-clear {{isDefault ? 'is-off' : ''}}" bindtap="onResetDefault">恢复默认</view>
+        </view>
       </view>
       <view class="option-list">
         <view class="option-row" wx:for="{{optionRows}}" wx:key="id">

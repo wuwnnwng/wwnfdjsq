@@ -1,23 +1,14 @@
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getFootprintToolShare } = require('../../../utils/share')
-const echarts = require('../../ec-canvas/echarts')
-const chinaMap = require('../../data/china.json')
+const { drawChinaMap, hitProvince } = require('../../utils/chinaMap')
 const {
   PROVINCES,
+  COLOR_MAP,
   readLitSet,
   toggleLit,
   clearLit,
-  buildChips,
-  buildMapOption
+  buildChips
 } = require('../../utils/footprint')
-
-let mapRegistered = false
-
-function ensureChinaMap() {
-  if (mapRegistered) return
-  echarts.registerMap('china', chinaMap)
-  mapRegistered = true
-}
 
 function litCount(set) {
   return PROVINCES.reduce((n, item) => n + (set[item.name] ? 1 : 0), 0)
@@ -26,7 +17,6 @@ function litCount(set) {
 Page({
   data: {
     theme: getThemeId(),
-    ec: { lazyLoad: true },
     chips: [],
     litCount: 0,
     totalCount: PROVINCES.length
@@ -34,7 +24,6 @@ Page({
 
   onLoad() {
     enableShareMenu()
-    ensureChinaMap()
     const litSet = readLitSet()
     this._litSet = litSet
     this.setData({
@@ -44,46 +33,52 @@ Page({
   },
 
   onReady() {
-    this.initChart()
+    this.initMap()
   },
 
   onShow() {
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
-    if (this._chart) this.renderMap()
+    if (this._map) this.drawMap()
   },
 
-  onUnload() {
-    if (this._chart) {
-      this._chart.dispose()
-      this._chart = null
-    }
-  },
-
-  initChart() {
-    const component = this.selectComponent('#footprintMap')
-    if (!component) return
-    component.init((canvas, width, height, dpr) => {
-      const chart = echarts.init(canvas, null, {
-        width,
-        height,
-        devicePixelRatio: dpr
+  initMap() {
+    wx.createSelectorQuery()
+      .in(this)
+      .select('#chinaMap')
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        const info = res && res[0]
+        if (!info || !info.node) return
+        const canvas = info.node
+        const ctx = canvas.getContext('2d')
+        const dpr = wx.getSystemInfoSync().pixelRatio || 1
+        canvas.width = info.width * dpr
+        canvas.height = info.height * dpr
+        ctx.scale(dpr, dpr)
+        this._map = {
+          canvas,
+          ctx,
+          width: info.width,
+          height: info.height
+        }
+        this.drawMap()
       })
-      canvas.setChart(chart)
-      this._chart = chart
-      chart.on('click', (params) => {
-        if (params && params.name) this.toggleProvince(params.name)
-      })
-      this.renderMap()
-      return chart
-    })
   },
 
-  renderMap() {
-    if (!this._chart) return
+  drawMap() {
+    if (!this._map) return
     const dark = this.data.theme === 'nexus'
-    this._chart.setOption(buildMapOption(this._litSet || {}, dark), true)
+    drawChinaMap(this._map.ctx, this._map.width, this._map.height, this._litSet || {}, COLOR_MAP, dark)
+  },
+
+  onMapTap(e) {
+    if (!this._map) return
+    const touch = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0])
+    if (!touch) return
+    const name = hitProvince(touch.x, touch.y, this._map.width, this._map.height)
+    if (name) this.toggleProvince(name)
   },
 
   toggleProvince(name) {
@@ -94,7 +89,7 @@ Page({
       chips: buildChips(next),
       litCount: litCount(next)
     })
-    this.renderMap()
+    this.drawMap()
     if (wx.vibrateShort) wx.vibrateShort({ type: 'light' })
   },
 
@@ -116,7 +111,7 @@ Page({
           chips: buildChips(this._litSet),
           litCount: 0
         })
-        this.renderMap()
+        this.drawMap()
       }
     })
   },

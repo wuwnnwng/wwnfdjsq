@@ -48,7 +48,9 @@
               <text class="tip-tag">{{item.tag}}</text>
             </view>
             <view class="tip-title">{{item.title}}</view>
-            <view class="tip-body">{{item.body}}</view>
+            <view class="tip-body">
+              <text wx:for="{{item.parts}}" wx:for-item="part" wx:for-index="pi" wx:key="pi" class="{{part.em ? 'is-em' : ''}}">{{part.text}}</text>
+            </view>
           </view>
         </scroll-view>
       </swiper-item>

@@ -85,6 +85,17 @@ function resetOptions() {
   return writeOptions(DEFAULT_OPTIONS.slice())
 }
 
+function shuffleOptions(list) {
+  const next = sanitizeOptions(list).slice()
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const tmp = next[i]
+    next[i] = next[j]
+    next[j] = tmp
+  }
+  return writeOptions(next)
+}
+
 function buildWheelView(options) {
   const items = normalizeOptions(options)
   const n = items.length
@@ -142,6 +153,7 @@ module.exports = {
   readOptions,
   writeOptions,
   resetOptions,
+  shuffleOptions,
   buildWheelView,
   pickIndex,
   nextWheelDeg

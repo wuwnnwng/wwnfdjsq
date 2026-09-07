@@ -1,7 +1,5 @@
 {
   "navigationBarTitleText": "足迹｜小小便民工具箱",
   "disableScroll": true,
-  "usingComponents": {
-    "ec-canvas": "../../ec-canvas/ec-canvas"
-  }
+  "usingComponents": {}
 }

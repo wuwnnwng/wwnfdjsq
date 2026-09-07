@@ -414,11 +414,14 @@
 .yi-ji-item {
   font-size: 26rpx;
   line-height: 1.4;
-  color: var(--color-ink);
+}
+
+.yi-ji-item.yi {
+  color: var(--color-brand-soft);
 }
 
 .yi-ji-item.ji {
-  color: var(--color-ink);
+  color: var(--color-accent);
 }
 
 .huangli-title-row {

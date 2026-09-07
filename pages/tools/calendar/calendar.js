@@ -21,7 +21,6 @@ const { getDayHolidayRecord } = require('../../../utils/holidayApi')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCalendarToolShare } = require('../../../utils/share')
 const { createPickerTick } = require('../../../utils/pickerTick')
-const { createLastInput } = require('../../../utils/toolLastInput')
 
 const WEEK_HEADERS = ['日', '一', '二', '三', '四', '五', '六']
 const WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
@@ -41,15 +40,6 @@ for (let year = PICKER_YEAR_START; year <= PICKER_YEAR_END; year += 1) {
   PICKER_YEARS.push(year)
 }
 const PICKER_MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-const lastInput = createLastInput('calendar', [
-  'viewYear',
-  'viewMonth',
-  'selectedYear',
-  'selectedMonth',
-  'selectedDay',
-  'pickerCalendar'
-])
-
 function daysInMonth(year, month) {
   return new Date(year, month, 0).getDate()
 }
@@ -256,23 +246,18 @@ Page({
     this._pickerTick = createPickerTick()
     const today = todayParts()
     this._today = today
-    const saved = lastInput.restore()
-    const picked = clampPickerDate(
-      saved.selectedYear || saved.viewYear || today.year,
-      saved.selectedMonth || saved.viewMonth || today.month,
-      saved.selectedDay || today.day
-    )
     this.setData(
       {
-        viewYear: saved.viewYear || picked.year,
-        viewMonth: saved.viewMonth || picked.month,
-        selectedYear: picked.year,
-        selectedMonth: picked.month,
-        selectedDay: picked.day,
-        pickerCalendar: saved.pickerCalendar === 'lunar' ? 'lunar' : 'solar'
+        viewYear: today.year,
+        viewMonth: today.month,
+        selectedYear: today.year,
+        selectedMonth: today.month,
+        selectedDay: today.day,
+        pickerCalendar: 'solar',
+        selectedHourZhi: ''
       },
       () => {
-        this.loadFestivalData(picked.year, () => this.refreshCalendarView())
+        this.loadFestivalData(today.year, () => this.refreshCalendarView())
       }
     )
   },
@@ -340,9 +325,7 @@ Page({
     }
   },
 
-  onHide() {
-    lastInput.flush(this)
-  },
+  onHide() {},
 
   refreshFestivalCountdown() {
     const { festivalGroups, viewYear } = this.data
@@ -415,7 +398,7 @@ Page({
         jianChu: almanac.jianChu
       },
       huangliDetail
-    }, () => lastInput.save(this))
+    })
   },
 
   applyPickedDate(picked) {
@@ -463,7 +446,6 @@ Page({
         pickerHint: solarPickerHint(picked)
       },
       () => {
-        lastInput.save(this)
         setTimeout(() => {
           this._datePickerReady = true
         }, 180)
@@ -487,7 +469,6 @@ Page({
         pickerHint: lunarPickerHint(this._pendingLunar)
       },
       () => {
-        lastInput.save(this)
         setTimeout(() => {
           this._lunarPickerReady = true
         }, 180)
@@ -800,7 +781,6 @@ Page({
   },
 
   onUnload() {
-    lastInput.flush(this)
     if (this._pickerTick) {
       this._pickerTick.destroy()
       this._pickerTick = null

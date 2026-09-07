@@ -1,65 +1,4 @@
-const chinaRaw = require('../data/china.js')
-
-function decodeRing(coordinate, encodeOffsets, encodeScale) {
-  const result = []
-  let prevX = encodeOffsets[0]
-  let prevY = encodeOffsets[1]
-  for (let i = 0; i < coordinate.length; i += 2) {
-    let x = coordinate.charCodeAt(i) - 64
-    let y = coordinate.charCodeAt(i + 1) - 64
-    x = (x >> 1) ^ -(x & 1)
-    y = (y >> 1) ^ -(y & 1)
-    x += prevX
-    y += prevY
-    prevX = x
-    prevY = y
-    result.push([x / encodeScale, y / encodeScale])
-  }
-  return result
-}
-
-function decodeGeo(json) {
-  if (!json || !json.UTF8Encoding) return json
-  const scale = json.UTF8Scale || 1024
-  const features = json.features || []
-  features.forEach((feature) => {
-    const geometry = feature.geometry
-    if (!geometry) return
-    const coordinates = geometry.coordinates
-    const encodeOffsets = geometry.encodeOffsets || []
-    if (geometry.type === 'Polygon') {
-      coordinates.forEach((ring, i) => {
-        if (typeof ring === 'string') {
-          coordinates[i] = decodeRing(ring, encodeOffsets[i], scale)
-        }
-      })
-    } else if (geometry.type === 'MultiPolygon') {
-      coordinates.forEach((polygon, i) => {
-        polygon.forEach((ring, j) => {
-          if (typeof ring === 'string') {
-            polygon[j] = decodeRing(ring, encodeOffsets[i][j], scale)
-          }
-        })
-      })
-    }
-  })
-  json.UTF8Encoding = false
-  return json
-}
-
-function ringsOf(feature) {
-  const geometry = feature.geometry || {}
-  const coordinates = geometry.coordinates || []
-  if (geometry.type === 'Polygon') return coordinates
-  if (geometry.type === 'MultiPolygon') {
-    const rings = []
-    coordinates.forEach((polygon) => {
-      polygon.forEach((ring) => rings.push(ring))
-    })
-    return rings
-  }
-  return []
-}
+const REGION_LIST = require('./chinaRegions')
 
 function ringArea(ring) {
   let sum = 0
@@ -84,11 +23,9 @@ function pointInRing(lng, lat, ring) {
   return inside
 }
 
-const decoded = decodeGeo(chinaRaw)
-const REGIONS = (decoded.features || [])
-  .map((feature) => {
-    const name = feature.properties && feature.properties.name
-    const rings = ringsOf(feature).filter((ring) => ring && ring.length > 2)
+const REGIONS = (REGION_LIST || [])
+  .map((item) => {
+    const rings = (item.rings || []).filter((ring) => ring && ring.length > 2)
     let minLng = 180
     let maxLng = 73
     let minLat = 54
@@ -103,7 +40,7 @@ const REGIONS = (decoded.features || [])
         if (pt[1] > maxLat) maxLat = pt[1]
       })
     })
-    return { name, rings, area, minLng, maxLng, minLat, maxLat }
+    return { name: item.name, rings, area, minLng, maxLng, minLat, maxLat }
   })
   .filter((item) => item.name && item.rings.length)
   .sort((a, b) => b.area - a.area)

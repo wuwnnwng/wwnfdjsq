@@ -244,22 +244,6 @@ Page({
   onLoad() {
     enableShareMenu()
     this._pickerTick = createPickerTick()
-    const today = todayParts()
-    this._today = today
-    this.setData(
-      {
-        viewYear: today.year,
-        viewMonth: today.month,
-        selectedYear: today.year,
-        selectedMonth: today.month,
-        selectedDay: today.day,
-        pickerCalendar: 'solar',
-        selectedHourZhi: ''
-      },
-      () => {
-        this.loadFestivalData(today.year, () => this.refreshCalendarView())
-      }
-    )
   },
 
   async loadFestivalData(year, callback) {
@@ -317,12 +301,32 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
-    if (this.data.activeTab === 'festival' && this.data.festivalGroups) {
-      this.refreshFestivalCountdown()
-    }
-    if (this.data.activeTab === 'almanac' && this.data.selectedYear) {
-      this.refreshCalendarView()
-    }
+    this.resetToToday()
+  },
+
+  resetToToday() {
+    const today = todayParts()
+    this._today = today
+    this.setData(
+      {
+        viewYear: today.year,
+        viewMonth: today.month,
+        selectedYear: today.year,
+        selectedMonth: today.month,
+        selectedDay: today.day,
+        pickerCalendar: 'solar',
+        selectedHourZhi: '',
+        showDatePicker: false
+      },
+      () => {
+        this.ensureFestivalYear(today.year, () => {
+          this.refreshCalendarView()
+          if (this.data.activeTab === 'festival') {
+            this.refreshFestivalCountdown()
+          }
+        })
+      }
+    )
   },
 
   onHide() {},
@@ -690,18 +694,7 @@ Page({
   },
 
   onBackToday() {
-    const today = this._today || todayParts()
-    this.setData(
-      {
-        viewYear: today.year,
-        viewMonth: today.month,
-        selectedYear: today.year,
-        selectedMonth: today.month,
-        selectedDay: today.day,
-        selectedHourZhi: ''
-      },
-      () => this.refreshCalendarView()
-    )
+    this.resetToToday()
   },
 
   onSelectDay(e) {

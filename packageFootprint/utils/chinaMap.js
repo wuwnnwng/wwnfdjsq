@@ -1,4 +1,4 @@
-const chinaRaw = require('../data/china.json')
+const chinaRaw = require('../data/china.js')
 
 function decodeRing(coordinate, encodeOffsets, encodeScale) {
   const result = []

@@ -81,7 +81,9 @@ function pack(rows) {
     tag: row[0],
     title: row[1],
     body: row[2],
-    parts: toParts(row[2], row[1], row[0])
+    parts: toParts(row[2], row[1], row[0]),
+    example: String(row[3] || '').trim(),
+    explain: String(row[4] || '').trim()
   }))
 }
 

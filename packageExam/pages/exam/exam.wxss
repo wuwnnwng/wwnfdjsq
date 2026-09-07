@@ -157,6 +157,37 @@
   border-radius: 6rpx;
 }
 
+.tip-example {
+  margin-top: 32rpx;
+  padding: 24rpx 24rpx 26rpx;
+  border-radius: 20rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+}
+
+.tip-example-kicker {
+  font-size: 22rpx;
+  font-weight: 800;
+  letter-spacing: 2rpx;
+  color: var(--color-accent);
+}
+
+.tip-example-q {
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  line-height: 1.7;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.tip-example-a {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  line-height: 1.65;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
 .reader-nav {
   flex-shrink: 0;
   display: grid;

@@ -27,7 +27,7 @@
           <view class="type-go">看卡片</view>
         </view>
       </view>
-      <view class="tool-note">按题型整理的答题方法小卡片，便于考前过一遍。是通用技巧，不能代替真题。下次进来会记住你看到哪张。</view>
+      <view class="tool-note">按题型整理的答题方法小卡片，行测每张都带一道例题帮你对上用法。是通用技巧，不能代替系统刷题。下次进来会记住你看到哪张。</view>
     </view>
   </scroll-view>
 
@@ -50,6 +50,11 @@
             <view class="tip-title">{{item.title}}</view>
             <view class="tip-body">
               <text wx:for="{{item.parts}}" wx:for-item="part" wx:for-index="pi" wx:key="pi" class="{{part.em ? 'is-em' : ''}}">{{part.text}}</text>
+            </view>
+            <view class="tip-example" wx:if="{{item.example}}">
+              <view class="tip-example-kicker">例题</view>
+              <view class="tip-example-q">{{item.example}}</view>
+              <view class="tip-example-a" wx:if="{{item.explain}}">{{item.explain}}</view>
             </view>
           </view>
         </scroll-view>

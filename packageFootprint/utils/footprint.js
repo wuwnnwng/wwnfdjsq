@@ -3,6 +3,7 @@
  */
 
 const STORAGE_KEY = 'footprint:litProvinces'
+const START_KEY = 'footprint:startProvince'
 const UNLIT_DARK = '#243044'
 const UNLIT_LIGHT = '#dbe3ee'
 const BORDER_DARK = '#5b6b82'
@@ -85,11 +86,30 @@ function clearLit() {
   return {}
 }
 
-function buildChips(litSet) {
+function readStartName() {
+  try {
+    const name = wx.getStorageSync(START_KEY)
+    return COLOR_MAP[name] ? name : ''
+  } catch (e) {
+    return ''
+  }
+}
+
+function writeStartName(name) {
+  const next = COLOR_MAP[name] ? name : ''
+  try {
+    if (next) wx.setStorageSync(START_KEY, next)
+    else wx.removeStorageSync(START_KEY)
+  } catch (e) {}
+  return next
+}
+
+function buildChips(litSet, startName) {
   return PROVINCES.map((item) => ({
     name: item.name,
     color: item.color,
-    lit: !!litSet[item.name]
+    lit: !!litSet[item.name],
+    start: item.name === startName
   }))
 }
 
@@ -147,6 +167,8 @@ module.exports = {
   writeLitSet,
   toggleLit,
   clearLit,
+  readStartName,
+  writeStartName,
   buildChips,
   buildMapOption
 }

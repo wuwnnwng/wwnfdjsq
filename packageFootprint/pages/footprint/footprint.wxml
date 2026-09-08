@@ -9,7 +9,7 @@
         <view class="conv-title">足迹地图</view>
       </view>
     </view>
-    <view class="conv-eq">已点亮 {{litCount}} / {{totalCount}} 省</view>
+    <view class="conv-eq">已点亮 {{litCount}} / {{totalCount}} 省<block wx:if="{{startName}}"> · 起点 {{startName}}</block></view>
   </view>
 
   <view class="panel map-panel">
@@ -17,7 +17,10 @@
       type="2d"
       id="chinaMap"
       class="map-canvas"
-      bindtouchend="onMapTap"
+      bindtouchstart="onMapTouchStart"
+      catchtouchmove="onMapTouchMove"
+      bindtouchend="onMapTouchEnd"
+      bindtouchcancel="onMapTouchCancel"
     ></canvas>
   </view>
 
@@ -25,19 +28,24 @@
     <view class="panel chip-panel">
       <view class="chip-head">
         <view class="chip-title">点亮省份</view>
-        <view class="chip-clear {{litCount ? '' : 'is-off'}}" bindtap="onClearAll">全部熄灭</view>
+        <view class="chip-clear {{litCount || startName ? '' : 'is-off'}}" bindtap="onClearAll">全部熄灭</view>
       </view>
       <view class="chip-grid">
         <view
-          class="prov-chip {{item.lit ? 'is-lit' : ''}}"
+          class="prov-chip {{item.lit ? 'is-lit' : ''}} {{item.start ? 'is-start' : ''}}"
           wx:for="{{chips}}"
           wx:key="name"
           style="{{item.lit ? 'background:' + item.color + ';' : ''}}"
           bindtap="onToggleChip"
+          bindlongpress="onStartChip"
+          hover-class="none"
           data-name="{{item.name}}"
-        >{{item.name}}</view>
+        >
+          {{item.name}}
+          <view wx:if="{{item.start}}" class="start-flag">起</view>
+        </view>
       </view>
-      <view class="tool-note">点灰色省名即可点亮，地图上对应区块会变成这个省自己的颜色。再点一次会熄灭。记录保存在这台手机上。</view>
+      <view class="tool-note">点省名即可点亮，地图上会变成这个省自己的颜色。长按可设为起点（只能有一个），点亮的省份会和起点连成弧线。再点一次会熄灭。记录保存在这台手机上。</view>
       <view class="save-bar-spacer"></view>
     </view>
   </scroll-view>

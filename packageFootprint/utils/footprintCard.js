@@ -47,6 +47,7 @@ function drawFootprintCard(ctx, width, height, view) {
   const colorMap = view.colorMap || {}
   const litCount = Number(view.litCount) || 0
   const totalCount = Number(view.totalCount) || PROVINCES.length
+  const startName = view.startName || ''
   const litNames = PROVINCES.map((item) => item.name).filter((name) => litSet[name])
 
   ctx.fillStyle = '#ffffff'
@@ -89,7 +90,8 @@ function drawFootprintCard(ctx, width, height, view) {
     y: mapY,
     skipClear: true,
     pad: 6,
-    lineWidth: 0.85
+    lineWidth: 0.85,
+    startName
   })
   ctx.restore()
 
@@ -99,6 +101,13 @@ function drawFootprintCard(ctx, width, height, view) {
   ctx.textAlign = 'left'
   ctx.textBaseline = 'alphabetic'
   ctx.fillText('已点亮', 24, y)
+  if (startName) {
+    ctx.fillStyle = '#d97706'
+    ctx.font = '700 13px sans-serif'
+    ctx.textAlign = 'right'
+    ctx.fillText(`起点 ${startName}`, width - 24, y)
+    ctx.textAlign = 'left'
+  }
 
   const countText = `${litCount} / ${totalCount}`
   ctx.fillStyle = '#0284c7'

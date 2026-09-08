@@ -121,6 +121,170 @@ function calculateInsurance(gross, rates) {
   }
 }
 
+/** 专项附加扣除现行标准（月预扣常用项，大病医疗仅汇算清缴故不纳入）。 */
+const ADDITIONAL_COUNT_MAX = 6
+const ADDITIONAL_STANDARDS = {
+  infantPerChild: 2000,
+  childPerChild: 2000,
+  continueDegree: 400,
+  continueVocational: 3600,
+  housingLoan: 1000,
+  rentHigh: 1500,
+  rentMid: 1100,
+  rentLow: 800,
+  elderOnly: 3000,
+  elderShareCap: 1500,
+  pensionMonthCap: 1000
+}
+
+const DEFAULT_ADDITIONAL_SELECTION = {
+  infantOn: false,
+  infantCount: 1,
+  childOn: false,
+  childCount: 1,
+  continueOn: false,
+  continueType: 'degree',
+  housingType: 'none',
+  rentLevel: 'high',
+  elderOn: false,
+  elderType: 'only',
+  elderShare: '1500',
+  pensionOn: false,
+  pensionPay: '1000'
+}
+
+function toBool(value) {
+  return value === true || value === 'true' || value === 1 || value === '1'
+}
+
+function clampCount(value, min, max) {
+  const n = Math.round(Number(value))
+  if (!Number.isFinite(n)) return min
+  return Math.min(max, Math.max(min, n))
+}
+
+function clampMoney(value, max) {
+  const n = toNumber(value)
+  if (!Number.isFinite(n) || n < 0) return 0
+  return round2(Math.min(max, n))
+}
+
+function amountOrDash(on, amount) {
+  return on && amount > 0 ? formatMoney(amount) : '—'
+}
+
+function calculateAdditionalDeduction(selection) {
+  const source = selection || {}
+  const infantOn = toBool(source.infantOn)
+  const infantCount = clampCount(source.infantCount, 1, ADDITIONAL_COUNT_MAX)
+  const childOn = toBool(source.childOn)
+  const childCount = clampCount(source.childCount, 1, ADDITIONAL_COUNT_MAX)
+  const continueOn = toBool(source.continueOn)
+  const continueType = source.continueType === 'vocational' ? 'vocational' : 'degree'
+  const housingType =
+    source.housingType === 'loan' || source.housingType === 'rent' ? source.housingType : 'none'
+  const rentLevel =
+    source.rentLevel === 'mid' || source.rentLevel === 'low' ? source.rentLevel : 'high'
+  const elderOn = toBool(source.elderOn)
+  const elderType = source.elderType === 'share' ? 'share' : 'only'
+  const elderShareNum = clampMoney(source.elderShare, ADDITIONAL_STANDARDS.elderShareCap)
+  const elderShare = formatInsuranceInput(elderShareNum || ADDITIONAL_STANDARDS.elderShareCap)
+  const pensionOn = toBool(source.pensionOn)
+  const pensionPay =
+    source.pensionPay == null ? DEFAULT_ADDITIONAL_SELECTION.pensionPay : String(source.pensionPay)
+  const pensionPayNum = clampMoney(pensionPay, ADDITIONAL_STANDARDS.pensionMonthCap)
+
+  const infantAmount = infantOn ? ADDITIONAL_STANDARDS.infantPerChild * infantCount : 0
+  const childAmount = childOn ? ADDITIONAL_STANDARDS.childPerChild * childCount : 0
+  const continueMonthly =
+    continueOn && continueType === 'degree' ? ADDITIONAL_STANDARDS.continueDegree : 0
+  const continueOnce =
+    continueOn && continueType === 'vocational' ? ADDITIONAL_STANDARDS.continueVocational : 0
+  const continueAmount = continueMonthly + continueOnce
+  const rentAmount =
+    rentLevel === 'mid'
+      ? ADDITIONAL_STANDARDS.rentMid
+      : rentLevel === 'low'
+        ? ADDITIONAL_STANDARDS.rentLow
+        : ADDITIONAL_STANDARDS.rentHigh
+  const housingOn = housingType !== 'none'
+  const housingAmount =
+    housingType === 'loan'
+      ? ADDITIONAL_STANDARDS.housingLoan
+      : housingType === 'rent'
+        ? rentAmount
+        : 0
+  const elderAmount = elderOn
+    ? elderType === 'only'
+      ? ADDITIONAL_STANDARDS.elderOnly
+      : elderShareNum
+    : 0
+  const pensionAmount = pensionOn ? pensionPayNum : 0
+
+  const monthlyTotal = round2(
+    infantAmount + childAmount + continueMonthly + housingAmount + elderAmount + pensionAmount
+  )
+  const onceTotal = round2(continueOnce)
+  const total = round2(monthlyTotal + onceTotal)
+  const hintParts = []
+  if (infantOn && infantAmount) hintParts.push(infantCount > 1 ? `婴幼儿×${infantCount}` : '婴幼儿')
+  if (childOn && childAmount) hintParts.push(childCount > 1 ? `子女教育×${childCount}` : '子女教育')
+  if (continueOn && continueAmount) {
+    hintParts.push(continueType === 'vocational' ? '职业资格' : '继续教育')
+  }
+  if (housingType === 'loan') hintParts.push('房贷利息')
+  if (housingType === 'rent') hintParts.push('住房租金')
+  if (elderOn && elderAmount) hintParts.push('赡养老人')
+  if (pensionOn && pensionAmount) hintParts.push('个人养老金')
+
+  return {
+    infantOn,
+    infantCount,
+    infantAmountText: amountOrDash(infantOn, infantAmount),
+    childOn,
+    childCount,
+    childAmountText: amountOrDash(childOn, childAmount),
+    continueOn,
+    continueType,
+    continueAmountText: amountOrDash(continueOn, continueAmount),
+    housingType,
+    housingOn,
+    rentLevel,
+    housingAmountText: amountOrDash(housingOn, housingAmount),
+    elderOn,
+    elderType,
+    elderShare,
+    elderAmountText: amountOrDash(elderOn, elderAmount),
+    pensionOn,
+    pensionPay,
+    pensionAmountText: amountOrDash(pensionOn, pensionAmount),
+    monthlyTotal,
+    onceTotal,
+    total,
+    totalText: formatMoney(total),
+    totalInput: formatInsuranceInput(total),
+    monthlyInput: formatInsuranceInput(monthlyTotal),
+    onceInput: formatInsuranceInput(onceTotal),
+    hint: hintParts.join(' · '),
+    emptyHint: '点击选择扣除项目'
+  }
+}
+
+function additionalFieldView(pack, included) {
+  const counted = included ? pack.total : 0
+  let hint = pack.emptyHint
+  if (pack.total > 0) {
+    hint = included ? pack.hint : `可扣 ${pack.totalText} 元 · 暂不计入本月`
+  }
+  return {
+    additional: formatInsuranceInput(counted),
+    additionalMonthly: included ? pack.monthlyInput : '0',
+    additionalOnce: included ? pack.onceInput : '0',
+    additionalHint: hint,
+    additionalIncluded: !!included
+  }
+}
+
 function findBracket(amount, table) {
   const taxable = Math.max(0, Number(amount) || 0)
   for (let i = 0; i < table.length; i += 1) {
@@ -155,6 +319,7 @@ function calculateMonthlySalaryTax(input) {
   const gross = toNumber(input.gross)
   const insurance = Math.max(0, toNumber(input.insurance))
   const additional = Math.max(0, toNumber(input.additional))
+  const additionalOnce = Math.max(0, toNumber(input.additionalOnce))
   const exempt = Math.max(0, toNumber(input.exempt))
   const monthIndex = clampMonth(input.monthIndex)
   const paidTaxBefore = input.paidTaxBefore === '' || input.paidTaxBefore == null
@@ -164,17 +329,25 @@ function calculateMonthlySalaryTax(input) {
   if (!Number.isFinite(gross) || gross < 0) {
     return { valid: false, message: '请输入正确的税前应发工资' }
   }
-  if (!Number.isFinite(insurance) || !Number.isFinite(additional) || !Number.isFinite(exempt)) {
+  if (
+    !Number.isFinite(insurance) ||
+    !Number.isFinite(additional) ||
+    !Number.isFinite(additionalOnce) ||
+    !Number.isFinite(exempt)
+  ) {
     return { valid: false, message: '请检查扣除项金额' }
   }
   if (paidTaxBefore != null && !Number.isFinite(paidTaxBefore)) {
     return { valid: false, message: '请检查累计已预扣税额' }
   }
 
-  const monthlyTaxableBase = gross - exempt - MONTHLY_DEDUCTION - insurance - additional
+  const thisMonthAdditional = round2(additional + additionalOnce)
+  const monthlyRecurringBase = gross - exempt - MONTHLY_DEDUCTION - insurance - additional
+  const monthlyTaxableBase = monthlyRecurringBase - additionalOnce
 
   function cumulativeTaxable(months) {
-    return round2(Math.max(0, monthlyTaxableBase * months))
+    const once = months >= monthIndex ? additionalOnce : 0
+    return round2(Math.max(0, monthlyRecurringBase * months - once))
   }
 
   const taxableN = cumulativeTaxable(monthIndex)
@@ -191,14 +364,16 @@ function calculateMonthlySalaryTax(input) {
     monthIndex,
     gross: round2(gross),
     insurance: round2(insurance),
-    additional: round2(additional),
+    additional: round2(thisMonthAdditional),
+    additionalMonthly: round2(additional),
+    additionalOnce: round2(additionalOnce),
     exempt: round2(exempt),
     deduction: MONTHLY_DEDUCTION,
     monthlyTaxableBase: round2(monthlyTaxableBase),
     cumulativeIncome: round2(gross * monthIndex),
     cumulativeDeduction: round2(MONTHLY_DEDUCTION * monthIndex),
     cumulativeInsurance: round2(insurance * monthIndex),
-    cumulativeAdditional: round2(additional * monthIndex),
+    cumulativeAdditional: round2(additional * monthIndex + additionalOnce),
     cumulativeTaxable: taxableN,
     cumulativeTax: taxN.tax,
     alreadyPaid: round2(alreadyPaid),
@@ -215,7 +390,12 @@ function calculateMonthlySalaryTax(input) {
       { label: '税前应发', value: formatMoney(gross), role: 'in' },
       { label: '三险一金（个人）', value: formatMoney(insurance), role: 'minus' },
       { label: '减除费用', value: formatMoney(MONTHLY_DEDUCTION), role: 'minus', hint: '5000 元 / 月' },
-      { label: '专项附加扣除', value: formatMoney(additional), role: 'minus' },
+      {
+        label: '专项附加扣除',
+        value: formatMoney(thisMonthAdditional),
+        role: 'minus',
+        hint: additionalOnce > 0 ? '含当年一次性扣除' : ''
+      },
       { label: '本月应纳税所得额', value: formatMoney(Math.max(0, monthlyTaxableBase)), role: 'sum' }
     ],
     flowYear: [
@@ -261,6 +441,7 @@ function calculateAnnualBonusMerged(input) {
   const gross = toNumber(input.gross)
   const insurance = Math.max(0, toNumber(input.insurance))
   const additional = Math.max(0, toNumber(input.additional))
+  const additionalOnce = Math.max(0, toNumber(input.additionalOnce))
   if (!Number.isFinite(bonus) || bonus < 0) {
     return { valid: false, message: '请输入正确的全年一次性奖金' }
   }
@@ -268,15 +449,10 @@ function calculateAnnualBonusMerged(input) {
     return { valid: false, message: '并入综合所得需填写月薪，以便测算全年税负' }
   }
   const yearIncome = gross * 12 + bonus
-  const yearTaxable = Math.max(
-    0,
-    yearIncome - MONTHLY_DEDUCTION * 12 - insurance * 12 - additional * 12
-  )
+  const yearDeduction = MONTHLY_DEDUCTION * 12 + insurance * 12 + additional * 12 + additionalOnce
+  const yearTaxable = Math.max(0, yearIncome - yearDeduction)
   const withBonus = taxByTable(yearTaxable, ANNUAL_BRACKETS)
-  const withoutBonus = taxByTable(
-    Math.max(0, gross * 12 - MONTHLY_DEDUCTION * 12 - insurance * 12 - additional * 12),
-    ANNUAL_BRACKETS
-  )
+  const withoutBonus = taxByTable(Math.max(0, gross * 12 - yearDeduction), ANNUAL_BRACKETS)
   const tax = round2(Math.max(0, withBonus.tax - withoutBonus.tax))
   return {
     valid: true,
@@ -324,11 +500,15 @@ module.exports = {
   MONTHLY_BRACKETS,
   INSURANCE_ITEMS,
   DEFAULT_INSURANCE_RATES,
+  ADDITIONAL_STANDARDS,
+  DEFAULT_ADDITIONAL_SELECTION,
   formatMoney,
   formatPercent,
   formatRateText,
   clampRate,
   calculateInsurance,
+  calculateAdditionalDeduction,
+  additionalFieldView,
   calculateMonthlySalaryTax,
   calculateAnnualBonusSeparate,
   calculateAnnualBonusMerged,

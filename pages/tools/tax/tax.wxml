@@ -62,13 +62,15 @@
         </view>
       </view>
       <view class="ins-inline-hint" bindtap="onShowInsurance">{{insuranceHint}}</view>
-      <view class="field">
+      <view class="field field-tap" bindtap="onShowAdditional">
         <text class="field-label">专项附加扣除</text>
         <view class="field-control">
-          <input class="field-input" type="digit" value="{{additional}}" data-field="additional" bindinput="onInput" placeholder="子女、住房、赡养等" />
+          <text class="field-value">{{additional}}</text>
           <text class="field-unit">元/月</text>
+          <text class="field-caret">›</text>
         </view>
       </view>
+      <view class="ins-inline-hint" bindtap="onShowAdditional">{{additionalHint}}</view>
       <view class="field" wx:if="{{tab === 'salary'}}">
         <text class="field-label">任职月份</text>
         <view class="field-control">
@@ -191,6 +193,139 @@
     </view>
   </view>
 
+  <view class="tip-mask" wx:if="{{showAdditional}}" catchtouchmove="preventMove" catchtap="onCancelAdditional">
+    <view class="ins-dialog add-dialog" catchtap="preventMove">
+      <view class="tip-title">专项附加扣除</view>
+      <view class="ins-lead">勾选个税 App 已填报的项目，按现行标准估算。住房贷款与租金不能同时扣除。</view>
+      <scroll-view scroll-y class="add-dialog-body" show-scrollbar="{{false}}">
+        <view class="add-dialog-list">
+        <view class="add-row {{infantOn ? 'is-on' : ''}}">
+          <view class="add-row-top" catchtap="onToggleAdd" data-key="infantOn">
+            <view class="add-check {{infantOn ? 'on' : ''}}"></view>
+            <view class="add-row-copy">
+              <text class="add-label">婴幼儿照护</text>
+              <text class="add-sub">3 岁以下 · 每孩 2000 元/月</text>
+            </view>
+            <text class="add-amt">{{infantAmountText}}</text>
+          </view>
+          <view class="add-row-extra" wx:if="{{infantOn}}" catchtap="preventMove">
+            <text class="add-extra-label">孩数</text>
+            <view class="add-stepper">
+              <view class="add-step" catchtap="onAddCount" data-key="infantCount" data-act="dec">−</view>
+              <text class="add-step-val">{{infantCount}}</text>
+              <view class="add-step" catchtap="onAddCount" data-key="infantCount" data-act="inc">+</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="add-row {{childOn ? 'is-on' : ''}}">
+          <view class="add-row-top" catchtap="onToggleAdd" data-key="childOn">
+            <view class="add-check {{childOn ? 'on' : ''}}"></view>
+            <view class="add-row-copy">
+              <text class="add-label">子女教育</text>
+              <text class="add-sub">学前至学历教育 · 每孩 2000 元/月</text>
+            </view>
+            <text class="add-amt">{{childAmountText}}</text>
+          </view>
+          <view class="add-row-extra" wx:if="{{childOn}}" catchtap="preventMove">
+            <text class="add-extra-label">孩数</text>
+            <view class="add-stepper">
+              <view class="add-step" catchtap="onAddCount" data-key="childCount" data-act="dec">−</view>
+              <text class="add-step-val">{{childCount}}</text>
+              <view class="add-step" catchtap="onAddCount" data-key="childCount" data-act="inc">+</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="add-row {{continueOn ? 'is-on' : ''}}">
+          <view class="add-row-top" catchtap="onToggleAdd" data-key="continueOn">
+            <view class="add-check {{continueOn ? 'on' : ''}}"></view>
+            <view class="add-row-copy">
+              <text class="add-label">继续教育</text>
+              <text class="add-sub">学历按月扣，职业资格当年一次性</text>
+            </view>
+            <text class="add-amt">{{continueAmountText}}</text>
+          </view>
+          <view class="add-chips" wx:if="{{continueOn}}" catchtap="preventMove">
+            <view class="add-chip {{continueType === 'degree' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="continueType" data-value="degree">学历 400/月</view>
+            <view class="add-chip {{continueType === 'vocational' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="continueType" data-value="vocational">证书 3600/年</view>
+          </view>
+        </view>
+
+        <view class="add-row {{housingOn ? 'is-on' : ''}}">
+          <view class="add-row-top" catchtap="onToggleAdd" data-key="housingOn">
+            <view class="add-check {{housingOn ? 'on' : ''}}"></view>
+            <view class="add-row-copy">
+              <text class="add-label">住房</text>
+              <text class="add-sub">贷款利息或租金，二选一</text>
+            </view>
+            <text class="add-amt">{{housingAmountText}}</text>
+          </view>
+          <block wx:if="{{housingOn}}">
+            <view class="add-chips" catchtap="preventMove">
+              <view class="add-chip {{housingType === 'loan' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="housingType" data-value="loan">贷款利息 1000</view>
+              <view class="add-chip {{housingType === 'rent' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="housingType" data-value="rent">住房租金</view>
+            </view>
+            <view class="add-chips" wx:if="{{housingType === 'rent'}}" catchtap="preventMove">
+              <view class="add-chip {{rentLevel === 'high' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="rentLevel" data-value="high">1500 省会</view>
+              <view class="add-chip {{rentLevel === 'mid' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="rentLevel" data-value="mid">1100 较大市</view>
+              <view class="add-chip {{rentLevel === 'low' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="rentLevel" data-value="low">800 其他</view>
+            </view>
+          </block>
+        </view>
+
+        <view class="add-row {{elderOn ? 'is-on' : ''}}">
+          <view class="add-row-top" catchtap="onToggleAdd" data-key="elderOn">
+            <view class="add-check {{elderOn ? 'on' : ''}}"></view>
+            <view class="add-row-copy">
+              <text class="add-label">赡养老人</text>
+              <text class="add-sub">独生 3000 · 非独生每人最多 1500</text>
+            </view>
+            <text class="add-amt">{{elderAmountText}}</text>
+          </view>
+          <block wx:if="{{elderOn}}">
+            <view class="add-chips" catchtap="preventMove">
+              <view class="add-chip {{elderType === 'only' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="elderType" data-value="only">独生子女</view>
+              <view class="add-chip {{elderType === 'share' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="elderType" data-value="share">非独生分摊</view>
+            </view>
+            <view class="add-chips" wx:if="{{elderType === 'share'}}" catchtap="preventMove">
+              <view class="add-chip {{elderShare === '1000' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="elderShare" data-value="1000">1000 元</view>
+              <view class="add-chip {{elderShare === '1500' ? 'active' : ''}}" catchtap="onSelectAdd" data-field="elderShare" data-value="1500">1500 元</view>
+            </view>
+          </block>
+        </view>
+
+        <view class="add-row {{pensionOn ? 'is-on' : ''}}">
+          <view class="add-row-top" catchtap="onToggleAdd" data-key="pensionOn">
+            <view class="add-check {{pensionOn ? 'on' : ''}}"></view>
+            <view class="add-row-copy">
+              <text class="add-label">个人养老金</text>
+              <text class="add-sub">按实际缴费 · 每月最多 1000 元</text>
+            </view>
+            <text class="add-amt">{{pensionAmountText}}</text>
+          </view>
+          <view class="add-row-extra" wx:if="{{pensionOn}}" catchtap="preventMove">
+            <text class="add-extra-label">月缴费</text>
+            <view class="add-pay">
+              <input class="add-pay-input" type="digit" value="{{pensionPay}}" data-field="pensionPay" bindinput="onAdditionalInput" bindblur="onPensionPayBlur" />
+              <text class="add-pay-unit">元</text>
+            </view>
+          </view>
+        </view>
+        </view>
+      </scroll-view>
+      <view class="ins-total">
+        <text class="ins-total-label">合计可扣</text>
+        <text class="ins-total-value">{{additionalTotalText}} 元</text>
+      </view>
+      <view class="add-confirm-lead">是否计入本期预扣？</view>
+      <view class="add-actions">
+        <view class="add-action ghost" catchtap="onSkipAdditional">暂不计入</view>
+        <view class="add-action primary" catchtap="onApplyAdditional">计入本月</view>
+      </view>
+    </view>
+  </view>
+
   <view class="tip-mask" wx:if="{{showTip}}" catchtouchmove="preventMove" catchtap="onHideTip">
     <view class="tip-dialog" catchtap="preventMove">
       <view class="tip-title">计税规则说明</view>
@@ -212,8 +347,8 @@
         <view class="tip-step">
           <view class="tip-step-idx">3</view>
           <view class="tip-step-body">
-            <view class="tip-step-title">专项附加以填报为准</view>
-            <view class="tip-step-text">子女教育、住房贷款利息或租金、赡养老人、婴幼儿照护、个人养老金等，请以税务 App 为准。结果仅供测算。</view>
+            <view class="tip-step-title">专项附加按填报项目估算</view>
+            <view class="tip-step-text">点开后勾选已填报类型，按现行标准自动算额。计入本月才参与本期测算；暂不计入只保留选项。请以税务 App 为准。</view>
           </view>
         </view>
       </view>

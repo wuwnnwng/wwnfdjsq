@@ -18,7 +18,7 @@
 
 .map-panel {
   flex-shrink: 0;
-  height: 560rpx;
+  height: 520rpx;
   padding: 8rpx 12rpx 16rpx;
   margin-bottom: 16rpx;
 }

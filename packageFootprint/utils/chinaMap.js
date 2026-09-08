@@ -121,12 +121,11 @@ const NANHAI_ISLANDS = [
 ]
 
 function getLayout(width, height, pad) {
-  const insetW = Math.max(48, Math.min(width * 0.18, 78))
-  const insetH = Math.max(68, Math.min(height * 0.32, 118))
-  const rightReserve = insetW + 10
+  const insetW = Math.max(32, Math.min(width * 0.105, 42))
+  const insetH = Math.max(44, Math.min(height * 0.185, 56))
   return {
     pad,
-    plotW: Math.max(48, width - pad * 2 - rightReserve),
+    plotW: Math.max(48, width - pad * 2),
     plotH: Math.max(48, height - pad * 2),
     insetX: width - pad - insetW,
     insetY: height - pad - insetH,
@@ -142,7 +141,7 @@ function project(lng, lat, layout) {
 }
 
 function projectInset(lng, lat, layout) {
-  const labelH = Math.min(14, layout.insetH * 0.16)
+  const labelH = Math.min(11, layout.insetH * 0.18)
   const drawH = layout.insetH - labelH
   const x =
     layout.insetX +
@@ -313,30 +312,30 @@ function drawNanhaiInset(ctx, layout, ox, oy, litSet, colorMap, dark, lineWidth)
     ox,
     oy,
     dash,
-    Math.max(1.05, lineWidth * 1.35),
+    Math.max(0.85, lineWidth * 1.1),
     (seg) => seg[0][0] < 122.4
   )
 
   NANHAI_ISLANDS.forEach((pt) => {
     const xy = projectInset(pt[0], pt[1], layout)
     ctx.beginPath()
-    ctx.arc(ox + xy[0], oy + xy[1], 1.35, 0, Math.PI * 2)
+    ctx.arc(ox + xy[0], oy + xy[1], 1.05, 0, Math.PI * 2)
     ctx.fillStyle = island
     ctx.fill()
   })
   ctx.restore()
 
   ctx.fillStyle = sea
-  ctx.fillRect(x + 1, y + h - 13, w - 2, 12)
+  ctx.fillRect(x + 1, y + h - 11, w - 2, 10)
   ctx.strokeStyle = dark ? '#94a3b8' : '#64748b'
-  ctx.lineWidth = Math.max(0.9, lineWidth)
+  ctx.lineWidth = Math.max(0.7, lineWidth * 0.9)
   ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1)
 
   ctx.fillStyle = dark ? '#cbd5e1' : '#475569'
-  ctx.font = `600 ${Math.max(8, Math.min(10, w * 0.16))}px sans-serif`
+  ctx.font = `600 ${Math.max(7, Math.min(8, w * 0.18))}px sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText('南海诸岛', x + w / 2, y + h - 7)
+  ctx.fillText('南海诸岛', x + w / 2, y + h - 6)
   ctx.textAlign = 'left'
   ctx.textBaseline = 'alphabetic'
 }

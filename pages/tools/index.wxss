@@ -208,6 +208,10 @@
   background: linear-gradient(135deg, #e0f2fe, #38bdf8);
 }
 
+.tool-icon-mortgage {
+  background: linear-gradient(135deg, #ffedd5, #fb923c);
+}
+
 .tool-icon-fitout {
   background: linear-gradient(135deg, #ffedd5, #fb923c);
 }
@@ -290,6 +294,10 @@
 
 .tool-icon-retire {
   background: linear-gradient(135deg, #e0e7ff, #818cf8);
+}
+
+.tool-icon-ershou {
+  background: linear-gradient(135deg, #ffedd5, #fb923c);
 }
 
 .tool-card-name {

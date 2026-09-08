@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/tools/index",
+    "pages/tools/mortgage/mortgage",
     "pages/tools/calendar/calendar",
     "pages/tools/weather/weather",
     "pages/tools/converter/converter",
@@ -59,6 +60,10 @@
     }
   ],
   "preloadRule": {
+    "pages/index/index": {
+      "network": "wifi",
+      "packages": ["footprint", "exam"]
+    },
     "pages/tools/index": {
       "network": "wifi",
       "packages": ["footprint", "exam"]

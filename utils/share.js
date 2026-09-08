@@ -5,8 +5,8 @@ const {
 
 const APP_BRAND = '小小便民工具箱'
 const TOOL_NAV_BRAND = APP_BRAND
-const TOOLS_HUB_PATH = '/pages/tools/index'
-const TOOLS_HUB_TITLE = `更多实用工具｜${APP_BRAND}`
+const TOOLS_HUB_PATH = '/pages/index/index'
+const TOOLS_HUB_TITLE = `实用工具｜${APP_BRAND}`
 
 function buildToolNavTitle(name) {
   const title = String(name || '').trim()
@@ -169,11 +169,11 @@ function buildToolShareTimeline(path, name) {
 }
 
 function getToolsHubShareAppMessage() {
-  return buildToolShareAppMessage(TOOLS_HUB_PATH, '更多实用工具')
+  return buildToolShareAppMessage(TOOLS_HUB_PATH, '实用工具')
 }
 
 function getToolsHubShareTimeline() {
-  return buildToolShareTimeline(TOOLS_HUB_PATH, '更多实用工具')
+  return buildToolShareTimeline(TOOLS_HUB_PATH, '实用工具')
 }
 
 function getConverterToolShare(type) {
@@ -237,6 +237,14 @@ function getHouseTaxToolShare() {
   return {
     appMessage: buildToolShareAppMessage(path, '房产交易税'),
     timeline: buildToolShareTimeline(path, '房产交易税')
+  }
+}
+
+function getMortgageToolShare() {
+  const path = '/pages/tools/mortgage/mortgage'
+  return {
+    appMessage: buildToolShareAppMessage(path, '房贷计算'),
+    timeline: buildToolShareTimeline(path, '房贷计算')
   }
 }
 
@@ -394,14 +402,14 @@ function getExamTipsToolShare() {
 
 function getShareAppMessage() {
   return {
-    title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
+    title: `日常计算、房产生活，打开就用｜${APP_BRAND}`,
     path: '/pages/index/index'
   }
 }
 
 function getShareTimeline() {
   return {
-    title: `公积金、商贷、组合贷一键算清｜${APP_BRAND}`,
+    title: `日常计算、房产生活，打开就用｜${APP_BRAND}`,
     query: ''
   }
 }
@@ -626,7 +634,7 @@ function parseResultShareQuery(query) {
 
 function getResultShareAppMessage(view) {
   const query = encodeResultShareQuery(view)
-  const path = query ? `/pages/result/result?${query}` : '/pages/index/index'
+  const path = query ? `/pages/result/result?${query}` : '/pages/tools/mortgage/mortgage'
   return {
     title: buildResultShareTitle(view),
     path
@@ -666,6 +674,7 @@ module.exports = {
   getWeatherToolShare,
   getTaxToolShare,
   getHouseTaxToolShare,
+  getMortgageToolShare,
   getFitoutToolShare,
   getDatetimeToolShare,
   getQrcodeToolShare,

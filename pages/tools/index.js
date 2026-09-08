@@ -1,4 +1,4 @@
-const { searchTools, groupTools, markToolsHubSeen, toggleFavoriteTool } = require('../../utils/toolsConfig')
+const { searchTools, groupTools, markToolsHubSeen, toggleFavoriteTool, openToolItem, getToolById } = require('../../utils/toolsConfig')
 const { getThemeId, applyThemeChrome } = require('../../utils/theme')
 const {
   enableShareMenu,
@@ -44,9 +44,11 @@ Page({
   },
 
   onOpenTool(e) {
-    const page = e.currentTarget.dataset.page
-    if (!page) return
-    wx.navigateTo({ url: page })
+    const id = e.currentTarget.dataset.id
+    openToolItem(getToolById(id) || {
+      page: e.currentTarget.dataset.page,
+      miniProgramAppId: e.currentTarget.dataset.appid
+    })
   },
 
   onToggleFavorite(e) {

@@ -5,30 +5,36 @@ const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
 const FAVORITE_TOOLS_KEY = 'favoriteToolIds'
 const MAX_FAVORITE_TOOLS = 10
 const HOME_CAROUSEL_MAX = 15
-const FEATURED_IDS = ['retire', 'calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'fitout', 'housetax', 'age']
-const FEATURED_PAGE_SIZE = 3
-
-/** 仅首页轮播展示，不进入工具箱 */
-const HOME_FEATURED_MINI_PROGRAMS = [
-  {
-    id: 'ershou',
-    name: '同城二手',
-    shortName: '同城二手',
-    icon: '🛍️',
-    iconType: 'ershou',
-    miniProgramAppId: 'wx663931c101197d69'
-  }
-]
+const FEATURED_IDS = ['mortgage', 'retire', 'calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'fitout']
+const FEATURED_PAGE_SIZE = 4
 
 const CATEGORIES = [
-  { id: 'daily', name: '日常工具', toolIds: ['retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle', 'exam'] },
-  { id: 'house', name: '房产生活', toolIds: ['fitout', 'housetax', 'tax'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle', 'exam'] },
+  { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
   { id: 'fun', name: '娱乐', toolIds: ['chance', 'drinkwheel', 'footprint'] }
 ]
 
 const TOOLS = [
+  {
+    id: 'ershou',
+    name: '同城二手',
+    shortName: '同城二手',
+    icon: '🛍️',
+    iconType: 'ershou',
+    keywords: '同城二手闲置转卖二手交易跳蚤市场',
+    miniProgramAppId: 'wx663931c101197d69'
+  },
+  {
+    id: 'mortgage',
+    name: '房贷计算',
+    shortName: '房贷',
+    icon: '🏠',
+    iconType: 'mortgage',
+    keywords: '房贷公积金商贷组合贷等额本息等额本金提前还款LPR月供',
+    page: '/pages/tools/mortgage/mortgage'
+  },
   {
     id: 'fitout',
     name: '装修材料',
@@ -343,7 +349,7 @@ function padFeaturedPage(page, size) {
 }
 
 function isPinnedHomeTool(id) {
-  return id === 'random' || HOME_FEATURED_MINI_PROGRAMS.some((item) => item.id === id)
+  return id === 'random' || id === 'ershou'
 }
 
 function getHomeRandomTool() {
@@ -430,15 +436,17 @@ function flattenFeaturedToolIds(pages) {
 
 function getFeaturedToolPages() {
   const random = getHomeRandomTool()
-  const extra = ['bmi', 'compound', 'pension', 'duedate', 'safeperiod']
+  const extra = ['housetax', 'bmi', 'compound', 'pension', 'duedate', 'safeperiod', 'age']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
-  const homeMiniPrograms = HOME_FEATURED_MINI_PROGRAMS.map(toFeaturedChip).filter(Boolean)
+  const pinned = ['ershou']
+    .map((id) => toFeaturedChip(getToolById(id)))
+    .filter(Boolean)
   const favorites = getFavoriteToolIds()
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
   const used = new Set(favorites.map((item) => item.id))
-  const rest = homeMiniPrograms
+  const rest = pinned
     .concat(getFeaturedTools(), extra)
     .filter((item) => item && !used.has(item.id))
   const body = capHomeCarousel(favorites.concat(rest), HOME_CAROUSEL_MAX - 1)
@@ -458,6 +466,38 @@ function pickRandomTool() {
   if (!TOOLS.length) return null
   const index = Math.floor(Math.random() * TOOLS.length)
   return TOOLS[index] || null
+}
+
+function openMiniProgram(appId) {
+  const id = String(appId || '').trim()
+  if (!id || id === 'undefined' || id === 'null') return false
+  wx.navigateToMiniProgram({
+    appId: id,
+    envVersion: 'release',
+    fail(err) {
+      const msg = (err && err.errMsg) || ''
+      if (msg.indexOf('cancel') >= 0) return
+      wx.showToast({ title: '暂无法打开该小程序', icon: 'none' })
+    }
+  })
+  return true
+}
+
+function openToolItem(item) {
+  if (!item) {
+    wx.showToast({ title: '暂无工具', icon: 'none' })
+    return
+  }
+  if (item.isRandom) {
+    openToolItem(pickRandomTool())
+    return
+  }
+  if (openMiniProgram(item.miniProgramAppId)) return
+  if (item.page) {
+    wx.navigateTo({ url: item.page })
+    return
+  }
+  wx.showToast({ title: '暂无法打开', icon: 'none' })
 }
 
 function groupTools(list) {
@@ -528,6 +568,8 @@ module.exports = {
   getFavoriteToolsKey,
   toggleFavoriteTool,
   pickRandomTool,
+  openToolItem,
+  getHomeRandomTool,
   hasSeenToolsHub,
   markToolsHubSeen
 }

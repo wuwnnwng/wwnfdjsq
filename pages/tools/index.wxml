@@ -24,7 +24,9 @@
             wx:for="{{group.tools}}"
             wx:key="id"
             bindtap="onOpenTool"
+            data-id="{{item.id}}"
             data-page="{{item.page}}"
+            data-appid="{{item.miniProgramAppId}}"
           >
             <view class="tool-icon-wrap tool-icon-{{item.iconType}}">
               <text class="tool-icon">{{item.icon}}</text>

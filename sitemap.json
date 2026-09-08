@@ -17,6 +17,11 @@
     },
     {
       "action": "allow",
+      "page": "pages/tools/mortgage/mortgage",
+      "priority": 80
+    },
+    {
+      "action": "allow",
       "page": "pages/tools/calendar/calendar",
       "priority": 80
     },

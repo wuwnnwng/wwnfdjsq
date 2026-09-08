@@ -367,7 +367,7 @@ Page({
     if (!this.data.ready) {
       return {
         title: '公积金、商贷、组合贷一键算清｜小小便民工具箱',
-        path: '/pages/index/index'
+        path: '/pages/tools/mortgage/mortgage'
       }
     }
     return getResultShareAppMessage(this.getShareView())
@@ -547,12 +547,12 @@ Page({
 
   onRecalculate() {
     if (this.data.fromShare) {
-      wx.redirectTo({ url: '/pages/index/index' })
+      wx.redirectTo({ url: '/pages/tools/mortgage/mortgage' })
       return
     }
     wx.navigateBack({
       fail: () => {
-        wx.redirectTo({ url: '/pages/index/index' })
+        wx.redirectTo({ url: '/pages/tools/mortgage/mortgage' })
       }
     })
   }

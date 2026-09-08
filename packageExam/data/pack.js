@@ -75,16 +75,65 @@ function toParts(body, title, tag) {
   return parts.length ? parts : [{ text, em: false }]
 }
 
-function pack(rows) {
-  return (rows || []).map((row, i) => ({
-    no: String(i + 1).padStart(2, '0'),
-    tag: row[0],
-    title: row[1],
-    body: row[2],
-    parts: toParts(row[2], row[1], row[0]),
-    example: String(row[3] || '').trim(),
-    explain: String(row[4] || '').trim()
-  }))
+function letterOf(index) {
+  return String.fromCharCode(65 + index)
 }
 
-module.exports = { pack, toParts }
+function toQuiz(raw, explainFallback) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
+  const stem = String(raw.q || raw.stem || '').trim()
+  const opts = raw.opts || raw.options
+  const ans = String(raw.ans || raw.answer || '')
+    .trim()
+    .toUpperCase()
+  const explain = String(raw.why || raw.explain || explainFallback || '').trim()
+  if (!stem || !Array.isArray(opts) || opts.length < 2 || !ans) return null
+  const options = opts.map((text, i) => {
+    const key = letterOf(i)
+    return {
+      key,
+      text: String(text || '').trim(),
+      correct: ans === key || Number(ans) === i
+    }
+  })
+  if (options.some((item) => !item.text) || !options.some((item) => item.correct)) return null
+  return { stem, options, explain }
+}
+
+function attachPicks(cards, picks) {
+  const map = picks && typeof picks === 'object' ? picks : {}
+  return (cards || []).map((card) => {
+    const picked = map[card.no] || ''
+    const quiz = card.quiz
+      ? {
+          stem: card.quiz.stem,
+          explain: card.quiz.explain,
+          options: (card.quiz.options || []).map((opt) => ({
+            key: opt.key,
+            text: opt.text,
+            correct: opt.correct,
+            status: picked === opt.key ? (opt.correct ? 'ok' : 'bad') : ''
+          }))
+        }
+      : null
+    return Object.assign({}, card, { picked, quiz })
+  })
+}
+
+function pack(rows) {
+  return (rows || []).map((row, i) => {
+    const quiz = toQuiz(row[3], row[4])
+    return {
+      no: String(i + 1).padStart(2, '0'),
+      tag: row[0],
+      title: row[1],
+      body: row[2],
+      parts: toParts(row[2], row[1], row[0]),
+      quiz,
+      example: quiz ? quiz.stem : String(row[3] || '').trim(),
+      explain: quiz ? quiz.explain : String(row[4] || '').trim()
+    }
+  })
+}
+
+module.exports = { pack, toParts, toQuiz, attachPicks }

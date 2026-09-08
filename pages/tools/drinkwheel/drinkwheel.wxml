@@ -41,7 +41,14 @@
           <view class="history-clear {{isDefault ? 'is-off' : ''}}" bindtap="onResetDefault">恢复默认</view>
         </view>
       </view>
-      <view class="option-list">
+      <scroll-view wx:if="{{optionCount > 5}}" scroll-y enhanced show-scrollbar class="option-list is-scroll">
+        <view class="option-row" wx:for="{{optionRows}}" wx:key="id">
+          <view class="option-index">{{item.index + 1}}</view>
+          <view class="option-text" bindtap="onOpenEdit" data-index="{{item.index}}">{{item.text}}</view>
+          <view class="option-del {{canRemove ? '' : 'is-off'}}" catchtap="onRemoveOption" data-index="{{item.index}}">删除</view>
+        </view>
+      </scroll-view>
+      <view wx:else class="option-list">
         <view class="option-row" wx:for="{{optionRows}}" wx:key="id">
           <view class="option-index">{{item.index + 1}}</view>
           <view class="option-text" bindtap="onOpenEdit" data-index="{{item.index}}">{{item.text}}</view>

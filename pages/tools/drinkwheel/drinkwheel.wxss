@@ -115,6 +115,10 @@
   opacity: 0.4;
 }
 
+.option-list.is-scroll {
+  height: 380rpx;
+}
+
 .option-row {
   display: flex;
   align-items: center;

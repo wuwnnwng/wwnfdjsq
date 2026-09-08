@@ -27,7 +27,7 @@
           <view class="type-go">看卡片</view>
         </view>
       </view>
-      <view class="tool-note">按题型整理的答题方法小卡片，行测每张都带一道例题帮你对上用法。是通用技巧，不能代替系统刷题。下次进来会记住你看到哪张。</view>
+      <view class="tool-note">按题型整理的答题方法小卡片，行测每张都带一道完整例题，点选项可自测。是通用技巧，不能代替系统刷题。下次进来会记住你看到哪张。</view>
     </view>
   </scroll-view>
 
@@ -51,10 +51,26 @@
             <view class="tip-body">
               <text wx:for="{{item.parts}}" wx:for-item="part" wx:for-index="pi" wx:key="pi" class="{{part.em ? 'is-em' : ''}}">{{part.text}}</text>
             </view>
-            <view class="tip-example" wx:if="{{item.example}}">
+            <view class="tip-example" wx:if="{{item.quiz}}">
               <view class="tip-example-kicker">例题</view>
-              <view class="tip-example-q">{{item.example}}</view>
-              <view class="tip-example-a" wx:if="{{item.explain}}">{{item.explain}}</view>
+              <view class="tip-example-q">{{item.quiz.stem}}</view>
+              <view
+                class="quiz-opt {{opt.status}}"
+                wx:for="{{item.quiz.options}}"
+                wx:for-item="opt"
+                wx:key="key"
+                catchtap="onPickOption"
+                data-no="{{item.no}}"
+                data-key="{{opt.key}}"
+              >
+                <view class="quiz-opt-main">
+                  <text class="quiz-opt-key">{{opt.key}}</text>
+                  <text class="quiz-opt-text">{{opt.text}}</text>
+                </view>
+                <view class="quiz-opt-tip is-ok" wx:if="{{opt.status === 'ok'}}">正确</view>
+                <view class="quiz-opt-tip is-bad" wx:if="{{opt.status === 'bad'}}">错误</view>
+              </view>
+              <view class="tip-example-a" wx:if="{{item.picked && item.quiz.explain}}">{{item.quiz.explain}}</view>
             </view>
           </view>
         </scroll-view>

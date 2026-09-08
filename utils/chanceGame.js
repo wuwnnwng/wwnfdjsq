@@ -3,7 +3,7 @@
  */
 
 const STORAGE_KEY = 'chanceGame:records'
-const MAX_RECORDS = 80
+const MAX_RECORDS = 10
 const DICE_PIPS = {
   1: [4],
   2: [0, 8],
@@ -92,7 +92,9 @@ function readRecords() {
   try {
     const raw = wx.getStorageSync(STORAGE_KEY)
     if (!Array.isArray(raw)) return []
-    return raw.map(normalizeRecord).filter(Boolean)
+    const list = raw.map(normalizeRecord).filter(Boolean).slice(0, MAX_RECORDS)
+    if (raw.length > MAX_RECORDS) writeRecords(list)
+    return list
   } catch (e) {
     return []
   }

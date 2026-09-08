@@ -2,6 +2,7 @@ const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getExamTipsToolShare } = require('../../../utils/share')
 const { CATALOG } = require('../../data/catalog')
 const { loadType } = require('../../data/load')
+const { attachPicks } = require('../../data/pack')
 
 const STORAGE_KEY = 'examTips:progress'
 
@@ -40,7 +41,8 @@ Page({
     cards: [],
     cardIndex: 0,
     cardTotal: 0,
-    currentCard: null
+    currentCard: null,
+    picks: {}
   },
 
   onLoad() {
@@ -81,15 +83,32 @@ Page({
     }
     const saved = Number(this._progress.indexByType[typeId]) || 0
     const cardIndex = Math.max(0, Math.min(pack.cards.length - 1, saved))
+    const cards = attachPicks(pack.cards, {})
     this._typeId = typeId
+    this._rawCards = pack.cards
     this.setData({
       reading: true,
       typeName: pack.name,
       typeHint: pack.hint,
-      cards: pack.cards,
-      cardTotal: pack.cards.length,
+      cards,
+      cardTotal: cards.length,
       cardIndex,
-      currentCard: pack.cards[cardIndex]
+      currentCard: cards[cardIndex],
+      picks: {}
+    })
+  },
+
+  onPickOption(e) {
+    const no = e.currentTarget.dataset.no
+    const key = e.currentTarget.dataset.key
+    if (!no || !key || !this._rawCards) return
+    const picks = Object.assign({}, this.data.picks, { [no]: key })
+    const cards = attachPicks(this._rawCards, picks)
+    const cardIndex = this.data.cardIndex
+    this.setData({
+      picks,
+      cards,
+      currentCard: cards[cardIndex]
     })
   },
 

@@ -1,5 +1,5 @@
 <view class="page page-shell theme-{{theme}} {{themeFading ? 'is-theme-fading' : ''}}">
-  <view class="panel hero-panel">
+  <view class="panel hero-panel {{featuredToolsOpen ? '' : 'is-tools-collapsed'}}">
     <view class="hero-head">
       <view class="brand-wrap">
         <view class="brand">小小便民工具箱</view>
@@ -67,8 +67,8 @@
         class="tools-fold"
         catchtap="onToggleFeaturedTools"
         aria-role="button"
-        aria-label="{{featuredToolsOpen ? '收起常用工具' : '展开常用工具'}}"
-      >{{featuredToolsOpen ? '收起' : '工具'}}</view>
+        aria-label="{{featuredToolsOpen ? '收起轮播' : '展开轮播'}}"
+      >{{featuredToolsOpen ? '收起' : '轮播'}}</view>
     </view>
   </view>
 

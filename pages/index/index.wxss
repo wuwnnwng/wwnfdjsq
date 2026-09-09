@@ -7,6 +7,11 @@
   margin-bottom: 16rpx;
 }
 
+.hero-panel.is-tools-collapsed {
+  gap: 4rpx;
+  padding-bottom: 16rpx;
+}
+
 .hero-head {
   display: flex;
   align-items: flex-start;
@@ -90,17 +95,24 @@
 
 .tools-entry.collapsed {
   justify-content: flex-end;
-  padding: 8rpx 0 4rpx;
+  align-items: center;
+  padding: 0;
+  height: 40rpx;
+  min-height: 40rpx;
+  max-height: 40rpx;
+  overflow: hidden;
 }
 
 .tools-entry.collapsed .tools-fold {
-  height: 56rpx;
-  line-height: 56rpx;
-  padding: 0 18rpx;
+  height: 40rpx;
+  max-height: 40rpx;
+  line-height: 40rpx;
+  padding: 0 14rpx;
   margin-top: 0;
   width: auto;
   writing-mode: horizontal-tb;
   letter-spacing: 2rpx;
+  font-size: 20rpx;
   border-radius: 999rpx;
   background: var(--color-chip);
   border: 1rpx solid var(--color-line);

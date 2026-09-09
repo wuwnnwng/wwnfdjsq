@@ -25,7 +25,7 @@
       <block wx:else>
         <view class="conv-eq" wx:if="{{lastValue}}">本次 {{lastTitle}}</view>
         <view class="conv-result" wx:if="{{lastValue}}">{{lastValue}}</view>
-        <view class="conv-eq" wx:else>抛一次 1 元硬币</view>
+        <view class="conv-eq" wx:else>抛一次看正反</view>
       </block>
     </view>
 
@@ -38,7 +38,7 @@
       <view class="stage {{shaking ? 'is-shake' : ''}} {{flipping ? 'is-flip' : ''}} {{lidOpen ? 'is-open' : ''}}">
         <block wx:if="{{tab === 'dice'}}">
           <view class="cup-well {{shaking ? 'is-shake' : ''}}" bindtap="onToggleLid">
-            <view class="cup-bowl">
+            <view class="cup-bowl {{lidOpen ? 'is-open' : ''}}">
               <view class="dice-pad count-{{diceCount}}">
                 <view class="die" wx:for="{{dice}}" wx:key="index">
                   <view class="pip {{pip.on ? 'on' : ''}}" wx:for="{{item.pips}}" wx:for-item="pip" wx:key="key"></view>
@@ -53,37 +53,20 @@
             </view>
           </view>
         </block>
-        <view class="coin-scene" wx:else>
-          <view class="yuan {{flipping ? 'is-flip' : ''}} {{coinHeads ? 'heads' : 'tails'}} {{willHeads ? 'will-heads' : 'will-tails'}}">
-            <view class="yuan-side yuan-obverse">
-              <view class="yuan-reed"></view>
-              <view class="yuan-plate">
-                <view class="yuan-ring"></view>
-                <view class="yuan-flower">
-                  <view class="yuan-petal" wx:for="{{coinPetals}}" wx:key="*this" style="transform: rotate({{item}}deg);"></view>
-                  <view class="yuan-center"></view>
-                </view>
-                <view class="yuan-denom">
-                  <text class="yuan-num">1</text>
-                  <text class="yuan-unit">元</text>
-                </view>
+        <view class="token-scene" wx:else>
+          <view class="token {{flipping ? 'is-flip' : ''}} {{coinHeads ? 'heads' : 'tails'}} {{willHeads ? 'will-heads' : 'will-tails'}}">
+            <view class="token-side token-heads">
+              <view class="token-rim"></view>
+              <view class="token-plate">
+                <view class="token-ring"></view>
+                <text class="token-mark">正</text>
               </view>
             </view>
-            <view class="yuan-side yuan-reverse">
-              <view class="yuan-reed"></view>
-              <view class="yuan-plate">
-                <view class="yuan-ring"></view>
-                <view class="yuan-emblem">
-                  <view class="yuan-emblem-gear"></view>
-                  <view class="yuan-emblem-gate"></view>
-                  <text class="yuan-star yuan-star-main">★</text>
-                  <text class="yuan-star yuan-star-a">★</text>
-                  <text class="yuan-star yuan-star-b">★</text>
-                  <text class="yuan-star yuan-star-c">★</text>
-                  <text class="yuan-star yuan-star-d">★</text>
-                </view>
-                <text class="yuan-caption">中华人民共和国</text>
-                <text class="yuan-year">2015</text>
+            <view class="token-side token-tails">
+              <view class="token-rim"></view>
+              <view class="token-plate">
+                <view class="token-ring"></view>
+                <text class="token-mark">反</text>
               </view>
             </view>
           </view>
@@ -107,7 +90,7 @@
         </view>
       </view>
       <view class="tool-note" wx:if="{{tab === 'dice'}}">杯子不透明，摇完再打开盖子看点数。也可以晃动手机摇一摇。</view>
-      <view class="tool-note" wx:else>1 元硬币：正面菊花，反面国徽。</view>
+      <view class="tool-note" wx:else>双面令牌：一面正，一面反。</view>
 
       <view class="action-row" wx:if="{{tab === 'dice'}}">
         <button class="primary-btn" disabled="{{rolling}}" bindtap="onPlay">{{rolling ? '摇晃中…' : '摇一摇'}}</button>

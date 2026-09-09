@@ -5,7 +5,6 @@ const { createGameSfx } = require('../../../utils/gameSfx')
 const { MIN_DICE, MAX_DICE, clampDiceCount, buildDie, rollDice, flipCoin } = require('../../../utils/chanceGame')
 
 const lastInput = createLastInput('chance', ['tab', 'diceCount'])
-const COIN_PETALS = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]
 const SHAKE_GAP = 1200
 const SHAKE_FORCE = 4.2
 const CUP_CLOSE_MS = 380
@@ -40,7 +39,6 @@ Page({
     dice: makeDice(1),
     coinHeads: true,
     willHeads: true,
-    coinPetals: COIN_PETALS,
     shaking: false,
     flipping: false,
     lidOpen: false,

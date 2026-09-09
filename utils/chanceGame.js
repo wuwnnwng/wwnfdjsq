@@ -51,8 +51,8 @@ function flipCoin() {
   const heads = Math.random() < 0.5
   return {
     heads,
-    title: '1 元硬币',
-    valueText: heads ? '正面 · 菊花' : '反面 · 国徽',
+    title: '硬币',
+    valueText: heads ? '正面' : '反面',
     faceText: heads ? '正' : '反'
   }
 }

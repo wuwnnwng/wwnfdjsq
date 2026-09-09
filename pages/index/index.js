@@ -24,6 +24,24 @@ const {
   markToolsHubSeen
 } = require('../../utils/toolsConfig')
 
+const FEATURED_TOOLS_OPEN_KEY = 'featuredToolsOpen'
+
+function readFeaturedToolsOpen() {
+  try {
+    const value = wx.getStorageSync(FEATURED_TOOLS_OPEN_KEY)
+    if (value === 0 || value === '0' || value === false) return false
+    return true
+  } catch (e) {
+    return true
+  }
+}
+
+function writeFeaturedToolsOpen(open) {
+  try {
+    wx.setStorageSync(FEATURED_TOOLS_OPEN_KEY, open ? 1 : 0)
+  } catch (e) {}
+}
+
 Page({
   data: {
     theme: getThemeId(),
@@ -32,9 +50,10 @@ Page({
     keyword: '',
     groups: groupTools(),
     featuredToolPages: getFeaturedToolPages(),
+    featuredToolsOpen: readFeaturedToolsOpen(),
     toolsIndicator: getTheme(getThemeId()).principal,
     toolsSwiperCurrent: 0,
-    toolsSwiperAutoplay: true,
+    toolsSwiperAutoplay: readFeaturedToolsOpen(),
     toolsSwiperKeys: [0]
   },
 
@@ -66,7 +85,7 @@ Page({
       patch.toolsSwiperCurrent = 0
       patch.toolsSwiperKeys = [(this.data.toolsSwiperKeys[0] || 0) + 1]
     }
-    if (!this.data.toolsSwiperAutoplay) {
+    if (this.data.featuredToolsOpen && !this.data.toolsSwiperAutoplay) {
       patch.toolsSwiperAutoplay = true
     }
     this.setData(patch)
@@ -117,6 +136,15 @@ Page({
         this._themeFadeTimer = null
       }, 300)
     }, 300)
+  },
+
+  onToggleFeaturedTools() {
+    const featuredToolsOpen = !this.data.featuredToolsOpen
+    writeFeaturedToolsOpen(featuredToolsOpen)
+    this.setData({
+      featuredToolsOpen,
+      toolsSwiperAutoplay: featuredToolsOpen
+    })
   },
 
   onFeaturedSwiperChange(e) {

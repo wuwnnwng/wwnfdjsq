@@ -18,8 +18,8 @@
       </view>
     </view>
 
-    <view class="tools-entry">
-      <view class="tools-swiper-wrap">
+    <view class="tools-entry {{featuredToolsOpen ? '' : 'collapsed'}}">
+      <view class="tools-swiper-wrap" wx:if="{{featuredToolsOpen}}">
         <block wx:for="{{toolsSwiperKeys}}" wx:for-item="swiperEpoch" wx:key="*this">
           <swiper
             class="tools-swiper"
@@ -63,6 +63,12 @@
           ></view>
         </view>
       </view>
+      <view
+        class="tools-fold"
+        catchtap="onToggleFeaturedTools"
+        aria-role="button"
+        aria-label="{{featuredToolsOpen ? '收起常用工具' : '展开常用工具'}}"
+      >{{featuredToolsOpen ? '收起' : '工具'}}</view>
     </view>
   </view>
 

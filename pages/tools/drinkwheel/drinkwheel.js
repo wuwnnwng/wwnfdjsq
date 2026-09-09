@@ -58,6 +58,7 @@ Page({
     wheelDeg: 0,
     wheelStyle: '',
     lastText: '',
+    showOptions: false,
     showEditor: false,
     editIndex: -1,
     editValue: '',
@@ -133,6 +134,15 @@ Page({
       if (this._sfx) this._sfx.play('wheelLand')
       if (wx.vibrateShort) wx.vibrateShort({ type: 'medium' })
     }, SPIN_MS)
+  },
+
+  onOpenOptions() {
+    if (this.data.spinning) return
+    this.setData({ showOptions: true })
+  },
+
+  onCloseOptions() {
+    this.setData({ showOptions: false })
   },
 
   onOpenAdd() {

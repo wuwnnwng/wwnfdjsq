@@ -83,40 +83,80 @@
   box-shadow: 0 8rpx 18rpx rgba(0, 0, 0, 0.25);
 }
 
-.history-head {
+.options-entry {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+
+.options-entry.is-off {
+  opacity: 0.38;
+}
+
+.tip-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1200;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
+  justify-content: center;
+  padding: 48rpx;
+  background: var(--color-mask);
+}
+
+.options-dialog {
+  width: 100%;
+  max-width: 640rpx;
+  max-height: 82vh;
+  padding: 32rpx 28rpx 24rpx;
+  border-radius: 24rpx;
+  background: var(--color-dialog);
+  box-sizing: border-box;
+}
+
+.options-head {
   margin-bottom: 8rpx;
 }
 
-.history-title {
-  font-size: 28rpx;
+.options-title {
+  font-size: 32rpx;
   font-weight: 700;
   color: var(--color-brand);
 }
 
-.history-actions {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
-  flex-shrink: 0;
+.options-sub {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: var(--color-muted);
 }
 
-.history-clear {
-  flex-shrink: 0;
+.options-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24rpx;
+  margin-bottom: 8rpx;
+}
+
+.options-action {
   font-size: 24rpx;
   font-weight: 600;
   color: var(--color-accent);
 }
 
-.history-clear.is-off {
+.options-action.is-off {
   opacity: 0.4;
 }
 
-.option-list.is-scroll {
-  height: 380rpx;
+.options-body {
+  max-height: 46vh;
+  margin-top: 4rpx;
 }
 
 .option-row {
@@ -169,13 +209,25 @@
   background: var(--color-soft);
 }
 
+.options-done {
+  margin-top: 16rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-on-brand);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+}
+
 .editor-mask {
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: 1200;
+  z-index: 1300;
   background: var(--color-mask);
   display: flex;
   align-items: flex-end;

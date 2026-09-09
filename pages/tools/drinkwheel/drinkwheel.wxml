@@ -30,35 +30,34 @@
       <button class="primary-btn" disabled="{{spinning}}" bindtap="onSpin">
         {{spinning ? '转动中…' : '转一次'}}
       </button>
+      <view class="options-entry {{spinning ? 'is-off' : ''}}" bindtap="onOpenOptions">
+        编辑转盘内容 · {{optionCount}} / {{maxOptions}}
+      </view>
       <view class="tool-note">仅供聚会娱乐，请适量饮酒，不要酒驾。</view>
     </view>
+  </scroll-view>
 
-    <view class="panel">
-      <view class="history-head">
-        <view class="history-title">转盘内容 {{optionCount}} / {{maxOptions}}</view>
-        <view class="history-actions">
-          <view class="history-clear" bindtap="onShuffle">打乱顺序</view>
-          <view class="history-clear {{isDefault ? 'is-off' : ''}}" bindtap="onResetDefault">恢复默认</view>
-        </view>
+  <view class="tip-mask" wx:if="{{showOptions}}" catchtouchmove="preventMove" catchtap="onCloseOptions">
+    <view class="options-dialog" catchtap="preventMove">
+      <view class="options-head">
+        <view class="options-title">转盘内容</view>
+        <view class="options-sub">{{optionCount}} / {{maxOptions}} 条 · 点文字可改</view>
       </view>
-      <scroll-view wx:if="{{optionCount > 5}}" scroll-y enhanced show-scrollbar class="option-list is-scroll">
+      <view class="options-actions">
+        <view class="options-action" catchtap="onShuffle">打乱顺序</view>
+        <view class="options-action {{isDefault ? 'is-off' : ''}}" catchtap="onResetDefault">恢复默认</view>
+      </view>
+      <scroll-view scroll-y class="options-body" enhanced show-scrollbar="{{false}}">
         <view class="option-row" wx:for="{{optionRows}}" wx:key="id">
           <view class="option-index">{{item.index + 1}}</view>
-          <view class="option-text" bindtap="onOpenEdit" data-index="{{item.index}}">{{item.text}}</view>
+          <view class="option-text" catchtap="onOpenEdit" data-index="{{item.index}}">{{item.text}}</view>
           <view class="option-del {{canRemove ? '' : 'is-off'}}" catchtap="onRemoveOption" data-index="{{item.index}}">删除</view>
         </view>
       </scroll-view>
-      <view wx:else class="option-list">
-        <view class="option-row" wx:for="{{optionRows}}" wx:key="id">
-          <view class="option-index">{{item.index + 1}}</view>
-          <view class="option-text" bindtap="onOpenEdit" data-index="{{item.index}}">{{item.text}}</view>
-          <view class="option-del {{canRemove ? '' : 'is-off'}}" catchtap="onRemoveOption" data-index="{{item.index}}">删除</view>
-        </view>
-      </view>
-      <view class="add-btn {{canAdd ? '' : 'is-off'}}" bindtap="onOpenAdd">＋ 添加一条（{{minOptions}}–{{maxOptions}} 条）</view>
-      <view class="tool-note">点文字可改内容。默认 9 条会记住；你改过之后下次进来还是你的版本。</view>
+      <view class="add-btn {{canAdd ? '' : 'is-off'}}" catchtap="onOpenAdd">＋ 添加一条（{{minOptions}}–{{maxOptions}} 条）</view>
+      <view class="options-done" catchtap="onCloseOptions">完成</view>
     </view>
-  </scroll-view>
+  </view>
 
   <view wx:if="{{showEditor}}" class="editor-mask" catchtap="onCancelEditor" catchtouchmove="preventMove">
     <view class="editor-sheet" catchtap="onSheetTap">

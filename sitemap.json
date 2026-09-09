@@ -94,6 +94,11 @@
     },
     {
       "action": "allow",
+      "page": "pages/tools/fuel/fuel",
+      "priority": 60
+    },
+    {
+      "action": "allow",
       "page": "pages/tools/compound/compound",
       "priority": 60
     },

@@ -233,6 +233,10 @@
   background: linear-gradient(135deg, #d1fae5, #34d399);
 }
 
+.tool-icon-fuel {
+  background: linear-gradient(135deg, #cffafe, #22d3ee);
+}
+
 .tool-icon-weight {
   background: linear-gradient(135deg, #f3e8ff, #c4b5fd);
 }

@@ -18,6 +18,7 @@
     "pages/tools/percent/percent",
     "pages/tools/age/age",
     "pages/tools/bmi/bmi",
+    "pages/tools/fuel/fuel",
     "pages/tools/compound/compound",
     "pages/tools/duedate/duedate",
     "pages/tools/safeperiod/safeperiod",

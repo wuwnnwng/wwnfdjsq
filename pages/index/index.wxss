@@ -357,6 +357,7 @@
 .tool-icon-age { background: linear-gradient(135deg, #fce7f3, #f472b6); }
 .tool-icon-qrcode { background: linear-gradient(135deg, #e2e8f0, #64748b); }
 .tool-icon-bmi { background: linear-gradient(135deg, #d1fae5, #34d399); }
+.tool-icon-fuel { background: linear-gradient(135deg, #cffafe, #22d3ee); }
 .tool-icon-random { background: linear-gradient(135deg, #ede9fe, #c4b5fd); }
 .tool-icon-canvas { background: linear-gradient(135deg, #fce7f3, #e879f9); }
 .tool-icon-puzzle { background: linear-gradient(135deg, #dbeafe, #60a5fa); }

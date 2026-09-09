@@ -7,14 +7,26 @@
             <text class="tool-icon">🎲</text>
           </view>
           <view class="conv-hero-copy">
-            <view class="conv-kicker">聚会 · 随机 · 记录</view>
+            <view class="conv-kicker">聚会 · 随机</view>
             <view class="conv-title">掷骰子 / 投硬币</view>
           </view>
         </view>
       </view>
-      <view class="conv-eq" wx:if="{{lastValue}}">本次 {{lastTitle}}</view>
-      <view class="conv-result" wx:if="{{lastValue}}">{{lastValue}}</view>
-      <view class="conv-eq" wx:else>点一下，当场出结果</view>
+      <block wx:if="{{tab === 'dice'}}">
+        <view class="conv-eq" wx:if="{{rolling}}">杯子正在摇晃</view>
+        <view class="conv-result" wx:if="{{rolling}}">摇一摇…</view>
+        <block wx:elif="{{lidOpen && lastValue}}">
+          <view class="conv-eq">本次 {{lastTitle}}</view>
+          <view class="conv-result">{{lastValue}}</view>
+        </block>
+        <view class="conv-eq" wx:elif="{{lastValue && !lidOpen}}">打开盖子看点数</view>
+        <view class="conv-eq" wx:else>盖上杯子，摇一摇</view>
+      </block>
+      <block wx:else>
+        <view class="conv-eq" wx:if="{{lastValue}}">本次 {{lastTitle}}</view>
+        <view class="conv-result" wx:if="{{lastValue}}">{{lastValue}}</view>
+        <view class="conv-eq" wx:else>抛一次 1 元硬币</view>
+      </block>
     </view>
 
     <view class="panel">
@@ -23,51 +35,87 @@
         <view class="seg-item {{tab === 'coin' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="coin">投硬币</view>
       </view>
 
-      <view class="stage {{shaking ? 'is-shake' : ''}} {{flipping ? 'is-flip' : ''}}">
+      <view class="stage {{shaking ? 'is-shake' : ''}} {{flipping ? 'is-flip' : ''}} {{lidOpen ? 'is-open' : ''}}">
         <block wx:if="{{tab === 'dice'}}">
-          <view class="dice-row">
-            <view class="die" wx:for="{{dice}}" wx:key="index">
-              <view class="pip {{pip.on ? 'on' : ''}}" wx:for="{{item.pips}}" wx:for-item="pip" wx:key="key"></view>
+          <view class="cup-well {{shaking ? 'is-shake' : ''}}" bindtap="onToggleLid">
+            <view class="cup-bowl">
+              <view class="dice-pad count-{{diceCount}}">
+                <view class="die" wx:for="{{dice}}" wx:key="index">
+                  <view class="pip {{pip.on ? 'on' : ''}}" wx:for="{{item.pips}}" wx:for-item="pip" wx:key="key"></view>
+                </view>
+              </view>
+            </view>
+            <view class="cup-lid {{lidOpen ? 'is-open' : ''}}">
+              <view class="cup-lid-face">
+                <view class="cup-lid-knob"></view>
+                <view class="cup-lid-ring"></view>
+              </view>
             </view>
           </view>
         </block>
-        <view class="coin {{coinHeads ? 'heads' : 'tails'}}" wx:else>
-          <text class="coin-face">{{coinFaceText}}</text>
+        <view class="coin-scene" wx:else>
+          <view class="yuan {{flipping ? 'is-flip' : ''}} {{coinHeads ? 'heads' : 'tails'}} {{willHeads ? 'will-heads' : 'will-tails'}}">
+            <view class="yuan-side yuan-obverse">
+              <view class="yuan-reed"></view>
+              <view class="yuan-plate">
+                <view class="yuan-ring"></view>
+                <view class="yuan-flower">
+                  <view class="yuan-petal" wx:for="{{coinPetals}}" wx:key="*this" style="transform: rotate({{item}}deg);"></view>
+                  <view class="yuan-center"></view>
+                </view>
+                <view class="yuan-denom">
+                  <text class="yuan-num">1</text>
+                  <text class="yuan-unit">元</text>
+                </view>
+              </view>
+            </view>
+            <view class="yuan-side yuan-reverse">
+              <view class="yuan-reed"></view>
+              <view class="yuan-plate">
+                <view class="yuan-ring"></view>
+                <view class="yuan-emblem">
+                  <view class="yuan-emblem-gear"></view>
+                  <view class="yuan-emblem-gate"></view>
+                  <text class="yuan-star yuan-star-main">★</text>
+                  <text class="yuan-star yuan-star-a">★</text>
+                  <text class="yuan-star yuan-star-b">★</text>
+                  <text class="yuan-star yuan-star-c">★</text>
+                  <text class="yuan-star yuan-star-d">★</text>
+                </view>
+                <text class="yuan-caption">中华人民共和国</text>
+                <text class="yuan-year">2015</text>
+              </view>
+            </view>
+          </view>
         </view>
       </view>
 
       <view class="count-row" wx:if="{{tab === 'dice'}}">
         <text class="count-label">骰子数量</text>
-        <view class="count-pills">
-          <view
-            class="count-pill {{diceCount === item ? 'active' : ''}}"
-            wx:for="{{diceCounts}}"
-            wx:key="*this"
-            bindtap="onSelectDiceCount"
-            data-count="{{item}}"
-          >{{item}} 枚</view>
+        <view class="count-stepper">
+          <view class="count-step {{diceCount <= minDice || rolling ? 'is-off' : ''}}" bindtap="onDiceCountStep" data-act="dec">−</view>
+          <input
+            class="count-input"
+            type="digit"
+            maxlength="1"
+            value="{{diceCountText}}"
+            disabled="{{rolling}}"
+            bindinput="onDiceCountInput"
+            bindblur="onDiceCountBlur"
+          />
+          <view class="count-step {{diceCount >= maxDice || rolling ? 'is-off' : ''}}" bindtap="onDiceCountStep" data-act="inc">+</view>
         </view>
       </view>
-      <view class="tool-note" wx:else>每次抛出正面或反面，公平随机。</view>
+      <view class="tool-note" wx:if="{{tab === 'dice'}}">杯子不透明，摇完再打开盖子看点数。也可以晃动手机摇一摇。</view>
+      <view class="tool-note" wx:else>1 元硬币：正面菊花，反面国徽。</view>
 
-      <button class="primary-btn" disabled="{{rolling}}" bindtap="onPlay">
-        {{rolling ? '进行中…' : (tab === 'dice' ? '掷一次' : '抛一次')}}
+      <view class="action-row" wx:if="{{tab === 'dice'}}">
+        <button class="primary-btn" disabled="{{rolling}}" bindtap="onPlay">{{rolling ? '摇晃中…' : '摇一摇'}}</button>
+        <button class="lid-btn" disabled="{{rolling}}" bindtap="onToggleLid">{{lidOpen ? '盖上' : '打开盖子'}}</button>
+      </view>
+      <button class="primary-btn" wx:else disabled="{{rolling}}" bindtap="onPlay">
+        {{rolling ? '进行中…' : '抛一次'}}
       </button>
-    </view>
-
-    <view class="panel history-panel">
-      <view class="history-head">
-        <view class="history-title">历史记录</view>
-        <view class="history-clear {{records.length ? '' : 'is-off'}}" bindtap="onClearRecords">清空记录</view>
-      </view>
-      <view class="history-empty" wx:if="{{!records.length}}">还没有结果。掷过或抛过之后会出现在这里，下次进来也还在。</view>
-      <view class="history-list" wx:else>
-        <view class="history-row" wx:for="{{records}}" wx:key="id">
-          <view class="history-kind">{{item.title}}</view>
-          <view class="history-value">{{item.valueText}}</view>
-          <view class="history-time">{{item.timeText}}</view>
-        </view>
-      </view>
     </view>
   </scroll-view>
 </view>

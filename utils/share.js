@@ -304,6 +304,14 @@ function getAgeToolShare() {
   }
 }
 
+function getFuelToolShare() {
+  const path = '/pages/tools/fuel/fuel'
+  return {
+    appMessage: buildToolShareAppMessage(path, '汽车油耗电耗'),
+    timeline: buildToolShareTimeline(path, '汽车油耗电耗')
+  }
+}
+
 function getBmiToolShare() {
   const path = '/pages/tools/bmi/bmi'
   return {
@@ -683,6 +691,7 @@ module.exports = {
   getPercentToolShare,
   getAgeToolShare,
   getBmiToolShare,
+  getFuelToolShare,
   getCanvasToolShare,
   getPuzzleToolShare,
   getCompoundToolShare,

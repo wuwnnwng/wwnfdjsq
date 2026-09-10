@@ -286,9 +286,9 @@ function buildProvinceRows(rows, selectedId, gradeKey) {
 
 function buildView(data, options) {
   const rows = (data && data.rows) || []
-  const wantedId = (options && options.provinceId) || readLastProvinceId()
-  const selected = rows.find((item) => item.id === wantedId) || rows[0] || null
-  const provinceId = selected ? selected.id : DEFAULT_PROVINCE_ID
+  const wanted = getProvince((options && options.provinceId) || readLastProvinceId())
+  const selected = rows.find((item) => item.id === wanted.id) || null
+  const provinceId = wanted.id
   const gradeKey = (options && options.gradeKey) || 'p92'
   const grade = GRADES.find((item) => item.key === gradeKey) || GRADES[0]
   const heroPrice = gradeValue(selected, grade.key)
@@ -302,7 +302,7 @@ function buildView(data, options) {
   }
   return {
     provinceId,
-    provinceName: selected ? selected.name : getProvince(provinceId).name,
+    provinceName: wanted.name,
     provinceIndex: getProvinceIndex(provinceId),
     gradeKey: grade.key,
     gradeLabel: grade.label,

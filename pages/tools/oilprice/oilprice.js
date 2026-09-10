@@ -41,6 +41,7 @@ Page({
 
   onLoad() {
     enableShareMenu()
+    this.setData(emptyView())
     this.refresh()
   },
 
@@ -74,10 +75,10 @@ Page({
     if (!silent) this.setData({ loading: true, error: '' })
     const view = await loadOilPrices({
       force: !!(options && options.force),
-      provinceId: (options && options.provinceId) || this.data.provinceId,
+      provinceId: (options && options.provinceId) || readLastProvinceId(),
       gradeKey: (options && options.gradeKey) || this.data.gradeKey
     })
-    writeLastProvinceId(view.provinceId)
+    if (view.provinceId) writeLastProvinceId(view.provinceId)
     this.applyView(view)
   },
 

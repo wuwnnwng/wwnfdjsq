@@ -9,7 +9,7 @@ const FEATURED_IDS = ['mortgage', 'retire', 'calendar', 'calc', 'qrcode', 'weath
 const FEATURED_PAGE_SIZE = 4
 
 const CATEGORIES = [
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'fuel', 'canvas', 'puzzle', 'exam'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'fuel', 'oilprice', 'canvas', 'puzzle', 'exam'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
@@ -151,8 +151,17 @@ const TOOLS = [
     shortName: '油耗电耗',
     icon: '🚗',
     iconType: 'fuel',
-    keywords: '汽车油耗电耗百公里油耗电耗加油充电油价电价燃油纯电花费',
+    keywords: '汽车油耗电耗百公里油耗电耗加油充电油价电价燃油纯电花费今日油价',
     page: '/pages/tools/fuel/fuel'
+  },
+  {
+    id: 'oilprice',
+    name: '今日油价',
+    shortName: '今日油价',
+    icon: '⛽',
+    iconType: 'oilprice',
+    keywords: '今日油价汽油柴油92号95号98号加油挂牌价各省油价',
+    page: '/pages/tools/oilprice/oilprice'
   },
   {
     id: 'compound',

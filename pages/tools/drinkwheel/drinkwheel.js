@@ -17,6 +17,21 @@ const {
 const { createGameSfx, wheelTickDelays } = require('../../../utils/gameSfx')
 
 const SPIN_MS = 3200
+const EDIT_HINT_KEY = 'drinkWheel:editHintSeen'
+
+function readEditHint() {
+  try {
+    return !wx.getStorageSync(EDIT_HINT_KEY)
+  } catch (e) {
+    return true
+  }
+}
+
+function markEditHintSeen() {
+  try {
+    wx.setStorageSync(EDIT_HINT_KEY, 1)
+  } catch (e) {}
+}
 
 function applyWheel(page, options, extra) {
   const view = buildWheelView(options)
@@ -59,6 +74,7 @@ Page({
     wheelStyle: '',
     lastText: '',
     showOptions: false,
+    editHint: true,
     showEditor: false,
     editIndex: -1,
     editValue: '',
@@ -69,7 +85,8 @@ Page({
     enableShareMenu()
     this._sfx = createGameSfx()
     applyWheel(this, readOptions(), {
-      wheelStyle: 'transform: rotate(0deg);'
+      wheelStyle: 'transform: rotate(0deg);',
+      editHint: readEditHint()
     })
   },
 
@@ -138,7 +155,8 @@ Page({
 
   onOpenOptions() {
     if (this.data.spinning) return
-    this.setData({ showOptions: true })
+    if (this.data.editHint) markEditHintSeen()
+    this.setData({ showOptions: true, editHint: false })
   },
 
   onCloseOptions() {

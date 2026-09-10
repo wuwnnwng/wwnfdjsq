@@ -11,6 +11,83 @@
   background: linear-gradient(135deg, #cffafe, #22d3ee);
 }
 
+.conv-hero-top {
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.conv-hero-id {
+  min-width: 0;
+  flex: 1;
+}
+
+.oil-chip {
+  flex-shrink: 0;
+  height: 56rpx;
+  padding: 0 20rpx;
+  line-height: 52rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  background: var(--color-soft);
+  border: 2rpx solid var(--color-brand);
+  box-sizing: border-box;
+}
+
+.oil-chip-hover {
+  opacity: 0.82;
+}
+
+.oil-jump {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 20rpx;
+  padding: 20rpx 22rpx;
+  border-radius: 20rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+  box-sizing: border-box;
+}
+
+.oil-jump-hover {
+  opacity: 0.86;
+}
+
+.oil-jump-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.oil-jump-title {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+}
+
+.oil-jump-sub {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+.oil-jump-go {
+  flex-shrink: 0;
+  height: 56rpx;
+  padding: 0 22rpx;
+  line-height: 56rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-brand);
+}
+
 .seg-row + .seg-row {
   margin-top: 12rpx;
 }

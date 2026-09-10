@@ -11,10 +11,19 @@
             <view class="conv-title">喝酒转盘</view>
           </view>
         </view>
+        <view
+          class="edit-chip {{spinning ? 'is-off' : ''}} {{editHint ? 'is-hint' : ''}}"
+          hover-class="edit-chip-hover"
+          hover-stay-time="80"
+          bindtap="onOpenOptions"
+        >
+          <text class="edit-chip-mark">✎</text>
+          <text>改内容</text>
+        </view>
       </view>
       <view class="conv-eq" wx:if="{{lastText}}">指针停在</view>
       <view class="conv-result" wx:if="{{lastText}}">{{lastText}}</view>
-      <view class="conv-eq" wx:else>转一下，看谁喝、看谁表演</view>
+      <view class="conv-eq" wx:else>转一次看谁喝。右上角可改惩罚</view>
     </view>
 
     <view class="panel wheel-panel">
@@ -30,8 +39,17 @@
       <button class="primary-btn" disabled="{{spinning}}" bindtap="onSpin">
         {{spinning ? '转动中…' : '转一次'}}
       </button>
-      <view class="options-entry {{spinning ? 'is-off' : ''}}" bindtap="onOpenOptions">
-        编辑转盘内容 · {{optionCount}} / {{maxOptions}}
+      <view
+        class="options-entry {{spinning ? 'is-off' : ''}}"
+        hover-class="options-entry-hover"
+        hover-stay-time="80"
+        bindtap="onOpenOptions"
+      >
+        <view class="options-entry-copy">
+          <view class="options-entry-title">修改转盘内容</view>
+          <view class="options-entry-sub">当前 {{optionCount}} / {{maxOptions}} 条，点这里换惩罚</view>
+        </view>
+        <view class="options-entry-go">去修改</view>
       </view>
       <view class="tool-note">仅供聚会娱乐，请适量饮酒，不要酒驾。</view>
     </view>

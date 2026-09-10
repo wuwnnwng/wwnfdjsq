@@ -312,6 +312,14 @@ function getFuelToolShare() {
   }
 }
 
+function getOilPriceToolShare() {
+  const path = '/pages/tools/oilprice/oilprice'
+  return {
+    appMessage: buildToolShareAppMessage(path, '今日油价'),
+    timeline: buildToolShareTimeline(path, '今日油价')
+  }
+}
+
 function getBmiToolShare() {
   const path = '/pages/tools/bmi/bmi'
   return {
@@ -692,6 +700,7 @@ module.exports = {
   getAgeToolShare,
   getBmiToolShare,
   getFuelToolShare,
+  getOilPriceToolShare,
   getCanvasToolShare,
   getPuzzleToolShare,
   getCompoundToolShare,

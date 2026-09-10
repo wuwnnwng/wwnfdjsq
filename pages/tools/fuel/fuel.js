@@ -32,11 +32,14 @@ Page({
     result: null
   },
 
-  onLoad() {
+  onLoad(options) {
     enableShareMenu()
     const restored = lastInput.restore()
     if (restored.kind && restored.kind !== 'ev') restored.kind = 'fuel'
     if (restored.mode && restored.mode !== 'plan') restored.mode = 'trip'
+    if (options && options.kind === 'ev') restored.kind = 'ev'
+    else if (options && (options.kind === 'fuel' || options.price)) restored.kind = 'fuel'
+    if (options && options.price) restored.fuelPrice = String(options.price)
     this.setData(restored, () => this.recalculate())
   },
 
@@ -84,6 +87,18 @@ Page({
       rateText: this.data[`${prefix}Rate`]
     })
     this.setData({ result }, () => lastInput.save(this))
+  },
+
+  applyOilPrice(price) {
+    const next = String(price || '').trim()
+    if (!next) return
+    this.setData({ kind: 'fuel', fuelPrice: next }, () => this.recalculate())
+  },
+
+  onGoOilPrice() {
+    wx.navigateTo({
+      url: '/pages/tools/oilprice/oilprice'
+    })
   },
 
   onShareAppMessage() {

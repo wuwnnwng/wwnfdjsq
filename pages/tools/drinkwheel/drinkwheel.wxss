@@ -11,6 +11,65 @@
   background: linear-gradient(135deg, #ffe4e6, #fb7185);
 }
 
+.conv-hero-top {
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.conv-hero-id {
+  min-width: 0;
+  flex: 1;
+}
+
+.edit-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  background: var(--color-soft);
+  border: 2rpx solid var(--color-brand);
+  box-sizing: border-box;
+}
+
+.edit-chip-mark {
+  font-size: 26rpx;
+  line-height: 1;
+}
+
+.edit-chip-hover {
+  opacity: 0.82;
+}
+
+.edit-chip.is-off,
+.options-entry.is-off {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.edit-chip.is-hint {
+  color: #fff;
+  background: linear-gradient(135deg, #fb7185, #e11d48);
+  border-color: transparent;
+  animation: edit-chip-pulse 1.6s ease-in-out 4;
+}
+
+@keyframes edit-chip-pulse {
+  0%,
+  100% {
+    box-shadow: 0 8rpx 18rpx rgba(225, 29, 72, 0.28);
+  }
+  50% {
+    box-shadow: 0 0 0 12rpx rgba(251, 113, 133, 0.22);
+  }
+}
+
 .wheel-panel {
   display: flex;
   flex-direction: column;
@@ -84,15 +143,51 @@
 }
 
 .options-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
   margin-top: 20rpx;
-  text-align: center;
-  font-size: 26rpx;
-  font-weight: 600;
+  padding: 20rpx 22rpx;
+  border-radius: 20rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+  box-sizing: border-box;
+}
+
+.options-entry-hover {
+  opacity: 0.86;
+}
+
+.options-entry-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.options-entry-title {
+  font-size: 28rpx;
+  font-weight: 800;
   color: var(--color-brand);
 }
 
-.options-entry.is-off {
-  opacity: 0.38;
+.options-entry-sub {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+.options-entry-go {
+  flex-shrink: 0;
+  height: 56rpx;
+  padding: 0 22rpx;
+  line-height: 56rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-brand);
 }
 
 .tip-mask {

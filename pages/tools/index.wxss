@@ -252,6 +252,10 @@
   background: linear-gradient(135deg, #cffafe, #22d3ee);
 }
 
+.tool-icon-oilprice {
+  background: linear-gradient(135deg, #ffedd5, #fb923c);
+}
+
 .tool-icon-canvas {
   background: linear-gradient(135deg, #fce7f3, #e879f9);
 }

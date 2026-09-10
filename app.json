@@ -19,6 +19,7 @@
     "pages/tools/age/age",
     "pages/tools/bmi/bmi",
     "pages/tools/fuel/fuel",
+    "pages/tools/oilprice/oilprice",
     "pages/tools/compound/compound",
     "pages/tools/duedate/duedate",
     "pages/tools/safeperiod/safeperiod",

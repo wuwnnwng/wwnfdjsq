@@ -99,6 +99,11 @@
     },
     {
       "action": "allow",
+      "page": "pages/tools/oilprice/oilprice",
+      "priority": 60
+    },
+    {
+      "action": "allow",
       "page": "pages/tools/compound/compound",
       "priority": 60
     },

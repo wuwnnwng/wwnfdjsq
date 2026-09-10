@@ -11,6 +11,7 @@
             <view class="conv-title">汽车油耗电耗</view>
           </view>
         </view>
+        <view class="oil-chip" hover-class="oil-chip-hover" hover-stay-time="80" bindtap="onGoOilPrice">今日油价</view>
       </view>
       <block wx:if="{{result && result.valid}}">
         <view class="conv-eq">{{result.formulaText}}</view>
@@ -79,6 +80,13 @@
           </view>
           <view class="tool-note">已知百公里油耗时，估算这段路要加多少油、花多少钱。</view>
         </block>
+        <view class="oil-jump" hover-class="oil-jump-hover" hover-stay-time="80" bindtap="onGoOilPrice">
+          <view class="oil-jump-copy">
+            <view class="oil-jump-title">查看今日油价</view>
+            <view class="oil-jump-sub">各省 92 / 95 / 98 / 柴油，可填回油价</view>
+          </view>
+          <view class="oil-jump-go">去查看</view>
+        </view>
       </block>
 
       <block wx:else>

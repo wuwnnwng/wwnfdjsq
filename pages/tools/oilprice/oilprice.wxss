@@ -1,0 +1,162 @@
+@import "../tool-common.wxss";
+@import "../calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(251, 146, 60, 0.18) 0%, var(--color-hero-fade) 58%),
+    var(--color-surface);
+}
+
+.conv-hero-top {
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.conv-hero-id {
+  min-width: 0;
+  flex: 1;
+}
+
+.tool-icon-oilprice {
+  background: linear-gradient(135deg, #ffedd5, #fb923c);
+}
+
+.oil-refresh {
+  flex-shrink: 0;
+  padding: 10rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  color: var(--color-brand-soft);
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+}
+
+.oil-refresh.is-off {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.oil-place {
+  display: flex;
+  align-items: baseline;
+  gap: 12rpx;
+  margin-top: 24rpx;
+}
+
+.oil-place-name {
+  font-family: var(--font-display);
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  line-height: 1.2;
+}
+
+.oil-place-caret {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.conv-result-suffix {
+  margin-left: 8rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.oil-change.up,
+.oil-grade-change.up,
+.oil-row-change.up {
+  color: #f43f5e;
+}
+
+.oil-change.down,
+.oil-grade-change.down,
+.oil-row-change.down {
+  color: #10b981;
+}
+
+.oil-meta {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.oil-grades {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+
+.oil-grade {
+  padding: 20rpx 18rpx 18rpx;
+  border-radius: 20rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+  box-sizing: border-box;
+}
+
+.oil-grade.active {
+  border-color: var(--color-brand);
+  background:
+    linear-gradient(160deg, rgba(251, 146, 60, 0.14) 0%, var(--color-hero-fade) 72%),
+    var(--color-soft);
+}
+
+.oil-grade-label {
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.oil-grade-price {
+  margin-top: 6rpx;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  line-height: 1.2;
+}
+
+.oil-grade-change {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.oil-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.oil-row:last-child {
+  border-bottom: none;
+}
+
+.oil-row.active .oil-row-name {
+  color: var(--color-brand);
+  font-weight: 800;
+}
+
+.oil-row-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  color: var(--color-ink);
+}
+
+.oil-row-price {
+  width: 120rpx;
+  text-align: right;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.oil-row-change {
+  width: 100rpx;
+  text-align: right;
+  font-size: 24rpx;
+  font-weight: 700;
+}

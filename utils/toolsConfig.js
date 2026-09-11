@@ -9,9 +9,9 @@ const FEATURED_IDS = ['mortgage', 'retire', 'calendar', 'calc', 'qrcode', 'weath
 const FEATURED_PAGE_SIZE = 4
 
 const CATEGORIES = [
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle', 'exam'] },
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
   { id: 'fun', name: '娱乐', toolIds: ['chance', 'drinkwheel', 'footprint'] }

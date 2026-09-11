@@ -28,8 +28,13 @@
   margin-bottom: 0;
 }
 
-.vehicle-hint {
+.vehicle-hint,
+.rate-table {
   margin-top: 0;
+}
+
+.rate-table {
+  margin-bottom: 8rpx;
 }
 
 .opt-row {

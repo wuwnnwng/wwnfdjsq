@@ -30,6 +30,7 @@
           </view>
         </view>
       </picker>
+      <view class="tool-note rate-table">本省客车常见费率 {{rateTable}} 元/公里</view>
 
       <view class="field field-stack">
         <text class="field-label">车型</text>
@@ -90,7 +91,7 @@
         </view>
         <view class="opt-switch {{holidayFree ? 'on' : ''}}"><view class="opt-knob"></view></view>
       </view>
-      <view class="tool-note">切换省份或车型会带出参考费率，也可按实际路段自己改。节假日免费打开后，一类客车按 0 元估算。</view>
+      <view class="tool-note">切换省份或车型会带出该省一类至四类公布费率，同一省不同路段仍可能不同，也可按实际路段自己改。节假日免费打开后，一类客车按 0 元估算。</view>
     </view>
 
     <view class="panel" wx:if="{{result && result.valid}}">

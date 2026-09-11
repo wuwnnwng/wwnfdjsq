@@ -5,6 +5,7 @@ const {
   getVehicle,
   getProvince,
   getProvinceByIndex,
+  formatRateTable,
   suggestRate,
   calculateToll
 } = require('../../utils/tollCalc')
@@ -39,6 +40,7 @@ Page({
     provinceId: DEFAULT_PROVINCE_ID,
     provinceName: getProvince(DEFAULT_PROVINCE_ID).name,
     provinceIndex: getProvince(DEFAULT_PROVINCE_ID).index,
+    rateTable: formatRateTable(getProvince(DEFAULT_PROVINCE_ID)),
     vehicleKey: 'c1',
     vehicleHint: getVehicle('c1').hint,
     distance: '200',
@@ -62,15 +64,16 @@ Page({
       provinceId,
       provinceName: province.name,
       provinceIndex: province.index,
+      rateTable: formatRateTable(province),
       vehicleKey,
-      vehicleHint: getVehicle(vehicleKey).hint
+      vehicleHint: getVehicle(vehicleKey).hint,
+      rate: suggestRate(provinceId, vehicleKey)
     }
     if (restored.distance) patch.distance = restored.distance
     if (restored.extra !== undefined) patch.extra = restored.extra
     if (typeof restored.roundTrip === 'boolean') patch.roundTrip = restored.roundTrip
     if (typeof restored.etcOn === 'boolean') patch.etcOn = restored.etcOn
     if (typeof restored.holidayFree === 'boolean') patch.holidayFree = restored.holidayFree
-    patch.rate = restored.rate || suggestRate(provinceId, vehicleKey)
     this.setData(patch, () => this.recalculate())
   },
 
@@ -95,6 +98,7 @@ Page({
       provinceId: province.id,
       provinceName: province.name,
       provinceIndex: province.index,
+      rateTable: formatRateTable(province),
       rate: suggestRate(province.id, this.data.vehicleKey)
     }, () => this.recalculate())
   },

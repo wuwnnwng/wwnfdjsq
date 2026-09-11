@@ -1,49 +1,49 @@
 /**
- * 高速过路费估算：里程 × 车型费率 + 附加，再按 ETC / 节假日规则折算。
- * 各省路段实际费率不同，结果仅供出行前估算。
+ * 高速过路费估算：各省客车一类至四类按公开费率计，不再套统一系数。
+ * 同一省不同路段仍可能不同，结果仅供出行前估算。
  */
 
 const ETC_DISCOUNT = 0.05
 
 const VEHICLES = [
-  { key: 'c1', name: '一类客车', short: '一类', hint: '9 座及以下轿车、SUV，车长小于 6 米', coeff: 1, holidayEligible: true },
-  { key: 'c2', name: '二类客车', short: '二类', hint: '10–19 座，或车长 6–8 米', coeff: 1.8, holidayEligible: false },
-  { key: 'c3', name: '三类客车', short: '三类', hint: '20–39 座，或车长 8–10 米', coeff: 2.5, holidayEligible: false },
-  { key: 'c4', name: '四类客车', short: '四类', hint: '40 座及以上，或车长不小于 10 米', coeff: 3, holidayEligible: false }
+  { key: 'c1', name: '一类客车', short: '一类', hint: '9 座及以下轿车、SUV，车长小于 6 米', holidayEligible: true },
+  { key: 'c2', name: '二类客车', short: '二类', hint: '10–19 座，或车长 6–8 米', holidayEligible: false },
+  { key: 'c3', name: '三类客车', short: '三类', hint: '20–39 座，或车长 8–10 米', holidayEligible: false },
+  { key: 'c4', name: '四类客车', short: '四类', hint: '40 座及以上，或车长不小于 10 米', holidayEligible: false }
 ]
 
 const PROVINCES = [
-  { id: 'bj', name: '北京', baseRate: 0.5 },
-  { id: 'tj', name: '天津', baseRate: 0.49 },
-  { id: 'he', name: '河北', baseRate: 0.4 },
-  { id: 'sx', name: '山西', baseRate: 0.39 },
-  { id: 'nm', name: '内蒙古', baseRate: 0.4 },
-  { id: 'ln', name: '辽宁', baseRate: 0.4 },
-  { id: 'jl', name: '吉林', baseRate: 0.4 },
-  { id: 'hl', name: '黑龙江', baseRate: 0.45 },
-  { id: 'sh', name: '上海', baseRate: 0.6 },
-  { id: 'js', name: '江苏', baseRate: 0.45 },
-  { id: 'zj', name: '浙江', baseRate: 0.4 },
-  { id: 'ah', name: '安徽', baseRate: 0.45 },
-  { id: 'fj', name: '福建', baseRate: 0.55 },
-  { id: 'jx', name: '江西', baseRate: 0.45 },
-  { id: 'sd', name: '山东', baseRate: 0.4 },
-  { id: 'ha', name: '河南', baseRate: 0.45 },
-  { id: 'hb', name: '湖北', baseRate: 0.45 },
-  { id: 'hn', name: '湖南', baseRate: 0.5 },
-  { id: 'gd', name: '广东', baseRate: 0.45 },
-  { id: 'gx', name: '广西', baseRate: 0.4 },
-  { id: 'hi', name: '海南', baseRate: 0.5 },
-  { id: 'cq', name: '重庆', baseRate: 0.55 },
-  { id: 'sc', name: '四川', baseRate: 0.42 },
-  { id: 'gz', name: '贵州', baseRate: 0.55 },
-  { id: 'yn', name: '云南', baseRate: 0.5 },
-  { id: 'xz', name: '西藏', baseRate: 0.5 },
-  { id: 'sn', name: '陕西', baseRate: 0.4 },
-  { id: 'gs', name: '甘肃', baseRate: 0.4 },
-  { id: 'qh', name: '青海', baseRate: 0.4 },
-  { id: 'nx', name: '宁夏', baseRate: 0.4 },
-  { id: 'xj', name: '新疆', baseRate: 0.4 }
+  { id: 'bj', name: '北京', rates: { c1: 0.5, c2: 1, c3: 1.5, c4: 1.8 } },
+  { id: 'tj', name: '天津', rates: { c1: 0.55, c2: 0.95, c3: 1.55, c4: 1.75 } },
+  { id: 'he', name: '河北', rates: { c1: 0.4, c2: 0.6, c3: 0.8, c4: 1.2 } },
+  { id: 'sx', name: '山西', rates: { c1: 0.36, c2: 0.54, c3: 0.72, c4: 1.08 } },
+  { id: 'nm', name: '内蒙古', rates: { c1: 0.4, c2: 0.4, c3: 0.5, c4: 0.7 } },
+  { id: 'ln', name: '辽宁', rates: { c1: 0.45, c2: 0.8, c3: 1.15, c4: 1.45 } },
+  { id: 'jl', name: '吉林', rates: { c1: 0.45, c2: 0.8, c3: 1.1, c4: 1.45 } },
+  { id: 'hl', name: '黑龙江', rates: { c1: 0.45, c2: 0.8, c3: 1.1, c4: 1.45 } },
+  { id: 'sh', name: '上海', rates: { c1: 0.6, c2: 0.6, c3: 0.9, c4: 0.9 }, note: '二类按一类、四类按三类计。' },
+  { id: 'js', name: '江苏', rates: { c1: 0.45, c2: 0.68, c3: 0.9, c4: 0.9 }, note: '四车道常见一类 0.45；部分路段一类 0.50 或 0.55，四类常与三类同价。' },
+  { id: 'zj', name: '浙江', rates: { c1: 0.4, c2: 0.4, c3: 0.8, c4: 1.2 }, note: '另有车次费：一/二类 5 元，三类 10 元，四类 15 元。' },
+  { id: 'ah', name: '安徽', rates: { c1: 0.45, c2: 0.8, c3: 1.1, c4: 1.3 } },
+  { id: 'fj', name: '福建', rates: { c1: 0.55, c2: 1.1, c3: 1.54, c4: 1.65 }, note: '一类常见 0.50 / 0.55 / 0.60，级差 1∶2∶2.8∶3。' },
+  { id: 'jx', name: '江西', rates: { c1: 0.45, c2: 0.8, c3: 1.15, c4: 1.5 } },
+  { id: 'sd', name: '山东', rates: { c1: 0.4, c2: 0.5, c3: 0.6, c4: 0.75 }, note: '2018 年前路段常见此档；新建改扩建多为 0.50 / 0.65 / 0.78 / 0.98。' },
+  { id: 'ha', name: '河南', rates: { c1: 0.45, c2: 0.65, c3: 1, c4: 1.2 }, note: '一类常见 0.45–0.55，二至四类随路段上浮。' },
+  { id: 'hb', name: '湖北', rates: { c1: 0.5, c2: 0.75, c3: 1.1, c4: 1.38 } },
+  { id: 'hn', name: '湖南', rates: { c1: 0.4, c2: 0.7, c3: 1, c4: 1.2 }, note: '造价较低的四车道为此档；较高造价或六车道多为 0.50 / 0.80 / 1.10 / 1.30。' },
+  { id: 'gd', name: '广东', rates: { c1: 0.45, c2: 0.68, c3: 0.9, c4: 1.35 }, note: '四车道一类 0.45，系数 1∶1.5∶2∶3；六车道一类 0.60。40 座以上按三类计。' },
+  { id: 'gx', name: '广西', rates: { c1: 0.4, c2: 0.8, c3: 1.2, c4: 1.44 } },
+  { id: 'hi', name: '海南', rates: { c1: 0, c2: 0, c3: 0, c4: 0 }, note: '海南大部分高速不单独收取通行费。' },
+  { id: 'cq', name: '重庆', rates: { c1: 0.65, c2: 1.3, c3: 1.95, c4: 2.6 }, note: '客车级差 1∶2∶3∶4；多数路段一类 0.65，少数 0.50 或 0.60。' },
+  { id: 'sc', name: '四川', rates: { c1: 0.45, c2: 0.9, c3: 1.35, c4: 1.8 }, note: '客车级差多为 1∶2∶3∶4，桥隧另计。' },
+  { id: 'gz', name: '贵州', rates: { c1: 0.5, c2: 1, c3: 1.5, c4: 2 } },
+  { id: 'yn', name: '云南', rates: { c1: 0.45, c2: 0.9, c3: 1.35, c4: 1.8 } },
+  { id: 'xz', name: '西藏', rates: { c1: 0.5, c2: 1, c3: 1.5, c4: 2 } },
+  { id: 'sn', name: '陕西', rates: { c1: 0.4, c2: 0.7, c3: 0.9, c4: 1.1 }, note: '存量路段常见此档；部分新建路段一类 0.60。' },
+  { id: 'gs', name: '甘肃', rates: { c1: 0.4, c2: 0.5, c3: 0.6, c4: 0.75 } },
+  { id: 'qh', name: '青海', rates: { c1: 0.4, c2: 0.58, c3: 0.83, c4: 1.21 } },
+  { id: 'nx', name: '宁夏', rates: { c1: 0.3, c2: 0.5, c3: 0.7, c4: 0.85 } },
+  { id: 'xj', name: '新疆', rates: { c1: 0.35, c2: 0.53, c3: 0.7, c4: 1.05 } }
 ]
 
 const DEFAULT_PROVINCE_ID = 'gd'
@@ -85,10 +85,20 @@ function getProvinceByIndex(index) {
   return PROVINCES[Number(index)] || PROVINCES[0]
 }
 
+function classRate(province, vehicleKey) {
+  const rates = (province && province.rates) || getProvince(DEFAULT_PROVINCE_ID).rates
+  const key = getVehicle(vehicleKey).key
+  const value = Number(rates[key])
+  return Number.isFinite(value) ? value : 0
+}
+
+function formatRateTable(province) {
+  const item = province || getProvince(DEFAULT_PROVINCE_ID)
+  return `一类 ${formatNumber(item.rates.c1)} / 二类 ${formatNumber(item.rates.c2)} / 三类 ${formatNumber(item.rates.c3)} / 四类 ${formatNumber(item.rates.c4)}`
+}
+
 function suggestRate(provinceId, vehicleKey) {
-  const province = getProvince(provinceId)
-  const vehicle = getVehicle(vehicleKey)
-  return formatNumber(province.baseRate * vehicle.coeff, 2)
+  return formatNumber(classRate(getProvince(provinceId), vehicleKey), 2)
 }
 
 function calculateToll(input) {
@@ -130,7 +140,9 @@ function calculateToll(input) {
 
   const rows = [
     { label: '车型', value: vehicle.name },
-    { label: '参考省份', value: `${province.name} · 一类参考 ${formatNumber(province.baseRate)} 元/公里` },
+    { label: '参考省份', value: province.name },
+    { label: '本省客车费率', value: `${formatRateTable(province)} 元/公里` },
+    { label: '本次采用', value: `${formatNumber(rate)} 元/公里` },
     { label: trips > 1 ? '往返里程' : '高速里程', value: `${formatNumber(tripDistance, 1)} 公里` },
     { label: '基础通行费', value: `${formatMoney(baseFee)} 元` }
   ]
@@ -149,7 +161,8 @@ function calculateToll(input) {
     { label: '折合每公里', value: `${formatNumber(perKm, 3)} 元` }
   )
 
-  let hint = '各省各路段费率不同，桥梁隧道和差异化收费未逐条计入。结果仅供出行前估算，以收费站 / ETC 实际扣费为准。'
+  let hint = '上表是该省客车常见公布费率，同一省不同路段仍可能不同，桥隧加收未逐条计入。结果仅供出行前估算，以收费站 / ETC 实际扣费为准。'
+  if (province.note) hint = `${province.note} ${hint}`
   if (holidayApplied) {
     hint = '春节、清明、劳动节、国庆期间，7 座及以下小型客车通常免费通行。免费时段以当年通知为准。'
   } else if (holidayIgnored) {
@@ -179,6 +192,7 @@ module.exports = {
   getVehicle,
   getProvince,
   getProvinceByIndex,
+  formatRateTable,
   suggestRate,
   calculateToll
 }

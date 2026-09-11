@@ -9,7 +9,8 @@ const FEATURED_IDS = ['mortgage', 'retire', 'calendar', 'calc', 'qrcode', 'weath
 const FEATURED_PAGE_SIZE = 4
 
 const CATEGORIES = [
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'fuel', 'oilprice', 'canvas', 'puzzle', 'exam'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle', 'exam'] },
+  { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
@@ -151,8 +152,8 @@ const TOOLS = [
     shortName: '油耗电耗',
     icon: '🚗',
     iconType: 'fuel',
-    keywords: '汽车油耗电耗百公里油耗电耗加油充电油价电价燃油纯电花费今日油价',
-    page: '/pages/tools/fuel/fuel'
+    keywords: '出行汽车油耗电耗百公里油耗电耗加油充电油价电价燃油纯电花费今日油价',
+    page: '/packageTravel/pages/fuel/fuel'
   },
   {
     id: 'oilprice',
@@ -160,8 +161,17 @@ const TOOLS = [
     shortName: '今日油价',
     icon: '⛽',
     iconType: 'oilprice',
-    keywords: '今日油价汽油柴油92号95号98号加油挂牌价各省油价',
-    page: '/pages/tools/oilprice/oilprice'
+    keywords: '出行今日油价汽油柴油92号95号98号加油挂牌价各省油价',
+    page: '/packageTravel/pages/oilprice/oilprice'
+  },
+  {
+    id: 'toll',
+    name: '高速过路费估算',
+    shortName: '过路费',
+    icon: '🛣️',
+    iconType: 'toll',
+    keywords: '出行高速过路费估算计算器ETC通行费桥梁隧道一类客车节假日免费收费站',
+    page: '/packageTravel/pages/toll/toll'
   },
   {
     id: 'compound',

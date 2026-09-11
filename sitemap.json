@@ -94,12 +94,17 @@
     },
     {
       "action": "allow",
-      "page": "pages/tools/fuel/fuel",
+      "page": "packageTravel/pages/fuel/fuel",
       "priority": 60
     },
     {
       "action": "allow",
-      "page": "pages/tools/oilprice/oilprice",
+      "page": "packageTravel/pages/oilprice/oilprice",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "packageTravel/pages/toll/toll",
       "priority": 60
     },
     {

@@ -59,16 +59,25 @@
       "root": "packageExam",
       "name": "exam",
       "pages": ["pages/exam/exam"]
+    },
+    {
+      "root": "packageTravel",
+      "name": "travel",
+      "pages": [
+        "pages/fuel/fuel",
+        "pages/oilprice/oilprice",
+        "pages/toll/toll"
+      ]
     }
   ],
   "preloadRule": {
     "pages/index/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam"]
+      "packages": ["footprint", "exam", "travel"]
     },
     "pages/tools/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam"]
+      "packages": ["footprint", "exam", "travel"]
     }
   },
   "lazyCodeLoading": "requiredComponents",

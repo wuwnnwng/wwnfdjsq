@@ -256,6 +256,10 @@
   background: linear-gradient(135deg, #ffedd5, #fb923c);
 }
 
+.tool-icon-toll {
+  background: linear-gradient(135deg, #e0f2fe, #0ea5e9);
+}
+
 .tool-icon-canvas {
   background: linear-gradient(135deg, #fce7f3, #e879f9);
 }

@@ -305,7 +305,7 @@ function getAgeToolShare() {
 }
 
 function getFuelToolShare() {
-  const path = '/pages/tools/fuel/fuel'
+  const path = '/packageTravel/pages/fuel/fuel'
   return {
     appMessage: buildToolShareAppMessage(path, '汽车油耗电耗'),
     timeline: buildToolShareTimeline(path, '汽车油耗电耗')
@@ -313,10 +313,18 @@ function getFuelToolShare() {
 }
 
 function getOilPriceToolShare() {
-  const path = '/pages/tools/oilprice/oilprice'
+  const path = '/packageTravel/pages/oilprice/oilprice'
   return {
     appMessage: buildToolShareAppMessage(path, '今日油价'),
     timeline: buildToolShareTimeline(path, '今日油价')
+  }
+}
+
+function getTollToolShare() {
+  const path = '/packageTravel/pages/toll/toll'
+  return {
+    appMessage: buildToolShareAppMessage(path, '高速过路费估算'),
+    timeline: buildToolShareTimeline(path, '高速过路费估算')
   }
 }
 
@@ -701,6 +709,7 @@ module.exports = {
   getBmiToolShare,
   getFuelToolShare,
   getOilPriceToolShare,
+  getTollToolShare,
   getCanvasToolShare,
   getPuzzleToolShare,
   getCompoundToolShare,

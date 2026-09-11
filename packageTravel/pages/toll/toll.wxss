@@ -1,0 +1,149 @@
+@import "../../../pages/tools/tool-common.wxss";
+@import "../../../pages/tools/calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(14, 165, 233, 0.16) 0%, var(--color-hero-fade) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-toll {
+  background: linear-gradient(135deg, #e0f2fe, #0ea5e9);
+}
+
+.field-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12rpx;
+  min-height: 0;
+}
+
+.field-stack .field-label {
+  width: auto;
+}
+
+.field-seg {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.vehicle-hint {
+  margin-top: 0;
+}
+
+.opt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.opt-row:last-of-type {
+  border-bottom: none;
+}
+
+.opt-row-hover {
+  opacity: 0.86;
+}
+
+.opt-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.opt-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.opt-sub {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+.opt-switch {
+  flex-shrink: 0;
+  width: 76rpx;
+  height: 44rpx;
+  padding: 4rpx;
+  border-radius: 999rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+  box-sizing: border-box;
+}
+
+.opt-switch.on {
+  background: var(--color-brand);
+  border-color: transparent;
+}
+
+.opt-knob {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.12);
+}
+
+.opt-switch.on .opt-knob {
+  margin-left: 32rpx;
+  background: var(--color-on-brand);
+}
+
+.oil-jump {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 20rpx;
+  padding: 20rpx 22rpx;
+  border-radius: 20rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+  box-sizing: border-box;
+}
+
+.oil-jump:first-child {
+  margin-top: 0;
+}
+
+.oil-jump-hover {
+  opacity: 0.86;
+}
+
+.oil-jump-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.oil-jump-title {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+}
+
+.oil-jump-sub {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+.oil-jump-go {
+  flex-shrink: 0;
+  height: 56rpx;
+  padding: 0 22rpx;
+  line-height: 56rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-brand);
+}

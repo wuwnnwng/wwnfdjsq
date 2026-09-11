@@ -1,5 +1,5 @@
-@import "../tool-common.wxss";
-@import "../calc-kit.wxss";
+@import "../../../pages/tools/tool-common.wxss";
+@import "../../../pages/tools/calc-kit.wxss";
 
 .conv-hero {
   background:
@@ -20,6 +20,14 @@
 .conv-hero-id {
   min-width: 0;
   flex: 1;
+}
+
+.oil-chips {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10rpx;
 }
 
 .oil-chip {

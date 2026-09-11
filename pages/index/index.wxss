@@ -412,6 +412,7 @@
 .tool-icon-bmi { background: linear-gradient(135deg, #d1fae5, #34d399); }
 .tool-icon-fuel { background: linear-gradient(135deg, #cffafe, #22d3ee); }
 .tool-icon-oilprice { background: linear-gradient(135deg, #ffedd5, #fb923c); }
+.tool-icon-toll { background: linear-gradient(135deg, #e0f2fe, #0ea5e9); }
 .tool-icon-random { background: linear-gradient(135deg, #ede9fe, #c4b5fd); }
 .tool-icon-canvas { background: linear-gradient(135deg, #fce7f3, #e879f9); }
 .tool-icon-puzzle { background: linear-gradient(135deg, #dbeafe, #60a5fa); }

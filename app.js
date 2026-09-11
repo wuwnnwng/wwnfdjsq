@@ -1,5 +1,21 @@
 const { checkLocalVersion, checkMiniProgramUpdate } = require('./utils/version')
 const { getThemeId } = require('./utils/theme')
+const { rememberShareLanding } = require('./utils/share')
+
+const originalPage = Page
+Page = function (config) {
+  const options = config || {}
+  const originalOnLoad = options.onLoad
+  options.onLoad = function (query) {
+    try {
+      rememberShareLanding(this.route)
+    } catch (e) {}
+    if (typeof originalOnLoad === 'function') {
+      return originalOnLoad.call(this, query)
+    }
+  }
+  return originalPage(options)
+}
 
 App({
   globalData: {

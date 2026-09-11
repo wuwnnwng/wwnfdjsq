@@ -40,6 +40,27 @@ function isShareEnterScene(scene) {
   return SHARE_ENTER_SCENES.indexOf(Number(scene)) >= 0
 }
 
+function markShareEnterConsumed(enter) {
+  const info = enter || getEnterOptions()
+  consumedShareEnterKey = shareEnterKey(info)
+}
+
+/**
+ * 分享卡片已经成功打开目标页时，立刻记为已消费。
+ * 否则点左上角小房子进入首页时，consumeShareEnter 会按启动路径再 reLaunch 回去，表现为闪一下、要点第二次。
+ */
+function rememberShareLanding(route) {
+  const current = normalizeRoute(route)
+  if (!current) return false
+  const enter = getEnterOptions()
+  if (!isShareEnterScene(enter.scene)) return false
+  const target = normalizeRoute(enter.path)
+  if (!target || target === 'pages/index/index') return false
+  if (current !== target) return false
+  markShareEnterConsumed(enter)
+  return true
+}
+
 function getEnterOptions() {
   let enter = {}
   let launch = {}
@@ -105,16 +126,16 @@ function shareEnterKey(enter) {
 }
 
 function consumeShareEnter(currentRoute) {
+  if (rememberShareLanding(currentRoute)) return false
   const enter = getEnterOptions()
   if (!isShareEnterScene(enter.scene)) return false
   const target = normalizeRoute(enter.path)
   if (!target || target === 'pages/index/index') return false
-  if (normalizeRoute(currentRoute) === target) return false
   const key = shareEnterKey(enter)
   if (consumedShareEnterKey === key) return false
   const url = buildUrlFromEnter(enter.path, enter.query)
   if (!url) return false
-  consumedShareEnterKey = key
+  markShareEnterConsumed(enter)
   wx.reLaunch({ url })
   return true
 }
@@ -685,6 +706,7 @@ module.exports = {
   buildToolNavTitle,
   enableShareMenu,
   resolvePageQuery,
+  rememberShareLanding,
   consumeShareEnter,
   isShareLanding,
   getShareAppMessage,

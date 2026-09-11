@@ -49,10 +49,14 @@ Page({
     roundTrip: false,
     etcOn: true,
     holidayFree: false,
+    detailOpen: false,
+    showTip: false,
+    tipTitle: '',
+    tipText: '',
     result: null
   },
 
-  onLoad() {
+  onLoad(options) {
     enableShareMenu()
     const restored = lastInput.restore()
     const provinceId = resolveProvinceId(restored.provinceId)
@@ -60,6 +64,7 @@ Page({
       ? restored.vehicleKey
       : 'c1'
     const province = getProvince(provinceId)
+    const incomingDistance = options && String(options.distance || '').trim()
     const patch = {
       provinceId,
       provinceName: province.name,
@@ -69,7 +74,8 @@ Page({
       vehicleHint: getVehicle(vehicleKey).hint,
       rate: suggestRate(provinceId, vehicleKey)
     }
-    if (restored.distance) patch.distance = restored.distance
+    if (incomingDistance) patch.distance = incomingDistance
+    else if (restored.distance) patch.distance = restored.distance
     if (restored.extra !== undefined) patch.extra = restored.extra
     if (typeof restored.roundTrip === 'boolean') patch.roundTrip = restored.roundTrip
     if (typeof restored.etcOn === 'boolean') patch.etcOn = restored.etcOn
@@ -125,6 +131,36 @@ Page({
     if (!field) return
     this.setData({ [field]: !this.data[field] }, () => this.recalculate())
   },
+
+  onToggleDetail() {
+    this.setData({ detailOpen: !this.data.detailOpen })
+  },
+
+  onShowProvinceTip() {
+    const province = getProvince(this.data.provinceId)
+    const parts = [`本省客车常见费率 ${formatRateTable(province)} 元/公里。`]
+    if (province.note) parts.push(province.note)
+    parts.push('切换省份或车型会带出该省一类至四类公布费率，同一省不同路段仍可能不同，也可按实际路段自己改。')
+    this.setData({
+      showTip: true,
+      tipTitle: '参考省份',
+      tipText: parts.join('\n\n')
+    })
+  },
+
+  onShowHolidayTip() {
+    this.setData({
+      showTip: true,
+      tipTitle: '节假日免费',
+      tipText: '春节、清明、劳动节、国庆的一类客车通常免费通行。打开后一类客车按 0 元估算，免费时段以当年通知为准。'
+    })
+  },
+
+  onHideTip() {
+    this.setData({ showTip: false })
+  },
+
+  preventMove() {},
 
   recalculate() {
     const result = calculateToll({

@@ -21,16 +21,18 @@
     </view>
 
     <view class="panel">
-      <picker mode="selector" range="{{provinceNames}}" value="{{provinceIndex}}" bindchange="onProvinceChange">
-        <view class="field">
+      <view class="field">
+        <view class="field-label-wrap">
           <text class="field-label">参考省份</text>
+          <view class="help-icon" catchtap="onShowProvinceTip" aria-role="button" aria-label="参考省份说明">!</view>
+        </view>
+        <picker mode="selector" range="{{provinceNames}}" value="{{provinceIndex}}" bindchange="onProvinceChange">
           <view class="field-control">
             <text class="picker-value">{{provinceName}}</text>
             <text class="field-unit">切换</text>
           </view>
-        </view>
-      </picker>
-      <view class="tool-note rate-table">本省客车常见费率 {{rateTable}} 元/公里</view>
+        </picker>
+      </view>
 
       <view class="field field-stack">
         <text class="field-label">车型</text>
@@ -86,21 +88,27 @@
       </view>
       <view class="opt-row" hover-class="opt-row-hover" hover-stay-time="80" bindtap="onToggle" data-field="holidayFree">
         <view class="opt-copy">
-          <view class="opt-title">节假日免费</view>
-          <view class="opt-sub">春节、清明、劳动节、国庆的一类客车</view>
+          <view class="opt-title-row">
+            <view class="opt-title">节假日免费</view>
+            <view class="help-icon" catchtap="onShowHolidayTip" aria-role="button" aria-label="节假日免费说明">!</view>
+          </view>
         </view>
         <view class="opt-switch {{holidayFree ? 'on' : ''}}"><view class="opt-knob"></view></view>
       </view>
-      <view class="tool-note">切换省份或车型会带出该省一类至四类公布费率，同一省不同路段仍可能不同，也可按实际路段自己改。节假日免费打开后，一类客车按 0 元估算。</view>
     </view>
 
     <view class="panel" wx:if="{{result && result.valid}}">
-      <view class="section-title">明细</view>
-      <view class="result-row" wx:for="{{result.rows}}" wx:key="label">
-        <view class="result-row-label">{{item.label}}</view>
-        <view class="result-row-value">{{item.value}}</view>
+      <view class="section-title-row" bindtap="onToggleDetail" hover-class="opt-row-hover" hover-stay-time="80">
+        <view class="section-title">明细</view>
+        <text class="detail-toggle">{{detailOpen ? '收起' : '展开'}}</text>
       </view>
-      <view class="tool-note">{{result.hint}}</view>
+      <block wx:if="{{detailOpen}}">
+        <view class="result-row" wx:for="{{result.rows}}" wx:key="label">
+          <view class="result-row-label">{{item.label}}</view>
+          <view class="result-row-value">{{item.value}}</view>
+        </view>
+        <view class="tool-note">{{result.hint}}</view>
+      </block>
     </view>
 
     <view class="panel">
@@ -120,4 +128,12 @@
       </view>
     </view>
   </scroll-view>
+
+  <view class="tip-mask" wx:if="{{showTip}}" catchtouchmove="preventMove" catchtap="onHideTip">
+    <view class="tip-dialog" catchtap="preventMove">
+      <view class="tip-title">{{tipTitle}}</view>
+      <view class="tip-text">{{tipText}}</view>
+      <view class="tip-confirm" catchtap="onHideTip">我知道了</view>
+    </view>
+  </view>
 </view>

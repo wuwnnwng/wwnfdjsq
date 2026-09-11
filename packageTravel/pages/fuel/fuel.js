@@ -102,8 +102,11 @@ Page({
   },
 
   onGoToll() {
+    const prefix = this.data.kind === 'ev' ? 'ev' : 'fuel'
+    const distance = String(this.data[`${prefix}Distance`] || '').trim()
+    const query = distance ? `?distance=${encodeURIComponent(distance)}` : ''
     wx.navigateTo({
-      url: '/packageTravel/pages/toll/toll'
+      url: `/packageTravel/pages/toll/toll${query}`
     })
   },
 

@@ -11,7 +11,7 @@ const FEATURED_PAGE_SIZE = 4
 const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'canvas', 'puzzle', 'exam'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'diet', 'canvas', 'puzzle', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
   { id: 'fun', name: '娱乐', toolIds: ['chance', 'drinkwheel', 'footprint'] }
@@ -145,6 +145,15 @@ const TOOLS = [
     iconType: 'bmi',
     keywords: 'BMI体重身高肥胖超重健康',
     page: '/pages/tools/bmi/bmi'
+  },
+  {
+    id: 'diet',
+    name: '减脂饮食搭配',
+    shortName: '减脂餐',
+    icon: '🥗',
+    iconType: 'diet',
+    keywords: '减脂饮食搭配减肥餐热量卡路里TDEEBMR蛋白质碳水脂肪食谱三餐高蛋白素食',
+    page: '/pages/tools/diet/diet'
   },
   {
     id: 'fuel',
@@ -464,7 +473,7 @@ function flattenFeaturedToolIds(pages) {
 
 function getFeaturedToolPages() {
   const random = getHomeRandomTool()
-  const extra = ['housetax', 'bmi', 'compound', 'pension', 'duedate', 'safeperiod', 'age']
+  const extra = ['housetax', 'bmi', 'diet', 'compound', 'pension', 'duedate', 'safeperiod', 'age']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
   const pinned = ['ershou']

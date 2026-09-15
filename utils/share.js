@@ -357,6 +357,14 @@ function getBmiToolShare() {
   }
 }
 
+function getDietToolShare() {
+  const path = '/pages/tools/diet/diet'
+  return {
+    appMessage: buildToolShareAppMessage(path, '减脂饮食搭配'),
+    timeline: buildToolShareTimeline(path, '减脂饮食搭配')
+  }
+}
+
 function getCanvasToolShare() {
   const path = '/pages/tools/canvas/canvas'
   return {
@@ -729,6 +737,7 @@ module.exports = {
   getPercentToolShare,
   getAgeToolShare,
   getBmiToolShare,
+  getDietToolShare,
   getFuelToolShare,
   getOilPriceToolShare,
   getTollToolShare,

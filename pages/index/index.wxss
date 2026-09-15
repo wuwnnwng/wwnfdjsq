@@ -410,6 +410,7 @@
 .tool-icon-age { background: linear-gradient(135deg, #fce7f3, #f472b6); }
 .tool-icon-qrcode { background: linear-gradient(135deg, #e2e8f0, #64748b); }
 .tool-icon-bmi { background: linear-gradient(135deg, #d1fae5, #34d399); }
+.tool-icon-diet { background: linear-gradient(135deg, #ecfccb, #84cc16); }
 .tool-icon-fuel { background: linear-gradient(135deg, #cffafe, #22d3ee); }
 .tool-icon-oilprice { background: linear-gradient(135deg, #ffedd5, #fb923c); }
 .tool-icon-toll { background: linear-gradient(135deg, #e0f2fe, #0ea5e9); }

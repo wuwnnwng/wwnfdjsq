@@ -1,0 +1,227 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll {{result && result.valid ? 'has-save-bar' : ''}}" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-diet">
+            <text class="tool-icon">🥗</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">热量 · 营养素 · 一日餐单</view>
+            <view class="conv-title">减脂饮食搭配</view>
+          </view>
+        </view>
+      </view>
+      <block wx:if="{{result && result.valid}}">
+        <view class="conv-eq">每日建议摄入</view>
+        <view class="conv-result">{{result.targetText}} 千卡</view>
+        <view class="conv-result-unit">{{result.heroSub}}</view>
+        <view class="diet-week">预计每周{{result.weeklyText}}</view>
+        <view class="macro-bars">
+          <view class="macro-row">
+            <view class="macro-label">蛋白质</view>
+            <view class="macro-track">
+              <view class="macro-fill protein" style="width: {{result.proteinBar}}%;"></view>
+            </view>
+            <view class="macro-value">{{result.proteinText}}</view>
+          </view>
+          <view class="macro-row">
+            <view class="macro-label">碳水</view>
+            <view class="macro-track">
+              <view class="macro-fill carb" style="width: {{result.carbBar}}%;"></view>
+            </view>
+            <view class="macro-value">{{result.carbText}}</view>
+          </view>
+          <view class="macro-row">
+            <view class="macro-label">脂肪</view>
+            <view class="macro-track">
+              <view class="macro-fill fat" style="width: {{result.fatBar}}%;"></view>
+            </view>
+            <view class="macro-value">{{result.fatText}}</view>
+          </view>
+        </view>
+      </block>
+      <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
+    </view>
+
+    <view class="panel">
+      <view class="seg-row">
+        <view
+          wx:for="{{sexOptions}}"
+          wx:key="id"
+          class="seg-item {{sex === item.id ? 'active' : ''}}"
+          bindtap="onSelect"
+          data-field="sex"
+          data-value="{{item.id}}"
+        >
+          {{item.name}}
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">年龄</text>
+        <view class="field-control">
+          <input class="field-input" type="number" value="{{age}}" data-field="age" bindinput="onInput" placeholder="例如 28" />
+          <text class="field-unit">岁</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">身高</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{height}}" data-field="height" bindinput="onInput" placeholder="例如 165" />
+          <text class="field-unit">厘米</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">体重</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{weight}}" data-field="weight" bindinput="onInput" placeholder="例如 58" />
+          <text class="field-unit">公斤</text>
+        </view>
+      </view>
+
+      <view class="field field-stack">
+        <text class="field-label">活动量</text>
+        <view class="grade-chips">
+          <view
+            wx:for="{{activityOptions}}"
+            wx:key="id"
+            class="grade-chip {{activity === item.id ? 'active' : ''}}"
+            bindtap="onSelect"
+            data-field="activity"
+            data-value="{{item.id}}"
+          >
+            {{item.name}}
+          </view>
+        </view>
+        <view class="chip-hint">{{activityHint}}</view>
+      </view>
+
+      <view class="field field-stack">
+        <text class="field-label">减脂强度</text>
+        <view class="grade-chips">
+          <view
+            wx:for="{{deficitOptions}}"
+            wx:key="id"
+            class="grade-chip {{deficit === item.id ? 'active' : ''}}"
+            bindtap="onSelect"
+            data-field="deficit"
+            data-value="{{item.id}}"
+          >
+            {{item.name}}
+          </view>
+        </view>
+      </view>
+
+      <view class="field field-stack">
+        <text class="field-label">饮食风格</text>
+        <view class="grade-chips">
+          <view
+            wx:for="{{styleOptions}}"
+            wx:key="id"
+            class="grade-chip {{style === item.id ? 'active' : ''}}"
+            bindtap="onSelect"
+            data-field="style"
+            data-value="{{item.id}}"
+          >
+            {{item.name}}
+          </view>
+        </view>
+        <view class="chip-hint" wx:if="{{style === 'vegetarian'}}">按蛋奶素搭配，便于凑蛋白质。</view>
+      </view>
+
+      <view class="field field-stack last-field">
+        <text class="field-label">餐次</text>
+        <view class="grade-chips">
+          <view
+            wx:for="{{mealCountOptions}}"
+            wx:key="id"
+            class="grade-chip {{mealCount === item.id ? 'active' : ''}}"
+            bindtap="onSelect"
+            data-field="mealCount"
+            data-value="{{item.id}}"
+          >
+            {{item.name}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">消耗与目标</view>
+      <view class="info-grid">
+        <view class="info-card">
+          <view class="info-card-label">基础代谢 BMR</view>
+          <view class="info-card-value">{{result.bmrText}}</view>
+          <view class="info-card-sub">千卡 / 完全休息</view>
+        </view>
+        <view class="info-card">
+          <view class="info-card-label">每日消耗 TDEE</view>
+          <view class="info-card-value">{{result.tdeeText}}</view>
+          <view class="info-card-sub">千卡 / 含活动</view>
+        </view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">热量缺口</view>
+        <view class="result-row-value">{{result.deficitText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">BMI</view>
+        <view class="result-row-value">{{result.bmiText}} · {{result.bmiLevelName}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">蛋白质密度</view>
+        <view class="result-row-value">{{result.proteinPerKgText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">建议饮水量</view>
+        <view class="result-row-value">{{result.waterText}}</view>
+      </view>
+      <view class="tool-note warn" wx:for="{{result.warnings}}" wx:key="*this">{{item}}</view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title-row">
+        <view class="section-title">今日搭配</view>
+        <view class="shuffle-link" bindtap="onShuffle">换一套</view>
+      </view>
+      <view class="meal-card" wx:for="{{result.meals}}" wx:key="id">
+        <view class="meal-head">
+          <view class="meal-title-wrap">
+            <view class="meal-slot">{{item.slotName}} · {{item.kcalText}} 千卡</view>
+            <view class="meal-title">{{item.title}}</view>
+          </view>
+          <view class="meal-swap" catchtap="onSwapMeal" data-slot="{{item.slot}}">换一换</view>
+        </view>
+        <view class="meal-item" wx:for="{{item.items}}" wx:for-item="food" wx:key="id">
+          <text class="meal-food">{{food.name}}</text>
+          <text class="meal-amount">{{food.amountText}}</text>
+        </view>
+        <view class="meal-macro">{{item.macroText}}</view>
+        <view class="meal-cook">{{item.cook}} {{item.swap}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">餐单合计</view>
+        <view class="result-row-value">{{result.actualKcalText}} 千卡</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">营养素合计</view>
+        <view class="result-row-value">{{result.actualMacroText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">与目标</view>
+        <view class="result-row-value">{{result.diffText}}</view>
+      </view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">怎么吃</view>
+      <view class="tip-item" wx:for="{{result.tips}}" wx:key="*this">{{item}}</view>
+      <view class="tool-note">{{result.note}}</view>
+    </view>
+    <view class="save-bar-spacer" wx:if="{{result && result.valid}}"></view>
+  </scroll-view>
+  <view class="save-card-bar" wx:if="{{result && result.valid}}">
+    <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '生成卡片保存到相册'}}</view>
+  </view>
+  <canvas type="2d" id="resultCard" class="result-card-canvas diet-card-canvas"></canvas>
+</view>

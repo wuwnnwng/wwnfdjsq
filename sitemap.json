@@ -94,6 +94,11 @@
     },
     {
       "action": "allow",
+      "page": "pages/tools/diet/diet",
+      "priority": 60
+    },
+    {
+      "action": "allow",
       "page": "packageTravel/pages/fuel/fuel",
       "priority": 60
     },

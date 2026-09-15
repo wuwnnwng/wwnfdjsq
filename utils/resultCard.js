@@ -464,6 +464,91 @@ function drawAgeCard(ctx, width, height, result, theme) {
   drawFooter(ctx, width, height, '趣味计算，好好生活')
 }
 
+function drawMacroBar(ctx, x, y, width, ratio, color) {
+  fillRoundRect(ctx, x, y, width, 8, 4, 'rgba(20, 35, 28, 0.08)')
+  const barW = Math.max(6, (Math.max(0, Math.min(100, Number(ratio) || 0)) / 100) * width)
+  fillRoundRect(ctx, x, y, barW, 8, 4, color)
+}
+
+function drawDietCard(ctx, width, height, result, theme) {
+  const palette = cardPalette(theme)
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, width, height)
+  drawHeader(ctx, width, 88, '减脂饮食搭配', palette.header)
+
+  const ink = '#14231c'
+  const muted = '#64748b'
+  let y = 118
+
+  ctx.fillStyle = muted
+  ctx.font = '600 13px sans-serif'
+  ctx.textAlign = 'left'
+  ctx.fillText('每日建议摄入', 24, y)
+
+  ctx.fillStyle = palette.accent
+  ctx.font = '800 42px sans-serif'
+  ctx.fillText(`${result.targetText} 千卡`, 24, y + 50)
+
+  ctx.fillStyle = ink
+  ctx.font = '600 13px sans-serif'
+  ctx.fillText(fitText(ctx, result.heroSub || '', width - 48), 24, y + 76)
+
+  y += 96
+  ctx.strokeStyle = 'rgba(20, 35, 28, 0.08)'
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(24, y)
+  ctx.lineTo(width - 24, y)
+  ctx.stroke()
+
+  y += 22
+  const rowW = width - 48
+  const macros = [
+    ['蛋白质', result.proteinText, result.proteinBar, '#34d399'],
+    ['碳水', result.carbText, result.carbBar, '#38bdf8'],
+    ['脂肪', result.fatText, result.fatBar, '#fbbf24']
+  ]
+  macros.forEach((row, index) => {
+    const rowY = y + index * 28
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = muted
+    ctx.font = '400 12px sans-serif'
+    ctx.fillText(row[0], 24, rowY)
+    drawMacroBar(ctx, 86, rowY - 4, rowW - 150, row[2], row[3])
+    ctx.textAlign = 'right'
+    ctx.fillStyle = ink
+    ctx.font = '600 12px sans-serif'
+    ctx.fillText(row[1], width - 24, rowY)
+  })
+
+  y += 96
+  drawMetaRow(ctx, 24, y, rowW, 'BMR / TDEE', `${result.bmrText} / ${result.tdeeText} 千卡`, ink, muted)
+  drawMetaRow(ctx, 24, y + 28, rowW, '预计每周', result.weeklyText, ink, muted)
+
+  y += 56
+  ctx.fillStyle = palette.accent
+  ctx.font = '700 13px sans-serif'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillText('今日搭配', 24, y)
+
+  y += 16
+  ;(result.meals || []).forEach((meal) => {
+    ctx.fillStyle = ink
+    ctx.font = '700 13px sans-serif'
+    ctx.textAlign = 'left'
+    ctx.fillText(fitText(ctx, `${meal.slotName}  ${meal.title}`, rowW - 72), 24, y)
+    ctx.textAlign = 'right'
+    ctx.fillStyle = muted
+    ctx.font = '600 12px sans-serif'
+    ctx.fillText(`${meal.kcalText} 千卡`, width - 24, y)
+    y += 28
+  })
+
+  drawFooter(ctx, width, height, 'Mifflin-St Jeor · 仅供参考')
+}
+
 function drawArtworkCard(ctx, width, height, view) {
   const headerColors = view.headerColors || ['#e879f9', '#7c3aed']
   ctx.fillStyle = '#ffffff'
@@ -514,5 +599,6 @@ module.exports = {
   handleSaveError,
   drawBmiCard,
   drawAgeCard,
+  drawDietCard,
   drawArtworkCard
 }

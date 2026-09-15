@@ -57,7 +57,10 @@
       <view class="section-title">七日预报</view>
       <view class="daily-list">
         <view class="daily-row" wx:for="{{daily}}" wx:key="key">
-          <view class="daily-label">{{item.label}}</view>
+          <view class="daily-when">
+            <view class="daily-label">{{item.label}}</view>
+            <view class="daily-date" wx:if="{{item.dateLabel}}">{{item.dateLabel}}</view>
+          </view>
           <view class="daily-icon">{{item.icon}}</view>
           <view class="daily-text">{{item.text}}</view>
           <view class="daily-pop" wx:if="{{item.showPop}}">{{item.pop}}%</view>

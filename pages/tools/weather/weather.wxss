@@ -169,12 +169,24 @@
   border-bottom: none;
 }
 
-.daily-label {
-  width: 88rpx;
+.daily-when {
+  width: 120rpx;
   flex-shrink: 0;
+}
+
+.daily-label {
   font-size: 26rpx;
   font-weight: 600;
   color: var(--color-ink);
+  line-height: 1.2;
+}
+
+.daily-date {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  font-weight: 400;
+  color: var(--color-muted);
+  line-height: 1.2;
 }
 
 .daily-icon {

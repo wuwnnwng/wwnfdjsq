@@ -138,6 +138,14 @@ function weekdayLabel(dateStr, index) {
   return WEEK_LABELS[date.getDay()]
 }
 
+function dailyDateLabel(dateStr) {
+  const match = String(dateStr || '').match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (match) return `${Number(match[2])}月${Number(match[3])}日`
+  const date = new Date(`${dateStr}T12:00:00`)
+  if (Number.isNaN(date.getTime())) return ''
+  return `${date.getMonth() + 1}月${date.getDate()}日`
+}
+
 function buildPlace(partial) {
   const latitude = Number(partial && partial.latitude)
   const longitude = Number(partial && partial.longitude)
@@ -315,6 +323,7 @@ function pickDaily(daily) {
     return {
       key: dateStr,
       label: weekdayLabel(dateStr, index),
+      dateLabel: dailyDateLabel(dateStr),
       icon: info.icon,
       text: info.text,
       min: Math.round(Number(daily.temperature_2m_min[index])),

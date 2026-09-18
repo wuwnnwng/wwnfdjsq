@@ -452,4 +452,5 @@
       节日
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

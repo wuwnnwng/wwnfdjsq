@@ -55,4 +55,5 @@
   </scroll-view>
 
   <canvas type="2d" id="qrCanvas" class="qr-canvas"></canvas>
+  <ad-banner theme="{{theme}}" />
 </view>

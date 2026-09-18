@@ -70,4 +70,5 @@
   <view class="save-card-bar">
     <view class="primary-btn save-card-btn" bindtap="onGoFuel">用当前油价去算油耗</view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

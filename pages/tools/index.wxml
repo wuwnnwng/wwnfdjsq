@@ -52,4 +52,5 @@
       没有找到「{{keyword}}」相关工具
     </view>
   </scroll-view>
+  <ad-banner theme="{{theme}}" />
 </view>

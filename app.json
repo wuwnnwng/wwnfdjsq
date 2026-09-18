@@ -39,6 +39,9 @@
     "backgroundColor": "#0B1220",
     "backgroundTextStyle": "dark"
   },
+  "usingComponents": {
+    "ad-banner": "/components/ad-banner/ad-banner"
+  },
   "permission": {
     "scope.userLocation": {
       "desc": "用于获取你所在城市的天气"

@@ -81,4 +81,5 @@
       <view class="nav-btn {{cardIndex === cardTotal - 1 ? 'is-off' : ''}}" bindtap="onNext">下一张</view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

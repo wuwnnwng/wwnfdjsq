@@ -161,4 +161,5 @@
       <view class="tool-note">{{result.hint}}</view>
     </view>
   </scroll-view>
+  <ad-banner theme="{{theme}}" />
 </view>

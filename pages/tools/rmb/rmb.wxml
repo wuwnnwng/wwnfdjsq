@@ -31,4 +31,5 @@
       <view class="tool-note">按银行惯例精确到分，整数金额以「整」收尾。可用于收据、合同填写。</view>
     </view>
   </scroll-view>
+  <ad-banner theme="{{theme}}" />
 </view>

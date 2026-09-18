@@ -1,10 +1,12 @@
 const { checkLocalVersion, checkMiniProgramUpdate } = require('./utils/version')
 const { getThemeId } = require('./utils/theme')
 const { rememberShareLanding } = require('./utils/share')
+const { bindPageAds } = require('./utils/ads')
 
 const originalPage = Page
 Page = function (config) {
   const options = config || {}
+  bindPageAds(options)
   const originalOnLoad = options.onLoad
   options.onLoad = function (query) {
     try {

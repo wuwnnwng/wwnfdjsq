@@ -97,4 +97,5 @@
       <view class="tip-confirm" catchtap="onHideDayTip">知道了</view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

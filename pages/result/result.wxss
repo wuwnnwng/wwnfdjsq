@@ -31,7 +31,7 @@
   flex-shrink: 0;
   margin-left: -28rpx;
   margin-right: -28rpx;
-  padding: 20rpx 28rpx calc(20rpx + env(safe-area-inset-bottom));
+  padding: 20rpx 28rpx;
   background: var(--color-footer);
   box-shadow: 0 -8rpx 24rpx var(--color-shadow);
 }

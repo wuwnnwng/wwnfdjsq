@@ -155,4 +155,5 @@
       <view class="city-picker-close" bindtap="onCloseCityPicker">取消</view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

@@ -216,4 +216,5 @@
       <view class="tip-confirm" catchtap="onHideRangeTip">知道了</view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

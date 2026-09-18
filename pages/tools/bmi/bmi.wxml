@@ -76,4 +76,5 @@
     <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '生成卡片保存到相册'}}</view>
   </view>
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
+  <ad-banner theme="{{theme}}" />
 </view>

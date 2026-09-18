@@ -226,4 +226,5 @@
       <view class="tip-confirm ghost" bindtap="onSkipAccumulate">不累加</view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

@@ -63,4 +63,5 @@
     </view>
     <view class="base-hint">点按结果可复制</view>
   </scroll-view>
+  <ad-banner theme="{{theme}}" />
 </view>

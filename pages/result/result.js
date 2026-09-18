@@ -20,6 +20,7 @@ const {
 } = require('../../utils/plans')
 const { exportResultToExcel, openExcelFile, shareExcelFile } = require('../../utils/excel')
 const { createConfettiPieces } = require('../../utils/confetti')
+const { createRewardedAd, unlockWithRewardedAd, destroyAd } = require('../../utils/ads')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -117,6 +118,7 @@ Page({
 
   onLoad(options) {
     enableShareMenu()
+    this._rewardedAd = createRewardedAd()
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
@@ -390,6 +392,18 @@ Page({
       return
     }
 
+    unlockWithRewardedAd(this).then((ok) => {
+      if (ok) this.exportExcelFile()
+    })
+  },
+
+  exportExcelFile() {
+    const result = this.rawResult
+    if (!result || !Array.isArray(result.schedule) || !result.schedule.length) {
+      wx.showToast({ title: '暂无可导出的还款计划', icon: 'none' })
+      return
+    }
+
     wx.showLoading({ title: '正在导出', mask: true })
     exportResultToExcel({
       loanTypeLabel: this.data.loanTypeLabel,
@@ -501,9 +515,20 @@ Page({
     }
 
     const showAllSchedule = !this.data.showAllSchedule
-    this.setData({
-      showAllSchedule,
-      visibleSchedule: showAllSchedule ? this.data.fullSchedule : []
+    if (!showAllSchedule) {
+      this.setData({
+        showAllSchedule: false,
+        visibleSchedule: []
+      })
+      return
+    }
+
+    unlockWithRewardedAd(this).then((ok) => {
+      if (!ok) return
+      this.setData({
+        showAllSchedule: true,
+        visibleSchedule: this.data.fullSchedule
+      })
     })
   },
 
@@ -543,6 +568,8 @@ Page({
       clearTimeout(this._earlySavedTimer)
       this._earlySavedTimer = null
     }
+    destroyAd(this._rewardedAd)
+    this._rewardedAd = null
   },
 
   onRecalculate() {

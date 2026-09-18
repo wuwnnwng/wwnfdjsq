@@ -136,4 +136,5 @@
       <view class="tip-confirm" catchtap="onHideTip">我知道了</view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

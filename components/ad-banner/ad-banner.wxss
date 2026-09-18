@@ -1,0 +1,17 @@
+.ad-banner {
+  flex-shrink: 0;
+  width: calc(100% + 56rpx);
+  margin: 0 -28rpx;
+}
+
+.ad-banner.is-on {
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--color-surface);
+}
+
+.ad-banner.is-off {
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+}

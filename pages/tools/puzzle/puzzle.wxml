@@ -120,4 +120,5 @@
   <canvas type="2d" id="puzzleArt" class="puzzle-art-canvas"></canvas>
   <canvas type="2d" id="puzzleThumbs" class="puzzle-thumbs-canvas"></canvas>
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
+  <ad-banner theme="{{theme}}" />
 </view>

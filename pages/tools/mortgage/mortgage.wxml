@@ -481,4 +481,5 @@
     bindconfirm="onFirstDateConfirm"
     bindcancel="onHideFirstDatePicker"
   />
+  <ad-banner theme="{{theme}}" />
 </view>

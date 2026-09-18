@@ -94,4 +94,5 @@
     bindconfirm="onDatePickerConfirm"
     bindcancel="onHideDatePicker"
   />
+  <ad-banner theme="{{theme}}" />
 </view>

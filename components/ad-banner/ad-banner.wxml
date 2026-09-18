@@ -1,0 +1,11 @@
+<view class="ad-banner {{hidden ? 'is-off' : ''}} {{ready ? 'is-on' : ''}}">
+  <ad
+    unit-id="{{unitId}}"
+    ad-type="banner"
+    ad-theme="{{adTheme}}"
+    ad-intervals="30"
+    bindload="onLoadAd"
+    binderror="onErrorAd"
+    bindclose="onCloseAd"
+  />
+</view>

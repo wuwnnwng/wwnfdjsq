@@ -97,4 +97,5 @@
       </view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

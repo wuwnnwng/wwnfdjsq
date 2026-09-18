@@ -193,4 +193,5 @@
       <view class="currency-picker-close" bindtap="onCloseCurrencyPicker">取消</view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

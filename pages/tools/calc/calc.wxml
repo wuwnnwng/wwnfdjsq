@@ -21,4 +21,5 @@
       </view>
     </view>
   </scroll-view>
+  <ad-banner theme="{{theme}}" />
 </view>

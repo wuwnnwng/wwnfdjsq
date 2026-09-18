@@ -128,4 +128,5 @@
       <view class="lived-confirm" catchtap="onCloseCelebrate">知道了</view>
     </view>
   </view>
+  <ad-banner theme="{{theme}}" />
 </view>

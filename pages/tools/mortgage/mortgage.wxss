@@ -853,7 +853,7 @@
   margin-left: -28rpx;
   margin-right: -28rpx;
   margin-bottom: 0;
-  padding: 12rpx 28rpx calc(12rpx + env(safe-area-inset-bottom));
+  padding: 12rpx 28rpx;
   background: var(--color-footer);
   box-shadow: 0 -4rpx 16rpx var(--color-shadow);
   transition: background-color 0.32s ease, box-shadow 0.32s ease;

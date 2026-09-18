@@ -81,4 +81,5 @@
   </view>
 
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
+  <ad-banner theme="{{theme}}" />
 </view>

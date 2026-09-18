@@ -22,6 +22,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="seg-row cols-3">
         <view class="seg-item {{tab === 'of' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="of">求数值</view>
@@ -79,5 +81,4 @@
       </block>
     </view>
   </scroll-view>
-  <ad-banner theme="{{theme}}" />
 </view>

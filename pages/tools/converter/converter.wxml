@@ -27,6 +27,8 @@
       <view class="tool-note warn" wx:if="{{type === 'currency' && rateError}}">{{rateError}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel conv-board">
       <view class="unit-tabs" wx:if="{{type !== 'currency'}}">
         <view
@@ -193,5 +195,4 @@
       <view class="currency-picker-close" bindtap="onCloseCurrencyPicker">取消</view>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

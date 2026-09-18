@@ -28,6 +28,8 @@
     </scroll-view>
   </view>
 
+  <ad-banner theme="{{theme}}" />
+
   <view class="canvas-stage" catchtouchmove="preventMove">
     <view class="canvas-frame">
       <canvas
@@ -81,5 +83,4 @@
   </view>
 
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
-  <ad-banner theme="{{theme}}" />
 </view>

@@ -1095,7 +1095,7 @@
   align-items: stretch;
   border-top: 1rpx solid var(--color-line);
   background: var(--color-footer);
-  padding-bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .calendar-tab {

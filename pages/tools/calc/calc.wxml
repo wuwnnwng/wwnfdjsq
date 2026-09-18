@@ -6,6 +6,8 @@
   </view>
 
   <scroll-view scroll-y class="calc-scroll" enhanced show-scrollbar="{{false}}">
+    <ad-banner theme="{{theme}}" />
+
     <view class="calc-keyboard panel">
       <view
         class="calc-key tone-{{item.tone || 'default'}} {{item.subLabel ? 'has-sub' : ''}}"
@@ -21,5 +23,4 @@
       </view>
     </view>
   </scroll-view>
-  <ad-banner theme="{{theme}}" />
 </view>

@@ -32,6 +32,8 @@
     <view class="panel" style="margin-top: 12rpx;">
       <view class="section-title">热门拼图 30 款</view>
       <view class="tool-note">点选一张开始。拖动图块互换位置，也可点两块互换。拼好后可导出卡片。</view>
+      <ad-banner theme="{{theme}}" />
+
       <view class="puzzle-grid" style="margin-top: 20rpx;">
         <view
           class="puzzle-card"
@@ -70,6 +72,7 @@
         bindtap="onChangeCols"
       >{{item}}×{{item}}</view>
     </view>
+    <ad-banner theme="{{theme}}" />
     <view class="play-board-wrap">
       <view
         id="tileBoardHost"
@@ -120,5 +123,4 @@
   <canvas type="2d" id="puzzleArt" class="puzzle-art-canvas"></canvas>
   <canvas type="2d" id="puzzleThumbs" class="puzzle-thumbs-canvas"></canvas>
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
-  <ad-banner theme="{{theme}}" />
 </view>

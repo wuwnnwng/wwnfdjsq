@@ -33,6 +33,8 @@
       <view class="tool-note warn" wx:elif="{{tab === 'offset' && offsetResult && !offsetResult.valid}}">{{offsetResult.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="seg-row cols-3">
         <view class="seg-item {{tab === 'convert' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="convert">时间换算</view>
@@ -189,5 +191,4 @@
     bindconfirm="onDatePickerConfirm"
     bindcancel="onHideDatePicker"
   />
-  <ad-banner theme="{{theme}}" />
 </view>

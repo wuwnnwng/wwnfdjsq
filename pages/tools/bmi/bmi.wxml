@@ -37,6 +37,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="field">
         <text class="field-label">身高</text>
@@ -76,5 +78,4 @@
     <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '生成卡片保存到相册'}}</view>
   </view>
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
-  <ad-banner theme="{{theme}}" />
 </view>

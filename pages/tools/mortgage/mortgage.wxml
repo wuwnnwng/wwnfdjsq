@@ -109,6 +109,8 @@
   </view>
 
   <scroll-view scroll-y class="form-scroll" enhanced show-scrollbar="{{false}}">
+    <ad-banner theme="{{theme}}" />
+
     <!-- 新贷款：还款方式 → 金额填写 → 贷款类型 -->
     <block wx:if="{{calcMode === 'new'}}">
       <view class="panel">
@@ -481,5 +483,4 @@
     bindconfirm="onFirstDateConfirm"
     bindcancel="onHideFirstDatePicker"
   />
-  <ad-banner theme="{{theme}}" />
 </view>

@@ -32,6 +32,8 @@
       <view class="total-clear" wx:if="{{totalCost > 0}}" bindtap="onClearTotal">清空合计</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="chip-scroll">
       <view class="chips">
         <view
@@ -226,5 +228,4 @@
       <view class="tip-confirm ghost" bindtap="onSkipAccumulate">不累加</view>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

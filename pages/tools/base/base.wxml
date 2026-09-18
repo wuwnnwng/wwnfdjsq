@@ -15,6 +15,8 @@
       <view class="conv-result-unit">{{baseLabels[baseIndex]}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel conv-board">
       <view class="conv-card">
         <view class="conv-card-label">输入进制</view>
@@ -63,5 +65,4 @@
     </view>
     <view class="base-hint">点按结果可复制</view>
   </scroll-view>
-  <ad-banner theme="{{theme}}" />
 </view>

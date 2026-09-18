@@ -40,6 +40,8 @@
       <view class="tool-note warn" wx:elif="{{tab === 'bonus' && bonusCompare && !bonusCompare.valid}}">{{bonusCompare.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="seg-row">
         <view class="seg-item {{tab === 'salary' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="salary">工资薪金</view>
@@ -355,5 +357,4 @@
       <view class="tip-confirm" catchtap="onHideTip">我知道了</view>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

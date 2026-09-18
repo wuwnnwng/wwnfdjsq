@@ -20,6 +20,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="field">
         <text class="field-label">本金</text>
@@ -102,5 +104,4 @@
       </view>
     </view>
   </scroll-view>
-  <ad-banner theme="{{theme}}" />
 </view>

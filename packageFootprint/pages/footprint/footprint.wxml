@@ -25,6 +25,8 @@
   </view>
 
   <scroll-view scroll-y class="tool-scroll chip-scroll" enhanced show-scrollbar="{{false}}">
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel chip-panel">
       <view class="chip-head">
         <view class="chip-title">点亮省份</view>
@@ -55,5 +57,4 @@
   </view>
 
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
-  <ad-banner theme="{{theme}}" />
 </view>

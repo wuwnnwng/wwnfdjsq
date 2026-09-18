@@ -29,6 +29,8 @@
       </block>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="seg-row">
         <view class="seg-item {{tab === 'dice' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="dice">掷骰子</view>
@@ -101,5 +103,4 @@
       </button>
     </view>
   </scroll-view>
-  <ad-banner theme="{{theme}}" />
 </view>

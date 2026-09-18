@@ -30,6 +30,8 @@
       <view class="tool-note warn" wx:if="{{error}}">{{error}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel" wx:if="{{cards.length}}">
       <view class="oil-grades">
         <view
@@ -70,5 +72,4 @@
   <view class="save-card-bar">
     <view class="primary-btn save-card-btn" bindtap="onGoFuel">用当前油价去算油耗</view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

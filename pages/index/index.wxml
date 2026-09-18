@@ -88,6 +88,8 @@
   </view>
 
   <scroll-view scroll-y class="hub-scroll" enhanced show-scrollbar="{{false}}">
+    <ad-banner theme="{{theme}}" />
+
     <block wx:if="{{groups.length}}">
       <view class="panel tool-group-panel" wx:for="{{groups}}" wx:for-item="group" wx:key="id">
         <view class="tool-group-title">{{group.name}}</view>
@@ -127,5 +129,4 @@
   </scroll-view>
 
   <add-mini-tip />
-  <ad-banner theme="{{theme}}" />
 </view>

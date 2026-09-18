@@ -24,6 +24,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="seg-row">
         <view class="seg-item {{kind === 'fuel' ? 'active' : ''}}" bindtap="onSwitchKind" data-kind="fuel">油耗</view>
@@ -161,5 +163,4 @@
       <view class="tool-note">{{result.hint}}</view>
     </view>
   </scroll-view>
-  <ad-banner theme="{{theme}}" />
 </view>

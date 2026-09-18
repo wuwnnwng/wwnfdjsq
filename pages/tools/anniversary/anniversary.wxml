@@ -22,6 +22,8 @@
       <view class="tool-note" wx:else>记下恋爱、结婚、生日这些日子，到了那天会弹框撒花。</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="section-title">我的纪念日</view>
       <view wx:if="{{!items.length}}" class="empty-hint">还没有纪念日，先添加一个吧</view>
@@ -128,5 +130,4 @@
       <view class="lived-confirm" catchtap="onCloseCelebrate">知道了</view>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

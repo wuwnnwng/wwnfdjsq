@@ -54,6 +54,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="seg-row cols-3">
         <view
@@ -216,5 +218,4 @@
       <view class="tip-confirm" catchtap="onHideRangeTip">知道了</view>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

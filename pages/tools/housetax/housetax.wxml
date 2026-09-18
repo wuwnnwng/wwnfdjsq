@@ -24,6 +24,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="seg-row">
         <view class="seg-item {{tab === 'buy' ? 'active' : ''}}" bindtap="onSwitchTab" data-tab="buy">买房</view>
@@ -150,5 +152,4 @@
       <view class="tip-confirm" bindtap="onHideTip">我知道了</view>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

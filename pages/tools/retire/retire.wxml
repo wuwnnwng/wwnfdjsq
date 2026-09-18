@@ -31,6 +31,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="type-grid">
         <view
@@ -94,5 +96,4 @@
     bindconfirm="onDatePickerConfirm"
     bindcancel="onHideDatePicker"
   />
-  <ad-banner theme="{{theme}}" />
 </view>

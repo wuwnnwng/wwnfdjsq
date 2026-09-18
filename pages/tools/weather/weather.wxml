@@ -39,6 +39,8 @@
       <view class="tool-note warn" wx:if="{{error}}">{{error}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel" wx:if="{{hourly.length}}">
       <view class="section-title">逐时预报</view>
       <scroll-view scroll-x class="hourly-scroll" enhanced show-scrollbar="{{false}}">
@@ -155,5 +157,4 @@
       <view class="city-picker-close" bindtap="onCloseCityPicker">取消</view>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

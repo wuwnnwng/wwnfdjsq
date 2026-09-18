@@ -26,6 +26,8 @@
       <view class="conv-eq" wx:else>转一次看谁喝。右上角可改惩罚</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel wheel-panel">
       <view class="wheel-stage">
         <view class="wheel-pointer"></view>
@@ -97,5 +99,4 @@
       </view>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>

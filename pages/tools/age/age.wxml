@@ -57,6 +57,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel" wx:if="{{result && result.valid}}">
       <view class="age-glance">
         <view class="age-glance-item">
@@ -217,5 +219,4 @@
     </view>
   </view>
   <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
-  <ad-banner theme="{{theme}}" />
 </view>

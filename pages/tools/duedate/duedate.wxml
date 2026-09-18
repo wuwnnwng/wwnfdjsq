@@ -24,6 +24,8 @@
       <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel">
       <view class="seg-row">
         <view class="seg-item {{mode === 'lmp' ? 'active' : ''}}" bindtap="onSwitchMode" data-mode="lmp">末次月经</view>
@@ -109,5 +111,4 @@
     bindconfirm="onDatePickerConfirm"
     bindcancel="onHideDatePicker"
   />
-  <ad-banner theme="{{theme}}" />
 </view>

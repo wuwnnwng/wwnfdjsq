@@ -52,6 +52,8 @@
       </view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
+
     <view class="panel" wx:if="{{isEarlyRepayment}}">
       <view class="schedule-head" bindtap="onToggleEarlyInfo">
         <view>
@@ -200,11 +202,11 @@
       <button class="share-btn ghost" open-type="share">分享好友</button>
     </view>
   </view>
-  <ad-banner theme="{{theme}}" />
 </view>
 
 <view class="page theme-{{theme}} empty" wx:else>
   <view class="empty-text">暂无计算结果</view>
-  <button class="primary-btn" bindtap="onRecalculate">返回填写</button>
   <ad-banner theme="{{theme}}" />
+
+  <button class="primary-btn" bindtap="onRecalculate">返回填写</button>
 </view>

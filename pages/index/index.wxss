@@ -17,6 +17,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16rpx;
+  min-height: 72rpx;
 }
 
 .brand-wrap {
@@ -221,11 +222,9 @@
   background: var(--color-line);
 }
 
-.search-panel {
+.hero-search {
   flex-shrink: 0;
-  margin-top: 0;
-  margin-bottom: 16rpx;
-  padding: 16rpx 22rpx;
+  margin-top: 8rpx;
 }
 
 .tool-search {

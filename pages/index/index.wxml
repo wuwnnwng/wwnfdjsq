@@ -18,6 +18,21 @@
       </view>
     </view>
 
+    <view class="hero-search">
+      <view class="tool-search">
+        <text class="tool-search-mark">搜</text>
+        <input
+          class="tool-search-input"
+          value="{{keyword}}"
+          placeholder="搜索工具名称"
+          placeholder-class="tool-search-placeholder"
+          confirm-type="search"
+          bindinput="onSearch"
+        />
+        <view class="tool-search-clear" wx:if="{{keyword}}" bindtap="onClearSearch" aria-role="button" aria-label="清空搜索">×</view>
+      </view>
+    </view>
+
     <view class="tools-entry {{featuredToolsOpen ? '' : 'collapsed'}}">
       <view class="tools-swiper-wrap" wx:if="{{featuredToolsOpen}}">
         <block wx:for="{{toolsSwiperKeys}}" wx:for-item="swiperEpoch" wx:key="*this">
@@ -69,21 +84,6 @@
         aria-role="button"
         aria-label="{{featuredToolsOpen ? '收起轮播' : '展开轮播'}}"
       >{{featuredToolsOpen ? '收起' : '轮播'}}</view>
-    </view>
-  </view>
-
-  <view class="panel search-panel">
-    <view class="tool-search">
-      <text class="tool-search-mark">搜</text>
-      <input
-        class="tool-search-input"
-        value="{{keyword}}"
-        placeholder="搜索工具名称"
-        placeholder-class="tool-search-placeholder"
-        confirm-type="search"
-        bindinput="onSearch"
-      />
-      <view class="tool-search-clear" wx:if="{{keyword}}" bindtap="onClearSearch" aria-role="button" aria-label="清空搜索">×</view>
     </view>
   </view>
 

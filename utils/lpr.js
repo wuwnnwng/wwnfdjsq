@@ -172,9 +172,51 @@ function getLprDisplay() {
   return { ...FALLBACK }
 }
 
+function parseLoanYears(years) {
+  const n = Number(years)
+  if (!Number.isFinite(n) || n <= 0) return null
+  return n
+}
+
+/**
+ * 按年限取对应 LPR 年利率：5 年及以下用 1 年期，5 年以上用 5 年期以上。
+ */
+function lprAnnualRateByYears(years, lpr) {
+  const data = lpr && lpr.oneYear && lpr.fiveYear ? lpr : getLprDisplay()
+  const n = parseLoanYears(years)
+  if (n !== null && n <= 5) return data.oneYear
+  return data.fiveYear
+}
+
+function lprTermLabelByYears(years) {
+  const n = parseLoanYears(years)
+  if (n !== null && n <= 5) return '1年期'
+  return '5年期以上'
+}
+
+function formatComparableRate(value) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return ''
+  return n.toFixed(2)
+}
+
+function isQuotedLprRate(value, ...lprList) {
+  const v = formatComparableRate(value)
+  if (!v) return false
+  const sources = lprList.filter(Boolean)
+  if (!sources.length) sources.push(getLprDisplay())
+  return sources.some((lpr) => {
+    return v === formatComparableRate(lpr.oneYear) || v === formatComparableRate(lpr.fiveYear)
+  })
+}
+
 module.exports = {
+  CACHE_TTL_MS,
   loadLprDisplay,
   getLprDisplay,
+  lprAnnualRateByYears,
+  lprTermLabelByYears,
+  isQuotedLprRate,
   EASTMONEY_URL,
   CHINAMONEY_URL
 }

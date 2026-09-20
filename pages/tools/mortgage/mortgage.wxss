@@ -718,6 +718,13 @@
   color: rgba(95, 114, 104, 0.55);
 }
 
+.field-hint {
+  margin: -8rpx 0 16rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
 .page-shell {
   position: absolute;
   top: 0;

@@ -102,7 +102,7 @@
       </view>
       <view class="tip-block">
         <view class="tip-name">什么是 LPR</view>
-        <view class="tip-text">LPR（贷款市场报价利率）是银行发放贷款的定价参考基准，由全国银行间同业拆借中心每月公布。房贷利率一般在「5年期以上 LPR」基础上加减基点确定。</view>
+        <view class="tip-text">房贷商贷年利率按贷款年限默认回显对应 LPR，可自行修改。5 年及以下用 1 年期 LPR，5 年以上用 5 年期以上 LPR。</view>
       </view>
       <view class="tip-confirm" bindtap="onHideLprTip">我知道了</view>
     </view>
@@ -177,11 +177,12 @@
                 value="{{commercialRate}}"
                 data-field="commercialRate"
                 bindinput="onInput"
-                placeholder="如 3.45"
+                placeholder="如 {{lpr.fiveYear}}"
               />
               <text class="field-unit">%</text>
             </view>
           </view>
+          <view class="field-hint" wx:if="{{commercialRateAuto}}">已按{{commercialLprLabel}} LPR 回显，可修改</view>
         </view>
 
         <view class="sub-block" wx:if="{{showProvident}}">
@@ -223,11 +224,12 @@
                 value="{{providentRate}}"
                 data-field="providentRate"
                 bindinput="onInput"
-                placeholder="如 2.85"
+                placeholder="如 2.60"
               />
               <text class="field-unit">%</text>
             </view>
           </view>
+          <view class="field-hint" wx:if="{{providentRateAuto}}">已按首套公积金利率回显，可修改</view>
         </view>
 
         <view class="inline-row">

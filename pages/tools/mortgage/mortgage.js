@@ -11,7 +11,13 @@ const {
   getMortgageToolShare,
   consumeShareEnter
 } = require('../../../utils/share')
-const { getLprDisplay, loadLprDisplay } = require('../../../utils/lpr')
+const {
+  getLprDisplay,
+  loadLprDisplay,
+  lprAnnualRateByYears,
+  lprTermLabelByYears,
+  isQuotedLprRate
+} = require('../../../utils/lpr')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const {
   MAX_PLANS,
@@ -22,6 +28,42 @@ const {
   removePlan
 } = require('../../../utils/plans')
 const { createLastInput } = require('../../../utils/toolLastInput')
+
+const PROVIDENT_FIRST_HOME = {
+  withinFive: '2.10',
+  aboveFive: '2.60'
+}
+const LEGACY_COMMERCIAL_RATES = ['3.45']
+const LEGACY_PROVIDENT_RATES = ['2.85', '2.35']
+
+function rateKey(value) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return ''
+  return n.toFixed(2)
+}
+
+function providentRateByYears(years) {
+  const n = Number(years)
+  if (Number.isFinite(n) && n > 0 && n <= 5) return PROVIDENT_FIRST_HOME.withinFive
+  return PROVIDENT_FIRST_HOME.aboveFive
+}
+
+function shouldSyncCommercialRate(value, oldLpr, newLpr) {
+  const v = String(value || '').trim()
+  if (!v) return true
+  if (LEGACY_COMMERCIAL_RATES.includes(rateKey(v))) return true
+  return isQuotedLprRate(v, oldLpr, newLpr)
+}
+
+function shouldSyncProvidentRate(value) {
+  const v = String(value || '').trim()
+  if (!v) return true
+  if (LEGACY_PROVIDENT_RATES.includes(rateKey(v))) return true
+  const key = rateKey(v)
+  return key === PROVIDENT_FIRST_HOME.withinFive || key === PROVIDENT_FIRST_HOME.aboveFive
+}
+
+const initialLpr = getLprDisplay()
 
 const lastInput = createLastInput('mortgage', [
   'calcMode',
@@ -66,11 +108,14 @@ Page({
 
     commercialAmount: '100',
     commercialYears: '30',
-    commercialRate: '3.45',
+    commercialRate: lprAnnualRateByYears('30', initialLpr),
+    commercialRateAuto: true,
+    commercialLprLabel: lprTermLabelByYears('30'),
 
     providentAmount: '50',
     providentYears: '30',
-    providentRate: '2.85',
+    providentRate: providentRateByYears('30'),
+    providentRateAuto: true,
 
     originalYears: '30',
     firstRepaymentDate: '',
@@ -85,7 +130,11 @@ Page({
     prepayAmountWan: '10',
     adjustMode: 'shorten',
 
-    lpr: getLprDisplay(),
+    lpr: {
+      oneYear: initialLpr.oneYear,
+      fiveYear: initialLpr.fiveYear,
+      publishedAt: initialLpr.publishedAt
+    },
     lprLoading: false,
     lprError: '',
 
@@ -103,7 +152,6 @@ Page({
     if (consumeShareEnter('pages/tools/mortgage/mortgage')) return
     enableShareMenu()
     applyThemeChrome(getThemeId())
-    this.refreshLpr()
 
     const now = new Date()
     const mm = String(now.getMonth() + 1).padStart(2, '0')
@@ -113,7 +161,9 @@ Page({
     const patch = Object.assign({ firstRepaymentDate: today }, saved)
     if (patch.loanType) Object.assign(patch, this.loanTypePatch(patch.loanType))
     patch.hasManualRate = String(patch.manualAnnualRate || '').trim() !== ''
+    Object.assign(patch, this.syncLoanRates(patch))
     this.setData(patch, () => this.refreshDerived())
+    this.refreshLpr()
   },
 
   onShow() {
@@ -135,23 +185,55 @@ Page({
     lastInput.save(this)
   },
 
+  syncLoanRates(overrides, nextLpr) {
+    const d = Object.assign({}, this.data, overrides || {})
+    const lpr = nextLpr || d.lpr
+    const patch = {
+      commercialLprLabel: lprTermLabelByYears(d.commercialYears)
+    }
+    if (shouldSyncCommercialRate(d.commercialRate, this.data.lpr, lpr)) {
+      patch.commercialRate = lprAnnualRateByYears(d.commercialYears, lpr)
+      patch.commercialRateAuto = true
+    } else {
+      patch.commercialRateAuto = false
+    }
+    if (shouldSyncProvidentRate(d.providentRate)) {
+      patch.providentRate = providentRateByYears(d.providentYears)
+      patch.providentRateAuto = true
+    } else {
+      patch.providentRateAuto = false
+    }
+    return patch
+  },
+
+  applyLprView(lpr, extra) {
+    const lprView = {
+      oneYear: lpr.oneYear,
+      fiveYear: lpr.fiveYear,
+      publishedAt: lpr.publishedAt
+    }
+    this.setData(
+      Object.assign(
+        {
+          lpr: lprView,
+          lprLoading: false
+        },
+        extra || {},
+        this.syncLoanRates({ lpr: lprView }, lprView)
+      ),
+      () => this.persistForm()
+    )
+  },
+
   async refreshLpr() {
     this.setData({ lprLoading: true, lprError: '' })
     try {
       const lpr = await loadLprDisplay()
-      this.setData({
-        lpr: {
-          oneYear: lpr.oneYear,
-          fiveYear: lpr.fiveYear,
-          publishedAt: lpr.publishedAt
-        },
-        lprLoading: false,
+      this.applyLprView(lpr, {
         lprError: lpr.source === 'fallback' ? '暂用本地兜底数据' : ''
       })
     } catch (e) {
-      this.setData({
-        lpr: getLprDisplay(),
-        lprLoading: false,
+      this.applyLprView(getLprDisplay(), {
         lprError: '查询失败，已显示缓存/兜底'
       })
     }
@@ -263,9 +345,15 @@ Page({
   },
 
   applyPlanToForm(input, callback) {
+    const formPatch = this.buildFormPatch(input)
     const patch = {
       showPlans: false,
-      ...this.buildFormPatch(input)
+      ...formPatch,
+      commercialRateAuto: shouldSyncCommercialRate(formPatch.commercialRate, this.data.lpr),
+      providentRateAuto: shouldSyncProvidentRate(formPatch.providentRate),
+      commercialLprLabel: lprTermLabelByYears(
+        formPatch.commercialYears || this.data.commercialYears
+      )
     }
     this.setData(patch, () => {
       this.persistForm()
@@ -390,9 +478,16 @@ Page({
 
   onInput(e) {
     const field = e.currentTarget.dataset.field
-    this.setData({
-      [field]: e.detail.value
-    })
+    const value = e.detail.value
+    const patch = { [field]: value }
+    if (field === 'commercialYears' || field === 'providentYears') {
+      Object.assign(patch, this.syncLoanRates(patch))
+    } else if (field === 'commercialRate') {
+      patch.commercialRateAuto = shouldSyncCommercialRate(value, this.data.lpr)
+    } else if (field === 'providentRate') {
+      patch.providentRateAuto = shouldSyncProvidentRate(value)
+    }
+    this.setData(patch)
     this.persistForm()
   },
 

@@ -1,22 +1,34 @@
 const { checkLocalVersion, checkMiniProgramUpdate } = require('./utils/version')
 const { getThemeId } = require('./utils/theme')
-const { rememberShareLanding } = require('./utils/share')
+const { rememberShareLanding, rewriteShareLaunchRoute } = require('./utils/share')
 const { bindPageAds } = require('./utils/ads')
 
-const originalPage = Page
-Page = function (config) {
-  const options = config || {}
-  bindPageAds(options)
-  const originalOnLoad = options.onLoad
-  options.onLoad = function (query) {
-    try {
-      rememberShareLanding(this.route)
-    } catch (e) {}
-    if (typeof originalOnLoad === 'function') {
-      return originalOnLoad.call(this, query)
+if (!Page.__wwnWrapped) {
+  const originalPage = Page
+  Page = function (config) {
+    const options = config || {}
+    bindPageAds(options)
+    const originalOnLoad = options.onLoad
+    options.onLoad = function (query) {
+      try {
+        rememberShareLanding(this.route)
+      } catch (e) {}
+      if (typeof originalOnLoad === 'function') {
+        return originalOnLoad.call(this, query)
+      }
     }
+    return originalPage(options)
   }
-  return originalPage(options)
+  Page.__wwnWrapped = true
+}
+
+if (typeof wx.onBeforeAppRoute === 'function' && !wx.__wwnBeforeAppRoute) {
+  wx.__wwnBeforeAppRoute = true
+  wx.onBeforeAppRoute((res) => {
+    try {
+      rewriteShareLaunchRoute(res)
+    } catch (e) {}
+  })
 }
 
 App({

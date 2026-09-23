@@ -38,18 +38,29 @@ function getPageRoute(page) {
   return normalizeRoute((page && (page.route || page.__route__)) || '')
 }
 
+function isDevtools() {
+  try {
+    return (wx.getSystemInfoSync() || {}).platform === 'devtools'
+  } catch (e) {
+    return false
+  }
+}
+
+function shouldMountNativeAd() {
+  return !isDevtools()
+}
+
+function destroyAd() {
+  // 页面卸载时原生 TextView/ImageView 已被回收。
+  // 再调 destroy() 会触发 removeTextView/removeImageView 3300x not found。
+}
+
 function hasApi(name) {
   return typeof wx !== 'undefined' && typeof wx[name] === 'function'
 }
 
-function destroyAd(ad) {
-  try {
-    if (ad && typeof ad.destroy === 'function') ad.destroy()
-  } catch (e) {}
-}
-
 function createInterstitialAd() {
-  if (!hasApi('createInterstitialAd')) return null
+  if (!shouldMountNativeAd() || !hasApi('createInterstitialAd')) return null
   try {
     const ad = wx.createInterstitialAd({ adUnitId: AD_UNITS.interstitial })
     if (ad && typeof ad.onError === 'function') {
@@ -78,20 +89,29 @@ function cancelInterstitial(page) {
   page._interstitialTimer = null
 }
 
+function ensureInterstitial(page) {
+  if (!page || page._adsUnloaded || page._interstitialAd) return
+  if (!INTERSTITIAL_ROUTES[getPageRoute(page)]) return
+  page._interstitialAd = createInterstitialAd()
+}
+
 function scheduleInterstitial(page) {
   cancelInterstitial(page)
-  if (!page || !INTERSTITIAL_ROUTES[getPageRoute(page)] || !page._interstitialAd) return
+  if (!page || page._adsUnloaded) return
+  ensureInterstitial(page)
+  if (!page._interstitialAd) return
   if (Date.now() - lastInterstitialAt < INTERSTITIAL_COOLDOWN_MS) return
 
   const delay = Math.max(INTERSTITIAL_DELAY_MS, MIN_APP_AGE_MS - (Date.now() - appStartedAt))
   page._interstitialTimer = setTimeout(() => {
     page._interstitialTimer = null
+    if (page._adsUnloaded) return
     showInterstitialAd(page._interstitialAd)
   }, Math.max(0, delay))
 }
 
 function createRewardedAd() {
-  if (!hasApi('createRewardedVideoAd')) return null
+  if (!shouldMountNativeAd() || !hasApi('createRewardedVideoAd')) return null
   try {
     const ad = wx.createRewardedVideoAd({ adUnitId: AD_UNITS.rewarded })
     if (ad && typeof ad.onError === 'function') {
@@ -179,23 +199,19 @@ function wrapLifecycle(options, name, after) {
 }
 
 function bindPageAds(options) {
-  wrapLifecycle(options, 'onLoad', function () {
-    if (INTERSTITIAL_ROUTES[getPageRoute(this)]) {
-      this._interstitialAd = createInterstitialAd()
-    }
+  wrapLifecycle(options, 'onReady', function () {
+    ensureInterstitial(this)
   })
   wrapLifecycle(options, 'onShow', function () {
-    if (!this._interstitialAd && INTERSTITIAL_ROUTES[getPageRoute(this)]) {
-      this._interstitialAd = createInterstitialAd()
-    }
+    this._adsUnloaded = false
     scheduleInterstitial(this)
   })
   wrapLifecycle(options, 'onHide', function () {
     cancelInterstitial(this)
   })
   wrapLifecycle(options, 'onUnload', function () {
+    this._adsUnloaded = true
     cancelInterstitial(this)
-    destroyAd(this._interstitialAd)
     this._interstitialAd = null
   })
 }
@@ -203,6 +219,7 @@ function bindPageAds(options) {
 module.exports = {
   AD_UNITS,
   INTERSTITIAL_ROUTES,
+  shouldMountNativeAd,
   createInterstitialAd,
   showInterstitialAd,
   scheduleInterstitial,

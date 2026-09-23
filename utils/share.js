@@ -125,6 +125,65 @@ function shareEnterKey(enter) {
   return `${enter.scene || ''}|${normalizeRoute(enter.path)}|${JSON.stringify(enter.query || {})}`
 }
 
+function packageRoot(path) {
+  const route = normalizeRoute(path)
+  if (route.indexOf('packageFootprint/') === 0) return 'packageFootprint'
+  if (route.indexOf('packageExam/') === 0) return 'packageExam'
+  if (route.indexOf('packageTravel/') === 0) return 'packageTravel'
+  return 'main'
+}
+
+function openShareTarget(url) {
+  const run = () => {
+    let pages = []
+    try {
+      pages = getCurrentPages() || []
+    } catch (e) {}
+    const current = pages.length ? pages[pages.length - 1] : null
+    const currentRoute = current ? normalizeRoute(current.route) : ''
+    if (currentRoute && currentRoute === normalizeRoute(url)) return
+
+    // appLaunch 尚未结束时同步 reLaunch 会被当成二次冷启动，触发
+    // "appLaunch with non-empty page stack"。栈里只有首页时改 redirectTo。
+    if (pages.length <= 1) {
+      wx.redirectTo({
+        url,
+        fail() {
+          wx.reLaunch({ url })
+        }
+      })
+      return
+    }
+    wx.reLaunch({ url })
+  }
+  if (typeof wx.nextTick === 'function') wx.nextTick(run)
+  else setTimeout(run, 0)
+}
+
+/**
+ * 分享冷启动：在首屏入栈前改写路由，避免 onLoad 里再 reLaunch。
+ * 跨分包暂不能 rewriteRoute，仍交给 consumeShareEnter。
+ */
+function rewriteShareLaunchRoute(res) {
+  if (!res || res.openType !== 'appLaunch') return false
+  if (typeof wx.rewriteRoute !== 'function') return false
+  const enter = getEnterOptions()
+  if (!isShareEnterScene(enter.scene)) return false
+  const target = normalizeRoute(enter.path)
+  const current = normalizeRoute(res.path)
+  if (!target) return false
+  if (current === target) {
+    markShareEnterConsumed(enter)
+    return false
+  }
+  if (packageRoot(current) !== packageRoot(target)) return false
+  const url = buildUrlFromEnter(enter.path, enter.query)
+  if (!url) return false
+  markShareEnterConsumed(enter)
+  wx.rewriteRoute({ url })
+  return true
+}
+
 function consumeShareEnter(currentRoute) {
   if (rememberShareLanding(currentRoute)) return false
   const enter = getEnterOptions()
@@ -136,7 +195,7 @@ function consumeShareEnter(currentRoute) {
   const url = buildUrlFromEnter(enter.path, enter.query)
   if (!url) return false
   markShareEnterConsumed(enter)
-  wx.reLaunch({ url })
+  openShareTarget(url)
   return true
 }
 
@@ -715,6 +774,7 @@ module.exports = {
   enableShareMenu,
   resolvePageQuery,
   rememberShareLanding,
+  rewriteShareLaunchRoute,
   consumeShareEnter,
   isShareLanding,
   getShareAppMessage,

@@ -1,4 +1,8 @@
-const { AD_UNITS } = require('../../utils/ads')
+const { AD_UNITS, shouldMountNativeAd } = require('../../utils/ads')
+
+function themeToAdTheme(theme) {
+  return theme === 'nexus' ? 'black' : 'white'
+}
 
 Component({
   properties: {
@@ -13,46 +17,35 @@ Component({
   },
 
   data: {
+    mount: false,
     adTheme: 'white',
-    hidden: false,
     ready: false
-  },
-
-  observers: {
-    theme(value) {
-      this.setData({
-        adTheme: value === 'nexus' ? 'black' : 'white'
-      })
-    }
   },
 
   lifetimes: {
     attached() {
-      if (!this.properties.theme) {
+      if (!shouldMountNativeAd()) return
+
+      let theme = this.properties.theme
+      if (!theme) {
         try {
           const app = getApp()
-          const theme = (app && app.globalData && app.globalData.theme) || ''
-          if (theme) {
-            this.setData({
-              adTheme: theme === 'nexus' ? 'black' : 'white'
-            })
-          }
+          theme = (app && app.globalData && app.globalData.theme) || ''
         } catch (e) {}
       }
+
+      this.setData({
+        mount: true,
+        adTheme: themeToAdTheme(theme)
+      })
     }
   },
 
   methods: {
     onLoadAd() {
-      this.setData({ hidden: false, ready: true })
+      this.setData({ ready: true })
     },
 
-    onErrorAd() {
-      this.setData({ hidden: true, ready: false })
-    },
-
-    onCloseAd() {
-      this.setData({ hidden: true, ready: false })
-    }
+    onErrorAd() {}
   }
 })

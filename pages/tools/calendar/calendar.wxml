@@ -78,8 +78,6 @@
         </view>
       </view>
 
-      <ad-banner theme="{{theme}}" />
-
       <view class="panel detail-panel" wx:if="{{selectedInfo}}">
         <view class="detail-lunar">{{selectedInfo.lunarText}}</view>
         <view class="detail-meta">{{selectedInfo.ganZhiText}} · {{selectedInfo.ganZhiDay}}</view>
@@ -106,8 +104,6 @@
 
     <!-- 黄历 -->
     <view wx:if="{{activeTab === 'almanac'}}">
-      <ad-banner theme="{{theme}}" />
-
       <view class="panel huangli-panel" wx:if="{{huangliDetail}}">
         <view class="huangli-head">
           <view class="month-nav" catchtap="onHuangliPrevDay" hover-class="month-nav-hover" aria-role="button" aria-label="前一天">‹</view>
@@ -299,8 +295,6 @@
 
     <!-- 节日 -->
     <view wx:if="{{activeTab === 'festival'}}">
-      <ad-banner theme="{{theme}}" />
-
       <view class="tool-note" wx:if="{{festivalLoading}}">正在加载官方放假安排…</view>
       <view class="tool-note warn" wx:if="{{festivalError}}">{{festivalError}}</view>
       <view class="panel festival-panel">
@@ -355,6 +349,7 @@
       </view>
     </view>
 
+    <ad-banner theme="{{theme}}" />
     <view class="calendar-bottom-space"></view>
   </scroll-view>
 

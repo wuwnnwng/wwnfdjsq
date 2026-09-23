@@ -20,7 +20,7 @@ const {
 } = require('../../utils/plans')
 const { exportResultToExcel, openExcelFile, shareExcelFile } = require('../../utils/excel')
 const { createConfettiPieces } = require('../../utils/confetti')
-const { createRewardedAd, unlockWithRewardedAd, destroyAd } = require('../../utils/ads')
+const { createRewardedAd, unlockWithRewardedAd } = require('../../utils/ads')
 
 const LOAN_TYPE_LABEL = {
   provident: '公积金贷',
@@ -568,7 +568,6 @@ Page({
       clearTimeout(this._earlySavedTimer)
       this._earlySavedTimer = null
     }
-    destroyAd(this._rewardedAd)
     this._rewardedAd = null
   },
 

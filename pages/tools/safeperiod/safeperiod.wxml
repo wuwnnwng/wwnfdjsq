@@ -63,7 +63,7 @@
           data-index="{{index}}"
         >
           <text class="cycle-day-num">{{item.day}}</text>
-          <text class="cycle-day-date">{{item.dateText}}</text>
+          <text class="cycle-day-date">{{item.isToday ? '今天' : item.dateText}}</text>
         </view>
       </view>
     </view>

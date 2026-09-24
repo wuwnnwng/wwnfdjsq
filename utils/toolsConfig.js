@@ -7,9 +7,8 @@ const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
   { id: 'fun', name: '娱乐', toolIds: ['mbti', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'diet', 'exam'] },
-  { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base', 'duedate', 'safeperiod'] },
-  { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] }
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'bmi', 'diet', 'exam'] },
+  { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'anniversary', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
 
 const TOOLS = [

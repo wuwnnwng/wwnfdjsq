@@ -101,11 +101,6 @@ function dbMessage(error) {
   return '签到创建失败，请重试'
 }
 
-function isMissingCollection(error) {
-  const msg = (error && (error.errMsg || error.message)) || ''
-  return /collection not exist|DATABASE_COLLECTION_NOT_EXIST|-502005/i.test(msg)
-}
-
 async function createEvent(openid, event) {
   const title = cleanText(event.title, 30)
   if (!title) return fail('请填写签到名称')

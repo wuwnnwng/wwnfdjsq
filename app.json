@@ -77,16 +77,21 @@
       "root": "packageMbti",
       "name": "mbti",
       "pages": ["pages/mbti/mbti"]
+    },
+    {
+      "root": "packageCheckin",
+      "name": "checkin",
+      "pages": ["pages/checkin/checkin"]
     }
   ],
   "preloadRule": {
     "pages/index/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel", "mbti"]
+      "packages": ["footprint", "exam", "travel", "mbti", "checkin"]
     },
     "pages/tools/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel", "mbti"]
+      "packages": ["footprint", "exam", "travel", "mbti", "checkin"]
     }
   },
   "lazyCodeLoading": "requiredComponents",

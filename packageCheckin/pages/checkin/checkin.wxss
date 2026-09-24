@@ -1,0 +1,167 @@
+@import "../../../pages/tools/tool-common.wxss";
+
+.hero-kicker {
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+  color: var(--color-muted);
+}
+
+.hero-title {
+  margin-top: 8rpx;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.hero-sub {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.field {
+  margin-top: 20rpx;
+}
+
+.field-label {
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.field-input {
+  margin-top: 8rpx;
+  height: 80rpx;
+  padding: 0 20rpx;
+  border-radius: 16rpx;
+  background: var(--color-soft);
+  font-size: 28rpx;
+  color: var(--color-ink);
+}
+
+.primary-btn.is-off {
+  opacity: 0.6;
+}
+
+.primary-btn.slim {
+  margin-top: 0;
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.event-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.event-meta {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.event-go,
+.text-btn {
+  flex-shrink: 0;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.board-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 24rpx;
+}
+
+.qr-canvas {
+  width: 420rpx;
+  height: 420rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+}
+
+.qr-hint {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.board-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.ghost-btn {
+  height: 88rpx;
+  border-radius: 16rpx;
+  text-align: center;
+  line-height: 88rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+  background: var(--color-soft);
+}
+
+.record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 18rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.record-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.record-time {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.empty {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: var(--color-muted);
+}
+
+.bottom-space {
+  height: 24rpx;
+}

@@ -131,6 +131,7 @@ function packageRoot(path) {
   if (route.indexOf('packageExam/') === 0) return 'packageExam'
   if (route.indexOf('packageTravel/') === 0) return 'packageTravel'
   if (route.indexOf('packageMbti/') === 0) return 'packageMbti'
+  if (route.indexOf('packageCheckin/') === 0) return 'packageCheckin'
   return 'main'
 }
 
@@ -513,6 +514,14 @@ function getExamTipsToolShare() {
   }
 }
 
+function getCheckinToolShare() {
+  const path = '/packageCheckin/pages/checkin/checkin'
+  return {
+    appMessage: buildToolShareAppMessage(path, '扫码签到'),
+    timeline: buildToolShareTimeline(path, '扫码签到')
+  }
+}
+
 function getMbtiToolShare(result) {
   const path = '/packageMbti/pages/mbti/mbti'
   if (result && result.code && result.name) {
@@ -834,6 +843,7 @@ module.exports = {
   getDrinkWheelToolShare,
   getFootprintToolShare,
   getExamTipsToolShare,
+  getCheckinToolShare,
   getMbtiToolShare,
   buildResultShareTitle,
   encodeShareInput,

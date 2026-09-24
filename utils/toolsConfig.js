@@ -10,7 +10,7 @@ const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
   { id: 'fun', name: '娱乐', toolIds: ['mbti', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'bmi', 'diet', 'exam'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'checkin', 'bmi', 'diet', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'anniversary', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
 
@@ -97,6 +97,15 @@ const TOOLS = [
     icon: '🔳',
     iconType: 'qrcode',
     page: '/pages/tools/qrcode/qrcode'
+  },
+  {
+    id: 'checkin',
+    name: '扫码签到',
+    shortName: '签到',
+    icon: '✅',
+    iconType: 'checkin',
+    keywords: '签到二维码扫描考勤会议活动导出Excel',
+    page: '/packageCheckin/pages/checkin/checkin'
   },
   {
     id: 'anniversary',

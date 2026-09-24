@@ -287,6 +287,7 @@
 .tool-icon-canvas { background: linear-gradient(135deg, #fce7f3, #e879f9); }
 .tool-icon-puzzle { background: linear-gradient(135deg, #dbeafe, #60a5fa); }
 .tool-icon-exam { background: linear-gradient(135deg, #dbeafe, #60a5fa); }
+.tool-icon-checkin { background: linear-gradient(135deg, #d1fae5, #34d399); }
 .tool-icon-chance { background: linear-gradient(135deg, #ffedd5, #fb923c); }
 .tool-icon-drinkwheel { background: linear-gradient(135deg, #ffe4e6, #fb7185); }
 .tool-icon-footprint { background: linear-gradient(135deg, #e0f2fe, #38bdf8); }

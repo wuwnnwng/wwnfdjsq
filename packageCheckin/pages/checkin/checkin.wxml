@@ -1,0 +1,76 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel">
+      <view class="hero-kicker">云端记录 · 扫码即到</view>
+      <view class="hero-title">扫码签到</view>
+      <view class="hero-sub">发起人出示二维码，参与人填写姓名后扫码。名单保存在云开发，发起人可以导出 Excel。</view>
+    </view>
+
+    <block wx:if="{{mode === 'home'}}">
+      <view class="panel">
+        <view class="section-title">我要签到</view>
+        <view class="field">
+          <view class="field-label">姓名</view>
+          <input class="field-input" value="{{name}}" maxlength="20" placeholder="签到时显示的名字" bindinput="onName" />
+        </view>
+        <view class="primary-btn" bindtap="onScan">扫码签到</view>
+      </view>
+
+      <view class="panel">
+        <view class="section-title">发起签到</view>
+        <view class="field">
+          <view class="field-label">名称</view>
+          <input class="field-input" value="{{title}}" maxlength="30" placeholder="例如周一例会" bindinput="onTitle" />
+        </view>
+        <view class="field">
+          <view class="field-label">备注</view>
+          <input class="field-input" value="{{note}}" maxlength="40" placeholder="选填，例如三楼会议室" bindinput="onNote" />
+        </view>
+        <view class="primary-btn {{creating ? 'is-off' : ''}}" bindtap="onCreate">{{creating ? '正在创建…' : '生成签到码'}}</view>
+      </view>
+
+      <view class="panel" wx:if="{{events.length}}">
+        <view class="section-title">我发起的</view>
+        <view class="event-row" wx:for="{{events}}" wx:key="id" bindtap="onOpenEvent" data-id="{{item.id}}">
+          <view class="event-copy">
+            <view class="event-title">{{item.title}}</view>
+            <view class="event-meta">{{item.createdAt}} · {{item.status === 'closed' ? '已结束' : '进行中'}}</view>
+          </view>
+          <view class="event-go">查看</view>
+        </view>
+      </view>
+    </block>
+
+    <block wx:elif="{{mode === 'board' && event}}">
+      <view class="panel">
+        <view class="board-head">
+          <view>
+            <view class="section-title">{{event.title}}</view>
+            <view class="event-meta">{{event.note}} {{event.status === 'closed' ? '已结束' : '进行中'}} · {{records.length}} 人</view>
+          </view>
+          <view class="text-btn" bindtap="onBackHome">返回</view>
+        </view>
+        <view class="qr-wrap" wx:if="{{isOwner}}">
+          <canvas type="2d" id="checkinQr" class="qr-canvas"></canvas>
+          <view class="qr-hint">让参与人打开「扫码签到」，填写姓名后扫描此码</view>
+        </view>
+        <view class="board-actions" wx:if="{{isOwner}}">
+          <view class="primary-btn slim" bindtap="onExport">{{exporting ? '正在导出…' : '导出 Excel'}}</view>
+          <view class="ghost-btn" bindtap="onToggleStatus">{{event.status === 'closed' ? '重新开启' : '结束签到'}}</view>
+        </view>
+      </view>
+
+      <view class="panel">
+        <view class="section-title">签到名单</view>
+        <view class="record" wx:for="{{records}}" wx:key="index">
+          <view class="record-name">{{item.index}}. {{item.name}}</view>
+          <view class="record-time">{{item.time}}</view>
+        </view>
+        <view class="empty" wx:if="{{!records.length}}">还没有人签到</view>
+      </view>
+    </block>
+
+    <ad-banner theme="{{theme}}" />
+    <view class="bottom-space"></view>
+  </scroll-view>
+</view>

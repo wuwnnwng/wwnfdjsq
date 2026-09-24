@@ -50,6 +50,13 @@ App({
 
     // 正式版/体验版：自动检查微信后台是否有新版本包
     checkMiniProgramUpdate()
+
+    if (wx.cloud) {
+      wx.cloud.init({
+        env: 'cloud1-d1gbvmd3eca12dcdc',
+        traceUser: true
+      })
+    }
   },
 
   onShow(options) {

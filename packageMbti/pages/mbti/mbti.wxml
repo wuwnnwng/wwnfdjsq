@@ -1,0 +1,265 @@
+<template name="mbtiDisclaimer">
+  <view class="disclaimer-card">
+    <view class="disclaimer-title">免责声明</view>
+    <view class="disclaimer-text">本测试是趣味性格自测，题目为原创，按能量、信息、决策、节奏四个偏好计分，常被称作 MBTI。结果只供自我了解和聊天参考，会随心情和作答状态变化。</view>
+    <view class="disclaimer-text">它不是心理诊断，不能替代专业心理咨询，也不能作为招聘、升学、医疗或重大决定的依据。参考占比和名人归类来自网络常见说法，不是普查，也不是本人声明。</view>
+    <view class="disclaimer-text">MBTI® 是相关权利人的注册商标。本工具与官方测评机构无关。</view>
+  </view>
+</template>
+
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view wx:if="{{stage === 'home'}}" scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="mbti-hero">
+      <view class="hero-kicker">四字母 · 16 型 · 原创题</view>
+      <view class="hero-title">MBTI 性格测试</view>
+      <view class="hero-sub">从能量、信息、决策、节奏四个偏好，看你更像哪一种人。适合自我了解，也适合发到朋友圈。</view>
+      <view class="last" wx:if="{{lastResult}}" bindtap="onOpenHistory" data-at="{{lastResult.at}}">
+        <view class="last-code" style="background: {{lastResult.color}}; color: {{lastResult.ink}};">{{lastResult.code}}</view>
+        <view class="last-copy">
+          <view class="last-kicker">上次结果</view>
+          <view class="last-name">{{lastResult.name}} · {{lastResult.when}}</view>
+        </view>
+        <view class="last-go">查看</view>
+      </view>
+    </view>
+
+    <view class="draft" wx:if="{{draftText}}" bindtap="onResume">
+      <text class="draft-text">{{draftText}}</text>
+      <text class="draft-go">继续</text>
+    </view>
+
+    <view class="mode-row">
+      <view
+        wx:for="{{modes}}"
+        wx:key="id"
+        class="mode-card {{item.recommend ? 'is-rec' : ''}}"
+        bindtap="onStart"
+        data-mode="{{item.id}}"
+      >
+        <view class="mode-badge" wx:if="{{item.recommend}}">更准</view>
+        <view class="mode-name">{{item.name}}</view>
+        <view class="mode-count">{{item.count}} 题 · {{item.time}}</view>
+        <view class="mode-desc">{{item.desc}}</view>
+        <view class="mode-go">{{draftMode === item.id ? '继续答' : '开始'}}</view>
+      </view>
+    </view>
+
+    <ad-banner theme="{{theme}}" />
+
+    <view class="panel" wx:if="{{history.length}}">
+      <view class="hist-head">
+        <view class="section-title">测过的</view>
+        <view class="text-btn" catchtap="onClearHistory">清空</view>
+      </view>
+      <scroll-view scroll-x class="hist-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="hist-row">
+          <view class="hist-chip" wx:for="{{history}}" wx:key="at" bindtap="onOpenHistory" data-at="{{item.at}}">
+            <text class="hist-code" style="color: {{item.color}};">{{item.code}}</text>
+            <text class="hist-name">{{item.name}}</text>
+            <text class="hist-when">{{item.when}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="panel">
+      <view class="section-title">16 型图鉴</view>
+      <view class="section-desc">点开任意类型先看画像。测完再回来对字母。</view>
+      <view class="atlas-group" wx:for="{{groups}}" wx:for-item="group" wx:key="id">
+        <view class="atlas-head">
+          <view class="atlas-mark" style="background: {{group.color}}; color: {{group.ink}};">{{group.mark}}</view>
+          <view class="atlas-copy">
+            <view class="atlas-name">{{group.name}}</view>
+            <view class="atlas-blurb">{{group.blurb}}</view>
+          </view>
+        </view>
+        <view class="atlas-grid">
+          <view
+            class="atlas-type"
+            wx:for="{{group.types}}"
+            wx:for-item="type"
+            wx:key="code"
+            style="background: {{group.color}}; color: {{group.ink}};"
+            bindtap="onPreview"
+            data-code="{{type.code}}"
+          >
+            <view class="atlas-code">{{type.code}}</view>
+            <view class="atlas-nick">{{type.name}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <template is="mbtiDisclaimer" />
+    <view class="home-spacer"></view>
+  </scroll-view>
+
+  <scroll-view wx:elif="{{stage === 'quiz'}}" scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="quiz-top">
+      <view class="quiz-exit" bindtap="onExitQuiz">离开</view>
+      <view class="quiz-count">{{quiz.number}} / {{quiz.total}}</view>
+      <view class="quiz-mode">{{quiz.modeName}}</view>
+    </view>
+    <view class="progress">
+      <view class="progress-fill" style="width: {{quiz.progress}}%;"></view>
+    </view>
+    <view class="q-card">
+      <view class="q-kicker">按第一反应选，不必想太久</view>
+      <view class="q-text">{{quiz.text}}</view>
+    </view>
+    <view
+      wx:for="{{options}}"
+      wx:key="value"
+      class="opt {{quiz.selected === item.value ? 'is-on' : ''}}"
+      bindtap="onPick"
+      data-value="{{item.value}}"
+    >
+      <view class="opt-label">{{item.label}}</view>
+      <view class="opt-hint">{{item.hint}}</view>
+    </view>
+    <view class="quiz-prev {{quiz.canPrev ? '' : 'is-off'}}" bindtap="onPrev">上一题</view>
+    <ad-banner theme="{{theme}}" />
+    <template is="mbtiDisclaimer" />
+    <view class="home-spacer"></view>
+  </scroll-view>
+
+  <scroll-view wx:else scroll-y class="tool-scroll has-save-bar" enhanced show-scrollbar="{{false}}">
+    <view class="result-body" style="--win: {{result.group.color}};">
+      <view class="type-hero" style="background: linear-gradient(145deg, {{result.group.color}}, {{result.group.color2}}); color: {{result.group.ink}};">
+        <view class="type-kicker">{{result.group.name}} · {{result.group.mark}} · {{result.meta}}</view>
+        <view class="type-code">{{result.code}}</view>
+        <view class="type-name">{{result.name}}</view>
+        <view class="type-motto">{{result.motto}}</view>
+        <view class="type-letters">
+          <view class="type-letter" wx:for="{{result.letters}}" wx:key="*this">{{item}}</view>
+        </view>
+        <view class="type-keywords">
+          <text wx:for="{{result.keywords}}" wx:key="*this" class="type-keyword">{{item}}</text>
+        </view>
+        <view class="type-ratio" wx:if="{{result.ratioText}}">参考占比 {{result.ratioText}}</view>
+      </view>
+
+      <view class="callout" wx:if="{{result.preview || result.shared}}">
+        <view class="callout-text">{{result.shared ? '这是好友的结果。你的四个字母，可能完全不一样。' : '这是类型图鉴。测完才知道你是不是这个类型。'}}</view>
+        <view class="callout-btn" bindtap="onRetest">我也测测</view>
+      </view>
+
+      <ad-banner theme="{{theme}}" />
+
+      <view class="panel" wx:if="{{result.dims.length}}">
+        <view class="section-title">四个维度</view>
+        <view class="dim" wx:for="{{result.dims}}" wx:key="key">
+          <view class="dim-top">
+            <text class="dim-side {{item.leftWin ? 'is-win' : ''}}">{{item.leftName}} {{item.leftPercent}}%</text>
+            <text class="dim-clarity">{{item.title}} · {{item.clarity}}</text>
+            <text class="dim-side is-right {{item.rightWin ? 'is-win' : ''}}">{{item.rightName}} {{item.rightPercent}}%</text>
+          </view>
+          <view class="dim-track">
+            <view class="dim-fill from-{{item.fillFrom}} {{item.tie ? 'is-tie' : ''}}" style="width: {{item.fillPercent}}%; background: {{result.group.color}};"></view>
+          </view>
+        </view>
+        <view class="focus" wx:if="{{result.focus}}">{{result.focus}}</view>
+        <view class="portrait-line" wx:if="{{result.portrait}}">{{result.portrait}}</view>
+        <view class="tool-note" wx:for="{{result.notes}}" wx:for-item="note" wx:key="*this">{{note}}</view>
+        <view class="tool-note">每一维取更高的一侧。两侧相同或非常接近时，记作内向、直觉、情感、随性，并标为均衡。</view>
+      </view>
+
+      <view class="tabs">
+        <view
+          wx:for="{{tabs}}"
+          wx:key="id"
+          class="tab {{resultTab === item.id ? 'is-on' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="onTab"
+        >{{item.name}}</view>
+      </view>
+
+      <view class="panel" wx:if="{{resultTab === 'portrait'}}">
+        <view class="section-title">画像</view>
+        <view class="prose">{{result.summary}}</view>
+        <view class="stack" wx:if="{{result.stackText}}">{{result.stackText}}</view>
+        <view class="fn" wx:for="{{result.functions}}" wx:key="code">
+          <view class="fn-role">{{item.role}}</view>
+          <view class="fn-body">
+            <view class="fn-name">{{item.code}} {{item.name}}</view>
+            <view class="fn-blurb">{{item.blurb}}</view>
+          </view>
+        </view>
+        <view class="block-label">常被归入此类型的名字</view>
+        <view class="chips">
+          <text class="chip" wx:for="{{result.figures}}" wx:key="*this">{{item}}</text>
+        </view>
+        <view class="tool-note">这些名字来自网络上的常见归类，不是本人填写的结果。</view>
+        <view class="block-label">同组的另外三种</view>
+        <view class="sibling-row">
+          <view class="sibling" wx:for="{{result.siblings}}" wx:key="code" bindtap="onPreview" data-code="{{item.code}}" style="background: {{item.color}}; color: {{item.ink}};">
+            <view class="sibling-code">{{item.code}}</view>
+            <view class="sibling-name">{{item.name}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="panel" wx:if="{{resultTab === 'edge'}}">
+        <view class="section-title">顺手的地方</view>
+        <view class="bullet" wx:for="{{result.strengths}}" wx:for-item="line" wx:key="*this">
+          <view class="bullet-dot"></view>
+          <text class="bullet-text">{{line}}</text>
+        </view>
+        <view class="section-title gap">容易忽略</view>
+        <view class="bullet" wx:for="{{result.blinds}}" wx:for-item="line" wx:key="*this">
+          <view class="bullet-dot is-soft"></view>
+          <text class="bullet-text">{{line}}</text>
+        </view>
+        <view class="advice">{{result.advice}}</view>
+      </view>
+
+      <view class="panel" wx:if="{{resultTab === 'work'}}">
+        <view class="section-title">怎么做事</view>
+        <view class="prose">{{result.work}}</view>
+        <view class="block-label">更容易发挥的方向</view>
+        <view class="chips">
+          <text class="chip" wx:for="{{result.careers}}" wx:key="*this">{{item}}</text>
+        </view>
+      </view>
+
+      <view class="panel" wx:if="{{resultTab === 'bond'}}">
+        <view class="section-title">跟人相处</view>
+        <view class="prose">{{result.relation}}</view>
+        <view class="block-label">亲密关系</view>
+        <view class="prose">{{result.love}}</view>
+        <view class="block-label">较容易合拍</view>
+        <view class="pair" wx:for="{{result.best}}" wx:key="code" bindtap="onPreview" data-code="{{item.code}}">
+          <view class="pair-code" style="background: {{item.color}}; color: {{item.ink}};">{{item.code}}</view>
+          <view class="pair-copy">
+            <view class="pair-name">{{item.name}}</view>
+            <view class="pair-line">{{item.line}}</view>
+          </view>
+        </view>
+        <view class="block-label">差异大，但能互补</view>
+        <view class="pair" wx:for="{{result.grow}}" wx:key="code" bindtap="onPreview" data-code="{{item.code}}">
+          <view class="pair-code" style="background: {{item.color}}; color: {{item.ink}};">{{item.code}}</view>
+          <view class="pair-copy">
+            <view class="pair-name">{{item.name}}</view>
+            <view class="pair-line">{{item.line}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="text-row">
+        <view class="text-btn" bindtap="onCopy">复制结果</view>
+        <view class="text-btn" wx:if="{{showBackOwn}}" bindtap="onBackOwn">返回我的结果</view>
+        <view class="text-btn" wx:elif="{{!result.preview && !result.shared}}" bindtap="onRetest">重新测试</view>
+      </view>
+      <template is="mbtiDisclaimer" />
+      <view class="save-bar-spacer"></view>
+    </view>
+  </scroll-view>
+
+  <view class="save-card-bar" wx:if="{{stage === 'result'}}">
+    <view class="mbti-bar">
+      <button class="mbti-ghost" open-type="share">分享</button>
+      <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '保存结果卡片'}}</view>
+    </view>
+  </view>
+  <canvas type="2d" id="resultCard" class="result-card-canvas"></canvas>
+</view>

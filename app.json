@@ -72,16 +72,21 @@
         "pages/oilprice/oilprice",
         "pages/toll/toll"
       ]
+    },
+    {
+      "root": "packageMbti",
+      "name": "mbti",
+      "pages": ["pages/mbti/mbti"]
     }
   ],
   "preloadRule": {
     "pages/index/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel"]
+      "packages": ["footprint", "exam", "travel", "mbti"]
     },
     "pages/tools/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel"]
+      "packages": ["footprint", "exam", "travel", "mbti"]
     }
   },
   "lazyCodeLoading": "requiredComponents",

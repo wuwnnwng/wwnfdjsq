@@ -14,7 +14,7 @@ const CATEGORIES = [
   { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'diet', 'canvas', 'puzzle', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
   { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
-  { id: 'fun', name: '娱乐', toolIds: ['chance', 'drinkwheel', 'footprint'] }
+  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'chance', 'drinkwheel', 'footprint'] }
 ]
 
 const TOOLS = [
@@ -271,6 +271,15 @@ const TOOLS = [
     page: '/pages/tools/base/base'
   },
   {
+    id: 'mbti',
+    name: 'MBTI性格测试',
+    shortName: 'MBTI',
+    icon: '🧠',
+    iconType: 'mbti',
+    keywords: 'MBTI性格测试16型人格四字母INTJ INTP ENTJ ENTP INFJ INFP ENFJ ENFP ISTJ ISFJ ESTJ ESFJ ISTP ISFP ESTP ESFP人格性格',
+    page: '/packageMbti/pages/mbti/mbti'
+  },
+  {
     id: 'chance',
     name: '掷骰子/投硬币',
     shortName: '骰子硬币',
@@ -473,7 +482,7 @@ function flattenFeaturedToolIds(pages) {
 
 function getFeaturedToolPages() {
   const random = getHomeRandomTool()
-  const extra = ['housetax', 'bmi', 'diet', 'compound', 'pension', 'duedate', 'safeperiod', 'age']
+  const extra = ['mbti', 'housetax', 'bmi', 'diet', 'compound', 'pension', 'duedate', 'safeperiod', 'age']
     .map((id) => toFeaturedChip(getToolById(id)))
     .filter(Boolean)
   const pinned = ['ershou']

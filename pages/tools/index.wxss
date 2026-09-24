@@ -316,6 +316,10 @@
   background: linear-gradient(135deg, #ffedd5, #fb923c);
 }
 
+.tool-icon-mbti {
+  background: linear-gradient(135deg, #ddd6fe, #8b5cf6);
+}
+
 .tool-card-name {
   font-size: 26rpx;
   font-weight: 600;

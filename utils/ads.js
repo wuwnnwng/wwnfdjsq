@@ -20,7 +20,8 @@ const INTERSTITIAL_ROUTES = {
   'pages/tools/tax/tax': true,
   'pages/tools/housetax/housetax': true,
   'packageTravel/pages/oilprice/oilprice': true,
-  'packageTravel/pages/fuel/fuel': true
+  'packageTravel/pages/fuel/fuel': true,
+  'packageMbti/pages/mbti/mbti': true
 }
 
 const INTERSTITIAL_DELAY_MS = 1200
@@ -108,6 +109,14 @@ function scheduleInterstitial(page) {
     if (page._adsUnloaded) return
     showInterstitialAd(page._interstitialAd)
   }, Math.max(0, delay))
+}
+
+function showRouteInterstitial(page) {
+  if (!page || page._adsUnloaded) return
+  ensureInterstitial(page)
+  if (!page._interstitialAd) return
+  if (Date.now() - lastInterstitialAt < INTERSTITIAL_COOLDOWN_MS) return
+  showInterstitialAd(page._interstitialAd)
 }
 
 function createRewardedAd() {
@@ -223,6 +232,7 @@ module.exports = {
   createInterstitialAd,
   showInterstitialAd,
   scheduleInterstitial,
+  showRouteInterstitial,
   cancelInterstitial,
   createRewardedAd,
   showRewardedAd,

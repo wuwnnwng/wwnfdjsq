@@ -130,6 +130,7 @@ function packageRoot(path) {
   if (route.indexOf('packageFootprint/') === 0) return 'packageFootprint'
   if (route.indexOf('packageExam/') === 0) return 'packageExam'
   if (route.indexOf('packageTravel/') === 0) return 'packageTravel'
+  if (route.indexOf('packageMbti/') === 0) return 'packageMbti'
   return 'main'
 }
 
@@ -512,6 +513,27 @@ function getExamTipsToolShare() {
   }
 }
 
+function getMbtiToolShare(result) {
+  const path = '/packageMbti/pages/mbti/mbti'
+  if (result && result.code && result.name) {
+    let query = `code=${result.code}`
+    if (!result.preview && result.dims && result.dims.length) {
+      query += `&d=${result.dims.map((dim) => dim.percent).join('-')}`
+    }
+    let title = `${result.code} ${result.name}是怎样的人？来测测你的16型人格`
+    if (result.shared) title = `好友是${result.code} ${result.name}，你呢？`
+    else if (!result.preview) title = `我是${result.code} ${result.name}，来测测你的16型人格`
+    return {
+      appMessage: { title, path: `${path}?${query}` },
+      timeline: { title, query }
+    }
+  }
+  return {
+    appMessage: buildToolShareAppMessage(path, 'MBTI性格测试'),
+    timeline: buildToolShareTimeline(path, 'MBTI性格测试')
+  }
+}
+
 function getShareAppMessage() {
   return {
     title: `日常计算、房产生活，打开就用｜${APP_BRAND}`,
@@ -812,6 +834,7 @@ module.exports = {
   getDrinkWheelToolShare,
   getFootprintToolShare,
   getExamTipsToolShare,
+  getMbtiToolShare,
   buildResultShareTitle,
   encodeShareInput,
   parseShareInputQuery,

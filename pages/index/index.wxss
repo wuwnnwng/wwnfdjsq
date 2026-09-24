@@ -435,3 +435,4 @@
 .tool-icon-percent { background: linear-gradient(135deg, #e0e7ff, #818cf8); }
 .tool-icon-base { background: linear-gradient(135deg, #ede9fe, #a78bfa); }
 .tool-icon-ershou { background: linear-gradient(135deg, #ffedd5, #fb923c); }
+.tool-icon-mbti { background: linear-gradient(135deg, #ddd6fe, #8b5cf6); }

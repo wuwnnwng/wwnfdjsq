@@ -21,6 +21,16 @@ const { getDayHolidayRecord } = require('../../../utils/holidayApi')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCalendarToolShare } = require('../../../utils/share')
 const { createPickerTick } = require('../../../utils/pickerTick')
+const {
+  HOLIDAY_TYPES,
+  isPastDate,
+  loadDayTags,
+  getDayTag,
+  saveDayTag,
+  clearDayTag,
+  consumeTodayPrompt,
+  markTodayPrompted
+} = require('../../../utils/calendarTags')
 
 const WEEK_HEADERS = ['日', '一', '二', '三', '四', '五', '六']
 const WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
@@ -122,7 +132,8 @@ function buildMonthCells(
   today,
   auspiciousEvent,
   auspiciousDays,
-  holidayDayMap
+  holidayDayMap,
+  dayTags
 ) {
   const firstWeekday = new Date(viewYear, viewMonth - 1, 1).getDay()
   const daysInMonth = new Date(viewYear, viewMonth, 0).getDate()
@@ -167,13 +178,17 @@ function buildMonthCells(
     const isAuspicious =
       inMonth && month === viewMonth && auspiciousEvent && auspiciousDays.indexOf(day) >= 0
     const holidayRecord = getDayHolidayRecord(holidayDayMap, year, month, day)
-    const isRestDay = !!(holidayRecord && holidayRecord.holiday)
+    const userTag = (dayTags || {})[formatDateKey(year, month, day)]
+    const userLabel = userTag && userTag.label ? userTag.label : ''
+    const userHoliday = !!(userTag && userTag.kind === 'holiday' && userLabel)
+    const isRestDay = !!(holidayRecord && holidayRecord.holiday) || userHoliday
     const isWorkDay = !!(
       holidayRecord &&
       !holidayRecord.holiday &&
       (holidayRecord.after || /补班/.test(holidayRecord.name || ''))
-    )
+    ) && !userHoliday
     const tagFestival = festivalShort === '班' ? '' : festivalShort
+    const subLabel = userLabel || tagFestival
 
     cells.push({
       key: formatDateKey(year, month, day),
@@ -186,9 +201,9 @@ function buildMonthCells(
       isAuspicious,
       isRestDay,
       isWorkDay,
-      festivalShort: tagFestival,
+      festivalShort: subLabel,
       lunarShort,
-      daySub: tagFestival || lunarShort
+      daySub: subLabel || lunarShort
     })
   }
 
@@ -238,7 +253,13 @@ Page({
     },
     selectedHourZhi: '',
     selectedHour: null,
-    showHuangliTip: false
+    showHuangliTip: false,
+    showTagSheet: false,
+    tagKind: 'memorial',
+    tagInput: '',
+    tagHoliday: '',
+    holidayTypes: HOLIDAY_TYPES,
+    tagKeyboardHeight: 0
   },
 
   onLoad() {
@@ -301,6 +322,8 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+    this._tagPromptChecked = false
+    this._dayTags = loadDayTags()
     this.resetToToday()
   },
 
@@ -356,6 +379,8 @@ Page({
     } = this.data
     const today = this._today || todayParts()
     const selected = { year: selectedYear, month: selectedMonth, day: selectedDay }
+    const dayTags = this._dayTags || loadDayTags()
+    this._dayTags = dayTags
     const auspiciousDays = auspiciousEvent
       ? getAuspiciousDaysInMonth(viewYear, viewMonth, auspiciousEvent)
       : []
@@ -371,6 +396,7 @@ Page({
       selectedHourZhi = (huangliDetail.currentHour && huangliDetail.currentHour.zhi) || '子'
     }
     const selectedHour = hourList.find((item) => item.zhi === selectedHourZhi) || hourList[0] || null
+    const selectedTag = getDayTag(selectedYear, selectedMonth, selectedDay)
 
     this.setData({
       selectedHourZhi,
@@ -382,7 +408,8 @@ Page({
         today,
         auspiciousEvent,
         auspiciousDays,
-        holidayDayMap
+        holidayDayMap,
+        dayTags
       ),
       pickerDate: formatPickerDate(selectedYear, selectedMonth, selectedDay),
       selectedInfo: {
@@ -399,10 +426,14 @@ Page({
         ji: almanac.ji,
         yiList: almanac.yiList,
         jiList: almanac.jiList,
-        jianChu: almanac.jianChu
+        jianChu: almanac.jianChu,
+        tagLabel: selectedTag ? selectedTag.label : '',
+        tagKind: selectedTag ? selectedTag.kind : '',
+        canTag: !isPastDate(selectedYear, selectedMonth, selectedDay)
       },
       huangliDetail
     })
+    this.maybePromptTodayTag()
   },
 
   applyPickedDate(picked) {
@@ -714,6 +745,88 @@ Page({
       patch.viewMonth = Number(month)
     }
     this.setData(patch, () => this.refreshCalendarView())
+  },
+
+  maybePromptTodayTag() {
+    if (this._tagPromptChecked) return
+    this._tagPromptChecked = true
+    const tag = consumeTodayPrompt()
+    if (tag) this.showTagPrompt(tag)
+  },
+
+  showTagPrompt(tag) {
+    if (!tag || !tag.label) return
+    markTodayPrompted()
+    wx.showModal({
+      title: tag.kind === 'holiday' ? '今天请假' : '今天的纪念日',
+      content: tag.label,
+      showCancel: false,
+      confirmText: '知道了'
+    })
+  },
+
+  onOpenDayTag() {
+    const { selectedYear, selectedMonth, selectedDay, selectedInfo } = this.data
+    if (isPastDate(selectedYear, selectedMonth, selectedDay) || !(selectedInfo && selectedInfo.canTag)) {
+      wx.showToast({ title: '已过的日期不能打标签', icon: 'none' })
+      return
+    }
+    const tag = getDayTag(selectedYear, selectedMonth, selectedDay)
+    this.setData({
+      showTagSheet: true,
+      tagKind: tag && tag.kind === 'holiday' ? 'holiday' : 'memorial',
+      tagInput: tag && tag.kind !== 'holiday' ? tag.label : '',
+      tagHoliday: tag && tag.kind === 'holiday' ? tag.label : ''
+    })
+  },
+
+  onCloseDayTag() {
+    this.setData({ showTagSheet: false, tagKeyboardHeight: 0 })
+  },
+
+  onSwitchTagKind(e) {
+    const kind = e.currentTarget.dataset.kind
+    if (kind !== 'memorial' && kind !== 'holiday') return
+    this.setData({ tagKind: kind })
+  },
+
+  onTagInput(e) {
+    this.setData({ tagInput: (e.detail && e.detail.value) || '' })
+  },
+
+  onTagKeyboard(e) {
+    const height = Number(e.detail && e.detail.height) || 0
+    if (height === this.data.tagKeyboardHeight) return
+    this.setData({ tagKeyboardHeight: height })
+  },
+
+  onPickHolidayType(e) {
+    const label = e.currentTarget.dataset.label
+    if (!label) return
+    this.setData({ tagHoliday: label })
+  },
+
+  onConfirmDayTag() {
+    const { selectedYear, selectedMonth, selectedDay, tagKind, tagInput, tagHoliday } = this.data
+    const label = tagKind === 'holiday' ? tagHoliday : tagInput
+    const result = saveDayTag(selectedYear, selectedMonth, selectedDay, tagKind, label)
+    if (!result.ok) {
+      wx.showToast({ title: result.message || '没能保存标签', icon: 'none' })
+      return
+    }
+    this._dayTags = loadDayTags()
+    this.setData({ showTagSheet: false, tagKeyboardHeight: 0 }, () => this.refreshCalendarView())
+    const today = todayParts()
+    if (selectedYear === today.year && selectedMonth === today.month && selectedDay === today.day) {
+      this.showTagPrompt(result.tag)
+    }
+  },
+
+  onClearDayTag() {
+    const { selectedYear, selectedMonth, selectedDay } = this.data
+    clearDayTag(selectedYear, selectedMonth, selectedDay)
+    this._dayTags = loadDayTags()
+    this.setData({ showTagSheet: false, tagKeyboardHeight: 0 }, () => this.refreshCalendarView())
   },
 
   onToggleAuspiciousPicker() {

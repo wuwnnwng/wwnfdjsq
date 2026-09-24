@@ -85,6 +85,17 @@
         <view class="detail-term">节气：{{selectedInfo.solarTerm}}</view>
         <view class="detail-term" wx:if="{{selectedInfo.constellation}}">星座：{{selectedInfo.constellation}}</view>
 
+        <view class="day-tag-bar" wx:if="{{selectedInfo.canTag}}">
+          <view class="day-tag-current" wx:if="{{selectedInfo.tagLabel}}">
+            {{selectedInfo.tagKind === 'holiday' ? '假期' : '纪念日'}} · {{selectedInfo.tagLabel}}
+          </view>
+          <view class="day-tag-actions">
+            <view class="day-tag-btn" bindtap="onOpenDayTag">{{selectedInfo.tagLabel ? '修改标签' : '打标签'}}</view>
+            <view class="day-tag-btn ghost" wx:if="{{selectedInfo.tagLabel}}" bindtap="onClearDayTag">清除</view>
+          </view>
+        </view>
+        <view class="day-tag-locked" wx:else>已过的日期不能打标签</view>
+
         <view class="yi-ji-block">
           <view class="yi-ji-row">
             <view class="yi-ji-label yi">宜</view>
@@ -417,6 +428,50 @@
           <view class="date-picker-item" wx:for="{{lunarDays}}" wx:key="*this">{{item}}</view>
         </picker-view-column>
       </picker-view>
+    </view>
+  </view>
+
+  <view class="tag-mask" wx:if="{{showTagSheet}}" catchtouchmove="preventMove" catchtap="onCloseDayTag">
+    <view class="tag-sheet" style="margin-bottom: {{tagKeyboardHeight}}px;" catchtap="preventMove">
+      <view class="tag-sheet-title">给这一天打标签</view>
+      <view class="tag-kind-row">
+        <view
+          class="tag-kind {{tagKind === 'memorial' ? 'active' : ''}}"
+          data-kind="memorial"
+          catchtap="onSwitchTagKind"
+        >纪念日</view>
+        <view
+          class="tag-kind {{tagKind === 'holiday' ? 'active' : ''}}"
+          data-kind="holiday"
+          catchtap="onSwitchTagKind"
+        >假期</view>
+      </view>
+      <view class="tag-field-label">类型</view>
+      <input
+        wx:if="{{tagKind === 'memorial'}}"
+        class="tag-input"
+        value="{{tagInput}}"
+        maxlength="8"
+        placeholder="例如生日"
+        placeholder-class="tag-input-placeholder"
+        adjust-position="{{false}}"
+        cursor-spacing="24"
+        bindinput="onTagInput"
+        bindkeyboardheightchange="onTagKeyboard"
+      />
+      <view wx:else class="tag-holiday-list">
+        <view
+          class="tag-holiday {{tagHoliday === item ? 'active' : ''}}"
+          wx:for="{{holidayTypes}}"
+          wx:key="*this"
+          data-label="{{item}}"
+          catchtap="onPickHolidayType"
+        >{{item}}</view>
+      </view>
+      <view class="tag-sheet-actions">
+        <view class="tag-sheet-btn ghost" catchtap="onCloseDayTag">取消</view>
+        <view class="tag-sheet-btn" catchtap="onConfirmDayTag">确定</view>
+      </view>
     </view>
   </view>
 

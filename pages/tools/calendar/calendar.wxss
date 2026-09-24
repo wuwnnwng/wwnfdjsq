@@ -351,6 +351,158 @@
   line-height: 1.6;
 }
 
+.day-tag-bar {
+  margin-top: 20rpx;
+}
+
+.day-tag-current {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.day-tag-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 12rpx;
+}
+
+.day-tag-btn {
+  min-width: 144rpx;
+  padding: 10rpx 22rpx;
+  border-radius: 999rpx;
+  text-align: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--color-brand);
+}
+
+.day-tag-btn.ghost {
+  color: var(--color-ink);
+  background: var(--color-soft);
+}
+
+.day-tag-locked {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.tag-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1400;
+  display: flex;
+  align-items: flex-end;
+  background: var(--color-mask);
+}
+
+.tag-sheet {
+  width: 100%;
+  padding: 28rpx 28rpx calc(28rpx + env(safe-area-inset-bottom));
+  border-radius: 28rpx 28rpx 0 0;
+  background: var(--color-surface);
+  box-sizing: border-box;
+}
+
+.tag-sheet-title {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.tag-kind-row {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.tag-kind {
+  flex: 1;
+  padding: 16rpx 0;
+  border-radius: 16rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+  background: var(--color-soft);
+  border: 2rpx solid transparent;
+}
+
+.tag-kind.active {
+  color: var(--color-brand);
+  border-color: var(--color-brand-soft);
+  background: rgba(31, 107, 82, 0.12);
+}
+
+.tag-field-label {
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.tag-input {
+  margin-top: 12rpx;
+  height: 80rpx;
+  padding: 0 20rpx;
+  border-radius: 16rpx;
+  background: var(--color-soft);
+  font-size: 28rpx;
+  color: var(--color-ink);
+}
+
+.tag-input-placeholder {
+  color: var(--color-muted);
+}
+
+.tag-holiday-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.tag-holiday {
+  padding: 12rpx 22rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  color: var(--color-ink);
+  background: var(--color-soft);
+  border: 2rpx solid transparent;
+}
+
+.tag-holiday.active {
+  color: var(--color-brand);
+  border-color: var(--color-brand-soft);
+  background: rgba(31, 107, 82, 0.12);
+}
+
+.tag-sheet-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+
+.tag-sheet-btn {
+  flex: 1;
+  padding: 18rpx 0;
+  border-radius: 16rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--color-brand);
+}
+
+.tag-sheet-btn.ghost {
+  color: var(--color-ink);
+  background: var(--color-soft);
+}
+
 .huangli-lunar,
 .huangli-meta,
 .huangli-term,

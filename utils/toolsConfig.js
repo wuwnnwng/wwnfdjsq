@@ -2,6 +2,9 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
+const FAVORITE_TOOLS_KEY = 'favoriteToolIds'
+const MAX_FAVORITE_TOOLS = 6
+const RECOMMEND_TOOL_IDS = ['mortgage', 'mbti', 'calendar']
 
 const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
@@ -383,6 +386,73 @@ function openToolItem(item) {
   wx.showToast({ title: '暂无法打开', icon: 'none' })
 }
 
+function getFavoriteToolIds() {
+  try {
+    const raw = wx.getStorageSync(FAVORITE_TOOLS_KEY)
+    if (!Array.isArray(raw)) return []
+    const seen = new Set()
+    const ids = []
+    raw.forEach((id) => {
+      if (typeof id !== 'string' || !id || seen.has(id) || !getToolById(id)) return
+      seen.add(id)
+      ids.push(id)
+    })
+    return ids.slice(0, MAX_FAVORITE_TOOLS)
+  } catch (e) {
+    return []
+  }
+}
+
+function writeFavoriteToolIds(ids) {
+  try {
+    wx.setStorageSync(FAVORITE_TOOLS_KEY, ids.slice(0, MAX_FAVORITE_TOOLS))
+  } catch (e) {}
+}
+
+function toggleFavoriteTool(id) {
+  if (!getToolById(id)) {
+    return { ok: false, favorited: false, message: '工具不存在' }
+  }
+  const ids = getFavoriteToolIds()
+  const index = ids.indexOf(id)
+  if (index >= 0) {
+    ids.splice(index, 1)
+    writeFavoriteToolIds(ids)
+    return { ok: true, favorited: false, ids }
+  }
+  if (ids.length >= MAX_FAVORITE_TOOLS) {
+    return { ok: false, favorited: false, message: `最多收藏 ${MAX_FAVORITE_TOOLS} 个` }
+  }
+  ids.unshift(id)
+  writeFavoriteToolIds(ids)
+  return { ok: true, favorited: true, ids }
+}
+
+function withFavoriteState(item, favoriteIds) {
+  const ids = favoriteIds || new Set(getFavoriteToolIds())
+  return Object.assign({}, item, { favorited: ids.has(item.id) })
+}
+
+function decorateTools(list, favoriteIds) {
+  const ids = favoriteIds || new Set(getFavoriteToolIds())
+  return (list || []).map((item) => withFavoriteState(item, ids))
+}
+
+function getRecommendTools() {
+  const favoriteIds = getFavoriteToolIds()
+  const favored = new Set(favoriteIds)
+  const seen = new Set()
+  const list = []
+  favoriteIds.concat(RECOMMEND_TOOL_IDS).forEach((id) => {
+    if (seen.has(id)) return
+    const tool = getToolById(id)
+    if (!tool) return
+    seen.add(id)
+    list.push(withFavoriteState(tool, favored))
+  })
+  return list
+}
+
 function groupTools(list) {
   const source = Array.isArray(list) ? list : TOOLS
   const byId = {}
@@ -414,7 +484,12 @@ function groupTools(list) {
       tools: rest
     })
   }
-  return groups
+  const favoriteIds = new Set(getFavoriteToolIds())
+  return groups.map((group) => ({
+    id: group.id,
+    name: group.name,
+    tools: decorateTools(group.tools, favoriteIds)
+  }))
 }
 
 function hasSeenToolsHub() {
@@ -434,9 +509,12 @@ function markToolsHubSeen() {
 module.exports = {
   TOOLS,
   CATEGORIES,
+  MAX_FAVORITE_TOOLS,
   getToolById,
   searchTools,
   groupTools,
+  getRecommendTools,
+  toggleFavoriteTool,
   openToolItem,
   hasSeenToolsHub,
   markToolsHubSeen

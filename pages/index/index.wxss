@@ -160,8 +160,12 @@
 
 .tool-board {
   margin-top: 0;
-  margin-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  margin-bottom: 0;
   padding: 24rpx 20rpx 28rpx;
+}
+
+.tool-board.is-last {
+  margin-bottom: calc(24rpx + env(safe-area-inset-bottom));
 }
 
 .tool-group + .tool-group {
@@ -216,6 +220,39 @@
 .tool-icon {
   font-size: 44rpx;
   line-height: 1;
+}
+
+.tool-fav {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  z-index: 2;
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-card);
+  border: 1rpx solid var(--color-card-border);
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.16);
+}
+
+.tool-fav-star {
+  font-size: 22rpx;
+  line-height: 1;
+  color: var(--color-muted);
+  opacity: 0.72;
+}
+
+.tool-fav.is-on {
+  border-color: rgba(245, 185, 66, 0.55);
+  background: rgba(245, 185, 66, 0.16);
+}
+
+.tool-fav.is-on .tool-fav-star {
+  color: #f5b942;
+  opacity: 1;
 }
 
 .tool-card-name {

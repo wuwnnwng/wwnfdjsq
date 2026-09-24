@@ -1,4 +1,29 @@
 <view class="page page-shell theme-{{theme}} {{themeFading ? 'is-theme-fading' : ''}}">
+  <template name="toolCard">
+    <view
+      class="tool-card"
+      bindtap="onOpenTool"
+      data-id="{{id}}"
+      data-page="{{page}}"
+      data-appid="{{miniProgramAppId}}"
+    >
+      <view class="tool-icon-wrap tool-icon-{{iconType}}">
+        <text class="tool-icon">{{icon}}</text>
+        <view
+          class="tool-fav {{favorited ? 'is-on' : ''}}"
+          catchtap="onToggleFavorite"
+          data-id="{{id}}"
+          hover-class="none"
+          hover-stop-propagation
+          aria-role="button"
+          aria-label="{{favorited ? '取消收藏' : '收藏'}}"
+        >
+          <text class="tool-fav-star">★</text>
+        </view>
+      </view>
+      <view class="tool-card-name">{{name}}</view>
+    </view>
+  </template>
   <view class="panel hero-panel">
     <view class="hero-head">
       <view class="brand-wrap">
@@ -38,30 +63,48 @@
   </view>
 
   <scroll-view scroll-y class="hub-scroll" enhanced show-scrollbar="{{false}}">
-    <ad-banner theme="{{theme}}" />
-
-    <view class="panel tool-board" wx:if="{{groups.length}}">
-      <view class="tool-group" wx:for="{{groups}}" wx:for-item="group" wx:key="id">
+    <view class="panel tool-board {{restGroups.length ? '' : 'is-last'}}" wx:if="{{recommendTools.length || leadGroups.length}}">
+      <view class="tool-group" wx:if="{{recommendTools.length}}">
+        <view class="tool-group-title">推荐</view>
+        <view class="tool-grid">
+          <template
+            wx:for="{{recommendTools}}"
+            wx:key="id"
+            is="toolCard"
+            data="{{id: item.id, name: item.name, icon: item.icon, iconType: item.iconType, page: item.page, miniProgramAppId: item.miniProgramAppId, favorited: item.favorited}}"
+          />
+        </view>
+      </view>
+      <view class="tool-group" wx:for="{{leadGroups}}" wx:for-item="group" wx:key="id">
         <view class="tool-group-title">{{group.name}}</view>
         <view class="tool-grid">
-          <view
-            class="tool-card"
+          <template
             wx:for="{{group.tools}}"
             wx:key="id"
-            bindtap="onOpenTool"
-            data-id="{{item.id}}"
-            data-page="{{item.page}}"
-            data-appid="{{item.miniProgramAppId}}"
-          >
-            <view class="tool-icon-wrap tool-icon-{{item.iconType}}">
-              <text class="tool-icon">{{item.icon}}</text>
-            </view>
-            <view class="tool-card-name">{{item.name}}</view>
-          </view>
+            is="toolCard"
+            data="{{id: item.id, name: item.name, icon: item.icon, iconType: item.iconType, page: item.page, miniProgramAppId: item.miniProgramAppId, favorited: item.favorited}}"
+          />
         </view>
       </view>
     </view>
-    <view class="panel tool-empty" wx:else>
+
+    <ad-banner wx:if="{{showSplitBanner}}" theme="{{theme}}" />
+
+    <view class="panel tool-board is-last" wx:if="{{restGroups.length}}">
+      <view class="tool-group" wx:for="{{restGroups}}" wx:for-item="group" wx:key="id">
+        <view class="tool-group-title">{{group.name}}</view>
+        <view class="tool-grid">
+          <template
+            wx:for="{{group.tools}}"
+            wx:key="id"
+            is="toolCard"
+            data="{{id: item.id, name: item.name, icon: item.icon, iconType: item.iconType, page: item.page, miniProgramAppId: item.miniProgramAppId, favorited: item.favorited}}"
+          />
+        </view>
+      </view>
+    </view>
+
+    <view class="panel tool-empty" wx:if="{{!recommendTools.length && !leadGroups.length && !restGroups.length}}">
       没有找到「{{keyword}}」相关工具
     </view>
   </scroll-view>

@@ -32,14 +32,18 @@
       <view
         wx:for="{{modes}}"
         wx:key="id"
-        class="mode-card {{item.recommend ? 'is-rec' : ''}}"
+        class="mode-card {{item.recommend ? 'is-rec' : ''}} {{item.premium ? 'is-premium' : ''}}"
         bindtap="onStart"
         data-mode="{{item.id}}"
       >
-        <view class="mode-badge" wx:if="{{item.recommend}}">更准</view>
-        <view class="mode-name">{{item.name}}</view>
-        <view class="mode-count">{{item.count}} 题 · {{item.time}}</view>
-        <view class="mode-desc">{{item.desc}}</view>
+        <view class="mode-body">
+          <view class="mode-head">
+            <view class="mode-name">{{item.name}}</view>
+            <view class="mode-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
+          </view>
+          <view class="mode-count">{{item.count}} 题 · {{item.time}}</view>
+          <view class="mode-desc">{{item.desc}}</view>
+        </view>
         <view class="mode-go">{{draftMode === item.id ? '继续答' : '开始'}}</view>
       </view>
     </view>

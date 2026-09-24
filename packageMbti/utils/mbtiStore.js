@@ -19,7 +19,7 @@ function write(key, value) {
 function loadDraft() {
   const draft = read(DRAFT_KEY)
   if (!draft || typeof draft !== 'object') return null
-  if (draft.mode !== 'quick' && draft.mode !== 'standard') return null
+  if (draft.mode !== 'quick' && draft.mode !== 'standard' && draft.mode !== 'deep') return null
   if (!draft.answers || typeof draft.answers !== 'object') return null
   return draft
 }

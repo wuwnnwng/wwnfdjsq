@@ -1,7 +1,9 @@
 /**
  * 原创四维偏好题。
  * pole 表示「很符合」所支持的字母；反向选项记到对侧。
- * quick 为 true 的题进入快速版（每维 6 题，两侧各 3 题）。
+ * quick 为 true：快速版、标准版、深度版都使用（每维 6 题，两侧各 3 题）。
+ * 无标记：仅标准版和深度版使用（每维再加 6 题）。
+ * deep 为 true：仅深度版使用（每维再加 8 题，两侧各 4 题）。
  */
 const QUESTIONS = [
   { id: 'ei1', axis: 'EI', pole: 'E', quick: true, text: '聚会结束后，我常常还想再聊一会儿，而不是马上回家歇着。' },
@@ -16,6 +18,14 @@ const QUESTIONS = [
   { id: 'ei10', axis: 'EI', pole: 'I', quick: false, text: '我更喜欢事先说好的小范围相处，而不是突然挤进一大群人。' },
   { id: 'ei11', axis: 'EI', pole: 'E', quick: false, text: '讨论时我常常会把气氛带动起来。' },
   { id: 'ei12', axis: 'EI', pole: 'I', quick: false, text: '很多判断我习惯先在自己脑子里完成，不一定要讲出来。' },
+  { id: 'ei13', axis: 'EI', pole: 'E', deep: true, text: '一个人待得太久，我会想找人说话，不然容易闷。' },
+  { id: 'ei14', axis: 'EI', pole: 'I', deep: true, text: '同样一件事，我更愿意先写成文字，而不是当场讲出来。' },
+  { id: 'ei15', axis: 'EI', pole: 'E', deep: true, text: '工作时旁边有人，我往往更有精神。' },
+  { id: 'ei16', axis: 'EI', pole: 'I', deep: true, text: '需要专心的时候，我更想一个人待着，尽量少被打断。' },
+  { id: 'ei17', axis: 'EI', pole: 'E', deep: true, text: '被临时点名分享，我通常能马上讲起来。' },
+  { id: 'ei18', axis: 'EI', pole: 'I', deep: true, text: '突然打来的电话或视频，我常常希望先有个缓冲。' },
+  { id: 'ei19', axis: 'EI', pole: 'E', deep: true, text: '周末如果完全没有和人接触，我会觉得这一天少了点什么。' },
+  { id: 'ei20', axis: 'EI', pole: 'I', deep: true, text: '即使是熟悉的朋友，我也更喜欢一对一，而不是一大桌一起聊。' },
 
   { id: 'sn1', axis: 'SN', pole: 'S', quick: true, text: '我更相信自己亲眼见过、亲手做过的经验。' },
   { id: 'sn2', axis: 'SN', pole: 'N', quick: true, text: '我经常从一件具体的事，联想到更大的可能。' },
@@ -29,6 +39,14 @@ const QUESTIONS = [
   { id: 'sn10', axis: 'SN', pole: 'N', quick: false, text: '我更容易记住整体印象，细节却会模糊。' },
   { id: 'sn11', axis: 'SN', pole: 'S', quick: false, text: '做决定前，我希望先看到现实里的例子。' },
   { id: 'sn12', axis: 'SN', pole: 'N', quick: false, text: '一个还没被验证的想法，也足够让我兴奋很久。' },
+  { id: 'sn13', axis: 'SN', pole: 'S', deep: true, text: '学新东西时，我更想先看别人怎么做，再自己照着练。' },
+  { id: 'sn14', axis: 'SN', pole: 'N', deep: true, text: '学新东西时，我更想先搞懂原理，再动手试。' },
+  { id: 'sn15', axis: 'SN', pole: 'S', deep: true, text: '说起一个人，我更容易想起他做过的具体事。' },
+  { id: 'sn16', axis: 'SN', pole: 'N', deep: true, text: '说起一个人，我更容易说出他给我的整体感觉。' },
+  { id: 'sn17', axis: 'SN', pole: 'S', deep: true, text: '空泛的愿景打动不了我，我更想知道下一步具体做什么。' },
+  { id: 'sn18', axis: 'SN', pole: 'N', deep: true, text: '如果看不到更大的意义，我很难对一件具体的事提起劲。' },
+  { id: 'sn19', axis: 'SN', pole: 'S', deep: true, text: '清单、数据和说明书，比一段灵感更能让我放心。' },
+  { id: 'sn20', axis: 'SN', pole: 'N', deep: true, text: '别人还在谈眼前的状况时，我经常已经想到后面会怎样。' },
 
   { id: 'tf1', axis: 'TF', pole: 'T', quick: true, text: '做决定时，我更看逻辑能不能站得住。' },
   { id: 'tf2', axis: 'TF', pole: 'F', quick: true, text: '做决定时，我会先想这件事对相关的人意味着什么。' },
@@ -42,6 +60,14 @@ const QUESTIONS = [
   { id: 'tf10', axis: 'TF', pole: 'F', quick: false, text: '夸奖或批评的语气，会明显影响我的状态。' },
   { id: 'tf11', axis: 'TF', pole: 'T', quick: false, text: '我能把私人感情和工作上的判断分开。' },
   { id: 'tf12', axis: 'TF', pole: 'F', quick: false, text: '如果一个选择会伤害在乎的人，我很难只按利弊来选。' },
+  { id: 'tf13', axis: 'TF', pole: 'T', deep: true, text: '别人来问我怎么办，我更想先把问题拆清楚，而不是先安慰。' },
+  { id: 'tf14', axis: 'TF', pole: 'F', deep: true, text: '对方还在难受时，我很难说出很直接的道理。' },
+  { id: 'tf15', axis: 'TF', pole: 'T', deep: true, text: '规则对每个人都一样，比个别通融更让我安心。' },
+  { id: 'tf16', axis: 'TF', pole: 'F', deep: true, text: '如果规则会让某个人特别委屈，我会想通融一次。' },
+  { id: 'tf17', axis: 'TF', pole: 'T', deep: true, text: '看故事时，我更容易注意情节合不合理。' },
+  { id: 'tf18', axis: 'TF', pole: 'F', deep: true, text: '看故事时，我更容易跟着人物的心情走。' },
+  { id: 'tf19', axis: 'TF', pole: 'T', deep: true, text: '意见不一致时，我更想先对齐判断标准。' },
+  { id: 'tf20', axis: 'TF', pole: 'F', deep: true, text: '意见不一致时，我更想先让每个人都被听见。' },
 
   { id: 'jp1', axis: 'JP', pole: 'J', quick: true, text: '我喜欢提前把计划排好，并尽量按计划走。' },
   { id: 'jp2', axis: 'JP', pole: 'P', quick: true, text: '我喜欢给自己留余地，临近期限再冲刺也没问题。' },
@@ -54,7 +80,15 @@ const QUESTIONS = [
   { id: 'jp9', axis: 'JP', pole: 'J', quick: false, text: '做完一件再做下一件，会让我更安心。' },
   { id: 'jp10', axis: 'JP', pole: 'P', quick: false, text: '计划被打断时，我通常能很快改道。' },
   { id: 'jp11', axis: 'JP', pole: 'J', quick: false, text: '我喜欢尽早把决定定下来。' },
-  { id: 'jp12', axis: 'JP', pole: 'P', quick: false, text: '我经常到最后一刻，还想看看有没有更好的选择。' }
+  { id: 'jp12', axis: 'JP', pole: 'P', quick: false, text: '我经常到最后一刻，还想看看有没有更好的选择。' },
+  { id: 'jp13', axis: 'JP', pole: 'J', deep: true, text: '约好的时间我不太喜欢临时改。' },
+  { id: 'jp14', axis: 'JP', pole: 'P', deep: true, text: '日程排得太满、太死，会让我觉得被卡住。' },
+  { id: 'jp15', axis: 'JP', pole: 'J', deep: true, text: '动手之前，我习惯先把目标和步骤理清楚。' },
+  { id: 'jp16', axis: 'JP', pole: 'P', deep: true, text: '我常常边做边想，做到一半才知道真正要的是什么。' },
+  { id: 'jp17', axis: 'JP', pole: 'J', deep: true, text: '截止日期快到了还没开始，我会明显焦虑。' },
+  { id: 'jp18', axis: 'JP', pole: 'P', deep: true, text: '没有一点时间压力，我反而很难进入状态。' },
+  { id: 'jp19', axis: 'JP', pole: 'J', deep: true, text: '桌面或文件乱了，我会想先收拾，再开始做事。' },
+  { id: 'jp20', axis: 'JP', pole: 'P', deep: true, text: '东西不必摆得很整齐，只要我找得到就行。' }
 ]
 
 module.exports = {

@@ -14,7 +14,8 @@ const {
   summarizeHistory,
   describeDraft,
   firstOpenIndex,
-  formatClipboard
+  formatClipboard,
+  modeName
 } = require('../../utils/mbtiEngine')
 const store = require('../../utils/mbtiStore')
 
@@ -134,7 +135,7 @@ Page({
         progress: Math.round(((this._index + 1) / total) * 100),
         text: question.text,
         selected: typeof picked === 'number' ? picked : -1,
-        modeName: this._mode === 'quick' ? '快速版' : '标准版',
+        modeName: modeName(this._mode),
         canPrev: this._index > 0
       }
     })
@@ -144,7 +145,7 @@ Page({
     this._quiz = buildQuiz(mode)
     this._answers = {}
     this._index = 0
-    this._mode = mode === 'quick' ? 'quick' : 'standard'
+    this._mode = mode === 'quick' || mode === 'deep' ? mode : 'standard'
     this._advancing = false
     this.persistDraft()
     this.armGuard(true)
@@ -175,7 +176,7 @@ Page({
 
   onStart(e) {
     const mode = e.currentTarget.dataset.mode
-    if (mode !== 'quick' && mode !== 'standard') return
+    if (mode !== 'quick' && mode !== 'standard' && mode !== 'deep') return
     const draft = this._draft
     const draftCount = draft && draft.answers
       ? Object.keys(draft.answers).filter((key) => typeof draft.answers[key] === 'number').length

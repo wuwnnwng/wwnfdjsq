@@ -100,18 +100,30 @@
 .mode-row {
   margin-top: 20rpx;
   display: flex;
+  flex-direction: column;
   gap: 16rpx;
 }
 
 .mode-card {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  padding: 24rpx 20rpx 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx;
   border-radius: 24rpx;
   background: var(--color-surface);
   border: 2rpx solid var(--color-line);
   box-sizing: border-box;
+}
+
+.mode-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.mode-head {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }
 
 .mode-card.is-rec {
@@ -119,16 +131,22 @@
   border-color: rgba(139, 92, 246, 0.55);
 }
 
+.mode-card.is-premium {
+  background: linear-gradient(135deg, rgba(91, 33, 182, 0.22), rgba(139, 92, 246, 0.08) 46%, var(--color-surface) 78%);
+  border-color: rgba(91, 33, 182, 0.72);
+}
+
 .mode-badge {
-  position: absolute;
-  top: 16rpx;
-  right: 16rpx;
   padding: 2rpx 12rpx;
   border-radius: 999rpx;
   font-size: 20rpx;
   font-weight: 700;
   color: #ffffff;
   background: #7c3aed;
+}
+
+.mode-card.is-premium .mode-badge {
+  background: #5b21b6;
 }
 
 .mode-name {
@@ -151,7 +169,7 @@
 }
 
 .mode-go {
-  margin-top: 18rpx;
+  flex-shrink: 0;
   font-size: 26rpx;
   font-weight: 700;
   color: #7c3aed;

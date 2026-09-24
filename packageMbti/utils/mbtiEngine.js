@@ -49,11 +49,28 @@ function getType(code) {
   return TYPE_MAP[String(code || '').toUpperCase()] || null
 }
 
+function questionRank(item) {
+  if (item.quick) return 1
+  if (item.deep) return 3
+  return 2
+}
+
+function normalizeMode(mode) {
+  if (mode === 'quick' || mode === 'deep') return mode
+  return 'standard'
+}
+
+function modeRank(mode) {
+  if (mode === 'quick') return 1
+  if (mode === 'deep') return 3
+  return 2
+}
+
 function buildQuiz(mode) {
-  const quick = mode === 'quick'
+  const rank = modeRank(mode)
   const pools = {}
   AXES.forEach((axis) => {
-    pools[axis.id] = QUESTIONS.filter((item) => item.axis === axis.id && (!quick || item.quick))
+    pools[axis.id] = QUESTIONS.filter((item) => item.axis === axis.id && questionRank(item) <= rank)
   })
   const max = AXES.reduce((size, axis) => Math.max(size, pools[axis.id].length), 0)
   const list = []
@@ -79,14 +96,26 @@ function getModes() {
       name: '标准版',
       time: '约 6 分钟',
       desc: '四个维度更稳',
+      badge: '更准',
       recommend: true,
       count: buildQuiz('standard').length
+    },
+    {
+      id: 'deep',
+      name: '深度版',
+      time: '约 10 分钟',
+      desc: '情境更全，偏好更稳',
+      badge: '深度',
+      premium: true,
+      count: buildQuiz('deep').length
     }
   ]
 }
 
 function modeName(mode) {
-  return mode === 'quick' ? '快速版' : '标准版'
+  if (mode === 'quick') return '快速版'
+  if (mode === 'deep') return '深度版'
+  return '标准版'
 }
 
 function clarityOf(percent, tie) {
@@ -266,8 +295,11 @@ function buildResult(quiz, answers, mode, at) {
   if (answered && neutral / answered >= 0.3) {
     notes.push('「说不准」偏多，字母会更靠近中间。换个状态再测，并尽量少选中立，会更清楚。')
   }
-  if (mode === 'quick' && dims.some((dim) => dim.clarity === '轻微' || dim.clarity === '均衡')) {
-    notes.push('有的维度还很接近。标准版题量更多，通常能把这种摇摆拉开。')
+  const close = dims.some((dim) => dim.clarity === '轻微' || dim.clarity === '均衡')
+  if (mode === 'quick' && close) {
+    notes.push('有的维度还很接近。标准版或深度版题量更多，通常能把这种摇摆拉开。')
+  } else if (mode === 'standard' && close) {
+    notes.push('有的维度还很接近。深度版覆盖更多生活情境，通常能把这种摇摆拉开。')
   }
   const stamp = Number(at) || Date.now()
   result.dims = dims
@@ -276,7 +308,7 @@ function buildResult(quiz, answers, mode, at) {
   result.portrait = portraitOf(dims)
   result.preview = false
   result.shared = false
-  result.mode = mode === 'quick' ? 'quick' : 'standard'
+  result.mode = normalizeMode(mode)
   result.meta = `${modeName(result.mode)} · ${(quiz || []).length}题 · ${formatWhen(stamp)}`
   result.at = stamp
   return result

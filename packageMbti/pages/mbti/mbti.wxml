@@ -53,11 +53,12 @@
     <view class="panel" wx:if="{{history.length}}">
       <view class="hist-head">
         <view class="section-title">测过的</view>
-        <view class="text-btn" catchtap="onClearHistory">清空</view>
+        <view class="text-btn" catchtap="onClearHistory">全部清空</view>
       </view>
       <scroll-view scroll-x class="hist-scroll" enhanced show-scrollbar="{{false}}">
         <view class="hist-row">
           <view class="hist-chip" wx:for="{{history}}" wx:key="at" bindtap="onOpenHistory" data-at="{{item.at}}">
+            <view class="hist-x" catchtap="onRemoveHistory" data-at="{{item.at}}" aria-role="button" aria-label="删除这条记录">×</view>
             <text class="hist-code" style="color: {{item.color}};">{{item.code}}</text>
             <text class="hist-name">{{item.name}}</text>
             <text class="hist-when">{{item.when}}</text>

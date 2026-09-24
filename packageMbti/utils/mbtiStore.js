@@ -54,11 +54,24 @@ function clearHistory() {
   } catch (e) {}
 }
 
+function removeHistory(at) {
+  const stamp = Number(at)
+  if (!stamp) return loadHistory()
+  const next = loadHistory().filter((row) => row.at !== stamp)
+  if (!next.length) {
+    clearHistory()
+    return []
+  }
+  write(HISTORY_KEY, next)
+  return next
+}
+
 module.exports = {
   loadDraft,
   saveDraft,
   clearDraft,
   loadHistory,
   pushHistory,
-  clearHistory
+  clearHistory,
+  removeHistory
 }

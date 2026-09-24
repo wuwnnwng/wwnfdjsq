@@ -344,11 +344,29 @@ Page({
     wx.setClipboardData({ data: formatClipboard(result) })
   },
 
+  onRemoveHistory(e) {
+    const at = Number(e.currentTarget.dataset.at)
+    const item = (this._history || []).find((row) => row.at === at)
+    if (!item) return
+    const label = [item.code, item.name].filter(Boolean).join(' ')
+    wx.showModal({
+      title: '删除这条记录？',
+      content: label || '只删除保存在这台设备上的这一条。',
+      confirmText: '删除',
+      success: (res) => {
+        if (!res.confirm) return
+        store.removeHistory(at)
+        if (this._ownResult && this._ownResult.at === at) this._ownResult = null
+        this.refreshHome()
+      }
+    })
+  },
+
   onClearHistory() {
     wx.showModal({
-      title: '清空测试记录？',
+      title: '清空全部记录？',
       content: '只删除保存在这台设备上的记录。',
-      confirmText: '清空',
+      confirmText: '全部清空',
       success: (res) => {
         if (!res.confirm) return
         store.clearHistory()

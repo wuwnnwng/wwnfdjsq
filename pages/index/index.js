@@ -6,7 +6,6 @@ const {
 } = require('../../utils/share')
 const {
   getThemeId,
-  getTheme,
   setThemeId,
   applyThemeChrome,
   THEME_LIST
@@ -14,33 +13,10 @@ const {
 const {
   searchTools,
   groupTools,
-  getFeaturedToolPages,
-  flattenFeaturedToolIds,
-  getFavoriteToolsKey,
-  toggleFavoriteTool,
   openToolItem,
   getToolById,
-  getHomeRandomTool,
   markToolsHubSeen
 } = require('../../utils/toolsConfig')
-
-const FEATURED_TOOLS_OPEN_KEY = 'featuredToolsOpen'
-
-function readFeaturedToolsOpen() {
-  try {
-    const value = wx.getStorageSync(FEATURED_TOOLS_OPEN_KEY)
-    if (value === 0 || value === '0' || value === false) return false
-    return true
-  } catch (e) {
-    return true
-  }
-}
-
-function writeFeaturedToolsOpen(open) {
-  try {
-    wx.setStorageSync(FEATURED_TOOLS_OPEN_KEY, open ? 1 : 0)
-  } catch (e) {}
-}
 
 Page({
   data: {
@@ -48,20 +24,12 @@ Page({
     themeList: THEME_LIST,
     themeFading: false,
     keyword: '',
-    groups: groupTools(),
-    featuredToolPages: getFeaturedToolPages(),
-    featuredToolsOpen: readFeaturedToolsOpen(),
-    toolsIndicator: getTheme(getThemeId()).principal,
-    toolsSwiperCurrent: 0,
-    toolsSwiperAutoplay: readFeaturedToolsOpen(),
-    toolsSwiperKeys: [0]
+    groups: groupTools()
   },
 
   onLoad() {
     if (consumeShareEnter('pages/index/index')) return
     enableShareMenu()
-    this._favoriteToolsKey = getFavoriteToolsKey()
-    this._featuredPagesKey = flattenFeaturedToolIds(this.data.featuredToolPages)
     this.applyTheme(getThemeId())
   },
 
@@ -69,32 +37,10 @@ Page({
     if (consumeShareEnter('pages/index/index')) return
     markToolsHubSeen()
     this.applyTheme(getThemeId())
-    const favoriteToolsKey = getFavoriteToolsKey()
-    const featuredToolPages = getFeaturedToolPages()
-    const pagesKey = flattenFeaturedToolIds(featuredToolPages)
     const keyword = this.data.keyword
-    const patch = {
+    this.setData({
       groups: groupTools(keyword ? searchTools(keyword) : undefined)
-    }
-    if (pagesKey !== this._featuredPagesKey) {
-      this._featuredPagesKey = pagesKey
-      patch.featuredToolPages = featuredToolPages
-    }
-    if (favoriteToolsKey !== this._favoriteToolsKey) {
-      this._favoriteToolsKey = favoriteToolsKey
-      patch.toolsSwiperCurrent = 0
-      patch.toolsSwiperKeys = [(this.data.toolsSwiperKeys[0] || 0) + 1]
-    }
-    if (this.data.featuredToolsOpen && !this.data.toolsSwiperAutoplay) {
-      patch.toolsSwiperAutoplay = true
-    }
-    this.setData(patch)
-  },
-
-  onHide() {
-    if (this.data.toolsSwiperAutoplay) {
-      this.setData({ toolsSwiperAutoplay: false })
-    }
+    })
   },
 
   onUnload() {
@@ -106,13 +52,7 @@ Page({
 
   applyTheme(themeId) {
     const theme = setThemeId(themeId)
-    const palette = getTheme(theme)
-    if (theme !== this.data.theme || this.data.toolsIndicator !== palette.principal) {
-      this.setData({
-        theme,
-        toolsIndicator: palette.principal
-      })
-    }
+    if (theme !== this.data.theme) this.setData({ theme })
     applyThemeChrome(theme)
   },
 
@@ -124,10 +64,8 @@ Page({
     if (this._themeFadeTimer) clearTimeout(this._themeFadeTimer)
     this._themeFadeTimer = setTimeout(() => {
       const next = setThemeId(theme)
-      const palette = getTheme(next)
       this.setData({
         theme: next,
-        toolsIndicator: palette.principal,
         themeFading: false
       })
       applyThemeChrome(next)
@@ -136,38 +74,6 @@ Page({
         this._themeFadeTimer = null
       }, 300)
     }, 300)
-  },
-
-  onToggleFeaturedTools() {
-    const featuredToolsOpen = !this.data.featuredToolsOpen
-    writeFeaturedToolsOpen(featuredToolsOpen)
-    this.setData({
-      featuredToolsOpen,
-      toolsSwiperAutoplay: featuredToolsOpen
-    })
-  },
-
-  onFeaturedSwiperChange(e) {
-    const current = e.detail && e.detail.current
-    const source = e.detail && e.detail.source
-    if (typeof current !== 'number' || current === this.data.toolsSwiperCurrent) return
-    if (source && source !== 'autoplay' && source !== 'touch') return
-    this.setData({ toolsSwiperCurrent: current })
-  },
-
-  onOpenFeaturedTool(e) {
-    const id = e.currentTarget.dataset.id
-    if (id === 'random') {
-      openToolItem(getHomeRandomTool())
-      return
-    }
-    const appId = e.currentTarget.dataset.appid
-    const page = e.currentTarget.dataset.page
-    openToolItem({
-      id,
-      page,
-      miniProgramAppId: appId
-    })
   },
 
   onSearch(e) {
@@ -190,30 +96,6 @@ Page({
     openToolItem(getToolById(id) || {
       page: e.currentTarget.dataset.page,
       miniProgramAppId: e.currentTarget.dataset.appid
-    })
-  },
-
-  onToggleFavorite(e) {
-    const id = e.currentTarget.dataset.id
-    if (!id) return
-    const result = toggleFavoriteTool(id)
-    if (!result.ok) {
-      wx.showToast({ title: result.message || '收藏失败', icon: 'none' })
-      return
-    }
-    const keyword = this.data.keyword
-    const featuredToolPages = getFeaturedToolPages()
-    this._favoriteToolsKey = getFavoriteToolsKey()
-    this._featuredPagesKey = flattenFeaturedToolIds(featuredToolPages)
-    this.setData({
-      groups: groupTools(keyword ? searchTools(keyword) : undefined),
-      featuredToolPages,
-      toolsSwiperCurrent: 0,
-      toolsSwiperKeys: [(this.data.toolsSwiperKeys[0] || 0) + 1]
-    })
-    wx.showToast({
-      title: result.favorited ? '已收藏到轮播' : '已取消收藏',
-      icon: 'none'
     })
   },
 

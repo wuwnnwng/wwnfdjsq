@@ -2,19 +2,14 @@
  * 更多工具：入口列表与路由
  */
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
-const FAVORITE_TOOLS_KEY = 'favoriteToolIds'
-const MAX_FAVORITE_TOOLS = 10
-const HOME_CAROUSEL_MAX = 15
-const FEATURED_IDS = ['mortgage', 'retire', 'calendar', 'calc', 'qrcode', 'weather', 'anniversary', 'fitout']
-const FEATURED_PAGE_SIZE = 4
 
 const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'duedate', 'safeperiod', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'diet', 'canvas', 'puzzle', 'exam'] },
-  { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base'] },
-  { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] },
-  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'chance', 'drinkwheel', 'footprint'] }
+  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'anniversary', 'datetime', 'age', 'bmi', 'diet', 'exam'] },
+  { id: 'calc', name: '计算工具', toolIds: ['calc', 'compound', 'rmb', 'percent', 'base', 'duedate', 'safeperiod'] },
+  { id: 'unit', name: '单位换算', toolIds: ['currency', 'unit'] }
 ]
 
 const TOOLS = [
@@ -361,159 +356,6 @@ function searchTools(keyword) {
     .map((row) => row.item)
 }
 
-function toFeaturedChip(item) {
-  if (!item) return null
-  const chip = {
-    id: item.id,
-    name: item.name,
-    shortName: item.shortName || item.name,
-    icon: item.icon,
-    iconType: item.iconType,
-    page: item.page || ''
-  }
-  if (item.miniProgramAppId) {
-    chip.miniProgramAppId = item.miniProgramAppId
-  }
-  return chip
-}
-
-function getFeaturedTools() {
-  return FEATURED_IDS.map((id) => toFeaturedChip(getToolById(id))).filter(Boolean)
-}
-
-function padFeaturedPage(page, size) {
-  const next = page.slice()
-  let pad = 0
-  while (next.length < size) {
-    pad += 1
-    next.push({
-      id: `pad-${pad}`,
-      isPad: true
-    })
-  }
-  return next
-}
-
-function isPinnedHomeTool(id) {
-  return id === 'random' || id === 'ershou'
-}
-
-function getHomeRandomTool() {
-  return {
-    id: 'random',
-    name: '随机工具',
-    shortName: '随机',
-    icon: '🎲',
-    iconType: 'random',
-    isRandom: true
-  }
-}
-
-function capHomeCarousel(list, max) {
-  const limit = max || HOME_CAROUSEL_MAX
-  const next = (list || []).filter(Boolean)
-  while (next.length > limit) {
-    let dropIndex = next.length - 1
-    while (dropIndex >= 0 && isPinnedHomeTool(next[dropIndex].id)) {
-      dropIndex -= 1
-    }
-    if (dropIndex < 0) break
-    next.splice(dropIndex, 1)
-  }
-  return next
-}
-
-function getFavoriteToolIds() {
-  try {
-    const raw = wx.getStorageSync(FAVORITE_TOOLS_KEY)
-    if (!Array.isArray(raw)) return []
-    const seen = new Set()
-    const ids = []
-    raw.forEach((id) => {
-      if (typeof id !== 'string' || !id || seen.has(id) || !getToolById(id)) return
-      seen.add(id)
-      ids.push(id)
-    })
-    return ids.slice(0, MAX_FAVORITE_TOOLS)
-  } catch (e) {
-    return []
-  }
-}
-
-function writeFavoriteToolIds(ids) {
-  try {
-    wx.setStorageSync(FAVORITE_TOOLS_KEY, ids)
-  } catch (e) {}
-}
-
-function getFavoriteToolsKey() {
-  return getFavoriteToolIds().join(',')
-}
-
-function toggleFavoriteTool(id) {
-  if (!getToolById(id)) {
-    return { ok: false, favorited: false, message: '工具不存在' }
-  }
-  const ids = getFavoriteToolIds()
-  const index = ids.indexOf(id)
-  if (index >= 0) {
-    ids.splice(index, 1)
-    writeFavoriteToolIds(ids)
-    return { ok: true, favorited: false, ids }
-  }
-  if (ids.length >= MAX_FAVORITE_TOOLS) {
-    return { ok: false, favorited: false, message: `最多收藏 ${MAX_FAVORITE_TOOLS} 个` }
-  }
-  ids.unshift(id)
-  writeFavoriteToolIds(ids)
-  return { ok: true, favorited: true, ids }
-}
-
-function withFavoriteState(item, favoriteIds) {
-  const ids = favoriteIds || new Set(getFavoriteToolIds())
-  return Object.assign({}, item, { favorited: ids.has(item.id) })
-}
-
-function flattenFeaturedToolIds(pages) {
-  return (pages || [])
-    .map((page) => (page.tools || []).filter((item) => item && !item.isPad).map((item) => item.id).join(','))
-    .join('|')
-}
-
-function getFeaturedToolPages() {
-  const random = getHomeRandomTool()
-  const extra = ['mbti', 'housetax', 'bmi', 'diet', 'compound', 'pension', 'duedate', 'safeperiod', 'age']
-    .map((id) => toFeaturedChip(getToolById(id)))
-    .filter(Boolean)
-  const pinned = ['ershou']
-    .map((id) => toFeaturedChip(getToolById(id)))
-    .filter(Boolean)
-  const favorites = getFavoriteToolIds()
-    .map((id) => toFeaturedChip(getToolById(id)))
-    .filter(Boolean)
-  const used = new Set(favorites.map((item) => item.id))
-  const rest = pinned
-    .concat(getFeaturedTools(), extra)
-    .filter((item) => item && !used.has(item.id))
-  const body = capHomeCarousel(favorites.concat(rest), HOME_CAROUSEL_MAX - 1)
-  const list = body.concat(random)
-  const pages = []
-  for (let i = 0; i < list.length; i += FEATURED_PAGE_SIZE) {
-    const index = i / FEATURED_PAGE_SIZE
-    pages.push({
-      key: `featured-${index}`,
-      tools: padFeaturedPage(list.slice(i, i + FEATURED_PAGE_SIZE), FEATURED_PAGE_SIZE)
-    })
-  }
-  return pages
-}
-
-function pickRandomTool() {
-  if (!TOOLS.length) return null
-  const index = Math.floor(Math.random() * TOOLS.length)
-  return TOOLS[index] || null
-}
-
 function openMiniProgram(appId) {
   const id = String(appId || '').trim()
   if (!id || id === 'undefined' || id === 'null') return false
@@ -532,10 +374,6 @@ function openMiniProgram(appId) {
 function openToolItem(item) {
   if (!item) {
     wx.showToast({ title: '暂无工具', icon: 'none' })
-    return
-  }
-  if (item.isRandom) {
-    openToolItem(pickRandomTool())
     return
   }
   if (openMiniProgram(item.miniProgramAppId)) return
@@ -577,12 +415,7 @@ function groupTools(list) {
       tools: rest
     })
   }
-  const favoriteIds = new Set(getFavoriteToolIds())
-  return groups.map((group) => ({
-    id: group.id,
-    name: group.name,
-    tools: group.tools.map((item) => withFavoriteState(item, favoriteIds))
-  }))
+  return groups
 }
 
 function hasSeenToolsHub() {
@@ -602,20 +435,10 @@ function markToolsHubSeen() {
 module.exports = {
   TOOLS,
   CATEGORIES,
-  MAX_FAVORITE_TOOLS,
-  HOME_CAROUSEL_MAX,
   getToolById,
   searchTools,
   groupTools,
-  getFeaturedTools,
-  getFeaturedToolPages,
-  flattenFeaturedToolIds,
-  getFavoriteToolIds,
-  getFavoriteToolsKey,
-  toggleFavoriteTool,
-  pickRandomTool,
   openToolItem,
-  getHomeRandomTool,
   hasSeenToolsHub,
   markToolsHubSeen
 }

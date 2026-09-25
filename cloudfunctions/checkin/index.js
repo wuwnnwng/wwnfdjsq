@@ -93,12 +93,31 @@ function publicEvent(item) {
 function dbMessage(error) {
   const msg = (error && (error.errMsg || error.message)) || ''
   if (/collection not exist|DATABASE_COLLECTION_NOT_EXIST|-502005/i.test(msg)) {
-    return '数据库还没建好，请再试一次'
+    return '数据库集合创建失败，请到云开发控制台打开数据库后再试'
   }
   if (/permission|PERMISSION_DENIED|-502003/i.test(msg)) {
     return '数据库权限不足'
   }
-  return '签到创建失败，请重试'
+  if (/未开通|database not|DATABASE_NOT|-501001|-501009/i.test(msg)) {
+    return '请先在云开发控制台开通数据库'
+  }
+  const detail = String(msg).replace(/\s+/g, ' ').slice(0, 60)
+  return detail ? `签到失败：${detail}` : '签到创建失败，请重试'
+}
+
+function alreadyExists(error) {
+  const msg = (error && (error.errMsg || error.message)) || ''
+  return /already exist|ALREADY_EXIST|已存在|-502002/i.test(msg)
+}
+
+async function ensureCollection(name) {
+  if (typeof db.createCollection !== 'function') return
+  try {
+    await db.createCollection(name)
+  } catch (error) {
+    if (alreadyExists(error)) return
+    throw error
+  }
 }
 
 async function createEvent(openid, event) {
@@ -112,9 +131,10 @@ async function createEvent(openid, event) {
     note,
     ownerOpenid: openid,
     status: 'open',
-    createdAt: db.serverDate()
+    createdAt: new Date()
   }
   try {
+    await ensureCollection(EVENTS)
     await db.collection(EVENTS).add({ data })
   } catch (error) {
     return fail(dbMessage(error))
@@ -133,16 +153,24 @@ async function createEvent(openid, event) {
 }
 
 async function listMine(openid) {
-  const res = await db.collection(EVENTS).where({ ownerOpenid: openid }).limit(30).get()
-  const list = (res.data || [])
-    .slice()
-    .sort((a, b) => {
-      const at = a.createdAt ? new Date(a.createdAt).getTime() : 0
-      const bt = b.createdAt ? new Date(b.createdAt).getTime() : 0
-      return bt - at
-    })
-    .map(publicEvent)
-  return { ok: true, events: list }
+  try {
+    await ensureCollection(EVENTS)
+    const res = await db.collection(EVENTS).where({ ownerOpenid: openid }).limit(30).get()
+    const list = (res.data || [])
+      .slice()
+      .sort((a, b) => {
+        const at = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const bt = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return bt - at
+      })
+      .map(publicEvent)
+      .filter(Boolean)
+    return { ok: true, events: list }
+  } catch (error) {
+    const msg = (error && (error.errMsg || error.message)) || ''
+    if (/not exist|-502005/i.test(msg)) return { ok: true, events: [] }
+    return fail(dbMessage(error))
+  }
 }
 
 async function readEvent(openid, eventId) {
@@ -181,18 +209,35 @@ async function checkIn(openid, event) {
   if (item.status === 'closed') return fail('签到已结束')
   const name = cleanText(event.name, 20)
   if (!name) return fail('请填写姓名')
-  const exist = await db.collection(RECORDS).where({ eventId: item._id, openid }).limit(1).get()
+  const eventKey = item.code || item._id
+  try {
+    await ensureCollection(RECORDS)
+  } catch (error) {
+    return fail(dbMessage(error))
+  }
+  let exist = { data: [] }
+  try {
+    exist = await db.collection(RECORDS).where({ eventId: eventKey, openid }).limit(1).get()
+  } catch (error) {
+    if (!/collection not exist|DATABASE_COLLECTION_NOT_EXIST|-502005/i.test((error && (error.errMsg || error.message)) || '')) {
+      return fail('签到失败，请重试')
+    }
+  }
   if (exist.data && exist.data.length) {
     return { ok: false, duplicate: true, message: '你已经签过到了', event: publicEvent(item) }
   }
-  await db.collection(RECORDS).add({
-    data: {
-      eventId: item.code || item._id,
-      openid,
-      name,
-      createdAt: db.serverDate()
-    }
-  })
+  try {
+    await db.collection(RECORDS).add({
+      data: {
+        eventId: eventKey,
+        openid,
+        name,
+        createdAt: new Date()
+      }
+    })
+  } catch (error) {
+    return fail(dbMessage(error))
+  }
   return { ok: true, event: publicEvent(item), name }
 }
 
@@ -237,6 +282,7 @@ exports.main = async (event) => {
     if (action === 'exportExcel') return await exportExcel(OPENID, event.eventId)
     return fail('未知操作')
   } catch (e) {
-    return fail('云端暂时不可用，请稍后再试')
+    const detail = (e && (e.errMsg || e.message)) || ''
+    return fail(detail ? String(detail).slice(0, 80) : '云函数执行失败')
   }
 }

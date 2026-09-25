@@ -34,11 +34,21 @@ function cloudMessage(err) {
   const result = err && err.result
   if (result && result.message) return result.message
   const msg = (err && (err.errMsg || err.message)) || ''
-  if (/FunctionName|FUNCTION_NOT_FOUND|cloud function|未找到|not found/i.test(msg)) {
-    return '请先在开发者工具里上传并部署云函数 checkin'
+  if (/FUNCTION_NOT_FOUND|FunctionName parameter could not be found|未找到对应的云函数/i.test(msg)) {
+    return '云函数 checkin 还没部署。请在开发者工具左侧右键 checkin，选择上传并部署。'
   }
-  if (/cloud|环境|env/i.test(msg)) return '云开发暂时不可用'
-  return msg || '操作失败'
+  if (/timeout|超时|FUNCTIONS_TIME_LIMIT|timed out/i.test(msg)) return '云函数超时，请再试一次'
+  const cleaned = msg.replace(/^cloud\.callFunction:fail\s*/i, '').replace(/^Error:\s*/i, '').trim()
+  return cleaned.slice(0, 120) || '操作失败'
+}
+
+function showCloudError(err) {
+  wx.showModal({
+    title: '签到失败',
+    content: cloudMessage(err),
+    showCancel: false,
+    confirmText: '知道了'
+  })
 }
 
 Page({
@@ -116,7 +126,7 @@ Page({
           .catch((err) => {
             wx.hideLoading()
             const result = err && err.result
-            wx.showToast({ title: cloudMessage(err), icon: 'none' })
+            showCloudError(err)
             if (result && result.duplicate) return
           })
       }
@@ -146,7 +156,7 @@ Page({
       })
       .catch((err) => {
         this.setData({ creating: false })
-        wx.showToast({ title: cloudMessage(err), icon: 'none' })
+        showCloudError(err)
       })
   },
 
@@ -168,7 +178,7 @@ Page({
         this.drawQr(result.event.id)
       })
       .catch((err) => {
-        wx.showToast({ title: cloudMessage(err), icon: 'none' })
+        showCloudError(err)
       })
   },
 
@@ -192,7 +202,7 @@ Page({
             this.setData({ event: result.event })
           })
           .catch((err) => {
-            wx.showToast({ title: cloudMessage(err), icon: 'none' })
+            showCloudError(err)
           })
       }
     })
@@ -220,7 +230,7 @@ Page({
       .catch((err) => {
         wx.hideLoading()
         this.setData({ exporting: false })
-        wx.showToast({ title: cloudMessage(err), icon: 'none' })
+        showCloudError(err)
       })
   },
 

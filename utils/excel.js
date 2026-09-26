@@ -412,8 +412,63 @@ function exportResultToExcel(payload) {
   return writeExcelFile(buildXlsxBytes(payload || {}))
 }
 
+function buildWorkbookXlsx(sheetName, rows, colWidths) {
+  const safeName = String(sheetName || 'Sheet1').replace(/[\\/*?:\[\]]/g, '').slice(0, 31) || 'Sheet1'
+  const sheet = buildSheetXml(rows && rows.length ? rows : [['']], colWidths)
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>`
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`
+  const workbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="${escapeXml(safeName)}" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>`
+  const workbookRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+</Relationships>`
+  return zipStore([
+    { name: '[Content_Types].xml', data: utf8Bytes(contentTypes) },
+    { name: '_rels/.rels', data: utf8Bytes(rootRels) },
+    { name: 'xl/workbook.xml', data: utf8Bytes(workbook) },
+    { name: 'xl/_rels/workbook.xml.rels', data: utf8Bytes(workbookRels) },
+    { name: 'xl/worksheets/sheet1.xml', data: utf8Bytes(sheet) }
+  ])
+}
+
+function exportTableToExcel(options) {
+  const rows = (options && options.rows) || []
+  const fileBase = String((options && options.fileName) || '导出').replace(/[\\/:*?"<>|]/g, '').slice(0, 40) || '导出'
+  const bytes = buildWorkbookXlsx(options && options.sheetName, rows, options && options.widths)
+  return new Promise((resolve, reject) => {
+    const fs = wx.getFileSystemManager()
+    const filePath = `${wx.env.USER_DATA_PATH}/${fileBase}-${stamp()}.xlsx`
+    fs.writeFile({
+      filePath,
+      data: toArrayBuffer(bytes),
+      success() {
+        resolve(filePath)
+      },
+      fail(err) {
+        reject(err)
+      }
+    })
+  })
+}
+
 module.exports = {
   exportResultToExcel,
+  exportTableToExcel,
   openExcelFile,
   shareExcelFile
 }

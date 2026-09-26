@@ -1,18 +1,19 @@
 <view class="page page-shell theme-{{theme}}">
   <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
-    <view class="panel">
-      <view class="hero-kicker">云端记录 · 扫码即到</view>
-      <view class="hero-title">扫码签到</view>
-      <view class="hero-sub">发起人出示二维码，参与人填写姓名后扫码。名单保存在云开发，发起人可以导出 Excel。</view>
-    </view>
-
     <block wx:if="{{mode === 'home'}}">
-      <view class="panel">
-        <view class="section-title">我要签到</view>
-        <view class="field">
-          <view class="field-label">姓名</view>
-          <input class="field-input" value="{{name}}" maxlength="20" placeholder="签到时显示的名字" bindinput="onName" />
+      <view class="panel conv-hero">
+        <view class="conv-hero-top">
+          <view class="conv-hero-id">
+            <view class="tool-icon-wrap tool-icon-checkin">
+              <text class="tool-icon">✅</text>
+            </view>
+            <view class="conv-hero-copy">
+              <view class="conv-kicker">扫码 · 填写 · 导出名单</view>
+              <view class="conv-title">我要签到</view>
+            </view>
+          </view>
         </view>
+        <view class="hero-sub">先扫发起人的二维码，再按要求填写。</view>
         <view class="primary-btn" bindtap="onScan">扫码签到</view>
       </view>
 
@@ -26,17 +27,34 @@
           <view class="field-label">备注</view>
           <input class="field-input" value="{{note}}" maxlength="40" placeholder="选填，例如三楼会议室" bindinput="onNote" />
         </view>
+        <view class="field">
+          <view class="field-label">扫码后填写</view>
+          <view class="check-row">
+            <view class="check-item {{fieldName ? 'is-on' : ''}}" data-key="name" bindtap="onToggleField">姓名</view>
+            <view class="check-item {{useCustom ? 'is-on' : ''}}" bindtap="onOpenCustom">自定义</view>
+          </view>
+          <view class="custom-summary" wx:if="{{useCustom}}" bindtap="onOpenCustom">{{customSummary}}</view>
+        </view>
         <view class="primary-btn {{creating ? 'is-off' : ''}}" bindtap="onCreate">{{creating ? '正在创建…' : '生成签到码'}}</view>
       </view>
 
-      <view class="panel" wx:if="{{events.length}}">
+      <view class="panel" wx:if="{{eventTotal || events.length}}">
         <view class="section-title">我发起的</view>
-        <view class="event-row" wx:for="{{events}}" wx:key="id" bindtap="onOpenEvent" data-id="{{item.id}}">
+        <view class="list-note">记录保留 7 天，到期自动删除。共 {{eventTotal}} 条，每页 5 条</view>
+        <view class="event-row" wx:for="{{events}}" wx:key="id" bindtap="onOpenEvent" data-id="{{item.id}}" data-title="{{item.title}}" data-note="{{item.note}}" data-status="{{item.status}}" data-created="{{item.createdAt}}">
           <view class="event-copy">
             <view class="event-title">{{item.title}}</view>
             <view class="event-meta">{{item.createdAt}} · {{item.status === 'closed' ? '已结束' : '进行中'}}</view>
           </view>
-          <view class="event-go">查看</view>
+          <view class="event-actions">
+            <view class="event-del" catchtap="onDeleteEvent" data-id="{{item.id}}" data-title="{{item.title}}">删除</view>
+            <view class="event-go">查看</view>
+          </view>
+        </view>
+        <view class="pager">
+          <view class="pager-btn {{eventPage <= 1 ? 'is-off' : ''}}" bindtap="onPrevEvents">上一页</view>
+          <view class="pager-text">{{eventPage}} / {{eventPages}}</view>
+          <view class="pager-btn {{eventPage >= eventPages ? 'is-off' : ''}}" bindtap="onNextEvents">下一页</view>
         </view>
       </view>
     </block>
@@ -51,8 +69,12 @@
           <view class="text-btn" bindtap="onBackHome">返回</view>
         </view>
         <view class="qr-wrap" wx:if="{{isOwner}}">
-          <canvas type="2d" id="checkinQr" class="qr-canvas"></canvas>
-          <view class="qr-hint">让参与人打开「扫码签到」，填写姓名后扫描此码</view>
+          <view class="qr-box">
+            <image wx:if="{{qrFileID}}" class="qr-canvas" src="{{qrFileID}}" mode="aspectFit" />
+            <canvas wx:else type="2d" id="checkinQr" class="qr-canvas"></canvas>
+            <view class="qr-download" bindtap="onSaveQr">↓</view>
+          </view>
+          <view class="qr-expire {{event.expired ? 'is-off' : ''}}" wx:if="{{event.expireAt}}">{{event.expired ? '二维码已于 ' + event.expireAt + ' 过期' : '二维码 7 天内有效，' + event.expireAt + ' 过期'}}</view>
         </view>
         <view class="board-actions" wx:if="{{isOwner}}">
           <view class="primary-btn slim" bindtap="onExport">{{exporting ? '正在导出…' : '导出 Excel'}}</view>
@@ -62,8 +84,8 @@
 
       <view class="panel">
         <view class="section-title">签到名单</view>
-        <view class="record" wx:for="{{records}}" wx:key="index">
-          <view class="record-name">{{item.index}}. {{item.name}}</view>
+        <view class="record" wx:for="{{records}}" wx:key="id">
+          <view class="record-name">{{item.index}}. {{item.summary}}</view>
           <view class="record-time">{{item.time}}</view>
         </view>
         <view class="empty" wx:if="{{!records.length}}">还没有人签到</view>
@@ -73,4 +95,95 @@
     <ad-banner theme="{{theme}}" />
     <view class="bottom-space"></view>
   </scroll-view>
+
+  <view class="sign-mask" wx:if="{{customSheet}}">
+    <view class="sign-mask-bg" catchtouchmove="noop" bindtap="onCancelCustom"></view>
+    <view class="sign-sheet custom-sheet" style="margin-bottom: {{customKeyboardHeight}}px;">
+      <view class="sign-title">自定义字段</view>
+      <scroll-view scroll-y class="custom-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="added-list" wx:if="{{draftFields.length}}">
+          <view class="option-row sheet-option" wx:for="{{draftFields}}" wx:key="label">
+            <view class="option-copy">
+              <view class="option-text">{{item.kindText}} · {{item.label}}</view>
+              <view class="field-sub" wx:if="{{item.optionText}}">{{item.optionText}}</view>
+            </view>
+            <view class="option-del" catchtap="onRemoveDraftField" data-index="{{index}}">删除</view>
+          </view>
+        </view>
+        <view class="sign-label">添加字段</view>
+        <view class="check-row">
+          <view class="check-item sheet-chip {{draftKind !== 'select' ? 'is-on' : ''}}" data-kind="text" bindtap="onCustomKind">普通字段</view>
+          <view class="check-item sheet-chip {{draftKind === 'select' ? 'is-on' : ''}}" data-kind="select" bindtap="onCustomKind">枚举字段</view>
+        </view>
+        <view class="field">
+          <view class="sign-label">字段名称</view>
+          <input class="sign-input" value="{{draftLabel}}" maxlength="12" placeholder="例如部门" placeholder-style="color:#8aa094;" placeholder-class="sign-placeholder" adjust-position="{{false}}" cursor-spacing="24" bindinput="onCustomLabel" bindkeyboardheightchange="onCustomKeyboard" />
+        </view>
+        <view class="field" wx:if="{{draftKind === 'select'}}">
+          <view class="sign-label">下拉选项</view>
+          <view class="option-row sheet-option" wx:for="{{draftOptions}}" wx:for-item="option" wx:for-index="optionIndex" wx:key="*this">
+            <view class="option-text">{{option}}</view>
+            <view class="option-del" catchtap="onRemoveOption" data-index="{{optionIndex}}">删除</view>
+          </view>
+          <view class="option-add">
+            <input class="sign-input option-input" value="{{optionDraft}}" maxlength="12" placeholder="输入选项，例如销售" placeholder-style="color:#8aa094;" placeholder-class="sign-placeholder" adjust-position="{{false}}" cursor-spacing="24" bindinput="onOptionDraft" bindkeyboardheightchange="onCustomKeyboard" />
+            <view class="option-btn" bindtap="onAddOption">添加</view>
+          </view>
+          <view class="sheet-note">每个枚举最少 2 个、最多 10 个选项。</view>
+        </view>
+        <view class="option-btn add-field-btn" bindtap="onAddDraftField">加入字段</view>
+        <view class="sheet-note">普通字段和枚举字段会按加入顺序放在一起，最多 8 个。</view>
+      </scroll-view>
+      <view class="sign-actions">
+        <view class="sign-cancel" bindtap="onCancelCustom">取消</view>
+        <view class="sign-ok" bindtap="onConfirmCustom">确定</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="sign-mask" wx:if="{{closeAsk}}" catchtouchmove="noop">
+    <view class="sign-sheet">
+      <view class="sign-title">结束这次签到？</view>
+      <view class="delete-copy">结束后不能再扫码签到。已有名单还在，可以之后重新开启。</view>
+      <view class="sign-actions">
+        <view class="sign-cancel" bindtap="onCancelClose">取消</view>
+        <view class="sign-ok sign-danger" bindtap="onConfirmClose">确认结束</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="sign-mask" wx:if="{{deleteAsk}}" catchtouchmove="noop">
+    <view class="sign-sheet">
+      <view class="sign-title">删除这次签到？</view>
+      <view class="delete-copy">将删除「{{deleteAsk.title}}」和里面的全部签到记录，删除后不能恢复。</view>
+      <view class="sign-actions">
+        <view class="sign-cancel" bindtap="onCancelDelete">取消</view>
+        <view class="sign-ok sign-danger" bindtap="onConfirmDelete">确认删除</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="sign-mask" wx:if="{{signSheet}}" catchtouchmove="noop">
+    <view class="sign-sheet" style="margin-bottom: {{signKeyboardHeight}}px;">
+      <view class="sign-title">填写签到信息</view>
+      <view class="field" wx:if="{{signFields.name}}">
+        <view class="sign-label">姓名</view>
+        <input class="sign-input" value="{{name}}" maxlength="20" focus="{{signSheet}}" placeholder="请输入姓名" placeholder-style="color:#8aa094;" placeholder-class="sign-placeholder" adjust-position="{{false}}" cursor-spacing="24" bindinput="onName" bindkeyboardheightchange="onSignKeyboard" />
+      </view>
+      <block wx:for="{{signFields.customs}}" wx:key="label">
+        <view class="field">
+          <view class="sign-label">{{item.label}}</view>
+          <picker wx:if="{{item.kind === 'select'}}" mode="selector" range="{{item.options}}" value="{{item.index}}" data-index="{{index}}" bindchange="onSignCustomPick">
+            <view class="sign-input sign-pick {{item.value ? '' : 'is-empty'}}">{{item.value || '请选择'}}</view>
+          </picker>
+          <input wx:else class="sign-input" value="{{item.value}}" maxlength="40" data-index="{{index}}" placeholder="请输入{{item.label}}" placeholder-style="color:#8aa094;" placeholder-class="sign-placeholder" adjust-position="{{false}}" cursor-spacing="24" bindinput="onCustomValue" bindkeyboardheightchange="onSignKeyboard" />
+        </view>
+      </block>
+      <view class="sign-actions">
+        <view class="sign-cancel" bindtap="onCloseSign">取消</view>
+        <view class="sign-ok" bindtap="onSubmitCheckIn">确认签到</view>
+      </view>
+    </view>
+  </view>
+  <canvas type="2d" id="qrPoster" class="qr-poster"></canvas>
 </view>

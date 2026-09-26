@@ -1,10 +1,10 @@
 /**
  * 皮肤主题
- * nexus 星核（默认，科技感）/ forest 青绿 / ocean 商务蓝 / amber 琥珀金 / crimson 中国红
+ * ocean 商务蓝（默认）/ nexus 星核 / forest 青绿 / amber 琥珀金 / crimson 中国红
  */
 
-const STORAGE_KEY = 'app_theme_v2'
-const DEFAULT_THEME = 'nexus'
+const STORAGE_KEY = 'app_theme_v3'
+const DEFAULT_THEME = 'ocean'
 
 const THEMES = {
   nexus: {

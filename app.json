@@ -34,9 +34,9 @@
   ],
   "window": {
     "navigationBarTitleText": "小小便民工具箱",
-    "navigationBarBackgroundColor": "#070D18",
+    "navigationBarBackgroundColor": "#1A3F66",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#0B1220",
+    "backgroundColor": "#EEF3F9",
     "backgroundTextStyle": "dark"
   },
   "usingComponents": {
@@ -45,9 +45,6 @@
   "permission": {
     "scope.userLocation": {
       "desc": "用于获取你所在城市的天气"
-    },
-    "scope.writePhotosAlbum": {
-      "desc": "用于把生成的二维码、画布、拼图、足迹和结果卡片保存到相册"
     }
   },
   "requiredPrivateInfos": ["getLocation"],
@@ -94,6 +91,5 @@
       "packages": ["footprint", "exam", "travel", "mbti", "checkin"]
     }
   },
-  "lazyCodeLoading": "requiredComponents",
-  "navigateToMiniProgramAppIdList": ["wx663931c101197d69"]
+  "lazyCodeLoading": "requiredComponents"
 }

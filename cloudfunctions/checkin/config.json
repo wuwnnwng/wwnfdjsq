@@ -1,7 +1,14 @@
 {
   "permissions": {
-    "openapi": []
+    "openapi": ["wxacode.getUnlimited"]
   },
   "timeout": 20,
-  "memorySize": 256
+  "memorySize": 256,
+  "triggers": [
+    {
+      "name": "purgeCheckinRecords",
+      "type": "timer",
+      "config": "0 30 3 * * * *"
+    }
+  ]
 }

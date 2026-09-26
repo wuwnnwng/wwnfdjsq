@@ -33,7 +33,7 @@ if (typeof wx.onBeforeAppRoute === 'function' && !wx.__wwnBeforeAppRoute) {
 
 App({
   globalData: {
-    theme: 'forest',
+    theme: 'ocean',
     enterOptions: null
   },
 

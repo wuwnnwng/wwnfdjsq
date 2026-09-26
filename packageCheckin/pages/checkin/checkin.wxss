@@ -37,6 +37,28 @@
   color: var(--color-ink);
 }
 
+.list-tabs {
+  display: flex;
+  gap: 12rpx;
+}
+
+.list-tab {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 16rpx;
+  text-align: center;
+  line-height: 72rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-muted);
+  background: var(--color-soft);
+}
+
+.list-tab.is-on {
+  color: #ffffff;
+  background: var(--color-brand);
+}
+
 .field {
   margin-top: 20rpx;
 }
@@ -90,6 +112,10 @@
   color: var(--color-muted);
 }
 
+.detail-time {
+  margin-top: 20rpx;
+}
+
 .event-go,
 .text-btn {
   flex-shrink: 0;
@@ -106,6 +132,7 @@
 }
 
 .event-del {
+  flex-shrink: 0;
   font-size: 26rpx;
   font-weight: 700;
   color: #b42318;
@@ -280,13 +307,6 @@
   color: #b42318;
 }
 
-.qr-poster {
-  position: fixed;
-  left: -2400px;
-  top: 0;
-  width: 10px;
-  height: 10px;
-}
 
 .board-actions {
   display: flex;
@@ -336,7 +356,7 @@
 }
 
 .list-note {
-  margin-top: 8rpx;
+  margin-top: 20rpx;
   font-size: 22rpx;
   color: var(--color-muted);
 }

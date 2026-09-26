@@ -37,7 +37,7 @@ function cloudMessage(err) {
   const result = err && err.result
   if (result && result.message) {
     if (result.message === '未知操作') {
-      return '云端还是旧版本。请右键 cloudfunctions/checkin，选择「上传并部署：所有文件」后再删除。'
+      return '云端还是旧版本。请右键 cloudfunctions/checkin，选择「上传并部署：所有文件」。'
     }
     return result.message
   }
@@ -181,6 +181,13 @@ Page({
     eventPage: 1,
     eventPages: 1,
     eventTotal: 0,
+    listTab: 'joined',
+    joined: [],
+    joinedPage: 1,
+    joinedPages: 1,
+    joinedTotal: 0,
+    joinedHint: '',
+    joinedDetail: null,
     event: null,
     isOwner: false,
     records: [],
@@ -197,6 +204,23 @@ Page({
 
   onLoad(query) {
     enableShareMenu()
+    const view = query && query.view
+    const viewId = query && query.id ? decodeURIComponent(query.id) : ''
+    if ((view === 'board' || view === 'record') && viewId) {
+      this._detail = {
+        view,
+        id: viewId,
+        fallback: view === 'board' ? {
+          id: viewId,
+          title: query.title ? decodeURIComponent(query.title) : '签到',
+          note: query.note ? decodeURIComponent(query.note) : '',
+          status: query.status ? decodeURIComponent(query.status) : 'open',
+          createdAt: query.created ? decodeURIComponent(query.created) : ''
+        } : null
+      }
+      this.setData({ mode: view === 'board' ? 'board' : 'record' })
+      return
+    }
     const raw = query && (query.scene || query.code || '')
     let eventId = ''
     try {
@@ -211,13 +235,20 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+    if (this._detail) {
+      if (this._detail.view === 'board') this.loadBoard(this._detail.id, this._detail.fallback)
+      else this.loadRecord(this._detail.id)
+      return
+    }
     if (this._pendingScan) {
       const eventId = this._pendingScan
       this._pendingScan = ''
       openSignSheet(this, eventId)
     }
-    if (this.data.mode === 'home') this.loadMine()
-    else if (this.data.event) this.loadBoard(this.data.event.id)
+    if (this.data.mode === 'home') {
+      this.loadMine()
+      this.loadJoined()
+    } else if (this.data.event) this.loadBoard(this.data.event.id)
   },
 
   onName(e) {
@@ -425,6 +456,78 @@ Page({
     this.loadMine(this.data.eventPage + 1)
   },
 
+  onListTab(e) {
+    const tab = e.currentTarget.dataset.tab
+    if (!tab || tab === this.data.listTab) return
+    this.setData({ listTab: tab })
+  },
+
+  loadJoined(page) {
+    const requested = Math.max(1, page || this.data.joinedPage || 1)
+    callCheckin('listJoined', { page: requested })
+      .then((result) => {
+        const list = result.records || []
+        const serverPaged = typeof result.total === 'number' && typeof result.pages === 'number'
+        if (serverPaged) {
+          this.setData({
+            joined: list,
+            joinedPage: result.page || 1,
+            joinedPages: result.pages || 1,
+            joinedTotal: result.total,
+            joinedHint: ''
+          })
+          return
+        }
+        const size = 5
+        const total = list.length
+        const pages = Math.max(1, Math.ceil(total / size) || 1)
+        const current = Math.min(requested, pages)
+        this.setData({
+          joined: list.slice((current - 1) * size, current * size),
+          joinedPage: current,
+          joinedPages: pages,
+          joinedTotal: total,
+          joinedHint: ''
+        })
+      })
+      .catch((err) => {
+        const msg = cloudMessage(err)
+        this.setData({
+          joinedHint: /旧版本|还没部署|未知操作/.test(msg)
+            ? '云端还是旧版本，请重新上传签到云函数后再查看。'
+            : ''
+        })
+      })
+  },
+
+  onPrevJoined() {
+    if (this.data.joinedPage <= 1) return
+    this.loadJoined(this.data.joinedPage - 1)
+  },
+
+  onNextJoined() {
+    if (this.data.joinedPage >= this.data.joinedPages) return
+    this.loadJoined(this.data.joinedPage + 1)
+  },
+
+  onOpenJoined(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+    wx.navigateTo({
+      url: `/packageCheckin/pages/checkin/checkin?view=record&id=${encodeURIComponent(id)}`
+    })
+  },
+
+  loadRecord(recordId) {
+    callCheckin('readRecord', { recordId })
+      .then((result) => {
+        this.setData({ mode: 'record', joinedDetail: result.record })
+      })
+      .catch((err) => {
+        showCloudError(err)
+      })
+  },
+
   onScan() {
     wx.scanCode({
       scanType: ['qrCode', 'wxCode'],
@@ -453,11 +556,17 @@ Page({
     this.setData({ signSheet: false, pendingEventId: '', signKeyboardHeight: 0 })
   },
 
+  onDeleteJoined(e) {
+    const data = (e && e.currentTarget && e.currentTarget.dataset) || {}
+    if (!data.id) return
+    this.setData({ deleteAsk: { kind: 'record', id: data.id, title: data.title || '这次签到' } })
+  },
+
   onDeleteEvent(e) {
     const data = (e && e.currentTarget && e.currentTarget.dataset) || {}
     const event = data.id ? { id: data.id, title: data.title || '这次签到' } : this.data.event
     if (!event || !event.id) return
-    this.setData({ deleteAsk: { id: event.id, title: event.title || '这次签到' } })
+    this.setData({ deleteAsk: { kind: 'event', id: event.id, title: event.title || '这次签到' } })
   },
 
   onCancelDelete() {
@@ -468,6 +577,23 @@ Page({
     const event = this.data.deleteAsk
     if (!event || !event.id) return
     this.setData({ deleteAsk: null })
+    if (event.kind === 'record') {
+      wx.showLoading({ title: '正在删除', mask: true })
+      callCheckin('removeRecord', { recordId: event.id })
+        .then(() => {
+          wx.hideLoading()
+          const page = this.data.joined.length <= 1 && this.data.joinedPage > 1
+            ? this.data.joinedPage - 1
+            : this.data.joinedPage
+          this.loadJoined(page)
+          wx.showToast({ title: '已删除', icon: 'none' })
+        })
+        .catch((err) => {
+          wx.hideLoading()
+          showCloudError(err)
+        })
+      return
+    }
     wx.showLoading({ title: '正在删除', mask: true })
     callCheckin('removeEvent', { eventId: event.id })
       .then(() => {
@@ -513,7 +639,18 @@ Page({
     callCheckin('checkIn', { eventId, name, customs })
       .then((result) => {
         wx.hideLoading()
-        this.setData({ signSheet: false, pendingEventId: '', signKeyboardHeight: 0 })
+        this.setData({
+          signSheet: false,
+          pendingEventId: '',
+          signKeyboardHeight: 0,
+          mode: 'home',
+          listTab: 'joined',
+          event: null,
+          records: [],
+          isOwner: false,
+          qrFileID: ''
+        })
+        this.loadJoined(1)
         const who = [name].concat(customs.map((item) => item.value)).filter(Boolean).join(' · ')
         wx.showModal({
           title: '签到成功',
@@ -554,16 +691,10 @@ Page({
       customFields
     })
       .then((result) => {
-        this.setData({
-          creating: false,
-          title: '',
-          note: '',
-          mode: 'board',
-          event: decorateEvent(result.event),
-          isOwner: true,
-          records: []
+        this.setData({ creating: false, title: '', note: '' })
+        wx.navigateTo({
+          url: `/packageCheckin/pages/checkin/checkin?view=board&id=${encodeURIComponent(result.event.id)}`
         })
-        this.loadCodeImage(result.event.id)
       })
       .catch((err) => {
         this.setData({ creating: false })
@@ -574,13 +705,15 @@ Page({
   onOpenEvent(e) {
     const data = e.currentTarget.dataset || {}
     if (!data.id) return
-    this.loadBoard(data.id, {
-      id: data.id,
-      title: data.title || '签到',
-      note: data.note || '',
-      status: data.status || 'open',
-      createdAt: data.created || ''
-    })
+    const query = [
+      'view=board',
+      `id=${encodeURIComponent(data.id)}`,
+      `title=${encodeURIComponent(data.title || '')}`,
+      `note=${encodeURIComponent(data.note || '')}`,
+      `status=${encodeURIComponent(data.status || '')}`,
+      `created=${encodeURIComponent(data.created || '')}`
+    ].join('&')
+    wx.navigateTo({ url: `/packageCheckin/pages/checkin/checkin?${query}` })
   },
 
   openBoardAnyway(eventId, fallback) {
@@ -620,8 +753,20 @@ Page({
   },
 
   onBackHome() {
-    this.setData({ mode: 'home', event: null, records: [], isOwner: false, qrFileID: '' })
+    if (this._detail && getCurrentPages().length > 1) {
+      wx.navigateBack()
+      return
+    }
+    this.setData({
+      mode: 'home',
+      event: null,
+      records: [],
+      isOwner: false,
+      qrFileID: '',
+      joinedDetail: null
+    })
     this.loadMine()
+    this.loadJoined()
   },
 
   onToggleStatus() {
@@ -665,7 +810,6 @@ Page({
 
   onSaveQr() {
     this.qrImagePath()
-      .then((filePath) => this.composeQrPoster(filePath))
       .then((filePath) => saveQrToAlbum(filePath))
       .then(() => {
         wx.showToast({ title: '已保存到相册', icon: 'none' })
@@ -695,58 +839,6 @@ Page({
         }
         wx.showToast({ title: '图片保存失败', icon: 'none' })
       })
-  },
-
-  composeQrPoster(src) {
-    return new Promise((resolve, reject) => {
-      wx.getImageInfo({
-        src,
-        success: (info) => {
-          wx.createSelectorQuery()
-            .in(this)
-            .select('#qrPoster')
-            .fields({ node: true, size: true })
-            .exec((res) => {
-              const canvas = res && res[0] && res[0].node
-              if (!canvas) {
-                reject(new Error('二维码还没准备好'))
-                return
-              }
-              const qr = Math.max(info.width, info.height)
-              const pad = Math.round(qr * 0.08)
-              const fontSize = Math.max(28, Math.round(qr * 0.07))
-              const textH = Math.round(fontSize * 2.4)
-              const width = qr + pad * 2
-              const height = pad + qr + textH
-              canvas.width = width
-              canvas.height = height
-              const ctx = canvas.getContext('2d')
-              const image = canvas.createImage()
-              image.onload = () => {
-                ctx.fillStyle = '#ffffff'
-                ctx.fillRect(0, 0, width, height)
-                ctx.drawImage(image, pad, pad, qr, qr)
-                ctx.fillStyle = '#14231c'
-                ctx.textAlign = 'center'
-                ctx.textBaseline = 'middle'
-                ctx.font = `700 ${fontSize}px sans-serif`
-                ctx.fillText('小小便民工具箱', width / 2, pad + qr + textH / 2)
-                wx.canvasToTempFilePath({
-                  canvas,
-                  fileType: 'png',
-                  destWidth: width,
-                  destHeight: height,
-                  success: (file) => resolve(file.tempFilePath),
-                  fail: reject
-                }, this)
-              }
-              image.onerror = () => reject(new Error('二维码还没准备好'))
-              image.src = src
-            })
-        },
-        fail: reject
-      })
-    })
   },
 
   qrImagePath() {

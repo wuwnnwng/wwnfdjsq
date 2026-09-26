@@ -78,24 +78,37 @@ const LUCKY_HOUR_DEITIES = {
   司命: true
 }
 
+/** 五不遇时：时干克日干，且阳克阳、阴克阴。黄历逢此改凶 */
+const WU_BU_YU_HOUR = {
+  甲: '庚午',
+  乙: '辛巳',
+  丙: '壬辰',
+  丁: '癸卯',
+  戊: '甲寅',
+  己: '乙丑',
+  庚: '丙子',
+  辛: '丁酉',
+  壬: '戊申',
+  癸: '己未'
+}
+
 /**
- * 时辰青龙所在：通书三合四局口诀
- * 亥卯未日鼠头青（子），巳酉丑日鸡栖栖（酉），寅午戌日兔月明（卯），申子辰日蟒出洞（巳）
- * 辛巳日属巳酉丑局，酉时起青龙：未时司命（吉）、亥时天刑（凶）
+ * 时辰青龙所在：黄黑道十二神，按日支对宫起法（万年历通行）
+ * 子午临申，丑未在戌，寅申在子，卯酉在寅，辰戌在辰，巳亥在午
  */
 const QING_LONG_HOUR_BY_DAY = {
-  亥: '子',
-  卯: '子',
-  未: '子',
-  巳: '酉',
-  酉: '酉',
-  丑: '酉',
-  寅: '卯',
-  午: '卯',
-  戌: '卯',
-  申: '巳',
-  子: '巳',
-  辰: '巳'
+  子: '申',
+  午: '申',
+  丑: '戌',
+  未: '戌',
+  寅: '子',
+  申: '子',
+  卯: '寅',
+  酉: '寅',
+  辰: '辰',
+  戌: '辰',
+  巳: '午',
+  亥: '午'
 }
 
 const YANG_GONG_DAYS = [
@@ -248,12 +261,13 @@ function buildHourLuckList(year, month, day, now) {
 
   return HOUR_SLOTS.map((slot, zhiIdx) => {
     const deity = HOUR_DEITIES[(zhiIdx - start + 12) % 12]
-    const lucky = !!LUCKY_HOUR_DEITIES[deity]
     const gan = getHourGan(dayGan, zhiIdx)
+    const ganZhi = gan + slot.zhi
+    const lucky = !!LUCKY_HOUR_DEITIES[deity] && WU_BU_YU_HOUR[dayGan] !== ganZhi
     return {
       gan,
       zhi: slot.zhi,
-      ganZhi: gan + slot.zhi,
+      ganZhi,
       label: slot.label,
       range: slot.range,
       deity,

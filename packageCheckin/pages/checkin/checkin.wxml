@@ -38,24 +38,50 @@
         <view class="primary-btn {{creating ? 'is-off' : ''}}" bindtap="onCreate">{{creating ? '正在创建…' : '生成签到码'}}</view>
       </view>
 
-      <view class="panel" wx:if="{{eventTotal || events.length}}">
-        <view class="section-title">我发起的</view>
-        <view class="list-note">记录保留 7 天，到期自动删除。共 {{eventTotal}} 条，每页 5 条</view>
-        <view class="event-row" wx:for="{{events}}" wx:key="id" bindtap="onOpenEvent" data-id="{{item.id}}" data-title="{{item.title}}" data-note="{{item.note}}" data-status="{{item.status}}" data-created="{{item.createdAt}}">
-          <view class="event-copy">
-            <view class="event-title">{{item.title}}</view>
-            <view class="event-meta">{{item.createdAt}} · {{item.status === 'closed' ? '已结束' : '进行中'}}</view>
-          </view>
-          <view class="event-actions">
-            <view class="event-del" catchtap="onDeleteEvent" data-id="{{item.id}}" data-title="{{item.title}}">删除</view>
-            <view class="event-go">查看</view>
-          </view>
+      <view class="panel">
+        <view class="list-tabs">
+          <view class="list-tab {{listTab === 'joined' ? 'is-on' : ''}}" data-tab="joined" bindtap="onListTab">我的签到</view>
+          <view class="list-tab {{listTab === 'mine' ? 'is-on' : ''}}" data-tab="mine" bindtap="onListTab">我发起的</view>
         </view>
-        <view class="pager">
-          <view class="pager-btn {{eventPage <= 1 ? 'is-off' : ''}}" bindtap="onPrevEvents">上一页</view>
-          <view class="pager-text">{{eventPage}} / {{eventPages}}</view>
-          <view class="pager-btn {{eventPage >= eventPages ? 'is-off' : ''}}" bindtap="onNextEvents">下一页</view>
-        </view>
+        <block wx:if="{{listTab === 'joined'}}">
+          <view class="list-note">记录保留 7 天，到期自动删除。共 {{joinedTotal}} 条，每页 5 条</view>
+          <view class="event-row" wx:for="{{joined}}" wx:key="id" bindtap="onOpenJoined" data-id="{{item.id}}">
+            <view class="event-copy">
+              <view class="event-title">{{item.title}}</view>
+              <view class="event-meta">{{item.time}} · {{item.summary}}</view>
+            </view>
+            <view class="event-actions">
+              <view class="event-del" catchtap="onDeleteJoined" data-id="{{item.id}}" data-title="{{item.title}}">删除</view>
+              <view class="event-go">查看</view>
+            </view>
+          </view>
+          <view class="empty" wx:if="{{joinedHint}}">{{joinedHint}}</view>
+          <view class="empty" wx:elif="{{!joined.length}}">还没有签到记录</view>
+          <view class="pager">
+            <view class="pager-btn {{joinedPage <= 1 ? 'is-off' : ''}}" bindtap="onPrevJoined">上一页</view>
+            <view class="pager-text">{{joinedPage}} / {{joinedPages}}</view>
+            <view class="pager-btn {{joinedPage >= joinedPages ? 'is-off' : ''}}" bindtap="onNextJoined">下一页</view>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="list-note">记录保留 7 天，到期自动删除。共 {{eventTotal}} 条，每页 5 条</view>
+          <view class="event-row" wx:for="{{events}}" wx:key="id" bindtap="onOpenEvent" data-id="{{item.id}}" data-title="{{item.title}}" data-note="{{item.note}}" data-status="{{item.status}}" data-created="{{item.createdAt}}">
+            <view class="event-copy">
+              <view class="event-title">{{item.title}}</view>
+              <view class="event-meta">{{item.createdAt}} · {{item.status === 'closed' ? '已结束' : '进行中'}}</view>
+            </view>
+            <view class="event-actions">
+              <view class="event-del" catchtap="onDeleteEvent" data-id="{{item.id}}" data-title="{{item.title}}">删除</view>
+              <view class="event-go">查看</view>
+            </view>
+          </view>
+          <view class="empty" wx:if="{{!events.length}}">还没有发起签到</view>
+          <view class="pager">
+            <view class="pager-btn {{eventPage <= 1 ? 'is-off' : ''}}" bindtap="onPrevEvents">上一页</view>
+            <view class="pager-text">{{eventPage}} / {{eventPages}}</view>
+            <view class="pager-btn {{eventPage >= eventPages ? 'is-off' : ''}}" bindtap="onNextEvents">下一页</view>
+          </view>
+        </block>
       </view>
     </block>
 
@@ -89,6 +115,30 @@
           <view class="record-time">{{item.time}}</view>
         </view>
         <view class="empty" wx:if="{{!records.length}}">还没有人签到</view>
+      </view>
+    </block>
+
+    <block wx:elif="{{mode === 'record'}}">
+      <view class="panel">
+        <view class="board-head">
+          <view>
+            <view class="section-title">{{joinedDetail.title || '签到详情'}}</view>
+            <view class="event-meta" wx:if="{{joinedDetail}}">{{joinedDetail.note}} {{joinedDetail.status === 'closed' ? '已结束' : '进行中'}}</view>
+          </view>
+          <view class="text-btn" bindtap="onBackHome">返回</view>
+        </view>
+      </view>
+      <view class="panel" wx:if="{{joinedDetail}}">
+        <view class="section-title">我的填写</view>
+        <view class="record" wx:for="{{joinedDetail.answers}}" wx:for-index="answerIndex" wx:key="answerIndex">
+          <view class="record-name">{{item.label}}</view>
+          <view class="record-time">{{item.value}}</view>
+        </view>
+        <view class="empty" wx:if="{{!joinedDetail.answers.length}}">没有填写内容</view>
+        <view class="event-meta detail-time">签到时间 {{joinedDetail.time}}</view>
+      </view>
+      <view class="panel" wx:else>
+        <view class="empty">正在读取签到详情</view>
       </view>
     </block>
 
@@ -154,8 +204,9 @@
 
   <view class="sign-mask" wx:if="{{deleteAsk}}" catchtouchmove="noop">
     <view class="sign-sheet">
-      <view class="sign-title">删除这次签到？</view>
-      <view class="delete-copy">将删除「{{deleteAsk.title}}」和里面的全部签到记录，删除后不能恢复。</view>
+      <view class="sign-title">{{deleteAsk.kind === 'record' ? '删除这条签到？' : '删除这次签到？'}}</view>
+      <view class="delete-copy" wx:if="{{deleteAsk.kind === 'record'}}">将删除你在「{{deleteAsk.title}}」的签到记录，删除后不能恢复。</view>
+      <view class="delete-copy" wx:else>将删除「{{deleteAsk.title}}」和里面的全部签到记录，删除后不能恢复。</view>
       <view class="sign-actions">
         <view class="sign-cancel" bindtap="onCancelDelete">取消</view>
         <view class="sign-ok sign-danger" bindtap="onConfirmDelete">确认删除</view>
@@ -185,5 +236,4 @@
       </view>
     </view>
   </view>
-  <canvas type="2d" id="qrPoster" class="qr-poster"></canvas>
 </view>

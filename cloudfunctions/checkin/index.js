@@ -17,8 +17,26 @@ function pad2(num) {
   return num < 10 ? `0${num}` : String(num)
 }
 
+function recordTime(value) {
+  if (!value) return 0
+  if (value instanceof Date) return value.getTime()
+  if (typeof value === 'number') return value
+  if (typeof value === 'object') {
+    if (value.$date) return recordTime(value.$date)
+    if (typeof value.getTime === 'function') {
+      const time = value.getTime()
+      if (!Number.isNaN(time)) return time
+    }
+    const seconds = value.seconds || value._seconds
+    if (typeof seconds === 'number') return seconds * 1000
+  }
+  const time = new Date(value).getTime()
+  return Number.isNaN(time) ? 0 : time
+}
+
 function formatTime(value) {
-  const date = value instanceof Date ? value : new Date(value)
+  const time = recordTime(value)
+  const date = time ? new Date(time) : null
   if (!date || Number.isNaN(date.getTime())) return ''
   const shifted = new Date(date.getTime() + 8 * 60 * 60 * 1000)
   return `${shifted.getUTCFullYear()}-${pad2(shifted.getUTCMonth() + 1)}-${pad2(shifted.getUTCDate())} ${pad2(shifted.getUTCHours())}:${pad2(shifted.getUTCMinutes())}:${pad2(shifted.getUTCSeconds())}`
@@ -277,6 +295,99 @@ async function listMine(openid, page) {
   }
 }
 
+async function listJoined(openid, page) {
+  const size = 5
+  try {
+    await ensureCollection(RECORDS)
+    try {
+      await purgeExpired()
+    } catch (e) {}
+    let rows = []
+    try {
+      const res = await db.collection(RECORDS).where({ openid }).limit(100).get()
+      rows = res.data || []
+    } catch (e) {}
+    if (!rows.length) {
+      try {
+        const res = await db.collection(RECORDS).limit(100).get()
+        rows = (res.data || []).filter((row) => row.openid === openid || row._openid === openid)
+      } catch (e) {}
+    }
+    const cutoff = Date.now() - KEEP_MS
+    const fresh = rows.filter((row) => {
+      const at = recordTime(row.createdAt)
+      return !at || at >= cutoff
+    })
+    fresh.sort((a, b) => recordTime(b.createdAt) - recordTime(a.createdAt))
+    const keys = []
+    fresh.forEach((row) => {
+      if (row.eventId && keys.indexOf(row.eventId) < 0) keys.push(row.eventId)
+    })
+    const events = {}
+    await Promise.all(keys.map(async (key) => {
+      const item = await getEvent(key)
+      if (item) events[item.code || item._id] = item
+      if (item && item.code) events[item.code] = item
+      if (item && item._id) events[item._id] = item
+    }))
+    const all = fresh.map((row) => {
+      const item = events[row.eventId]
+      const values = recordValues(row)
+      return {
+        id: row._id,
+        eventId: row.eventId,
+        title: item ? item.title : '签到',
+        time: formatTime(row.createdAt),
+        summary: [row.name].concat(values).filter(Boolean).join(' · ') || '已签到',
+        status: item && item.status === 'closed' ? 'closed' : 'open',
+        note: item ? (item.note || '') : '',
+        answers: recordAnswers(row)
+      }
+    })
+    const total = all.length
+    const pages = Math.max(1, Math.ceil(total / size) || 1)
+    const current = Math.min(Math.max(1, parseInt(page, 10) || 1), pages)
+    return {
+      ok: true,
+      records: all.slice((current - 1) * size, current * size),
+      page: current,
+      pages: total ? pages : 1,
+      total
+    }
+  } catch (error) {
+    const msg = (error && (error.errMsg || error.message)) || ''
+    if (/not exist|-502005/i.test(msg)) return { ok: true, records: [], page: 1, pages: 1, total: 0 }
+    return fail(dbMessage(error))
+  }
+}
+
+async function readRecord(openid, recordId) {
+  const id = cleanText(recordId, 64)
+  if (!id) return fail('找不到这条签到')
+  let row
+  try {
+    const res = await db.collection(RECORDS).doc(id).get()
+    row = res && res.data
+  } catch (error) {
+    return fail('找不到这条签到')
+  }
+  if (!row) return fail('找不到这条签到')
+  if (row.openid !== openid && row._openid !== openid) return fail('只能查看自己的签到')
+  const item = row.eventId ? await getEvent(row.eventId) : null
+  return {
+    ok: true,
+    record: {
+      id: row._id,
+      eventId: row.eventId || '',
+      title: item ? item.title : '签到',
+      note: item ? (item.note || '') : '',
+      status: item && item.status === 'closed' ? 'closed' : 'open',
+      time: formatTime(row.createdAt),
+      answers: recordAnswers(row)
+    }
+  }
+}
+
 async function readEvent(openid, eventId) {
   const item = await getEvent(eventId)
   if (!item) return fail('找不到这个签到')
@@ -288,23 +399,26 @@ async function readEvent(openid, eventId) {
 }
 
 async function purgeExpired(eventKey) {
-  const cutoff = new Date(Date.now() - KEEP_MS)
-  const _ = db.command
-  const where = { createdAt: _.lt(cutoff) }
-  if (eventKey) where.eventId = eventKey
+  const cutoff = Date.now() - KEEP_MS
   for (let round = 0; round < 20; round += 1) {
     let res
     try {
-      res = await db.collection(RECORDS).where(where).limit(100).get()
+      const query = eventKey
+        ? db.collection(RECORDS).where({ eventId: eventKey })
+        : db.collection(RECORDS)
+      res = await query.limit(100).get()
     } catch (error) {
       const msg = (error && (error.errMsg || error.message)) || ''
       if (/not exist|-502005/i.test(msg)) return
       throw error
     }
-    const rows = (res && res.data) || []
+    const rows = ((res && res.data) || []).filter((row) => {
+      const at = recordTime(row.createdAt)
+      return at && at < cutoff
+    })
     if (!rows.length) return
     await Promise.all(rows.map((row) => db.collection(RECORDS).doc(row._id).remove().catch(() => {})))
-    if (rows.length < 100) return
+    if (((res && res.data) || []).length < 100) return
   }
 }
 
@@ -361,6 +475,22 @@ function recordValues(row) {
     return row.customs.map((item) => item && item.value).filter(Boolean)
   }
   return row.customValue ? [row.customValue] : []
+}
+
+function recordAnswers(row) {
+  const answers = []
+  if (row.name) answers.push({ label: '姓名', value: row.name })
+  if (Array.isArray(row.customs) && row.customs.length) {
+    row.customs.forEach((item) => {
+      if (!item || !item.label) return
+      answers.push({ label: item.label, value: item.value || '' })
+    })
+    return answers
+  }
+  if (row.customLabel || row.customValue) {
+    answers.push({ label: row.customLabel || '填写内容', value: row.customValue || '' })
+  }
+  return answers
 }
 
 function collectAnswers(customs, event) {
@@ -428,6 +558,26 @@ async function checkIn(openid, event) {
     return fail(dbMessage(error))
   }
   return { ok: true, event: publicEvent(item), name }
+}
+
+async function removeRecord(openid, recordId) {
+  const id = cleanText(recordId, 64)
+  if (!id) return fail('找不到这条签到')
+  let row
+  try {
+    const res = await db.collection(RECORDS).doc(id).get()
+    row = res && res.data
+  } catch (error) {
+    return fail('找不到这条签到')
+  }
+  if (!row) return fail('找不到这条签到')
+  if (row.openid !== openid && row._openid !== openid) return fail('只能删除自己的签到')
+  try {
+    await db.collection(RECORDS).doc(id).remove()
+  } catch (error) {
+    return fail('删除失败，请重试')
+  }
+  return { ok: true }
 }
 
 async function removeEvent(openid, eventId) {
@@ -542,9 +692,12 @@ exports.main = async (event) => {
   try {
     if (action === 'createEvent') return await createEvent(OPENID, event)
     if (action === 'listMine') return await listMine(OPENID, event.page)
+    if (action === 'listJoined') return await listJoined(OPENID, event.page)
+    if (action === 'readRecord') return await readRecord(OPENID, event.recordId)
     if (action === 'readEvent') return await readEvent(OPENID, event.eventId)
     if (action === 'listRecords') return await listRecords(OPENID, event.eventId)
     if (action === 'checkIn') return await checkIn(OPENID, event)
+    if (action === 'removeRecord') return await removeRecord(OPENID, event.recordId)
     if (action === 'removeEvent') return await removeEvent(OPENID, event.eventId)
     if (action === 'closeEvent') return await setStatus(OPENID, event.eventId, 'closed')
     if (action === 'openEvent') return await setStatus(OPENID, event.eventId, 'open')

@@ -47,8 +47,18 @@ function isDevtools() {
   }
 }
 
+function getEnvVersion() {
+  try {
+    const account = wx.getAccountInfoSync()
+    return (account && account.miniProgram && account.miniProgram.envVersion) || ''
+  } catch (e) {
+    return ''
+  }
+}
+
 function shouldMountNativeAd() {
-  return !isDevtools()
+  // develop 开发版、trial 体验版不挂广告，只有 release 正式版展示。
+  return getEnvVersion() === 'release' && !isDevtools()
 }
 
 function destroyAd() {

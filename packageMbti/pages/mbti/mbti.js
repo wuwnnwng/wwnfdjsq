@@ -50,7 +50,8 @@ Page({
     result: null,
     resultTab: 'portrait',
     showBackOwn: false,
-    savingCard: false
+    savingCard: false,
+    retainBack: false
   },
 
   onLoad(query) {
@@ -129,6 +130,7 @@ Page({
     const picked = this._answers[question.id]
     this.setData({
       stage: 'quiz',
+      retainBack: true,
       quiz: {
         number: this._index + 1,
         total,
@@ -222,7 +224,15 @@ Page({
     this.persistDraft()
     this.armGuard(false)
     this.refreshHome()
-    this.setData({ stage: 'home', quiz: null })
+    this.setData({ stage: 'home', quiz: null, retainBack: false })
+  },
+
+  onRetainBack() {
+    if (this.data.stage !== 'quiz') {
+      this.setData({ retainBack: false })
+      return
+    }
+    this.leaveQuiz()
   },
 
   onPrev() {
@@ -278,7 +288,8 @@ Page({
       result,
       resultTab: 'portrait',
       showBackOwn: false,
-      quiz: null
+      quiz: null,
+      retainBack: false
     })
     const token = (this._adToken = (this._adToken || 0) + 1)
     setTimeout(() => {

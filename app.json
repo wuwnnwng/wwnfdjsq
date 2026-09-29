@@ -13,7 +13,6 @@
     "pages/tools/fitout/fitout",
     "pages/tools/datetime/datetime",
     "pages/tools/qrcode/qrcode",
-    "pages/tools/anniversary/anniversary",
     "pages/tools/rmb/rmb",
     "pages/tools/percent/percent",
     "pages/tools/age/age",
@@ -79,16 +78,21 @@
       "root": "packageCheckin",
       "name": "checkin",
       "pages": ["pages/checkin/checkin"]
+    },
+    {
+      "root": "packageFocus",
+      "name": "focus",
+      "pages": ["pages/focus/focus"]
     }
   ],
   "preloadRule": {
     "pages/index/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel", "mbti", "checkin"]
+      "packages": ["footprint", "exam", "travel", "mbti", "checkin", "focus"]
     },
     "pages/tools/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel", "mbti", "checkin"]
+      "packages": ["footprint", "exam", "travel", "mbti", "checkin", "focus"]
     }
   },
   "lazyCodeLoading": "requiredComponents"

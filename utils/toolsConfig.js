@@ -9,9 +9,9 @@ const RECOMMEND_TOOL_IDS = ['mortgage', 'mbti', 'calendar']
 const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
-  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
+  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
   { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'checkin', 'bmi', 'diet', 'exam'] },
-  { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'anniversary', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
+  { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
 
 const TOOLS = [
@@ -106,15 +106,6 @@ const TOOLS = [
     iconType: 'checkin',
     keywords: '签到二维码扫描考勤会议活动导出Excel',
     page: '/packageCheckin/pages/checkin/checkin'
-  },
-  {
-    id: 'anniversary',
-    name: '纪念日倒计时',
-    shortName: '纪念日',
-    icon: '🎉',
-    iconType: 'anniversary',
-    keywords: '纪念日倒计时恋爱结婚生日相识周年撒花',
-    page: '/pages/tools/anniversary/anniversary'
   },
   {
     id: 'rmb',
@@ -284,6 +275,15 @@ const TOOLS = [
     iconType: 'mbti',
     keywords: 'MBTI性格测试16型人格四字母INTJ INTP ENTJ ENTP INFJ INFP ENFJ ENFP ISTJ ISFJ ESTJ ESFJ ISTP ISFP ESTP ESFP人格性格',
     page: '/packageMbti/pages/mbti/mbti'
+  },
+  {
+    id: 'focus',
+    name: '综合脑力自测',
+    shortName: '脑力自测',
+    icon: '🎯',
+    iconType: 'focus',
+    keywords: '综合脑力自测脑力测试记忆力反应力空间思维空间力专注力趣味娱乐',
+    page: '/packageFocus/pages/focus/focus'
   },
   {
     id: 'chance',

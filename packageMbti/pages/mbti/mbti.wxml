@@ -7,6 +7,15 @@
   </view>
 </template>
 
+<page-container
+  show="{{retainBack}}"
+  overlay="{{false}}"
+  duration="{{0}}"
+  z-index="1"
+  custom-style="height:0;width:0;overflow:hidden;opacity:0;background:transparent;"
+  bindbeforeleave="onRetainBack"
+/>
+
 <view class="page page-shell theme-{{theme}}">
   <scroll-view wx:if="{{stage === 'home'}}" scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
     <view class="mbti-hero">

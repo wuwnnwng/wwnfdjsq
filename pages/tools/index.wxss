@@ -255,10 +255,6 @@
   background: linear-gradient(135deg, #e0f2fe, #38bdf8);
 }
 
-.tool-icon-anniversary {
-  background: linear-gradient(135deg, #fce7f3, #e879f9);
-}
-
 .tool-icon-compound {
   background: linear-gradient(135deg, #d1fae5, #10b981);
 }
@@ -285,6 +281,10 @@
 
 .tool-icon-mbti {
   background: linear-gradient(135deg, #ddd6fe, #8b5cf6);
+}
+
+.tool-icon-focus {
+  background: linear-gradient(135deg, #ccfbf1, #2dd4bf);
 }
 
 .tool-card-name {

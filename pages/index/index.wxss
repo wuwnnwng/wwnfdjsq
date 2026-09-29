@@ -296,7 +296,6 @@
 .tool-icon-weather { background: linear-gradient(135deg, #dbeafe, #60a5fa); }
 .tool-icon-rmb { background: linear-gradient(135deg, #fef3c7, #f59e0b); }
 .tool-icon-calc { background: linear-gradient(135deg, #ccfbf1, #5eead4); }
-.tool-icon-anniversary { background: linear-gradient(135deg, #fce7f3, #e879f9); }
 .tool-icon-compound { background: linear-gradient(135deg, #d1fae5, #10b981); }
 .tool-icon-duedate { background: linear-gradient(135deg, #fce7f3, #f472b6); }
 .tool-icon-safeperiod { background: linear-gradient(135deg, #ede9fe, #a78bfa); }
@@ -307,3 +306,4 @@
 .tool-icon-base { background: linear-gradient(135deg, #ede9fe, #a78bfa); }
 .tool-icon-ershou { background: linear-gradient(135deg, #ffedd5, #fb923c); }
 .tool-icon-mbti { background: linear-gradient(135deg, #ddd6fe, #8b5cf6); }
+.tool-icon-focus { background: linear-gradient(135deg, #ccfbf1, #2dd4bf); }

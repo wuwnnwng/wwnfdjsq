@@ -354,14 +354,6 @@ function getQrcodeToolShare() {
   }
 }
 
-function getAnniversaryToolShare() {
-  const path = '/pages/tools/anniversary/anniversary'
-  return {
-    appMessage: buildToolShareAppMessage(path, '纪念日倒计时'),
-    timeline: buildToolShareTimeline(path, '纪念日倒计时')
-  }
-}
-
 function getRmbToolShare() {
   const path = '/pages/tools/rmb/rmb'
   return {
@@ -823,7 +815,6 @@ module.exports = {
   getFitoutToolShare,
   getDatetimeToolShare,
   getQrcodeToolShare,
-  getAnniversaryToolShare,
   getRmbToolShare,
   getPercentToolShare,
   getAgeToolShare,

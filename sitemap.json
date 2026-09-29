@@ -49,11 +49,6 @@
     },
     {
       "action": "allow",
-      "page": "pages/tools/anniversary/anniversary",
-      "priority": 70
-    },
-    {
-      "action": "allow",
       "page": "pages/tools/fitout/fitout",
       "priority": 70
     },
@@ -180,6 +175,11 @@
     {
       "action": "allow",
       "page": "packageCheckin/pages/checkin/checkin",
+      "priority": 40
+    },
+    {
+      "action": "allow",
+      "page": "packageFocus/pages/focus/focus",
       "priority": 40
     },
     {

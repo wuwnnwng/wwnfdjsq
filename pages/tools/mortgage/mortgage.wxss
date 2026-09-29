@@ -305,10 +305,6 @@
   background: linear-gradient(135deg, #ccfbf1, #5eead4);
 }
 
-.tool-icon-anniversary {
-  background: linear-gradient(135deg, #fce7f3, #e879f9);
-}
-
 .tool-icon-compound {
   background: linear-gradient(135deg, #d1fae5, #10b981);
 }

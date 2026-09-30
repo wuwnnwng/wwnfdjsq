@@ -291,6 +291,10 @@
   background: linear-gradient(135deg, #ffedd5, #fdba74);
 }
 
+.tool-icon-guide {
+  background: linear-gradient(135deg, #d1fae5, #34d399);
+}
+
 .tool-card-name {
   font-size: 26rpx;
   font-weight: 600;

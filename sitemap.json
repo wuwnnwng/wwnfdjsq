@@ -109,6 +109,11 @@
     },
     {
       "action": "allow",
+      "page": "packageTravel/pages/guide/guide",
+      "priority": 40
+    },
+    {
+      "action": "allow",
       "page": "pages/tools/compound/compound",
       "priority": 60
     },

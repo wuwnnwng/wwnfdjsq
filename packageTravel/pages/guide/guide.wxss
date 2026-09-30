@@ -1,0 +1,161 @@
+@import "../../../pages/tools/tool-common.wxss";
+@import "../../../pages/tools/calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, var(--bg-glow-1) 0%, var(--color-hero-fade) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-guide {
+  background: linear-gradient(135deg, #d1fae5, #34d399);
+}
+
+.province-row {
+  white-space: nowrap;
+  margin-top: 16rpx;
+  height: 72rpx;
+}
+
+.province-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 56rpx;
+  margin-right: 12rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid var(--color-line);
+  background: var(--color-chip);
+  font-size: 26rpx;
+  color: var(--color-ink);
+}
+
+.province-chip.active {
+  color: var(--color-on-brand);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+  border-color: transparent;
+}
+
+.city-sheet {
+  height: 420rpx;
+  margin-top: 16rpx;
+}
+
+.city-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.city-chip {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  padding: 12rpx 20rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid var(--color-line);
+  background: var(--color-chip);
+  font-size: 26rpx;
+  color: var(--color-ink);
+}
+
+.city-chip.active {
+  color: var(--color-on-brand);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+  border-color: transparent;
+}
+
+.city-region {
+  font-size: 20rpx;
+  color: var(--color-muted);
+}
+
+.city-chip.active .city-region {
+  color: var(--color-on-brand);
+  opacity: 0.8;
+}
+
+.city-empty {
+  padding: 24rpx 0;
+  font-size: 26rpx;
+  color: var(--color-muted);
+}
+
+.list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.list-count {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.spot-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  min-height: 148rpx;
+  padding: 18rpx 16rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 12rpx 28rpx var(--color-shadow);
+}
+
+.spot-badge {
+  flex-shrink: 0;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.spot-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.spot-no {
+  font-size: 20rpx;
+  font-weight: 800;
+  letter-spacing: 1rpx;
+  opacity: 0.72;
+}
+
+.spot-name {
+  margin-top: 4rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.is-food.tone-0 { background: linear-gradient(145deg, #fff7ed, #fdba74); color: #9a3412; }
+.is-food.tone-1 { background: linear-gradient(145deg, #ffe4e6, #fda4af); color: #9f1239; }
+.is-food.tone-2 { background: linear-gradient(145deg, #fef3c7, #fcd34d); color: #92400e; }
+.is-food.tone-3 { background: linear-gradient(145deg, #ffedd5, #fb923c); color: #9a3412; }
+.is-food.tone-4 { background: linear-gradient(145deg, #fce7f3, #f9a8d4); color: #9d174d; }
+.is-food.tone-5 { background: linear-gradient(145deg, #ecfccb, #bef264); color: #3f6212; }
+.is-sight.tone-0 { background: linear-gradient(145deg, #e0f2fe, #7dd3fc); color: #075985; }
+.is-sight.tone-1 { background: linear-gradient(145deg, #d1fae5, #6ee7b7); color: #065f46; }
+.is-sight.tone-2 { background: linear-gradient(145deg, #ede9fe, #c4b5fd); color: #5b21b6; }
+.is-sight.tone-3 { background: linear-gradient(145deg, #cffafe, #67e8f9); color: #155e75; }
+.is-sight.tone-4 { background: linear-gradient(145deg, #dbeafe, #93c5fd); color: #1e3a8a; }
+.is-sight.tone-5 { background: linear-gradient(145deg, #ccfbf1, #5eead4); color: #115e59; }

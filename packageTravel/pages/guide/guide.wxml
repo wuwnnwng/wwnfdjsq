@@ -1,0 +1,87 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-id">
+        <view class="tool-icon-wrap tool-icon-guide">
+          <text class="tool-icon">🧳</text>
+        </view>
+        <view class="conv-hero-copy">
+          <view class="conv-kicker">娱乐 · {{region}}</view>
+          <view class="conv-title">{{cityName}}</view>
+        </view>
+      </view>
+      <view class="conv-eq">只看{{cityName}}</view>
+      <view class="conv-result">美食 {{foods.length}} 样 · 美景 {{sights.length}} 样</view>
+    </view>
+
+    <ad-banner theme="{{theme}}" />
+
+    <view class="panel">
+      <view class="field">
+        <text class="field-label">县区</text>
+        <view class="field-control">
+          <input class="field-input" value="{{keyword}}" bindinput="onSearch" placeholder="搜县区，例如武隆、奉节" confirm-type="search" />
+        </view>
+      </view>
+      <scroll-view scroll-x class="province-row" enhanced show-scrollbar="{{false}}" wx:if="{{!keyword}}">
+        <view
+          wx:for="{{provinces}}"
+          wx:key="id"
+          class="province-chip {{browseId === item.id ? 'active' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="onPickProvince"
+        >{{item.name}}</view>
+      </scroll-view>
+      <scroll-view scroll-y class="city-sheet" enhanced show-scrollbar="{{false}}">
+        <view class="city-empty" wx:if="{{!cities.length}}">没有这个县区</view>
+        <view class="city-grid" wx:else>
+          <view
+            wx:for="{{cities}}"
+            wx:key="id"
+            class="city-chip {{cityId === item.id ? 'active' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onPickCity"
+          >
+            <text>{{item.name}}</text>
+            <text class="city-region" wx:if="{{item.showRegion}}">{{item.region}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="panel">
+      <view class="list-head">
+        <text>美食</text>
+        <text class="list-count">{{foods.length}} 样</text>
+      </view>
+      <view class="city-empty" wx:if="{{!foods.length}}">这个县区还没有单独收录的吃食</view>
+      <view class="card-grid" wx:else>
+        <view class="spot-card is-food tone-{{item.tone}}" wx:for="{{foods}}" wx:key="no">
+          <view class="spot-badge">{{item.mark}}</view>
+          <view class="spot-copy">
+            <text class="spot-no">{{item.no}}</text>
+            <text class="spot-name">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="panel">
+      <view class="list-head">
+        <text>美景</text>
+        <text class="list-count">{{sights.length}} 样</text>
+      </view>
+      <view class="city-empty" wx:if="{{!sights.length}}">这个县区还没有单独收录的去处</view>
+      <view class="card-grid" wx:else>
+        <view class="spot-card is-sight tone-{{item.tone}}" wx:for="{{sights}}" wx:key="no">
+          <view class="spot-badge">{{item.mark}}</view>
+          <view class="spot-copy">
+            <text class="spot-no">{{item.no}}</text>
+            <text class="spot-name">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="tool-note">点到哪个县区，就只列这个县区的。不够十样就少放几张，不拿全省的来凑。</view>
+    </view>
+  </scroll-view>
+</view>

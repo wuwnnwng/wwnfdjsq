@@ -402,6 +402,14 @@ function getTollToolShare() {
   }
 }
 
+function getGuideToolShare() {
+  const path = '/packageTravel/pages/guide/guide'
+  return {
+    appMessage: buildToolShareAppMessage(path, '旅行攻略'),
+    timeline: buildToolShareTimeline(path, '旅行攻略')
+  }
+}
+
 function getBmiToolShare() {
   const path = '/pages/tools/bmi/bmi'
   return {
@@ -823,6 +831,7 @@ module.exports = {
   getFuelToolShare,
   getOilPriceToolShare,
   getTollToolShare,
+  getGuideToolShare,
   getCanvasToolShare,
   getPuzzleToolShare,
   getCompoundToolShare,

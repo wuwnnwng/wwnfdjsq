@@ -308,3 +308,4 @@
 .tool-icon-mbti { background: linear-gradient(135deg, #ddd6fe, #8b5cf6); }
 .tool-icon-focus { background: linear-gradient(135deg, #ccfbf1, #2dd4bf); }
 .tool-icon-bark { background: linear-gradient(135deg, #ffedd5, #fdba74); }
+.tool-icon-guide { background: linear-gradient(135deg, #d1fae5, #34d399); }

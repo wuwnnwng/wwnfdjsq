@@ -83,16 +83,21 @@
       "root": "packageFocus",
       "name": "focus",
       "pages": ["pages/focus/focus"]
+    },
+    {
+      "root": "packageBark",
+      "name": "bark",
+      "pages": ["pages/bark/bark"]
     }
   ],
   "preloadRule": {
     "pages/index/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel", "mbti", "checkin", "focus"]
+      "packages": ["footprint", "exam", "travel", "mbti", "checkin", "focus", "bark"]
     },
     "pages/tools/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel", "mbti", "checkin", "focus"]
+      "packages": ["footprint", "exam", "travel", "mbti", "checkin", "focus", "bark"]
     }
   },
   "lazyCodeLoading": "requiredComponents"

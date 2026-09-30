@@ -9,7 +9,7 @@ const RECOMMEND_TOOL_IDS = ['mortgage', 'mbti', 'calendar']
 const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
-  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
+  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'bark', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
   { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'checkin', 'bmi', 'diet', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
@@ -284,6 +284,15 @@ const TOOLS = [
     iconType: 'focus',
     keywords: '综合脑力自测脑力测试记忆力反应力空间思维空间力专注力趣味娱乐',
     page: '/packageFocus/pages/focus/focus'
+  },
+  {
+    id: 'bark',
+    name: '狗狗叫声',
+    shortName: '狗狗叫声',
+    icon: '🐶',
+    iconType: 'bark',
+    keywords: '狗狗叫声狗叫汪汪情绪开心兴奋撒娇警惕生气害怕打招呼犯困饥饿玩耍委屈护主猫咪挑衅狼嚎虎啸娱乐',
+    page: '/packageBark/pages/bark/bark'
   },
   {
     id: 'chance',

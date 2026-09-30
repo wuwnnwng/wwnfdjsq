@@ -1,0 +1,57 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-id">
+        <view class="tool-icon-wrap tool-icon-bark">
+          <text class="tool-icon">🐶</text>
+        </view>
+        <view class="conv-hero-copy">
+          <view class="conv-kicker">娱乐 · 点一下一直叫</view>
+          <view class="conv-title">狗狗叫声</view>
+        </view>
+      </view>
+      <view class="conv-eq">十八种狗叫，外加猫咪挑衅、狼嚎、虎啸</view>
+      <view class="conv-result">{{playingName ? playingName + ' 正在叫' : '点头像开始，再点一次停下'}}</view>
+    </view>
+
+    <ad-banner theme="{{theme}}" />
+
+    <view class="panel">
+      <view class="dog-grid">
+        <view
+          class="dog-card {{playingId === item.id ? 'is-on' : ''}}"
+          wx:for="{{calls}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="onPlay"
+        >
+          <view
+            class="avatar sp-{{item.sp}} ear-{{item.ear}} mark-{{item.mark}} {{item.tongue ? 'has-tongue' : ''}}"
+            style="--coat:{{item.coat}};--earc:{{item.earc}};--snout:{{item.snout}};"
+          >
+            <view class="ear ear-l"></view>
+            <view class="ear ear-r"></view>
+            <view class="face">
+              <view class="mask"></view>
+              <view class="spot"></view>
+              <view class="brow brow-l"></view>
+              <view class="brow brow-r"></view>
+              <view class="eye eye-l"><view class="pupil"></view></view>
+              <view class="eye eye-r"><view class="pupil"></view></view>
+              <view class="whisker whisker-l"></view>
+              <view class="whisker whisker-r"></view>
+              <view class="snout">
+                <view class="nose"></view>
+                <view class="mouth"></view>
+                <view class="tongue"></view>
+              </view>
+            </view>
+          </view>
+          <view class="dog-name">{{item.name}}</view>
+          <view class="dog-hint">{{item.hint}}</view>
+        </view>
+      </view>
+      <view class="tool-note">点一下会一直叫，再点这一只就停。点另一只，会换成它的声音。</view>
+    </view>
+  </scroll-view>
+</view>

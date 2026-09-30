@@ -184,6 +184,11 @@
     },
     {
       "action": "allow",
+      "page": "packageBark/pages/bark/bark",
+      "priority": 40
+    },
+    {
+      "action": "allow",
       "page": "*",
       "priority": 20
     }

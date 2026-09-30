@@ -1,0 +1,301 @@
+@import "../../../pages/tools/tool-common.wxss";
+@import "../../../pages/tools/calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, var(--bg-glow-1) 0%, var(--color-hero-fade) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-bark {
+  background: linear-gradient(135deg, #ffedd5, #fdba74);
+}
+
+.dog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14rpx;
+}
+
+.dog-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 8rpx 14rpx;
+  border-radius: 22rpx;
+  background: var(--color-soft);
+  border: 1rpx solid var(--color-line);
+}
+
+.dog-card.is-on {
+  border-color: transparent;
+  background:
+    linear-gradient(160deg, var(--bg-glow-1) 0%, var(--color-card) 70%),
+    var(--color-card);
+  box-shadow: 0 12rpx 28rpx var(--color-shadow);
+}
+
+.dog-name {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+  text-align: center;
+}
+
+.dog-hint {
+  margin-top: 2rpx;
+  font-size: 20rpx;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.avatar {
+  position: relative;
+  width: 132rpx;
+  height: 132rpx;
+}
+
+.ear,
+.face,
+.eye,
+.snout,
+.nose,
+.mouth,
+.tongue,
+.brow,
+.pupil,
+.mask,
+.spot,
+.whisker {
+  position: absolute;
+}
+
+.face {
+  left: 18rpx;
+  top: 32rpx;
+  width: 96rpx;
+  height: 88rpx;
+  border-radius: 46rpx 46rpx 40rpx 40rpx;
+  background: var(--coat);
+  overflow: hidden;
+}
+
+.ear {
+  width: 26rpx;
+  height: 40rpx;
+  top: 14rpx;
+  border-radius: 14rpx 14rpx 6rpx 6rpx;
+  background: var(--earc);
+}
+
+.ear-l { left: 20rpx; }
+.ear-r { right: 20rpx; }
+
+.ear-flop .ear {
+  top: 38rpx;
+  width: 28rpx;
+  height: 44rpx;
+  border-radius: 16rpx;
+}
+
+.ear-flop .ear-l { left: 2rpx; transform: rotate(26deg); }
+.ear-flop .ear-r { right: 2rpx; transform: rotate(-26deg); }
+
+.ear-point .ear {
+  top: 4rpx;
+  width: 22rpx;
+  height: 46rpx;
+}
+
+.ear-tall .ear {
+  top: -2rpx;
+  width: 20rpx;
+  height: 56rpx;
+  border-radius: 12rpx 12rpx 4rpx 4rpx;
+}
+
+.ear-fold .ear {
+  top: 24rpx;
+  width: 32rpx;
+  height: 26rpx;
+  border-radius: 10rpx;
+}
+
+.ear-round .ear {
+  top: 16rpx;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+}
+
+.eye {
+  top: 28rpx;
+  width: 18rpx;
+  height: 22rpx;
+  border-radius: 50%;
+  background: #fff;
+  z-index: 2;
+}
+
+.eye-l { left: 18rpx; }
+.eye-r { right: 18rpx; }
+
+.pupil {
+  left: 6rpx;
+  top: 8rpx;
+  width: 8rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #1f2937;
+}
+
+.snout {
+  left: 26rpx;
+  top: 48rpx;
+  width: 44rpx;
+  height: 32rpx;
+  border-radius: 22rpx;
+  background: var(--snout);
+  z-index: 2;
+}
+
+.nose {
+  left: 14rpx;
+  top: 4rpx;
+  width: 16rpx;
+  height: 12rpx;
+  border-radius: 8rpx 8rpx 6rpx 6rpx;
+  background: #3f2a22;
+}
+
+.mouth {
+  left: 20rpx;
+  top: 16rpx;
+  width: 4rpx;
+  height: 10rpx;
+  border-radius: 2rpx;
+  background: #6b3a2a;
+}
+
+.tongue {
+  display: none;
+  left: 12rpx;
+  top: 22rpx;
+  width: 16rpx;
+  height: 12rpx;
+  border-radius: 0 0 10rpx 10rpx;
+  background: #f43f5e;
+}
+
+.brow,
+.mask,
+.spot,
+.whisker {
+  display: none;
+}
+
+.mark-brow .brow,
+.sp-cat .brow {
+  display: block;
+  width: 18rpx;
+  height: 5rpx;
+  top: 22rpx;
+  background: #292524;
+  border-radius: 4rpx;
+  z-index: 3;
+}
+
+.mark-brow .brow-l,
+.sp-cat .brow-l { left: 16rpx; transform: rotate(16deg); }
+.mark-brow .brow-r,
+.sp-cat .brow-r { right: 16rpx; transform: rotate(-16deg); }
+
+.mark-wide .eye { width: 24rpx; height: 26rpx; top: 24rpx; }
+.mark-wide .eye-l { left: 12rpx; }
+.mark-wide .eye-r { right: 12rpx; }
+.mark-wide .pupil { width: 10rpx; height: 12rpx; }
+
+.mark-sleepy .eye {
+  height: 6rpx;
+  top: 36rpx;
+  background: #44403c;
+  border-radius: 4rpx;
+}
+
+.mark-sleepy .pupil { display: none; }
+
+.mark-sad .eye { transform: rotate(8deg); top: 32rpx; }
+.mark-sad .eye-r { transform: rotate(-8deg); }
+
+.mark-mask .mask {
+  display: block;
+  left: 8rpx;
+  top: 22rpx;
+  width: 80rpx;
+  height: 28rpx;
+  border-radius: 14rpx;
+  background: #1c1917;
+  z-index: 1;
+}
+
+.mark-mask .eye { background: #fef3c7; }
+.mark-mask .pupil { background: #111827; }
+
+.mark-spot .spot {
+  display: block;
+  left: 8rpx;
+  top: 10rpx;
+  width: 28rpx;
+  height: 22rpx;
+  border-radius: 14rpx;
+  background: #1c1917;
+  opacity: 0.85;
+}
+
+.has-tongue .tongue { display: block; }
+
+.sp-cat .face { border-radius: 40rpx 40rpx 34rpx 34rpx; }
+.sp-cat .ear {
+  width: 0;
+  height: 0;
+  top: 6rpx;
+  background: transparent;
+  border-left: 14rpx solid transparent;
+  border-right: 14rpx solid transparent;
+  border-bottom: 36rpx solid var(--earc);
+  border-radius: 0;
+}
+.sp-cat .ear-l { left: 16rpx; transform: rotate(-12deg); }
+.sp-cat .ear-r { right: 16rpx; transform: rotate(12deg); }
+.sp-cat .eye { height: 14rpx; top: 32rpx; }
+.sp-cat .pupil { width: 4rpx; height: 10rpx; left: 7rpx; top: 2rpx; background: #14532d; }
+.sp-cat .whisker { display: block; width: 22rpx; height: 2rpx; top: 58rpx; background: #78716c; z-index: 3; }
+.sp-cat .whisker-l { left: 2rpx; }
+.sp-cat .whisker-r { right: 2rpx; }
+.sp-cat .nose { background: #fb7185; width: 12rpx; left: 16rpx; }
+
+.sp-wolf .face { height: 96rpx; top: 28rpx; border-radius: 40rpx 40rpx 28rpx 28rpx; }
+.sp-wolf .snout { width: 36rpx; height: 42rpx; left: 30rpx; top: 52rpx; background: var(--snout); }
+.sp-wolf .nose { background: #111827; }
+.sp-wolf .eye { background: #fef9c3; }
+.sp-wolf .pupil { background: #b45309; }
+
+.sp-tiger .face {
+  background:
+    linear-gradient(105deg, transparent 0 16%, #1c1917 16% 22%, transparent 22% 38%, #1c1917 38% 44%, transparent 44% 62%, #1c1917 62% 68%, transparent 68%),
+    var(--coat);
+}
+.sp-tiger .snout { background: var(--snout); }
+.sp-tiger .nose { background: #1c1917; width: 18rpx; }
+.sp-tiger .eye { background: #fef08a; }
+.sp-tiger .pupil { background: #1c1917; }
+
+.dog-card.is-on .mouth { height: 16rpx; }
+.dog-card.is-on .avatar { animation: dog-bob 0.32s ease-in-out infinite; }
+.dog-card.is-on.has-tongue .tongue,
+.dog-card.is-on .has-tongue .tongue { display: block; }
+
+@keyframes dog-bob {
+  50% { transform: translateY(-6rpx) rotate(-2deg); }
+}

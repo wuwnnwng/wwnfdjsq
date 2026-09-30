@@ -13,7 +13,7 @@
     <view class="conv-result">美食 {{foods.length}} 样 · 美景 {{sights.length}} 样</view>
   </view>
 
-  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}" scroll-into-view="{{cityAnchor}}" scroll-with-animation>
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
     <ad-banner theme="{{theme}}" />
 
     <view class="panel guide-body">
@@ -32,7 +32,7 @@
           bindtap="onPickProvince"
         >{{item.name}}</view>
       </scroll-view>
-      <view class="city-sheet">
+      <scroll-view scroll-y class="city-sheet" scroll-into-view="{{cityAnchor}}" scroll-with-animation show-scrollbar>
         <view class="city-empty" wx:if="{{!cities.length}}">没有这个城市</view>
         <view class="city-grid" wx:else>
           <view
@@ -47,7 +47,7 @@
             <text class="city-region" wx:if="{{item.showRegion}}">{{item.region}}</text>
           </view>
         </view>
-      </view>
+      </scroll-view>
 
       <view class="guide-block">
         <view class="list-head">

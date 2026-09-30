@@ -47,6 +47,7 @@
 }
 
 .city-sheet {
+  height: 228rpx;
   margin-top: 16rpx;
 }
 

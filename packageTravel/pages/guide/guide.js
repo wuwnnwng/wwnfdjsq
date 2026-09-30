@@ -1,5 +1,6 @@
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getGuideToolShare } = require('../../../utils/share')
+const { createLastInput } = require('../../../utils/toolLastInput')
 const {
   provinces,
   placesOf,
@@ -11,6 +12,8 @@ const {
   defaultPlaceId
 } = require('../../utils/guideData')
 const { createClickSfx } = require('../../utils/clickSfx')
+
+const lastInput = createLastInput('guide', ['cityId', 'browseId'])
 
 function ranked(list, kind) {
   const marks = kind === 'food'
@@ -54,8 +57,11 @@ Page({
   onLoad() {
     enableShareMenu()
     this._click = createClickSfx()
-    this.showPlace(DEFAULT_CITY_ID)
-    this.refreshList('', '50', DEFAULT_CITY_ID)
+    const saved = lastInput.restore()
+    const place = findPlace(saved.cityId || DEFAULT_CITY_ID)
+    const browseId = place.provinceId || saved.browseId || '50'
+    this.showPlace(place.id)
+    this.refreshList('', browseId, place.id)
   },
 
   onShow() {
@@ -78,6 +84,7 @@ Page({
       foods: ranked(lists.foods, 'food'),
       sights: ranked(lists.sights, 'sight')
     })
+    lastInput.flush(this, { cityId: place.id, browseId: place.provinceId })
   },
 
   focusCity(cities, cityId) {

@@ -1,5 +1,10 @@
 {
   "navigationBarTitleText": "旅行攻略｜小小便民工具箱",
   "disableScroll": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "ad-banner": "/components/ad-banner/ad-banner"
+  },
+  "componentPlaceholder": {
+    "ad-banner": "view"
+  }
 }

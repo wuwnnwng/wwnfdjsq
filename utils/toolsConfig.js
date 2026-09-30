@@ -7,9 +7,9 @@ const MAX_FAVORITE_TOOLS = 6
 const RECOMMEND_TOOL_IDS = ['mortgage', 'mbti', 'calendar']
 
 const CATEGORIES = [
-  { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll'] },
+  { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll', 'guide'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
-  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'bark', 'guide', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
+  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'bark', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
   { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'checkin', 'bmi', 'diet', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
@@ -185,7 +185,7 @@ const TOOLS = [
     shortName: '旅行攻略',
     icon: '🧳',
     iconType: 'guide',
-    keywords: '旅行攻略美食美景前十城市重庆北京上海成都西安杭州旅游娱乐',
+    keywords: '出行旅行攻略美食美景城市重庆北京上海成都西安杭州旅游',
     page: '/packageTravel/pages/guide/guide'
   },
   {

@@ -6,7 +6,7 @@
           <text class="tool-icon">🧳</text>
         </view>
         <view class="conv-hero-copy">
-          <view class="conv-kicker">娱乐 · {{region}}</view>
+          <view class="conv-kicker">出行 · {{region}}</view>
           <view class="conv-title">{{cityName}}</view>
         </view>
       </view>
@@ -81,7 +81,7 @@
           </view>
         </view>
       </view>
-      <view class="tool-note">点到哪个县区，就只列这个县区的。不够十样就少放几张，不拿全省的来凑。</view>
+      <view class="tool-note">只列省会、市和县，不列区。县和县级市不够十样就少放。</view>
     </view>
   </scroll-view>
 </view>

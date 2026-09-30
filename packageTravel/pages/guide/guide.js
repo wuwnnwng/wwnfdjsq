@@ -7,7 +7,8 @@ const {
   findPlace,
   listsOf,
   regionOf,
-  DEFAULT_CITY_ID
+  DEFAULT_CITY_ID,
+  defaultPlaceId
 } = require('../../utils/guideData')
 const { createClickSfx } = require('../../utils/clickSfx')
 
@@ -97,6 +98,7 @@ Page({
     if (!id || id === this.data.browseId && !this.data.keyword) return
     if (this._click) this._click.play()
     this.refreshList('', id)
+    this.showPlace(defaultPlaceId(id))
   },
 
   onPickCity(e) {

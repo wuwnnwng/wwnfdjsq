@@ -1,4 +1,5 @@
 const index = require('./guideIndex')
+const { fillCounty } = require('./guideFill')
 
 const CURATED = {
   '50|渝中区': { foods: ['重庆火锅', '重庆小面', '酸辣粉', '山城小汤圆', '抄手', '毛血旺'], sights: ['解放碑', '洪崖洞', '朝天门', '十八梯', '湖广会馆', '三峡博物馆', '人民大礼堂', '李子坝轻轨', '鹅岭', '来福士'] },
@@ -161,7 +162,8 @@ function localOf(place) {
   const curated = CURATED[key] || {}
   const foods = curated.foods || index.countyFood[key] || []
   const sights = curated.sights || index.countySight[key] || []
-  return { foods: foods.slice(), sights: sights.slice() }
+  if (foods.length || sights.length) return { foods: foods.slice(), sights: sights.slice() }
+  return fillCounty(place)
 }
 
 module.exports = {

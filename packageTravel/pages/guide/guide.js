@@ -44,6 +44,7 @@ Page({
     provinces: provinces(),
     cities: [],
     cityId: DEFAULT_CITY_ID,
+    cityAnchor: '',
     cityName: '',
     region: '',
     foods: [],
@@ -54,7 +55,7 @@ Page({
     enableShareMenu()
     this._click = createClickSfx()
     this.showPlace(DEFAULT_CITY_ID)
-    this.refreshList('', '50')
+    this.refreshList('', '50', DEFAULT_CITY_ID)
   },
 
   onShow() {
@@ -79,13 +80,23 @@ Page({
     })
   },
 
-  refreshList(keyword, browseId) {
+  focusCity(cities, cityId) {
+    const anchor = cities.some((item) => item.id === cityId) ? `place-${cityId}` : ''
+    this.setData({ cityAnchor: '' }, () => {
+      if (anchor) this.setData({ cityAnchor: anchor })
+    })
+  },
+
+  refreshList(keyword, browseId, focusId) {
     const rows = keyword ? filterPlaces(keyword) : placesOf(browseId)
+    const cities = cityCards(rows)
+    const activeId = focusId || this.data.cityId
     this.setData({
       keyword,
       browseId,
-      cities: cityCards(rows)
+      cities
     })
+    this.focusCity(cities, activeId)
   },
 
   onSearch(e) {
@@ -97,8 +108,9 @@ Page({
     const id = e.currentTarget.dataset.id
     if (!id || id === this.data.browseId && !this.data.keyword) return
     if (this._click) this._click.play()
-    this.refreshList('', id)
-    this.showPlace(defaultPlaceId(id))
+    const placeId = defaultPlaceId(id)
+    this.refreshList('', id, placeId)
+    this.showPlace(placeId)
   },
 
   onPickCity(e) {
@@ -107,6 +119,7 @@ Page({
     if (this._click) this._click.play()
     if (id === this.data.cityId) return
     this.showPlace(id)
+    this.focusCity(this.data.cities, id)
   },
 
   onShareAppMessage() {

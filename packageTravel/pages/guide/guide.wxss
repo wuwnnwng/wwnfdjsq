@@ -169,3 +169,58 @@
 .is-sight.tone-3 { background: linear-gradient(145deg, #cffafe, #67e8f9); color: #155e75; }
 .is-sight.tone-4 { background: linear-gradient(145deg, #dbeafe, #93c5fd); color: #1e3a8a; }
 .is-sight.tone-5 { background: linear-gradient(145deg, #ccfbf1, #5eead4); color: #115e59; }
+
+.intro-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 32rpx;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.intro-sheet {
+  width: 100%;
+  padding: 36rpx 32rpx 32rpx;
+  border-radius: 28rpx;
+  background: var(--color-surface);
+  box-shadow: 0 18rpx 48rpx var(--color-shadow);
+}
+
+.intro-label {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.intro-title {
+  margin-top: 8rpx;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.intro-text {
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+
+.intro-close {
+  margin-top: 28rpx;
+  height: 80rpx;
+  border-radius: 999rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-on-brand);
+  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-soft) 100%);
+}

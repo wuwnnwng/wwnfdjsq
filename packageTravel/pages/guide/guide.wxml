@@ -56,7 +56,7 @@
         </view>
         <view class="city-empty" wx:if="{{!foods.length}}">这个城市还没有单独收录的吃食</view>
         <view class="card-grid" wx:else>
-          <view class="spot-card is-food tone-{{item.tone}}" wx:for="{{foods}}" wx:key="no">
+          <view class="spot-card is-food tone-{{item.tone}}" wx:for="{{foods}}" wx:key="no" data-kind="food" data-name="{{item.name}}" bindtap="onSpot">
             <view class="spot-badge">{{item.mark}}</view>
             <view class="spot-copy">
               <text class="spot-no">{{item.no}}</text>
@@ -73,7 +73,7 @@
         </view>
         <view class="city-empty" wx:if="{{!sights.length}}">这个城市还没有单独收录的去处</view>
         <view class="card-grid" wx:else>
-          <view class="spot-card is-sight tone-{{item.tone}}" wx:for="{{sights}}" wx:key="no">
+          <view class="spot-card is-sight tone-{{item.tone}}" wx:for="{{sights}}" wx:key="no" data-kind="sight" data-name="{{item.name}}" bindtap="onSpot">
             <view class="spot-badge">{{item.mark}}</view>
             <view class="spot-copy">
               <text class="spot-no">{{item.no}}</text>
@@ -85,4 +85,13 @@
       </view>
     </view>
   </scroll-view>
+
+  <view class="intro-mask" wx:if="{{intro}}" bindtap="onCloseIntro" catchtouchmove="onHoldIntro">
+    <view class="intro-sheet" catchtap="onHoldIntro">
+      <view class="intro-label">{{intro.label}}</view>
+      <view class="intro-title">{{intro.name}}</view>
+      <view class="intro-text">{{intro.text}}</view>
+      <view class="intro-close" bindtap="onCloseIntro">知道了</view>
+    </view>
+  </view>
 </view>

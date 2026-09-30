@@ -12,6 +12,7 @@ const {
   defaultPlaceId
 } = require('../../utils/guideData')
 const { createClickSfx } = require('../../utils/clickSfx')
+const { introOf } = require('../../utils/guideIntro')
 
 const lastInput = createLastInput('guide', ['cityId', 'browseId'])
 
@@ -51,7 +52,8 @@ Page({
     cityName: '',
     region: '',
     foods: [],
-    sights: []
+    sights: [],
+    intro: null
   },
 
   onLoad() {
@@ -119,6 +121,27 @@ Page({
     this.refreshList('', id, placeId)
     this.showPlace(placeId)
   },
+
+  onSpot(e) {
+    const kind = e.currentTarget.dataset.kind
+    const name = e.currentTarget.dataset.name
+    if (!name) return
+    if (this._click) this._click.play()
+    this.setData({
+      intro: {
+        kind,
+        label: kind === 'food' ? '美食' : '美景',
+        name,
+        text: introOf(kind, name, this.data.cityName)
+      }
+    })
+  },
+
+  onCloseIntro() {
+    this.setData({ intro: null })
+  },
+
+  onHoldIntro() {},
 
   onPickCity(e) {
     const id = e.currentTarget.dataset.id

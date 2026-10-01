@@ -1,0 +1,102 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" show-scrollbar="{{false}}">
+    <view class="stage">
+      <button class="upload" hover-class="upload-on" bindtap="onChoose" style="{{result && showBg ? 'background:' + colorHex : ''}}">
+        <image wx:if="{{result}}" class="photo" src="{{result}}" mode="aspectFit" />
+        <image wx:elif="{{src}}" class="photo" src="{{src}}" mode="aspectFit" />
+        <block wx:else>
+          <view class="plus">+</view>
+          <view class="upload-tip">点击上传图片</view>
+        </block>
+      </button>
+      <view class="rechoose" wx:if="{{src}}" bindtap="onChoose">重新选图</view>
+      <view class="meta" wx:if="{{resultMeta}}">{{resultMeta}}</view>
+    </view>
+
+    <view class="panel dock">
+      <view class="field" wx:if="{{showSpec}}" bindtap="onPickSpec">
+        <text class="field-label">规格</text>
+        <text class="field-value">{{specText}} ›</text>
+      </view>
+
+      <view wx:if="{{showBg}}">
+        <view class="field-label alone">选择底色</view>
+        <view class="swatches">
+          <view
+            class="swatch {{colorId === item.id ? 'on' : ''}} {{item.id === 'white' ? 'white' : ''}}"
+            wx:for="{{colors}}"
+            wx:key="id"
+            style="background: {{item.hex}}"
+            data-id="{{item.id}}"
+            bindtap="onColor"
+          ></view>
+          <view class="swatch more {{moreOpen ? 'on' : ''}}" bindtap="onMore">更多</view>
+          <block wx:if="{{moreOpen}}">
+            <view
+              class="swatch {{colorId === item.id ? 'on' : ''}}"
+              wx:for="{{moreColors}}"
+              wx:key="id"
+              style="background: {{item.hex}}"
+              data-id="{{item.id}}"
+              bindtap="onColor"
+            ></view>
+          </block>
+        </view>
+        <view class="field-label alone">换底强度</view>
+        <view class="segment">
+          <view
+            class="segment-item {{strength === item.id ? 'active' : ''}}"
+            wx:for="{{strengths}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="onStrength"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
+      <view wx:if="{{showOffset}}">
+        <view class="field-label alone">取景位置</view>
+        <slider
+          value="{{offset}}"
+          min="0"
+          max="100"
+          activeColor="#1A3F66"
+          block-size="20"
+          bindchanging="onOffset"
+          bindchange="onOffset"
+        />
+      </view>
+
+      <view class="field" wx:if="{{showFormat}}" bindtap="onPickFormat">
+        <text class="field-label">图片类型</text>
+        <text class="field-value">{{fileName}} ›</text>
+      </view>
+
+      <view class="primary-btn {{making ? 'busy' : ''}}" bindtap="onMake">{{making ? '制作中…' : '开始制作'}}</view>
+      <view class="primary-btn ghost" wx:if="{{result}}" bindtap="onSave">保存到相册</view>
+      <view class="tool-note warn" wx:if="{{warn}}">{{warn}}</view>
+      <view class="tool-note" wx:if="{{showBg}}">换底只替换和边缘相近的颜色。衣服颜色贴近底色时，可能被一起换掉。</view>
+      <view class="tool-note" wx:elif="{{mode === 'sharp'}}">在原图上锐化，不能凭空补出没有拍到的细节。</view>
+      <view class="tool-note" wx:elif="{{mode === 'format'}}">导出为 JPG 或 PNG。最长边超过 1400 像素时会先缩小。</view>
+      <view class="tool-note" wx:else>按规格居中裁切。照片比目标更长或更宽时，用取景位置挪一下。</view>
+    </view>
+  </scroll-view>
+
+  <canvas type="2d" id="outCanvas" class="out-canvas"></canvas>
+
+  <view class="privacy-mask" wx:if="{{privacyOpen}}" bindtap="onRejectPrivacy" catchtouchmove="onHoldPrivacy">
+    <view class="privacy-sheet" catchtap="onHoldPrivacy">
+      <view class="privacy-title">隐私保护提示</view>
+      <view class="privacy-text">制作证件照会读取你选中的照片，只在手机里处理，不会上传。请先阅读并同意{{privacyName}}。</view>
+      <view class="privacy-link" bindtap="onOpenPrivacy">查看{{privacyName}}</view>
+      <button
+        id="privacy-agree"
+        class="primary-btn privacy-agree"
+        open-type="agreePrivacyAuthorization"
+        bindagreeprivacyauthorization="onAgreePrivacy"
+        bindtap="onAgreePrivacy"
+      >同意并继续</button>
+      <view class="privacy-skip" bindtap="onRejectPrivacy">不同意</view>
+    </view>
+  </view>
+</view>

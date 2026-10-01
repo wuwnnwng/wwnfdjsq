@@ -84,7 +84,10 @@
       "root": "packageCheckin",
       "name": "checkin",
       "pages": [
-        "pages/checkin/checkin"
+        "pages/checkin/checkin",
+        "pages/idphoto/idphoto",
+        "pages/idphoto/specs",
+        "pages/idphoto/make"
       ]
     },
     {

@@ -1,0 +1,53 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel id-hero">
+      <view class="id-hero-copy">
+        <view class="conv-kicker">日常 · 证件照</view>
+        <view class="conv-title">免费证件照制作</view>
+        <view class="id-go" bindtap="onQuick">一键生成</view>
+      </view>
+      <view class="id-art">📷</view>
+    </view>
+
+    <view class="cat-grid">
+      <view class="id-card cat-tile" wx:for="{{cats}}" wx:key="id" bindtap="onCat" data-id="{{item.id}}">
+        <view class="cat-row">
+          <view>
+            <view class="cat-name">{{item.name}}</view>
+            <view class="cat-desc">{{item.desc}}</view>
+          </view>
+          <view class="cat-mark sm">{{item.mark}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="acts">
+      <view class="act" wx:for="{{acts}}" wx:key="mode" bindtap="onAct" data-mode="{{item.mode}}">
+        <view class="act-icon">{{item.mark}}</view>
+        <view class="act-name">{{item.name}}</view>
+      </view>
+    </view>
+
+    <view class="sec-head">
+      <view class="sec-title">热门证件照</view>
+      <view class="sec-more" bindtap="onMore">查看更多 ›</view>
+    </view>
+    <view class="spec-cols">
+      <view class="spec-col">
+        <view class="id-card spec-card" wx:for="{{hotLeft}}" wx:key="id" bindtap="onSpec" data-id="{{item.id}}">
+          <view class="spec-name">{{item.name}}</view>
+          <view class="spec-sub">{{item.size}}</view>
+        </view>
+      </view>
+      <view class="spec-col">
+        <view class="id-card spec-card" wx:for="{{hotRight}}" wx:key="id" bindtap="onSpec" data-id="{{item.id}}">
+          <view class="spec-name">{{item.name}}</view>
+          <view class="spec-sub">{{item.size}}</view>
+        </view>
+      </view>
+    </view>
+
+    <ad-banner theme="{{theme}}" />
+    <view class="tool-note">照片只在手机里处理，不会上传。换底色适合原来就是纯色背景的照片。</view>
+  </scroll-view>
+</view>

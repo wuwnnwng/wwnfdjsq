@@ -1,0 +1,41 @@
+<view class="page page-shell theme-{{theme}}">
+  <view class="search">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      value="{{keyword}}"
+      placeholder="搜索您需要的规格名称/尺寸"
+      placeholder-class="search-placeholder"
+      confirm-type="search"
+      bindinput="onInput"
+    />
+  </view>
+  <scroll-view wx:if="{{!keyword}}" scroll-x class="tabs" enhanced show-scrollbar="{{false}}">
+    <view
+      class="tab {{tab === item.id ? 'on' : ''}}"
+      wx:for="{{tabs}}"
+      wx:key="id"
+      bindtap="onTab"
+      data-id="{{item.id}}"
+    >{{item.name}}</view>
+  </scroll-view>
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="spec-cols" wx:if="{{!empty}}">
+      <view class="spec-col">
+        <view class="spec-card" wx:for="{{left}}" wx:key="id" bindtap="onSpec" data-id="{{item.id}}">
+          <view class="spec-name">{{item.name}}</view>
+          <view class="spec-sub">{{item.px}}</view>
+          <view class="spec-sub">{{item.mm}}</view>
+        </view>
+      </view>
+      <view class="spec-col">
+        <view class="spec-card" wx:for="{{right}}" wx:key="id" bindtap="onSpec" data-id="{{item.id}}">
+          <view class="spec-name">{{item.name}}</view>
+          <view class="spec-sub">{{item.px}}</view>
+          <view class="spec-sub">{{item.mm}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="empty" wx:else>没有这个规格</view>
+  </scroll-view>
+</view>

@@ -1,0 +1,90 @@
+@import "../../../pages/tools/tool-common.wxss";
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  height: 80rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-panel-border);
+}
+
+.search-icon {
+  font-size: 28rpx;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 80rpx;
+  font-size: 26rpx;
+  color: var(--color-ink);
+}
+
+.search-placeholder {
+  color: var(--color-muted);
+}
+
+.tabs {
+  flex-shrink: 0;
+  height: 84rpx;
+  white-space: nowrap;
+}
+
+.tab {
+  display: inline-block;
+  margin-right: 32rpx;
+  padding: 22rpx 0 12rpx;
+  font-size: 28rpx;
+  color: var(--color-muted);
+}
+
+.tab.on {
+  font-weight: 800;
+  color: var(--color-ink);
+  border-bottom: 6rpx solid var(--color-brand);
+}
+
+.spec-cols {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 24rpx;
+}
+
+.spec-col {
+  width: 332rpx;
+  flex-shrink: 0;
+}
+
+.spec-card {
+  width: 332rpx;
+  margin-bottom: 16rpx;
+  padding: 28rpx 24rpx;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-panel-border);
+  box-sizing: border-box;
+}
+
+.spec-name {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.spec-sub {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--color-muted);
+}
+
+.empty {
+  padding: 80rpx 20rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-muted);
+}

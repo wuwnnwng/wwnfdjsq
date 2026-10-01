@@ -243,6 +243,10 @@
   background: linear-gradient(135deg, #d1fae5, #34d399);
 }
 
+.tool-icon-idphoto {
+  background: linear-gradient(135deg, #dbeafe, #3b82f6);
+}
+
 .tool-icon-chance {
   background: linear-gradient(135deg, #ffedd5, #fb923c);
 }

@@ -184,6 +184,21 @@
     },
     {
       "action": "allow",
+      "page": "packageCheckin/pages/idphoto/idphoto",
+      "priority": 40
+    },
+    {
+      "action": "allow",
+      "page": "packageCheckin/pages/idphoto/specs",
+      "priority": 40
+    },
+    {
+      "action": "allow",
+      "page": "packageCheckin/pages/idphoto/make",
+      "priority": 40
+    },
+    {
+      "action": "allow",
       "page": "packageFocus/pages/focus/focus",
       "priority": 40
     },

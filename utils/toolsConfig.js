@@ -10,7 +10,7 @@ const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll', 'guide'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
   { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'bark', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'checkin', 'bmi', 'diet', 'exam'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'checkin', 'idphoto', 'bmi', 'diet', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
 
@@ -106,6 +106,15 @@ const TOOLS = [
     iconType: 'checkin',
     keywords: '签到二维码扫描考勤会议活动导出Excel',
     page: '/packageCheckin/pages/checkin/checkin'
+  },
+  {
+    id: 'idphoto',
+    name: '证件照',
+    shortName: '证件照',
+    icon: '📷',
+    iconType: 'idphoto',
+    keywords: '日常证件照一寸二寸换底色换背景裁剪尺寸简历教师资格证公务员格式',
+    page: '/packageCheckin/pages/idphoto/idphoto'
   },
   {
     id: 'rmb',

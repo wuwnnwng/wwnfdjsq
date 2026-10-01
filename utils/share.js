@@ -522,6 +522,14 @@ function getCheckinToolShare() {
   }
 }
 
+function getIdPhotoToolShare() {
+  const path = '/packageCheckin/pages/idphoto/idphoto'
+  return {
+    appMessage: buildToolShareAppMessage(path, '证件照'),
+    timeline: buildToolShareTimeline(path, '证件照')
+  }
+}
+
 function getMbtiToolShare(result) {
   const path = '/packageMbti/pages/mbti/mbti'
   if (result && result.code && result.name) {
@@ -844,6 +852,7 @@ module.exports = {
   getFootprintToolShare,
   getExamTipsToolShare,
   getCheckinToolShare,
+  getIdPhotoToolShare,
   getMbtiToolShare,
   buildResultShareTitle,
   encodeShareInput,

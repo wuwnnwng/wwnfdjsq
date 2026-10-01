@@ -3,8 +3,5 @@
   "disableScroll": true,
   "usingComponents": {
     "ad-banner": "/components/ad-banner/ad-banner"
-  },
-  "componentPlaceholder": {
-    "ad-banner": "view"
   }
 }

@@ -38,27 +38,30 @@
     "backgroundColor": "#EEF3F9",
     "backgroundTextStyle": "dark"
   },
-  "usingComponents": {
-    "ad-banner": "/components/ad-banner/ad-banner"
-  },
   "permission": {
     "scope.userLocation": {
       "desc": "用于获取你所在城市的天气"
     }
   },
-  "requiredPrivateInfos": ["getLocation"],
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "subPackages": [
     {
       "root": "packageFootprint",
       "name": "footprint",
-      "pages": ["pages/footprint/footprint"]
+      "pages": [
+        "pages/footprint/footprint"
+      ]
     },
     {
       "root": "packageExam",
       "name": "exam",
-      "pages": ["pages/exam/exam"]
+      "pages": [
+        "pages/exam/exam"
+      ]
     },
     {
       "root": "packageTravel",
@@ -73,32 +76,56 @@
     {
       "root": "packageMbti",
       "name": "mbti",
-      "pages": ["pages/mbti/mbti"]
+      "pages": [
+        "pages/mbti/mbti"
+      ]
     },
     {
       "root": "packageCheckin",
       "name": "checkin",
-      "pages": ["pages/checkin/checkin"]
+      "pages": [
+        "pages/checkin/checkin"
+      ]
     },
     {
       "root": "packageFocus",
       "name": "focus",
-      "pages": ["pages/focus/focus"]
+      "pages": [
+        "pages/focus/focus"
+      ]
     },
     {
       "root": "packageBark",
       "name": "bark",
-      "pages": ["pages/bark/bark"]
+      "pages": [
+        "pages/bark/bark"
+      ]
     }
   ],
   "preloadRule": {
     "pages/index/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel", "mbti", "checkin", "focus", "bark"]
+      "packages": [
+        "footprint",
+        "exam",
+        "travel",
+        "mbti",
+        "checkin",
+        "focus",
+        "bark"
+      ]
     },
     "pages/tools/index": {
       "network": "wifi",
-      "packages": ["footprint", "exam", "travel", "mbti", "checkin", "focus", "bark"]
+      "packages": [
+        "footprint",
+        "exam",
+        "travel",
+        "mbti",
+        "checkin",
+        "focus",
+        "bark"
+      ]
     }
   },
   "lazyCodeLoading": "requiredComponents"

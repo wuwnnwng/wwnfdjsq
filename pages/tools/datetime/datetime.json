@@ -2,6 +2,7 @@
   "navigationBarTitleText": "日期时间｜小小便民工具箱",
   "disableScroll": true,
   "usingComponents": {
-    "date-picker": "/components/date-picker/date-picker"
+    "date-picker": "/components/date-picker/date-picker",
+    "ad-banner": "/components/ad-banner/ad-banner"
   }
 }

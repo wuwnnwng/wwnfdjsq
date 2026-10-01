@@ -37,11 +37,6 @@
     },
     {
       "action": "allow",
-      "page": "pages/tools/weather/weather",
-      "priority": 80
-    },
-    {
-      "action": "allow",
       "page": "pages/tools/converter/converter",
       "params": ["type"],
       "matching": "inclusive",

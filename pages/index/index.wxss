@@ -294,7 +294,6 @@
 .tool-icon-footprint { background: linear-gradient(135deg, #e0f2fe, #38bdf8); }
 .tool-icon-currency { background: linear-gradient(135deg, #fef3c7, #fde68a); }
 .tool-icon-unit { background: linear-gradient(135deg, #dbeafe, #93c5fd); }
-.tool-icon-weather { background: linear-gradient(135deg, #dbeafe, #60a5fa); }
 .tool-icon-rmb { background: linear-gradient(135deg, #fef3c7, #f59e0b); }
 .tool-icon-calc { background: linear-gradient(135deg, #ccfbf1, #5eead4); }
 .tool-icon-compound { background: linear-gradient(135deg, #d1fae5, #10b981); }

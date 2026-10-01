@@ -298,14 +298,6 @@ function getCalendarToolShare() {
   }
 }
 
-function getWeatherToolShare() {
-  const path = '/pages/tools/weather/weather'
-  return {
-    appMessage: buildToolShareAppMessage(path, '天气'),
-    timeline: buildToolShareTimeline(path, '天气')
-  }
-}
-
 function getTaxToolShare() {
   const path = '/pages/tools/tax/tax'
   return {
@@ -824,7 +816,6 @@ module.exports = {
   getCalcToolShare,
   getBaseToolShare,
   getCalendarToolShare,
-  getWeatherToolShare,
   getTaxToolShare,
   getHouseTaxToolShare,
   getMortgageToolShare,

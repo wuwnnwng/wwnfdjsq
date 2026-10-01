@@ -10,7 +10,7 @@ const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll', 'guide'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
   { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'bark', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'weather', 'qrcode', 'checkin', 'idphoto', 'bmi', 'diet', 'exam'] },
+  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'qrcode', 'checkin', 'idphoto', 'bmi', 'diet', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
 
@@ -73,14 +73,6 @@ const TOOLS = [
     icon: '📅',
     iconType: 'calendar',
     page: '/pages/tools/calendar/calendar'
-  },
-  {
-    id: 'weather',
-    name: '天气',
-    shortName: '天气',
-    icon: '🌤️',
-    iconType: 'weather',
-    page: '/pages/tools/weather/weather'
   },
   {
     id: 'calc',

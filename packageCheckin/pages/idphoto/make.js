@@ -2,6 +2,7 @@ const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getIdPhotoToolShare } = require('../../../utils/share')
 const { COLORS, MORE_COLORS, colorById, getSpec } = require('../../utils/idphotoSpecs')
 const { processFrame } = require('../../utils/idphotoImage')
+const { checkImage, showRisky } = require('../../../utils/imageSec')
 
 const TITLES = {
   quick: '制作证件照',
@@ -260,7 +261,20 @@ Page({
         if (token !== this._pickToken) return
         const path = res.tempFilePaths && res.tempFilePaths[0]
         if (!path) return
-        this.setData({ src: path, result: '', resultMeta: '', warn: '' })
+        wx.showLoading({ title: '正在检测', mask: true })
+        checkImage(path).then((result) => {
+          if (token !== this._pickToken) return
+          wx.hideLoading()
+          if (result && result.risky) {
+            showRisky()
+            return
+          }
+          this.setData({ src: path, result: '', resultMeta: '', warn: '' })
+        }).catch(() => {
+          if (token !== this._pickToken) return
+          wx.hideLoading()
+          this.setData({ src: path, result: '', resultMeta: '', warn: '' })
+        })
       },
       fail: (err) => {
         if (token !== this._pickToken) return

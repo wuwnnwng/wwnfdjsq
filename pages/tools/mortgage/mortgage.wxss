@@ -293,10 +293,6 @@
   background: linear-gradient(135deg, #dbeafe, #93c5fd);
 }
 
-.tool-icon-weather {
-  background: linear-gradient(135deg, #dbeafe, #60a5fa);
-}
-
 .tool-icon-rmb {
   background: linear-gradient(135deg, #fef3c7, #f59e0b);
 }

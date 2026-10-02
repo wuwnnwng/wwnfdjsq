@@ -1,0 +1,46 @@
+<view class="cam-page">
+  <camera
+    wx:if="{{cameraOn}}"
+    class="cam"
+    device-position="{{position}}"
+    flash="off"
+    resolution="medium"
+    binderror="onCamError"
+  ></camera>
+  <view class="hud" wx:if="{{cameraOn}}">
+    <view class="tip">站在纯色背景前，拍摄效果最佳</view>
+    <view class="outline">
+      <view class="skull"></view>
+      <view class="ear left"></view>
+      <view class="ear right"></view>
+      <view class="dash"></view>
+      <view class="jaw"></view>
+      <view class="neck"></view>
+      <view class="shoulder left"></view>
+      <view class="shoulder right"></view>
+    </view>
+  </view>
+  <view class="dock" wx:if="{{cameraOn}}">
+    <view class="shutter" hover-class="shutter-on" bindtap="onShot"></view>
+    <view class="flip" hover-class="flip-on" bindtap="onFlip">
+      <view class="flip-ico"></view>
+      <text>切换</text>
+    </view>
+  </view>
+
+  <view class="privacy-mask" wx:if="{{privacyOpen}}" bindtap="onRejectPrivacy" catchtouchmove="onHoldPrivacy">
+    <view class="privacy-sheet" catchtap="onHoldPrivacy">
+      <view class="privacy-title">隐私保护提示</view>
+      <view class="privacy-text">拍摄证件照会使用摄像头。请先阅读并同意{{privacyName}}。</view>
+      <view class="privacy-link" bindtap="onOpenPrivacy">查看{{privacyName}}</view>
+      <button
+        id="privacy-agree"
+        class="privacy-agree"
+        open-type="agreePrivacyAuthorization"
+        bindagreeprivacyauthorization="onAgreePrivacy"
+        bindtap="onAgreePrivacy"
+      >同意并继续</button>
+      <view class="privacy-skip" bindtap="onRejectPrivacy">不同意</view>
+    </view>
+  </view>
+</view>

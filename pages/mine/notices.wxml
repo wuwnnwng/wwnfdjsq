@@ -1,0 +1,9 @@
+<view class="page">
+  <view class="card" wx:for="{{list}}" wx:key="id">
+    <view class="card-title">{{item.title}}</view>
+    <view class="card-time" wx:if="{{item.time}}">{{item.time}}</view>
+    <view class="card-text">{{item.body}}</view>
+  </view>
+  <view class="empty" wx:if="{{empty}}">暂无系统通知</view>
+  <view class="manage" wx:if="{{canManage}}" bindtap="onManage">发布和修改通知</view>
+</view>

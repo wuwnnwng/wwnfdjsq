@@ -1,0 +1,57 @@
+<view class="page">
+  <block wx:if="{{phase === 'checking'}}">
+    <view class="scan">
+      <view class="corner tl"></view>
+      <view class="corner tr"></view>
+      <view class="corner bl"></view>
+      <view class="corner br"></view>
+      <view class="beam"></view>
+    </view>
+    <view class="scan-title">正在处理照片，预计耗时5s左右</view>
+    <view class="task" wx:for="{{tasks}}" wx:key="*this">
+      <view class="task-ico"></view>
+      <text>{{item}}</text>
+    </view>
+  </block>
+
+  <block wx:else>
+    <scroll-view scroll-y class="fail-scroll" show-scrollbar="{{false}}">
+      <view class="card result-card">
+        <image class="thumb" src="{{file}}" mode="aspectFill" />
+        <view class="result-copy">
+          <view class="result-title">{{issueCount}}项检测不合格</view>
+          <view class="issue" wx:for="{{issues}}" wx:key="id">
+            <text class="issue-ico">!</text>
+            <text>{{item.text}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="card sample-card">
+        <view class="sample-title">请仔细阅读后重新拍摄</view>
+        <view class="sample-row">
+          <view class="sample">
+            <view class="sample-photo">
+              <view class="person">
+                <view class="person-head"></view>
+                <view class="person-body"></view>
+              </view>
+            </view>
+            <text class="sample-cap">示例图片</text>
+          </view>
+          <view class="tips">
+            <view class="tip" wx:for="{{guide}}" wx:key="*this">
+              <text class="tip-ok">✓</text>
+              <text>{{item}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="fail-bar">
+      <view class="again" hover-class="again-on" bindtap="onRetake">{{from === 'camera' ? '重新拍照' : '重新选择'}}</view>
+      <button class="forward" open-type="share">转发截图</button>
+    </view>
+  </block>
+</view>

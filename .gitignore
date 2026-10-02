@@ -3,6 +3,7 @@ Thumbs.db
 *.log
 node_modules/
 miniprogram_npm/
+cloudfunctions/**/vendor/
 .idea/
 .vscode/
 project.private.config.json

@@ -1,0 +1,83 @@
+<view class="page theme-{{theme}} {{themeFading ? 'is-theme-fading' : ''}}">
+  <scroll-view scroll-y class="scroll" show-scrollbar="{{false}}">
+    <view class="profile" bindtap="onEdit">
+      <image wx:if="{{loggedIn && avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" />
+      <view wx:else class="avatar avatar-empty">{{loggedIn ? '我' : '登'}}</view>
+      <view class="profile-copy">
+        <view class="profile-name">{{loggedIn ? (nick || '微信用户') : '未登录'}}</view>
+        <view class="profile-sub">{{loggedIn ? '点击编辑我的资料' : '点击登录'}}</view>
+      </view>
+      <text class="chevron">›</text>
+    </view>
+
+    <view class="menu">
+      <view class="row theme-row">
+        <view class="mark skin">肤</view>
+        <text class="row-name">换肤</text>
+        <view class="theme-switch" aria-label="切换皮肤">
+          <view
+            wx:for="{{themeList}}"
+            wx:key="id"
+            class="theme-dot {{theme === item.id ? 'active' : ''}}"
+            data-theme="{{item.id}}"
+            catchtap="onThemeChange"
+            aria-role="button"
+            aria-label="{{item.name}}皮肤"
+          >
+            <view class="theme-dot-core {{item.id}}"></view>
+          </view>
+        </view>
+      </view>
+      <view class="row" bindtap="onPoints">
+        <view class="mark coin">分</view>
+        <text class="row-name">我的积分</text>
+        <text class="row-extra">{{loggedIn ? points : '登录'}}</text>
+        <text class="chevron">›</text>
+      </view>
+      <button class="row button" open-type="contact">
+        <view class="mark service">客</view>
+        <text class="row-name">联系客服</text>
+        <text class="chevron">›</text>
+      </button>
+      <view class="row" bindtap="onNotices">
+        <view class="mark bell">讯</view>
+        <text class="row-name">系统通知</text>
+        <text class="chevron">›</text>
+      </view>
+      <view class="row" wx:if="{{loggedIn && admin}}" bindtap="onUsers">
+        <view class="mark users">员</view>
+        <text class="row-name">用户列表</text>
+        <text class="chevron">›</text>
+      </view>
+      <view class="row" wx:if="{{loggedIn}}" bindtap="onLogout">
+        <view class="mark out">退</view>
+        <text class="row-name danger">退出登录</text>
+        <text class="chevron">›</text>
+      </view>
+    </view>
+    <view class="ad-note" wx:if="{{adFreeText}}">免广告至 {{adFreeText}}</view>
+  </scroll-view>
+
+  <view class="mask" wx:if="{{editing}}" bindtap="onCloseEdit" catchtouchmove="onHold">
+    <view class="sheet" catchtap="onHold">
+      <view class="sheet-title">{{loggedIn ? '编辑资料' : '登录'}}</view>
+      <button class="avatar-pick" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
+        <view wx:else class="avatar avatar-empty">我</view>
+        <text>选择头像</text>
+      </button>
+      <input
+        class="nick-input"
+        type="nickname"
+        value="{{draftNick}}"
+        placeholder="点这里使用微信昵称，也可修改"
+        placeholder-class="nick-placeholder"
+        focus="{{nickFocus}}"
+        bindinput="onNick"
+        bindblur="onNickBlur"
+      />
+      <view class="nick-hint">选择头像后，点昵称栏即可填入微信昵称</view>
+      <view class="save" bindtap="onSaveProfile">{{loggedIn ? '保存' : '登录'}}</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,44 @@
+<view class="page">
+  <view class="balance">
+    <view class="balance-num">{{points}}</view>
+    <view class="balance-label">当前积分</view>
+    <view class="balance-until" wx:if="{{adFreeText}}">免广告至 {{adFreeText}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">积分兑换</view>
+    <view class="card-desc">100积分兑换15天免广告。未到期再次兑换会往后顺延。</view>
+    <view class="progress">
+      <view class="progress-track">
+        <view class="progress-fill" style="width: {{progress}}%;"></view>
+      </view>
+      <view class="progress-text">{{lack > 0 ? '还差' + lack + '积分' : '已攒满，可以兑换'}}</view>
+    </view>
+    <view class="redeem {{points >= cost ? '' : 'off'}}" bindtap="onRedeem">立即兑换</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">获取积分</view>
+    <view class="task">
+      <view class="task-copy">
+        <view class="task-name">每日签到</view>
+        <view class="task-sub">每天 5 积分</view>
+      </view>
+      <view class="task-btn {{checked ? 'done' : ''}}" bindtap="onCheckIn">{{checked ? '已签到' : '签到'}}</view>
+    </view>
+    <view class="task">
+      <view class="task-copy">
+        <view class="task-name">分享给好友</view>
+        <view class="task-sub">好友打开后，你获得 15 积分</view>
+      </view>
+      <button class="task-btn share" open-type="share">分享</button>
+    </view>
+    <view class="task">
+      <view class="task-copy">
+        <view class="task-name">发朋友圈</view>
+        <view class="task-sub">点右侧按钮，按提示分享到朋友圈，每天 5 积分</view>
+      </view>
+      <view class="task-btn {{timelineDone ? 'done' : ''}}" bindtap="onTimeline">{{timelineDone ? '已领取' : '去分享'}}</view>
+    </view>
+  </view>
+</view>

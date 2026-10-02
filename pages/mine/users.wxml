@@ -1,0 +1,18 @@
+<view class="page theme-{{theme}}">
+  <view class="summary">共 {{total}} 人 · 第 {{page}} 页</view>
+  <scroll-view scroll-y class="scroll" show-scrollbar="{{false}}">
+    <view class="card" wx:for="{{list}}" wx:key="id">
+      <view class="head">
+        <text class="name">{{item.nickText}}</text>
+        <text class="status {{item.online ? 'on' : ''}}">{{item.statusText}}</text>
+      </view>
+      <view class="meta">积分 {{item.points}} · 兑换 {{item.redeemCount}} 次</view>
+      <view class="time">创建时间 {{item.timeText}}</view>
+    </view>
+    <view class="empty" wx:if="{{!loading && !list.length}}">还没有用户</view>
+  </scroll-view>
+  <view class="pager">
+    <view class="pager-btn {{page <= 1 ? 'disabled' : ''}}" bindtap="onPrev">上一页</view>
+    <view class="pager-btn {{hasMore ? '' : 'disabled'}}" bindtap="onNext">下一页</view>
+  </view>
+</view>

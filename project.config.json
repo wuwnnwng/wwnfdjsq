@@ -8,7 +8,19 @@
       },
       {
         "type": "glob",
+        "value": "cloudfunctions/**"
+      },
+      {
+        "type": "glob",
         "value": "**/node_modules/**"
+      },
+      {
+        "type": "glob",
+        "value": "**/vendor/**"
+      },
+      {
+        "type": "regexp",
+        "value": "(^|/)(cloudfunctions|node_modules|vendor)/"
       }
     ],
     "include": []

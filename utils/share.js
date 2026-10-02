@@ -235,18 +235,34 @@ function buildToolShareTitle(name) {
   return `${title}｜${APP_BRAND}`
 }
 
+function readShareOpenId() {
+  try {
+    return wx.getStorageSync('points_openid') || ''
+  } catch (e) {
+    return ''
+  }
+}
+
+function withInviter(path) {
+  const openid = readShareOpenId()
+  const target = String(path || '')
+  if (!openid || !target || target.indexOf('inviter=') >= 0) return target
+  return `${target}${target.indexOf('?') >= 0 ? '&' : '?'}inviter=${encodeURIComponent(openid)}`
+}
+
 function buildToolShareAppMessage(path, name) {
   return {
     title: buildToolShareTitle(name),
-    path
+    path: withInviter(path)
   }
 }
 
 function buildToolShareTimeline(path, name) {
-  const queryIndex = path.indexOf('?')
+  const full = withInviter(path)
+  const queryIndex = full.indexOf('?')
   return {
     title: buildToolShareTitle(name),
-    query: queryIndex >= 0 ? path.slice(queryIndex + 1) : ''
+    query: queryIndex >= 0 ? full.slice(queryIndex + 1) : ''
   }
 }
 
@@ -544,17 +560,11 @@ function getMbtiToolShare(result) {
 }
 
 function getShareAppMessage() {
-  return {
-    title: `日常计算、房产生活，打开就用｜${APP_BRAND}`,
-    path: '/pages/index/index'
-  }
+  return buildToolShareAppMessage('/pages/index/index', '日常计算、房产生活，打开就用')
 }
 
 function getShareTimeline() {
-  return {
-    title: `日常计算、房产生活，打开就用｜${APP_BRAND}`,
-    query: ''
-  }
+  return buildToolShareTimeline('/pages/index/index', '日常计算、房产生活，打开就用')
 }
 
 /**

@@ -14,7 +14,7 @@ Page({
   },
 
   onLoad() {
-    enableShareMenu()
+    wx.switchTab({ url: '/pages/index/index' })
   },
 
   onShow() {

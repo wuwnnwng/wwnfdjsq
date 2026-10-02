@@ -127,6 +127,15 @@ function applyThemeChrome(themeId) {
       backgroundColorBottom: theme.pageBg
     })
   }
+  if (wx.setTabBarStyle) {
+    const dark = theme.id === 'nexus'
+    wx.setTabBarStyle({
+      color: '#94A3B8',
+      selectedColor: theme.brand,
+      backgroundColor: dark ? '#0B1220' : '#ffffff',
+      borderStyle: dark ? 'black' : 'white'
+    })
+  }
   return theme
 }
 

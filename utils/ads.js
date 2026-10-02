@@ -56,7 +56,17 @@ function getEnvVersion() {
   }
 }
 
+function isAdFree() {
+  try {
+    const until = Number(wx.getStorageSync('ad_free_until') || 0)
+    return until > Date.now()
+  } catch (e) {
+    return false
+  }
+}
+
 function shouldMountNativeAd() {
+  if (isAdFree()) return false
   // develop 开发版、trial 体验版不挂广告，只有 release 正式版展示。
   return getEnvVersion() === 'release' && !isDevtools()
 }
@@ -238,6 +248,7 @@ function bindPageAds(options) {
 module.exports = {
   AD_UNITS,
   INTERSTITIAL_ROUTES,
+  isAdFree,
   shouldMountNativeAd,
   createInterstitialAd,
   showInterstitialAd,

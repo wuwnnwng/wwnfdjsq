@@ -2,6 +2,7 @@ const { checkLocalVersion, checkMiniProgramUpdate } = require('./utils/version')
 const { getThemeId } = require('./utils/theme')
 const { rememberShareLanding, rewriteShareLaunchRoute } = require('./utils/share')
 const { bindPageAds } = require('./utils/ads')
+const { syncPoints, claimInvite } = require('./utils/points')
 
 if (!Page.__wwnWrapped) {
   const originalPage = Page
@@ -56,6 +57,8 @@ App({
         env: 'cloud1-d1gbvmd3eca12dcdc',
         traceUser: true
       })
+      syncPoints().catch(() => {})
+      claimInvite(options)
     }
   },
 
@@ -63,5 +66,6 @@ App({
     if (options && (options.path || (options.query && Object.keys(options.query).length))) {
       this.globalData.enterOptions = options
     }
+    if (wx.cloud) claimInvite(options)
   }
 })

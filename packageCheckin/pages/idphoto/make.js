@@ -1,8 +1,8 @@
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
-const { enableShareMenu, getIdPhotoToolShare } = require('../../../utils/share')
+const { enableShareMenu } = require('../../../utils/share')
 const { COLORS, MORE_COLORS, colorById, getSpec } = require('../../utils/idphotoSpecs')
 const { processFrame } = require('../../utils/idphotoImage')
-const { checkImage, showRisky } = require('../../../utils/imageSec')
+const { wait: waitPhoto } = require('../../utils/idphotoBridge')
 
 const TITLES = {
   quick: '制作证件照',
@@ -17,6 +17,38 @@ const STRENGTHS = [
   { id: 'mid', name: '中' },
   { id: 'strong', name: '强' }
 ]
+
+const SHORT = {
+  quick: '证件照',
+  bg: '更换底色',
+  crop: '裁剪尺寸',
+  sharp: '图片变清晰',
+  format: '格式转换'
+}
+
+const STEPS = [
+  { no: '第1步', name: '上传相片', sub: '拍摄' },
+  { no: '第2步', name: '裁剪换底', sub: '马上出图' },
+  { no: '第3步', name: '保存相片', sub: '存到相册' }
+]
+
+const GUIDE = [
+  '优先使用后置摄像头拍摄',
+  '站白墙（纯色）前，光线充足均匀',
+  '头部居中，正对镜头',
+  '露出眉毛和耳朵，面部无遮挡'
+]
+
+function presentSpec(spec, mode) {
+  const hasMm = !!(spec && spec.mmW > 0 && spec.mmH > 0)
+  return {
+    specName: spec ? spec.name : (SHORT[mode] || '证件照'),
+    printText: hasMm ? `${spec.mmW}*${spec.mmH}mm` : '无要求',
+    pixelText: spec ? `${spec.width}*${spec.height}px` : '原图尺寸',
+    fileText: spec && spec.maxKb ? `${spec.maxKb}KB以内` : '无要求',
+    dpiText: hasMm ? '300dpi' : '无要求'
+  }
+}
 
 function readFrame(src) {
   return new Promise((resolve, reject) => {
@@ -120,6 +152,14 @@ Page({
     showFormat: false,
     showOffset: true,
     showStrength: true,
+    specName: '证件照',
+    printText: '无要求',
+    pixelText: '原图尺寸',
+    fileText: '无要求',
+    dpiText: '无要求',
+    steps: STEPS,
+    guide: GUIDE,
+    demoCells: [1, 2, 3, 4, 5, 6],
     privacyOpen: false,
     privacyName: '《小程序隐私保护指引》'
   },
@@ -129,8 +169,9 @@ Page({
     this.bindPrivacy()
     const mode = TITLES[options && options.mode] ? options.mode : 'quick'
     const spec = getSpec(options && options.spec)
-    wx.setNavigationBarTitle({ title: `${TITLES[mode]}｜小小便民工具箱` })
-    this.setData(this.viewOf(mode, spec))
+    const view = this.viewOf(mode, spec)
+    wx.setNavigationBarTitle({ title: view.specName })
+    this.setData(view)
   },
 
   onUnload() {
@@ -138,7 +179,10 @@ Page({
   },
 
   bindPrivacy() {
-    if (this._privacyBound || typeof wx.onNeedPrivacyAuthorization !== 'function') return
+    if (typeof wx.onNeedPrivacyAuthorization !== 'function') return
+    if (this._onNeedPrivacy && typeof wx.offNeedPrivacyAuthorization === 'function') {
+      wx.offNeedPrivacyAuthorization(this._onNeedPrivacy)
+    }
     this._privacyBound = true
     this._onNeedPrivacy = (resolve) => {
       if (this._privacyChosen === 'agree') {
@@ -220,6 +264,11 @@ Page({
     const theme = getThemeId()
     this.setData({ theme })
     applyThemeChrome(theme)
+    this.bindPrivacy()
+  },
+
+  onHide() {
+    this.unbindPrivacy()
   },
 
   viewOf(mode, spec, extra) {
@@ -241,39 +290,60 @@ Page({
       result: '',
       resultMeta: '',
       warn: ''
-    }, extra)
+    }, presentSpec(spec, mode), extra)
     return patch
   },
 
-  onChoose() {
+  beginPick(sourceType) {
+    this._sourceType = sourceType
     this._agreeLock = false
     this._privacyChosen = ''
     this._pickToken = (this._pickToken || 0) + 1
     this.pickImage(this._pickToken)
   },
 
+  onAlbum() {
+    this.beginPick(['album'])
+  },
+
+  onCamera() {
+    this._pickToken = (this._pickToken || 0) + 1
+    const token = this._pickToken
+    waitPhoto((path) => {
+      if (token !== this._pickToken || !path) return
+      this.setData({ src: path, result: '', resultMeta: '', warn: '' })
+    })
+    wx.navigateTo({ url: '/packageCheckin/pages/idphoto/camera' })
+  },
+
+  onBarPrimary() {
+    if (this.data.making) return
+    if (this.data.result) {
+      this.onSave()
+      return
+    }
+    if (this.data.src) {
+      this.onMake()
+      return
+    }
+    this.onCamera()
+  },
+
   pickImage(token) {
     wx.chooseImage({
       count: 1,
       sizeType: ['original', 'compressed'],
-      sourceType: ['album', 'camera'],
+      sourceType: this._sourceType || ['album', 'camera'],
       success: (res) => {
         if (token !== this._pickToken) return
         const path = res.tempFilePaths && res.tempFilePaths[0]
         if (!path) return
-        wx.showLoading({ title: '正在检测', mask: true })
-        checkImage(path).then((result) => {
-          if (token !== this._pickToken) return
-          wx.hideLoading()
-          if (result && result.risky) {
-            showRisky()
-            return
-          }
-          this.setData({ src: path, result: '', resultMeta: '', warn: '' })
-        }).catch(() => {
-          if (token !== this._pickToken) return
-          wx.hideLoading()
-          this.setData({ src: path, result: '', resultMeta: '', warn: '' })
+        waitPhoto((file) => {
+          if (token !== this._pickToken || !file) return
+          this.setData({ src: file, result: '', resultMeta: '', warn: '' })
+        })
+        wx.navigateTo({
+          url: `/packageCheckin/pages/idphoto/check?from=album&file=${encodeURIComponent(path)}`
         })
       },
       fail: (err) => {
@@ -292,7 +362,8 @@ Page({
       this.setData({ privacyOpen: true })
       return
     }
-    wx.showToast({ title: '没有打开相册', icon: 'none' })
+    const camera = this._sourceType && this._sourceType[0] === 'camera'
+    wx.showToast({ title: camera ? '没有打开相机' : '没有打开相册', icon: 'none' })
   },
 
   stopMake() {
@@ -335,19 +406,22 @@ Page({
   },
 
   onPickSpec() {
+    if (!this.data.showSpec) return
     wx.navigateTo({
       url: '/packageCheckin/pages/idphoto/specs?pick=1',
       events: {
         pick: (spec) => {
           const color = colorById(spec.bg || this.data.colorId)
-          this.setData({
+          const shown = presentSpec(spec, this.data.mode)
+          wx.setNavigationBarTitle({ title: shown.specName })
+          this.setData(Object.assign({
             spec,
             specText: `${spec.name} · ${spec.width}×${spec.height}`,
             colorId: color.id,
             colorHex: color.hex,
             result: '',
             resultMeta: ''
-          })
+          }, shown))
         }
       }
     })
@@ -504,11 +578,24 @@ Page({
     })
   },
 
+  shareOf() {
+    const spec = this.data.spec
+    const name = spec ? spec.name : '证件照'
+    const query = spec ? `mode=${this.data.mode}&spec=${spec.id}` : `mode=${this.data.mode}`
+    return {
+      title: `${name}｜小小便民工具箱`,
+      path: `/packageCheckin/pages/idphoto/make?${query}`,
+      query
+    }
+  },
+
   onShareAppMessage() {
-    return getIdPhotoToolShare().appMessage
+    const share = this.shareOf()
+    return { title: share.title, path: share.path }
   },
 
   onShareTimeline() {
-    return getIdPhotoToolShare().timeline
+    const share = this.shareOf()
+    return { title: share.title, query: share.query }
   }
 })

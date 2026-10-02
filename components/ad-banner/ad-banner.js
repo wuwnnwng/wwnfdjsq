@@ -22,6 +22,12 @@ Component({
     ready: false
   },
 
+  pageLifetimes: {
+    show() {
+      if (!shouldMountNativeAd()) this.setData({ mount: false, ready: false })
+    }
+  },
+
   lifetimes: {
     attached() {
       if (!shouldMountNativeAd()) return

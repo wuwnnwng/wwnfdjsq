@@ -7,8 +7,7 @@ const {
 const {
   getThemeId,
   setThemeId,
-  applyThemeChrome,
-  THEME_LIST
+  applyThemeChrome
 } = require('../../utils/theme')
 const {
   searchTools,
@@ -46,8 +45,6 @@ function buildHome(keyword) {
 Page({
   data: {
     theme: getThemeId(),
-    themeList: THEME_LIST,
-    themeFading: false,
     keyword: '',
     recommendTools: getRecommendTools(),
     leadGroups: [],
@@ -69,37 +66,10 @@ Page({
     this.setData(buildHome(this.data.keyword))
   },
 
-  onUnload() {
-    if (this._themeFadeTimer) {
-      clearTimeout(this._themeFadeTimer)
-      this._themeFadeTimer = null
-    }
-  },
-
   applyTheme(themeId) {
     const theme = setThemeId(themeId)
     if (theme !== this.data.theme) this.setData({ theme })
     applyThemeChrome(theme)
-  },
-
-  onThemeChange(e) {
-    const theme = e.currentTarget.dataset.theme
-    if (!theme || theme === this.data.theme || this._themeSwitching) return
-    this._themeSwitching = true
-    this.setData({ themeFading: true })
-    if (this._themeFadeTimer) clearTimeout(this._themeFadeTimer)
-    this._themeFadeTimer = setTimeout(() => {
-      const next = setThemeId(theme)
-      this.setData({
-        theme: next,
-        themeFading: false
-      })
-      applyThemeChrome(next)
-      this._themeFadeTimer = setTimeout(() => {
-        this._themeSwitching = false
-        this._themeFadeTimer = null
-      }, 300)
-    }, 300)
   },
 
   onSearch(e) {

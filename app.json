@@ -1,6 +1,11 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/mine/mine",
+    "pages/mine/points",
+    "pages/mine/notices",
+    "pages/mine/users",
+    "pages/mine/notice-edit",
     "pages/tools/index",
     "pages/tools/mortgage/mortgage",
     "pages/tools/calendar/calendar",
@@ -36,6 +41,31 @@
     "navigationBarTextStyle": "white",
     "backgroundColor": "#EEF3F9",
     "backgroundTextStyle": "dark"
+  },
+  "permission": {
+    "scope.camera": {
+      "desc": "用于拍摄证件照"
+    }
+  },
+  "tabBar": {
+    "color": "#94A3B8",
+    "selectedColor": "#1A3F66",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/tab/home.png",
+        "selectedIconPath": "assets/tab/home-on.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "assets/tab/mine.png",
+        "selectedIconPath": "assets/tab/mine-on.png"
+      }
+    ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
@@ -78,7 +108,9 @@
         "pages/checkin/checkin",
         "pages/idphoto/idphoto",
         "pages/idphoto/specs",
-        "pages/idphoto/make"
+        "pages/idphoto/make",
+        "pages/idphoto/camera",
+        "pages/idphoto/check"
       ]
     },
     {

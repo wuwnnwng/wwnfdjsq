@@ -1,7 +1,16 @@
 {
   "description": "小小便民工具箱",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "cloudfunctions"
+      },
+      {
+        "type": "glob",
+        "value": "**/node_modules/**"
+      }
+    ],
     "include": []
   },
   "setting": {

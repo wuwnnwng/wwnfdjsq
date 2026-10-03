@@ -2,9 +2,11 @@
   <scroll-view scroll-y class="scroll" show-scrollbar="{{false}}">
     <view class="profile" bindtap="onEdit">
       <image wx:if="{{loggedIn && avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" />
-      <view wx:else class="avatar avatar-empty">{{loggedIn ? '我' : '登'}}</view>
+      <view wx:else class="avatar avatar-guest">
+        <text class="avatar-watermark">便民</text>
+      </view>
       <view class="profile-copy">
-        <view class="profile-name">{{loggedIn ? (nick || '微信用户') : '未登录'}}</view>
+        <view class="profile-name">{{loggedIn ? (nick || '微信用户') : '便民用户'}}</view>
         <view class="profile-sub">{{loggedIn ? '点击编辑我的资料' : '点击登录'}}</view>
       </view>
       <text class="chevron">›</text>
@@ -41,7 +43,20 @@
       </button>
       <view class="row" bindtap="onNotices">
         <view class="mark bell">讯</view>
-        <text class="row-name">系统通知</text>
+        <view class="row-title">
+          <text class="row-name">系统通知</text>
+          <text class="badge" wx:if="{{unreadCount}}">{{unreadText}}</text>
+        </view>
+        <text class="chevron">›</text>
+      </view>
+      <view class="row" bindtap="onOpenBird">
+        <view class="mark bird">鸟</view>
+        <text class="row-name">好鸟哥</text>
+        <text class="chevron">›</text>
+      </view>
+      <view class="row" bindtap="onOpenErshou">
+        <view class="mark market">市</view>
+        <text class="row-name">同城二手</text>
         <text class="chevron">›</text>
       </view>
       <view class="row" wx:if="{{loggedIn && admin}}" bindtap="onUsers">
@@ -59,25 +74,40 @@
   </scroll-view>
 
   <view class="mask" wx:if="{{editing}}" bindtap="onCloseEdit" catchtouchmove="onHold">
-    <view class="sheet" catchtap="onHold">
+    <view class="sheet" bindtap="onSheetTap">
       <view class="sheet-title">{{loggedIn ? '编辑资料' : '登录'}}</view>
-      <button class="avatar-pick" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <view class="avatar-pick" catchtap="onPickAvatar">
         <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
         <view wx:else class="avatar avatar-empty">我</view>
-        <text>选择头像</text>
-      </button>
+        <text>从相册选择</text>
+      </view>
       <input
         class="nick-input"
         type="nickname"
         value="{{draftNick}}"
-        placeholder="点这里使用微信昵称，也可修改"
+        placeholder="请输入昵称"
         placeholder-class="nick-placeholder"
         focus="{{nickFocus}}"
         bindinput="onNick"
         bindblur="onNickBlur"
       />
-      <view class="nick-hint">选择头像后，点昵称栏即可填入微信昵称</view>
+      <view class="nick-hint">头像从相册选择，昵称可自行修改</view>
       <view class="save" bindtap="onSaveProfile">{{loggedIn ? '保存' : '登录'}}</view>
+    </view>
+  </view>
+
+  <view class="privacy-mask" wx:if="{{privacyOpen}}" catchtouchmove="onHold">
+    <view class="privacy-sheet">
+      <view class="privacy-title">用户协议</view>
+      <view class="privacy-text">从相册选择头像前，请先阅读并同意{{privacyName}}。同意后即可打开相册。</view>
+      <view class="privacy-link" bindtap="onOpenPrivacy">查看{{privacyName}}</view>
+      <button
+        id="privacy-agree"
+        class="privacy-agree"
+        open-type="agreePrivacyAuthorization"
+        bindagreeprivacyauthorization="onAgreePrivacy"
+      >同意</button>
+      <view class="privacy-skip" bindtap="onRejectPrivacy">不同意</view>
     </view>
   </view>
 </view>

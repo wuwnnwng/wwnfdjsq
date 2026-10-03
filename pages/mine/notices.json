@@ -1,6 +1,6 @@
 {
-  "navigationBarTitleText": "系统通知",
-  "navigationBarBackgroundColor": "#F5F7FB",
+  "navigationBarTitleText": "通知",
+  "navigationBarBackgroundColor": "#F3F4F8",
   "navigationBarTextStyle": "black",
-  "backgroundColor": "#F5F7FB"
+  "backgroundColor": "#F3F4F8"
 }

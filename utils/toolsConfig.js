@@ -10,20 +10,11 @@ const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll', 'guide'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
   { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'bark', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
-  { id: 'daily', name: '日常工具', toolIds: ['ershou', 'retire', 'pension', 'calendar', 'qrcode', 'checkin', 'idphoto', 'bmi', 'diet', 'exam'] },
+  { id: 'daily', name: '日常工具', toolIds: ['retire', 'pension', 'calendar', 'qrcode', 'checkin', 'idphoto', 'bmi', 'diet', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
 
 const TOOLS = [
-  {
-    id: 'ershou',
-    name: '同城二手',
-    shortName: '同城二手',
-    icon: '🛍️',
-    iconType: 'ershou',
-    keywords: '同城二手闲置转卖二手交易跳蚤市场',
-    miniProgramAppId: 'wx663931c101197d69'
-  },
   {
     id: 'mortgage',
     name: '房贷计算',

@@ -1,8 +1,3 @@
-const path = require('path')
-const Module = require('module')
-process.env.NODE_PATH = path.join(__dirname, 'vendor')
-Module._initPaths()
-
 const cloud = require('wx-server-sdk')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })

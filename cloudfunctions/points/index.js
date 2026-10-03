@@ -1,8 +1,3 @@
-const path = require('path')
-const Module = require('module')
-process.env.NODE_PATH = path.join(__dirname, 'vendor')
-Module._initPaths()
-
 const cloud = require('wx-server-sdk')
 const crypto = require('crypto')
 
@@ -37,6 +32,8 @@ function signedIn(doc, event) {
 }
 
 function viewOf(doc, openid, loggedIn) {
+  const nick = (doc && doc.nick) || ''
+  const avatar = (doc && doc.avatar) || ''
   if (!loggedIn) {
     return {
       ok: true,
@@ -47,8 +44,8 @@ function viewOf(doc, openid, loggedIn) {
       adFreeUntil: 0,
       checked: false,
       timelineDone: false,
-      nick: '',
-      avatar: '',
+      nick,
+      avatar,
       admin: false
     }
   }
@@ -62,10 +59,21 @@ function viewOf(doc, openid, loggedIn) {
     adFreeUntil: doc.adFreeUntil || 0,
     checked: doc.checkinDate === day,
     timelineDone: doc.timelineDate === day,
-    nick: doc.nick || '',
-    avatar: doc.avatar || '',
+    nick,
+    avatar,
     admin: !!doc.admin
   }
+}
+
+async function presentView(view) {
+  const avatar = view && view.avatar
+  if (!avatar || String(avatar).indexOf('cloud://') !== 0) return view
+  try {
+    const res = await cloud.getTempFileURL({ fileList: [avatar] })
+    const file = res && res.fileList && res.fileList[0]
+    if (file && file.tempFileURL) view.avatarUrl = file.tempFileURL
+  } catch (err) {}
+  return view
 }
 
 function isAdmin(openid) {
@@ -296,16 +304,16 @@ async function handle(event) {
     const session = newSession()
     await db.collection(USERS).doc(doc._id).update({ data: { session } })
     doc.session = session
-    return viewOf(doc, openid, true)
+    return presentView(viewOf(doc, openid, true))
   }
 
   if (action === 'logout') {
     await db.collection(USERS).doc(doc._id).update({ data: { session: '' } })
     doc.session = ''
-    return viewOf(doc, openid, false)
+    return presentView(viewOf(doc, openid, false))
   }
 
-  if (action === 'sync') return viewOf(doc, openid, active)
+  if (action === 'sync') return presentView(viewOf(doc, openid, active))
 
   if (action === 'notices') {
     const rows = await noticeRows()
@@ -390,12 +398,13 @@ async function handle(event) {
       } catch (err) {}
     }
     const patch = { avatar: fileID }
-    if (typeof payload.nick === 'string') patch.nick = String(payload.nick).trim().slice(0, 32)
+    const nick = typeof payload.nick === 'string' ? String(payload.nick).trim().slice(0, 32) : ''
+    if (nick) patch.nick = nick
     await db.collection(USERS).doc(doc._id).update({ data: patch })
     const next = await db.collection(USERS).doc(doc._id).get()
     next.data.admin = doc.admin
     next.data.session = doc.session
-    return viewOf(next.data, openid, true)
+    return presentView(viewOf(next.data, openid, true))
   }
 
   if (action === 'profile') {
@@ -404,8 +413,12 @@ async function handle(event) {
       patch.nick = ''
       patch.avatar = ''
     } else {
-      if (typeof payload.nick === 'string') patch.nick = String(payload.nick).trim().slice(0, 32)
-      if (typeof payload.avatar === 'string') patch.avatar = String(payload.avatar).slice(0, 300)
+      if (typeof payload.nick === 'string' && String(payload.nick).trim()) {
+        patch.nick = String(payload.nick).trim().slice(0, 32)
+      }
+      if (typeof payload.avatar === 'string' && payload.avatar.indexOf('http') !== 0) {
+        patch.avatar = String(payload.avatar).slice(0, 300)
+      }
     }
     if (Object.keys(patch).length) {
       await db.collection(USERS).doc(doc._id).update({ data: patch })
@@ -413,7 +426,7 @@ async function handle(event) {
     const next = await db.collection(USERS).doc(doc._id).get()
     next.data.admin = doc.admin
     next.data.session = doc.session
-    return viewOf(next.data, openid, true)
+    return presentView(viewOf(next.data, openid, true))
   }
 
   if (action === 'checkin') {

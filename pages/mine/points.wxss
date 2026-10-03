@@ -2,53 +2,58 @@
   min-height: 100vh;
   padding: 24rpx 28rpx 48rpx;
   box-sizing: border-box;
-  background: #f5f7fb;
+  background:
+    radial-gradient(120% 80% at 0% 0%, var(--bg-glow-1), transparent 55%),
+    radial-gradient(90% 70% at 100% 10%, var(--bg-glow-2), transparent 50%),
+    linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 42%, var(--bg-grad-3) 100%);
 }
 
 .balance {
   padding: 48rpx 28rpx;
   border-radius: 28rpx;
-  background: linear-gradient(180deg, #eef2ff, #fff);
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-panel-border);
   text-align: center;
 }
 
 .balance-num {
   font-size: 80rpx;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--color-ink);
   line-height: 1;
 }
 
 .balance-label {
   margin-top: 12rpx;
   font-size: 26rpx;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .balance-until {
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: #2563eb;
+  color: var(--color-brand);
 }
 
 .card {
   margin-top: 24rpx;
   padding: 28rpx;
   border-radius: 28rpx;
-  background: #fff;
+  background: var(--color-card);
+  border: 1rpx solid var(--color-card-border);
 }
 
 .card-title {
   font-size: 32rpx;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--color-ink);
 }
 
 .card-desc {
   margin-top: 12rpx;
   font-size: 26rpx;
   line-height: 1.5;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .progress {
@@ -58,28 +63,28 @@
 .progress-track {
   height: 16rpx;
   border-radius: 999rpx;
-  background: #e2e8f0;
+  background: var(--color-soft);
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #60a5fa, #3b82f6);
+  background: linear-gradient(90deg, var(--color-brand-soft), var(--color-brand));
 }
 
 .progress-text {
   margin-top: 12rpx;
   font-size: 24rpx;
-  color: #64748b;
+  color: var(--color-muted);
 }
 
 .redeem {
   margin-top: 24rpx;
   height: 88rpx;
   border-radius: 44rpx;
-  background: #3b82f6;
-  color: #fff;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
   font-size: 30rpx;
   font-weight: 700;
   display: flex;
@@ -88,8 +93,8 @@
 }
 
 .redeem.off {
-  background: #e2e8f0;
-  color: #64748b;
+  background: var(--color-soft);
+  color: var(--color-muted);
 }
 
 .task {
@@ -107,14 +112,14 @@
 .task-name {
   font-size: 30rpx;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-ink);
 }
 
 .task-sub {
   margin-top: 6rpx;
   font-size: 24rpx;
   line-height: 1.4;
-  color: #94a3b8;
+  color: var(--color-muted);
 }
 
 .task-btn {
@@ -123,8 +128,8 @@
   height: 64rpx;
   padding: 0 20rpx;
   border-radius: 32rpx;
-  background: #3b82f6;
-  color: #fff;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
   font-size: 26rpx;
   font-weight: 700;
   display: flex;
@@ -134,8 +139,8 @@
 }
 
 .task-btn.done {
-  background: #e2e8f0;
-  color: #64748b;
+  background: var(--color-soft);
+  color: var(--color-muted);
 }
 
 .task-btn.share {

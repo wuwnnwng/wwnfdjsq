@@ -1,3 +1,4 @@
+const { getThemeId, applyThemeChrome } = require('../../utils/theme')
 const { enableShareMenu, getShareAppMessage, getShareTimeline } = require('../../utils/share')
 const {
   readState,
@@ -35,6 +36,7 @@ function applyState(page, state, message) {
 
 Page({
   data: {
+    theme: getThemeId(),
     points: 0,
     checked: false,
     timelineDone: false,
@@ -50,6 +52,9 @@ Page({
   },
 
   onShow() {
+    const theme = getThemeId()
+    this.setData({ theme })
+    applyThemeChrome(theme)
     if (!readState().loggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' })
       setTimeout(() => wx.navigateBack(), 400)

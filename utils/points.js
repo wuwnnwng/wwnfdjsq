@@ -2,13 +2,68 @@ const STATE_KEY = 'points_state'
 const OPENID_KEY = 'points_openid'
 const AD_FREE_KEY = 'ad_free_until'
 const SESSION_KEY = 'user_session'
+const PROFILE_KEY = 'user_profile'
+
+function readProfile() {
+  try {
+    const saved = wx.getStorageSync(PROFILE_KEY)
+    if (saved && typeof saved === 'object') {
+      return {
+        openid: saved.openid || '',
+        nick: saved.nick || '',
+        avatar: saved.avatar || '',
+        avatarUrl: saved.avatarUrl || ''
+      }
+    }
+  } catch (e) {}
+  return { openid: '', nick: '', avatar: '', avatarUrl: '' }
+}
+
+function readOpenId() {
+  try { return wx.getStorageSync(OPENID_KEY) || '' } catch (e) { return '' }
+}
+
+function sameUser(openid, profile) {
+  const left = openid || ''
+  const right = (profile && profile.openid) || ''
+  if (!left || !right) return true
+  return left === right
+}
+
+function rememberProfile(patch) {
+  const prev = readProfile()
+  const openid = (patch && patch.openid) || prev.openid || readOpenId() || ''
+  if (prev.openid && openid && prev.openid !== openid) {
+    const nextUser = {
+      openid,
+      nick: (patch && patch.nick) || '',
+      avatar: (patch && patch.avatar) || '',
+      avatarUrl: (patch && patch.avatarUrl) || ''
+    }
+    try { wx.setStorageSync(PROFILE_KEY, nextUser) } catch (e) {}
+    return nextUser
+  }
+  const avatar = (patch && patch.avatar) || prev.avatar || ''
+  let avatarUrl = (patch && patch.avatarUrl) || ''
+  if (!avatarUrl && avatar && avatar === prev.avatar) avatarUrl = prev.avatarUrl || ''
+  const next = {
+    openid,
+    nick: (patch && patch.nick) || prev.nick || '',
+    avatar,
+    avatarUrl
+  }
+  try { wx.setStorageSync(PROFILE_KEY, next) } catch (e) {}
+  return next
+}
 
 function readState() {
+  const profile = readProfile()
+  let saved = null
   try {
-    const saved = wx.getStorageSync(STATE_KEY)
-    if (saved && typeof saved === 'object') return saved
+    const raw = wx.getStorageSync(STATE_KEY)
+    if (raw && typeof raw === 'object') saved = raw
   } catch (e) {}
-  return {
+  const state = Object.assign({
     points: 0,
     adFreeUntil: 0,
     checked: false,
@@ -16,21 +71,47 @@ function readState() {
     openid: '',
     nick: '',
     avatar: '',
+    avatarUrl: '',
     loggedIn: false,
     admin: false
+  }, saved || {})
+  if (sameUser(state.openid || readOpenId(), profile)) {
+    if (!state.nick) state.nick = profile.nick || ''
+    if (!state.avatar) state.avatar = profile.avatar || ''
+    if (!state.avatarUrl) state.avatarUrl = profile.avatarUrl || ''
   }
+  return state
 }
 
 function writeState(state) {
+  const prev = readState()
+  const profile = readProfile()
+  const loggedIn = !!state.loggedIn
+  const nick = state.nick || prev.nick || profile.nick || ''
+  const avatar = state.avatar || prev.avatar || profile.avatar || ''
+  let avatarUrl = state.avatarUrl || ''
+  if (!avatarUrl && avatar && (avatar === prev.avatar || avatar === profile.avatar)) {
+    avatarUrl = prev.avatarUrl || profile.avatarUrl || ''
+  }
+  if (!avatarUrl && avatar && String(avatar).indexOf('cloud://') !== 0 && String(avatar).indexOf('http') === 0) {
+    avatarUrl = avatar
+  }
+  rememberProfile({
+    openid: state.openid || prev.openid || readOpenId(),
+    nick,
+    avatar,
+    avatarUrl
+  })
   const next = {
     points: Number(state.points) || 0,
     adFreeUntil: Number(state.adFreeUntil) || 0,
     checked: !!state.checked,
     timelineDone: !!state.timelineDone,
-    openid: state.openid || '',
-    nick: state.nick || '',
-    avatar: state.avatar || '',
-    loggedIn: !!state.loggedIn,
+    openid: state.openid || (loggedIn ? '' : prev.openid) || '',
+    nick,
+    avatar,
+    avatarUrl,
+    loggedIn,
     admin: !!state.admin
   }
   try {
@@ -41,6 +122,17 @@ function writeState(state) {
     if (!next.loggedIn) wx.removeStorageSync(SESSION_KEY)
   } catch (e) {}
   return next
+}
+
+function saveAvatarUrl(fileID, url) {
+  if (!url) return readState()
+  const state = readState()
+  if (fileID && state.avatar && state.avatar !== fileID) return state
+  state.avatarUrl = url
+  if (!state.avatar && fileID) state.avatar = fileID
+  rememberProfile({ nick: state.nick, avatar: state.avatar, avatarUrl: url })
+  try { wx.setStorageSync(STATE_KEY, state) } catch (e) {}
+  return state
 }
 
 function readSession() {
@@ -201,6 +293,9 @@ function formatUntil(time) {
 module.exports = {
   AD_FREE_KEY,
   readState,
+  readProfile,
+  rememberProfile,
+  saveAvatarUrl,
   syncPoints,
   loginAccount,
   logoutAccount,

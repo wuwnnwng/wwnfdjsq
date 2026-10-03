@@ -1,5 +1,5 @@
 <view class="page theme-{{theme}}">
-  <button wx:if="{{needPrivacy}}" id="privacy-agree" class="avatar-pick" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="onAgreePrivacy" hover-class="none">
+  <button wx:if="{{needPrivacy}}" class="avatar-pick" bindtap="onOpenPrivacy" hover-class="none">
     <view class="preview">
       <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
       <view wx:else class="avatar avatar-guest">
@@ -32,10 +32,25 @@
         bindblur="onNickBlur"
         bindnicknamereview="onNickReview"
       />
-      <button wx:if="{{needPrivacy}}" id="privacy-agree-nick" class="nick-mask" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="onAgreePrivacy" hover-class="none"></button>
+      <view wx:if="{{needPrivacy}}" class="nick-mask" catchtap="onOpenPrivacy"></view>
     </view>
     <view class="hint">点昵称栏可填入微信昵称，也可以自己修改</view>
   </view>
 
   <view class="save" bindtap="onSave">保存</view>
+
+  <view class="privacy-mask" wx:if="{{privacyOpen}}" catchtouchmove="onHold">
+    <view class="privacy-sheet">
+      <view class="privacy-title">隐私保护提示</view>
+      <view class="privacy-text">使用微信头像和微信昵称前，请先阅读并同意{{privacyName}}。</view>
+      <view class="privacy-link" bindtap="onOpenContract">查看{{privacyName}}</view>
+      <button
+        id="privacy-agree"
+        class="privacy-agree"
+        open-type="agreePrivacyAuthorization"
+        bindagreeprivacyauthorization="onAgreePrivacy"
+      >同意</button>
+      <view class="privacy-skip" bindtap="onRejectPrivacy">不同意</view>
+    </view>
+  </view>
 </view>

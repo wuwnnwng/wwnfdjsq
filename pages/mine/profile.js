@@ -9,7 +9,9 @@ Page({
     avatar: '',
     draftAvatar: '',
     avatarId: '',
-    needPrivacy: true
+    needPrivacy: true,
+    privacyOpen: false,
+    privacyName: '《用户隐私保护指引》'
   },
 
   onShow() {
@@ -47,13 +49,40 @@ Page({
   },
 
   bindPrivacy() {
-    if (typeof wx.onNeedPrivacyAuthorization !== 'function') return
+    if (typeof wx.onNeedPrivacyAuthorization !== 'function' || this._onNeedPrivacy) return
     if (typeof wx.offNeedPrivacyAuthorization === 'function') wx.offNeedPrivacyAuthorization()
     this._onNeedPrivacy = (resolve) => {
       this.privacyResolve = resolve
+      this.setData({ privacyOpen: true })
+      if (typeof wx.getPrivacySetting !== 'function') return
+      wx.getPrivacySetting({
+        success: (res) => {
+          if (res && res.privacyContractName) this.setData({ privacyName: res.privacyContractName })
+        }
+      })
     }
     wx.onNeedPrivacyAuthorization(this._onNeedPrivacy)
   },
+
+  onOpenPrivacy() {
+    this.setData({ privacyOpen: true })
+    if (typeof wx.getPrivacySetting === 'function') {
+      wx.getPrivacySetting({
+        success: (res) => {
+          if (res && res.privacyContractName) this.setData({ privacyName: res.privacyContractName })
+          if (res && !res.needAuthorization) this.setData({ privacyOpen: false, needPrivacy: false })
+        }
+      })
+    }
+    if (typeof wx.requirePrivacyAuthorize !== 'function') return
+    wx.requirePrivacyAuthorize({ success() {}, fail() {} })
+  },
+
+  onOpenContract() {
+    if (wx.openPrivacyContract) wx.openPrivacyContract({})
+  },
+
+  onHold() {},
 
   refreshPrivacy() {
     if (typeof wx.getPrivacySetting !== 'function') {
@@ -72,10 +101,18 @@ Page({
       const resolve = this.privacyResolve
       this.privacyResolve = null
       if (resolve) resolve({ buttonId, event: 'agree' })
-      this.setData({ needPrivacy: false })
+      this.setData({ privacyOpen: false, needPrivacy: false })
+      wx.showToast({ title: '请再点一次更换头像', icon: 'none' })
     }
     if (this.privacyResolve) finish()
     else setTimeout(finish, 0)
+  },
+
+  onRejectPrivacy() {
+    const resolve = this.privacyResolve
+    this.privacyResolve = null
+    if (resolve) resolve({ event: 'disagree' })
+    this.setData({ privacyOpen: false })
   },
 
   onChooseAvatar(e) {

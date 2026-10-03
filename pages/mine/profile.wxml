@@ -1,30 +1,24 @@
 <view class="page theme-{{theme}}">
-  <view class="preview" bindtap="onOpenPicker">
-    <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
-    <view wx:else class="avatar avatar-guest">
-      <text class="avatar-watermark">便民</text>
-    </view>
-  </view>
-  <view class="avatar-tip" bindtap="onOpenPicker">点击更换头像</view>
-  <view class="avatar-sub" bindtap="onOpenPicker">支持从微信相册选择或拍摄</view>
-
-  <view class="mask" wx:if="{{pickerOpen}}" bindtap="onClosePicker" catchtouchmove="onHold">
-    <view class="sheet" bindtap="onSheetTap">
-      <view class="sheet-group">
-        <button class="sheet-item wechat" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-          <text>用微信头像</text>
-          <image wx:if="{{draftAvatar || avatar}}" class="wechat-thumb" src="{{draftAvatar || avatar}}" mode="aspectFill" />
-        </button>
-        <view class="sheet-item" bindtap="onAlbum">从相册选择</view>
-      </view>
-      <view class="sheet-group">
-        <view class="sheet-item" bindtap="onCamera">拍照</view>
-      </view>
-      <view class="sheet-group cancel-group">
-        <view class="sheet-item cancel" bindtap="onClosePicker">取消</view>
+  <button wx:if="{{needPrivacy}}" id="privacy-agree" class="avatar-pick" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="onAgreePrivacy" hover-class="none">
+    <view class="preview">
+      <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
+      <view wx:else class="avatar avatar-guest">
+        <text class="avatar-watermark">便民</text>
       </view>
     </view>
-  </view>
+    <view class="avatar-tip">点击更换头像</view>
+    <view class="avatar-sub">支持从微信相册选择或拍摄</view>
+  </button>
+  <button wx:else class="avatar-pick" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" hover-class="none">
+    <view class="preview">
+      <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
+      <view wx:else class="avatar avatar-guest">
+        <text class="avatar-watermark">便民</text>
+      </view>
+    </view>
+    <view class="avatar-tip">点击更换头像</view>
+    <view class="avatar-sub">支持从微信相册选择或拍摄</view>
+  </button>
 
   <view class="card">
     <view class="label">昵称</view>
@@ -32,33 +26,16 @@
       <input
         class="nick-input"
         type="nickname"
-        value="{{draftNick}}"
-        placeholder="请输入昵称"
+        placeholder="{{nick || '请输入昵称'}}"
         placeholder-class="nick-placeholder"
-        focus="{{nickFocus}}"
-        disabled="{{!privacyReady}}"
         bindinput="onNick"
         bindblur="onNickBlur"
+        bindnicknamereview="onNickReview"
       />
-      <view wx:if="{{!privacyReady}}" class="nick-mask" catchtap="onAskNick"></view>
+      <button wx:if="{{needPrivacy}}" id="privacy-agree-nick" class="nick-mask" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="onAgreePrivacy" hover-class="none"></button>
     </view>
     <view class="hint">点昵称栏可填入微信昵称，也可以自己修改</view>
   </view>
 
   <view class="save" bindtap="onSave">保存</view>
-
-  <view class="privacy-mask" wx:if="{{privacyOpen}}" catchtouchmove="onHold">
-    <view class="privacy-sheet">
-      <view class="privacy-title">用户协议</view>
-      <view class="privacy-text">使用微信头像和微信昵称前，请先阅读并同意{{privacyName}}。同意后即可继续。</view>
-      <view class="privacy-link" bindtap="onOpenPrivacy">查看{{privacyName}}</view>
-      <button
-        id="privacy-agree"
-        class="privacy-agree"
-        open-type="agreePrivacyAuthorization"
-        bindagreeprivacyauthorization="onAgreePrivacy"
-      >同意</button>
-      <view class="privacy-skip" bindtap="onRejectPrivacy">不同意</view>
-    </view>
-  </view>
 </view>

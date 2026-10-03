@@ -14,6 +14,50 @@ const TIMELINE_POINTS = 5
 const INVITE_POINTS = 15
 const REDEEM_COST = 100
 const REDEEM_MS = 15 * 24 * 60 * 60 * 1000
+const RISKY_TEXT = '所发布内容含违规信息'
+const RISKY_CODE = 87014
+
+function errCodeOf(err) {
+  if (!err) return 0
+  return err.errCode || err.errcode || 0
+}
+
+async function checkPublishText(openid, content) {
+  const text = String(content || '').trim()
+  if (!text) return { ok: true }
+  try {
+    const res = await cloud.openapi.security.msgSecCheck({
+      openid,
+      scene: 1,
+      version: 2,
+      content: text.slice(0, 2500)
+    })
+    const suggest = res && res.result && res.result.suggest
+    if (suggest === 'risky' || suggest === 'review' || errCodeOf(res) === RISKY_CODE) {
+      return { ok: false, message: RISKY_TEXT }
+    }
+    return { ok: true }
+  } catch (err) {
+    if (errCodeOf(err) === RISKY_CODE) return { ok: false, message: RISKY_TEXT }
+    return { ok: false, message: '没有保存成功' }
+  }
+}
+
+async function checkPublishImage(buffer) {
+  try {
+    const res = await cloud.openapi.security.imgSecCheck({
+      media: {
+        contentType: 'image/jpeg',
+        value: buffer
+      }
+    })
+    if (errCodeOf(res) === RISKY_CODE) return { ok: false, message: RISKY_TEXT }
+    return { ok: true }
+  } catch (err) {
+    if (errCodeOf(err) === RISKY_CODE) return { ok: false, message: RISKY_TEXT }
+    return { ok: false, message: '没有保存成功' }
+  }
+}
 
 function todayKey() {
   const shifted = new Date(Date.now() + 8 * 60 * 60 * 1000)
@@ -386,6 +430,12 @@ async function handle(event) {
   if (action === 'avatar') {
     const image = String(payload.image || '')
     if (!image || image.length > 1800000) return { ok: false, message: '图片太大' }
+    const buffer = Buffer.from(image, 'base64')
+    const imageCheck = await checkPublishImage(buffer)
+    if (!imageCheck.ok) return { ok: false, message: imageCheck.message }
+    const nick = typeof payload.nick === 'string' ? String(payload.nick).trim().slice(0, 32) : ''
+    const textCheck = await checkPublishText(openid, nick)
+    if (!textCheck.ok) return { ok: false, message: textCheck.message }
     const uploaded = await cloud.uploadFile({
       cloudPath: `avatars/${openid}-${Date.now()}.jpg`,
       fileContent: Buffer.from(image, 'base64')
@@ -398,7 +448,6 @@ async function handle(event) {
       } catch (err) {}
     }
     const patch = { avatar: fileID }
-    const nick = typeof payload.nick === 'string' ? String(payload.nick).trim().slice(0, 32) : ''
     if (nick) patch.nick = nick
     await db.collection(USERS).doc(doc._id).update({ data: patch })
     const next = await db.collection(USERS).doc(doc._id).get()
@@ -414,7 +463,10 @@ async function handle(event) {
       patch.avatar = ''
     } else {
       if (typeof payload.nick === 'string' && String(payload.nick).trim()) {
-        patch.nick = String(payload.nick).trim().slice(0, 32)
+        const nick = String(payload.nick).trim().slice(0, 32)
+        const textCheck = await checkPublishText(openid, nick)
+        if (!textCheck.ok) return { ok: false, message: textCheck.message }
+        patch.nick = nick
       }
       if (typeof payload.avatar === 'string' && payload.avatar.indexOf('http') !== 0) {
         patch.avatar = String(payload.avatar).slice(0, 300)

@@ -1,0 +1,243 @@
+.page {
+  min-height: 100vh;
+  padding: 48rpx 28rpx 48rpx;
+  box-sizing: border-box;
+  background:
+    radial-gradient(120% 80% at 0% 0%, var(--bg-glow-1), transparent 55%),
+    radial-gradient(90% 70% at 100% 10%, var(--bg-glow-2), transparent 50%),
+    linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 42%, var(--bg-grad-3) 100%);
+}
+
+.preview {
+  display: flex;
+  justify-content: center;
+}
+
+.avatar-tip {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.avatar-sub {
+  margin-top: 8rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.avatar {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: var(--color-card);
+}
+
+.avatar-guest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f6fa;
+}
+
+.avatar-watermark {
+  font-size: 36rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  color: rgba(26, 63, 102, 0.28);
+}
+
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.sheet {
+  width: 100%;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #f2f3f5;
+}
+
+.card {
+  margin-top: 36rpx;
+  padding: 8rpx 28rpx;
+  border-radius: 28rpx;
+  background: var(--color-card);
+  border: 1rpx solid var(--color-card-border);
+}
+
+.sheet-group {
+  background: #fff;
+  margin-bottom: 16rpx;
+}
+
+.sheet-group:first-child {
+  border-radius: 24rpx 24rpx 0 0;
+  overflow: hidden;
+}
+
+.cancel-group {
+  margin-bottom: 0;
+}
+
+.sheet-item {
+  min-height: 108rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34rpx;
+  color: #111;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.sheet-group .sheet-item:last-child {
+  border-bottom: none;
+}
+
+.sheet-item.wechat {
+  width: 100%;
+  margin: 0;
+  padding: 28rpx 0 24rpx;
+  flex-direction: column;
+  line-height: 1.4;
+  border-radius: 0;
+  font-size: 34rpx;
+  font-weight: 400;
+}
+
+.sheet-item.wechat::after {
+  border: none;
+}
+
+.wechat-thumb {
+  width: 72rpx;
+  height: 72rpx;
+  margin-top: 16rpx;
+  border-radius: 8rpx;
+}
+
+.sheet-item.cancel {
+  min-height: 112rpx;
+  color: #333;
+}
+
+.label {
+  padding-top: 24rpx;
+  font-size: 26rpx;
+  color: var(--color-muted);
+}
+
+.nick-wrap {
+  position: relative;
+}
+
+.nick-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.nick-input {
+  height: 88rpx;
+  margin-top: 8rpx;
+  font-size: 32rpx;
+  color: var(--color-ink);
+}
+
+.nick-placeholder {
+  color: var(--color-muted);
+}
+
+.hint {
+  padding-bottom: 24rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.save {
+  margin-top: 40rpx;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-size: 30rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.privacy-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.privacy-sheet {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 36rpx 32rpx calc(28rpx + env(safe-area-inset-bottom));
+  border-radius: 28rpx 28rpx 0 0;
+  background: var(--color-dialog);
+}
+
+.privacy-title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.privacy-text {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.privacy-link {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: var(--color-brand);
+}
+
+.privacy-agree {
+  margin-top: 28rpx;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-size: 30rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.privacy-agree::after {
+  border: none;
+}
+
+.privacy-skip {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--color-muted);
+}

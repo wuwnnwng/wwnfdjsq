@@ -72,42 +72,4 @@
     </view>
     <view class="ad-note" wx:if="{{adFreeText}}">免广告至 {{adFreeText}}</view>
   </scroll-view>
-
-  <view class="mask" wx:if="{{editing}}" bindtap="onCloseEdit" catchtouchmove="onHold">
-    <view class="sheet" bindtap="onSheetTap">
-      <view class="sheet-title">{{loggedIn ? '编辑资料' : '登录'}}</view>
-      <view class="avatar-pick" catchtap="onPickAvatar">
-        <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
-        <view wx:else class="avatar avatar-empty">我</view>
-        <text>从相册选择</text>
-      </view>
-      <input
-        class="nick-input"
-        type="nickname"
-        value="{{draftNick}}"
-        placeholder="请输入昵称"
-        placeholder-class="nick-placeholder"
-        focus="{{nickFocus}}"
-        bindinput="onNick"
-        bindblur="onNickBlur"
-      />
-      <view class="nick-hint">头像从相册选择，昵称可自行修改</view>
-      <view class="save" bindtap="onSaveProfile">{{loggedIn ? '保存' : '登录'}}</view>
-    </view>
-  </view>
-
-  <view class="privacy-mask" wx:if="{{privacyOpen}}" catchtouchmove="onHold">
-    <view class="privacy-sheet">
-      <view class="privacy-title">用户协议</view>
-      <view class="privacy-text">从相册选择头像前，请先阅读并同意{{privacyName}}。同意后即可打开相册。</view>
-      <view class="privacy-link" bindtap="onOpenPrivacy">查看{{privacyName}}</view>
-      <button
-        id="privacy-agree"
-        class="privacy-agree"
-        open-type="agreePrivacyAuthorization"
-        bindagreeprivacyauthorization="onAgreePrivacy"
-      >同意</button>
-      <view class="privacy-skip" bindtap="onRejectPrivacy">不同意</view>
-    </view>
-  </view>
 </view>

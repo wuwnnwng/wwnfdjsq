@@ -1,0 +1,21 @@
+<view class="page theme-{{theme}}">
+  <view class="summary">已选 {{ids.length}} / {{max}}，按点选顺序出现在首页推荐</view>
+  <scroll-view scroll-y class="scroll" show-scrollbar="{{false}}">
+    <view class="group" wx:for="{{groups}}" wx:key="id">
+      <view class="group-name">{{item.name}}</view>
+      <view
+        class="tool {{tool.picked ? 'on' : ''}}"
+        wx:for="{{item.tools}}"
+        wx:for-item="tool"
+        wx:key="id"
+        data-id="{{tool.id}}"
+        bindtap="onToggle"
+      >
+        <text class="tool-icon">{{tool.icon}}</text>
+        <text class="tool-name">{{tool.name}}</text>
+        <text class="tool-order" wx:if="{{tool.picked}}">{{tool.order}}</text>
+      </view>
+    </view>
+  </scroll-view>
+  <view class="save {{saving ? 'off' : ''}}" bindtap="onSave">{{saving ? '正在保存' : '保存推荐'}}</view>
+</view>

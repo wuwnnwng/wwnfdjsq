@@ -1,0 +1,29 @@
+@import "../../../pages/tools/tool-common.wxss";
+@import "../../../pages/tools/calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(245, 158, 11, 0.16) 0%, var(--color-hero-fade) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-deposit {
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+}
+
+.field-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12rpx;
+  min-height: 0;
+}
+
+.field-stack .field-label {
+  width: auto;
+}
+
+.field-seg {
+  width: 100%;
+  margin-bottom: 0;
+}

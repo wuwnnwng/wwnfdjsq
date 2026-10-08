@@ -1,0 +1,137 @@
+@import "../../../pages/tools/tool-common.wxss";
+@import "../../../pages/tools/calc-kit.wxss";
+
+.conv-hero {
+  background:
+    linear-gradient(160deg, rgba(56, 189, 248, 0.16) 0%, var(--color-hero-fade) 58%),
+    var(--color-surface);
+}
+
+.tool-icon-utility {
+  background: linear-gradient(135deg, #fef3c7, #38bdf8);
+}
+
+.city-search {
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+  padding: 0 20rpx;
+  height: 72rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.city-input {
+  flex: 1;
+  height: 72rpx;
+  font-size: 28rpx;
+  color: var(--color-ink);
+}
+
+.city-input-placeholder {
+  color: var(--color-muted);
+}
+
+.city-clear {
+  width: 40rpx;
+  text-align: center;
+  font-size: 32rpx;
+  color: var(--color-muted);
+}
+
+.match-list {
+  margin-top: 12rpx;
+  max-height: 360rpx;
+  overflow: hidden;
+}
+
+.match-row {
+  padding: 16rpx 4rpx;
+  font-size: 28rpx;
+  color: var(--color-ink);
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.city-place {
+  display: flex;
+  align-items: baseline;
+  gap: 12rpx;
+  margin-top: 24rpx;
+}
+
+.city-name {
+  font-family: var(--font-display);
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+  line-height: 1.2;
+}
+
+.city-caret {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.fee-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.fee-cycle {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--color-muted);
+}
+
+.fee-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--color-line);
+}
+
+.fee-row:last-of-type {
+  border-bottom: none;
+}
+
+.fee-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.fee-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.fee-range {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+.fee-price {
+  flex-shrink: 0;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: var(--color-brand);
+}
+
+.fee-unit {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.disclaimer {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--color-muted);
+}

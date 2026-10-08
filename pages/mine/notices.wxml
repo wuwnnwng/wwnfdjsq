@@ -5,7 +5,6 @@
       <text>全部已读</text>
     </view>
     <view class="pill clear" wx:if="{{canManage}}" bindtap="onDelete">删除消息</view>
-    <view class="pill clear" wx:else bindtap="onClear">清除消息</view>
   </view>
 
   <scroll-view wx:if="{{list.length}}" class="list" scroll-y show-scrollbar="{{false}}">

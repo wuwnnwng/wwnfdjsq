@@ -27,6 +27,18 @@
   <scroll-view scroll-y class="tool-scroll chip-scroll" enhanced show-scrollbar="{{false}}">
     <ad-banner theme="{{theme}}" />
 
+    <view class="panel bank-entry">
+      <view class="chip-title">银行理财</view>
+      <view class="bank-row" bindtap="onOpenBank" data-page="/packageFootprint/pages/compound/compound">
+        <text class="bank-name">复利计算器</text>
+        <text class="bank-chevron">›</text>
+      </view>
+      <view class="bank-row" bindtap="onOpenBank" data-page="/packageFootprint/pages/deposit/deposit">
+        <text class="bank-name">银行存款利息</text>
+        <text class="bank-chevron">›</text>
+      </view>
+    </view>
+
     <view class="panel chip-panel">
       <view class="chip-head">
         <view class="chip-title">点亮省份</view>

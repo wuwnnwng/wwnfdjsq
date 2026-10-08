@@ -6,6 +6,7 @@
     "pages/mine/points",
     "pages/mine/notices",
     "pages/mine/users",
+    "pages/mine/recommend",
     "pages/mine/notice-edit",
     "pages/tools/index",
     "pages/tools/mortgage/mortgage",
@@ -25,7 +26,6 @@
     "pages/tools/diet/diet",
     "pages/tools/fuel/fuel",
     "pages/tools/oilprice/oilprice",
-    "pages/tools/compound/compound",
     "pages/tools/duedate/duedate",
     "pages/tools/safeperiod/safeperiod",
     "pages/tools/pension/pension",
@@ -75,7 +75,10 @@
       "root": "packageFootprint",
       "name": "footprint",
       "pages": [
-        "pages/footprint/footprint"
+        "pages/footprint/footprint",
+        "pages/compound/compound",
+        "pages/deposit/deposit",
+        "pages/utility/utility"
       ]
     },
     {

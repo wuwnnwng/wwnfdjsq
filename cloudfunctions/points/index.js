@@ -8,6 +8,10 @@ const _ = db.command
 const USERS = 'user_points'
 const INVITES = 'point_invites'
 const NOTICES = 'notices'
+const NOTICE_READS = 'notice_reads'
+const SETTINGS = 'app_settings'
+const NOTICE_KEEP_MS = 7 * 24 * 60 * 60 * 1000
+const MAX_RECOMMEND = 3
 const ADMIN_OPENID = 'opl734khWEfxThguUoCc5XfpRRgY'
 const CHECKIN_POINTS = 5
 const TIMELINE_POINTS = 5
@@ -271,6 +275,24 @@ async function ensureCollection(name) {
   throw new Error('数据表 ' + name + ' 还没建好。' + (createError || '请到云开发控制台的数据库里新建这个集合'))
 }
 
+function cleanRecommendIds(list) {
+  const seen = {}
+  const out = []
+  ;(Array.isArray(list) ? list : []).forEach((id) => {
+    const text = String(id || '').trim().slice(0, 40)
+    if (!text || seen[text] || !/^[a-z0-9]+$/i.test(text)) return
+    seen[text] = true
+    out.push(text)
+  })
+  return out.slice(0, MAX_RECOMMEND)
+}
+
+async function recommendRow() {
+  await ensureCollection(SETTINGS)
+  const found = await db.collection(SETTINGS).where({ key: 'recommend' }).limit(1).get()
+  return (found.data && found.data[0]) || null
+}
+
 async function noticeRows() {
   try {
     const found = await db.collection(NOTICES).limit(50).get()
@@ -278,6 +300,67 @@ async function noticeRows() {
   } catch (err) {
     return []
   }
+}
+
+function cleanNoticeIds(list) {
+  const seen = {}
+  const out = []
+  ;(Array.isArray(list) ? list : []).forEach((id) => {
+    const text = String(id || '').trim()
+    if (!text || seen[text] || text.length > 64) return
+    seen[text] = true
+    out.push(text)
+  })
+  return out.slice(0, 50)
+}
+
+async function readMap(openid) {
+  await ensureCollection(NOTICE_READS)
+  const found = await db.collection(NOTICE_READS).where({ openid }).limit(100).get()
+  const map = {}
+  ;(found.data || []).forEach((row) => {
+    if (row && row.noticeId) map[row.noticeId] = row
+  })
+  return map
+}
+
+function noticeView(item, read) {
+  const view = noticeItem(item)
+  const readAt = read ? Number(read.readAt) || 0 : 0
+  view.unread = !(readAt && readAt >= (Number(item.updatedAt) || 0))
+  return view
+}
+
+async function removeMatched(name, where) {
+  let removed = 0
+  for (let round = 0; round < 8; round++) {
+    const found = await db.collection(name).where(where).limit(100).get()
+    const rows = found.data || []
+    if (!rows.length) break
+    await Promise.all(rows.map((row) => db.collection(name).doc(row._id).remove().catch(() => null)))
+    removed += rows.length
+    if (rows.length < 100) break
+  }
+  return removed
+}
+
+async function removeNoticeBundle(id) {
+  await ensureCollection(NOTICE_READS)
+  await removeMatched(NOTICE_READS, { noticeId: id })
+  await db.collection(NOTICES).doc(id).remove()
+}
+
+async function purgeExpiredNotices() {
+  await ensureCollection(NOTICES)
+  await ensureCollection(NOTICE_READS)
+  const cutoff = Date.now() - NOTICE_KEEP_MS
+  const found = await db.collection(NOTICES).where({ updatedAt: _.lt(cutoff) }).limit(50).get()
+  const rows = found.data || []
+  for (let i = 0; i < rows.length; i++) {
+    await removeNoticeBundle(rows[i]._id)
+  }
+  const leftover = await removeMatched(NOTICE_READS, { readAt: _.lt(cutoff) })
+  return { notices: rows.length, reads: leftover }
 }
 
 async function loadUser(openid) {
@@ -326,6 +409,9 @@ async function addPoints(doc, extra) {
 
 exports.main = async (event) => {
   try {
+    if (event && (event.Type === 'Timer' || event.TriggerName === 'purgeNotices')) {
+      return { ok: true, purged: await purgeExpiredNotices() }
+    }
     return await handle(event)
   } catch (err) {
     return { ok: false, message: (err && (err.message || err.errMsg)) || '登录失败' }
@@ -340,6 +426,8 @@ async function handle(event) {
   const payload = event || {}
   await ensureCollection(INVITES)
   await ensureCollection(NOTICES)
+  await ensureCollection(NOTICE_READS)
+  await ensureCollection(SETTINGS)
   const doc = await loadUser(openid)
   const active = signedIn(doc, payload)
   doc.admin = isAdmin(openid)
@@ -359,14 +447,45 @@ async function handle(event) {
 
   if (action === 'sync') return presentView(viewOf(doc, openid, active))
 
+  if (action === 'recommend') {
+    const row = await recommendRow()
+    if (!row) return { ok: true, custom: false, ids: [] }
+    return { ok: true, custom: true, ids: cleanRecommendIds(row.toolIds) }
+  }
+
   if (action === 'notices') {
-    const rows = await noticeRows()
+    const rows = (await noticeRows()).filter((item) => item.published)
+    const reads = await readMap(openid)
     const canManage = active && doc.admin
     return {
       ok: true,
-      list: rows.filter((item) => item.published).map(noticeItem),
+      list: rows.map((item) => noticeView(item, reads[item._id])),
       canManage
     }
+  }
+
+  if (action === 'noticeRead') {
+    const ids = cleanNoticeIds(payload.ids)
+    if (!ids.length) return { ok: true }
+    const rows = await noticeRows()
+    const byId = {}
+    rows.forEach((item) => { byId[item._id] = item })
+    const now = Date.now()
+    for (let i = 0; i < ids.length; i++) {
+      const notice = byId[ids[i]]
+      if (!notice || !notice.published) continue
+      const data = {
+        openid,
+        noticeId: notice._id,
+        readAt: now,
+        noticeUpdatedAt: notice.updatedAt || 0
+      }
+      const found = await db.collection(NOTICE_READS).where({ openid, noticeId: notice._id }).limit(1).get()
+      const row = found.data && found.data[0]
+      if (row) await db.collection(NOTICE_READS).doc(row._id).update({ data })
+      else await db.collection(NOTICE_READS).add({ data })
+    }
+    return { ok: true }
   }
 
   if (action === 'noticeManage') {
@@ -389,7 +508,7 @@ async function handle(event) {
   if (action === 'noticeRemove') {
     if (!active || !doc.admin) return { ok: false, message: '没有管理权限' }
     if (!payload.id) return { ok: false, message: '没有这条通知' }
-    await db.collection(NOTICES).doc(payload.id).remove()
+    await removeNoticeBundle(payload.id)
     return { ok: true, list: (await noticeRows()).map(noticeItem) }
   }
 
@@ -407,6 +526,16 @@ async function handle(event) {
   }
 
   if (!active) return { ok: false, message: '请先登录' }
+
+  if (action === 'recommendSave') {
+    if (!doc.admin) return { ok: false, message: '没有管理权限' }
+    const ids = cleanRecommendIds(payload.ids)
+    const data = { key: 'recommend', toolIds: ids, updatedAt: Date.now() }
+    const row = await recommendRow()
+    if (row) await db.collection(SETTINGS).doc(row._id).update({ data })
+    else await db.collection(SETTINGS).add({ data })
+    return { ok: true, custom: true, ids }
+  }
 
   if (action === 'users') {
     if (!doc.admin) return { ok: false, message: '没有管理权限' }

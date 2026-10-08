@@ -10,6 +10,17 @@
   padding: 20rpx 24rpx 8rpx;
 }
 
+.play-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background:
+    radial-gradient(120% 80% at 0% 0%, var(--bg-glow-1), transparent 55%),
+    radial-gradient(90% 70% at 100% 10%, var(--bg-glow-2), transparent 50%),
+    linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 42%, var(--bg-grad-3) 100%);
+}
+
 .play-wrap {
   flex: 1;
   min-height: 0;

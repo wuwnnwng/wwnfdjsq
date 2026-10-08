@@ -9,10 +9,12 @@ const {
   setThemeId,
   applyThemeChrome
 } = require('../../utils/theme')
+const { loadRecommend } = require('../../utils/points')
 const {
   searchTools,
   groupTools,
   getRecommendTools,
+  applyRecommendResult,
   toggleFavoriteTool,
   openToolItem,
   getToolById,
@@ -20,7 +22,7 @@ const {
 } = require('../../utils/toolsConfig')
 
 function splitGroups(groups) {
-  const index = (groups || []).findIndex((group) => group.id === 'fun')
+  const index = (groups || []).findIndex((group) => group.id === 'travel')
   if (index < 0) return { leadGroups: groups || [], restGroups: [] }
   return {
     leadGroups: groups.slice(0, index + 1),
@@ -38,7 +40,7 @@ function buildHome(keyword) {
     recommendTools: searching ? [] : getRecommendTools(),
     leadGroups: split.leadGroups,
     restGroups: split.restGroups,
-    showSplitBanner: split.restGroups.length > 0 && split.leadGroups.some((group) => group.id === 'fun')
+    showSplitBanner: split.restGroups.length > 0 && split.leadGroups.some((group) => group.id === 'travel')
   }
 }
 
@@ -64,6 +66,17 @@ Page({
     markToolsHubSeen()
     this.applyTheme(getThemeId())
     this.setData(buildHome(this.data.keyword))
+    this.refreshRecommend()
+  },
+
+  refreshRecommend() {
+    const ticket = (this._recommendTicket || 0) + 1
+    this._recommendTicket = ticket
+    loadRecommend().then((result) => {
+      if (ticket !== this._recommendTicket) return
+      applyRecommendResult(result)
+      this.setData(buildHome(this.data.keyword))
+    }).catch(() => {})
   },
 
   applyTheme(themeId) {
@@ -99,7 +112,7 @@ Page({
     }
     this.setData(buildHome(this.data.keyword))
     wx.showToast({
-      title: result.favorited ? '已放到推荐最前' : '已取消收藏',
+      title: result.favorited ? '已收藏' : '已取消收藏',
       icon: 'none'
     })
   },

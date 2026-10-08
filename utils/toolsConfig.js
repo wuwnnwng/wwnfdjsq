@@ -4,14 +4,17 @@
 const TOOLS_HUB_SEEN_KEY = 'toolsHubSeen'
 const FAVORITE_TOOLS_KEY = 'favoriteToolIds'
 const MAX_FAVORITE_TOOLS = 6
-const RECOMMEND_TOOL_IDS = ['mortgage', 'mbti', 'calendar']
+const RECOMMEND_KEY = 'recommend_tool_ids'
+const DEFAULT_RECOMMEND_TOOL_IDS = ['mortgage', 'mbti', 'calendar']
+const MAX_RECOMMEND_TOOLS = 3
 
 const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll', 'guide'] },
-  { id: 'house', name: '房产生活', toolIds: ['mortgage', 'fitout', 'housetax', 'tax'] },
+  { id: 'house', name: '房产生活', toolIds: ['mortgage', 'utility', 'fitout', 'housetax', 'tax'] },
+  { id: 'bank', name: '银行理财', toolIds: ['compound', 'deposit'] },
   { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'bark', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
   { id: 'daily', name: '日常工具', toolIds: ['retire', 'pension', 'calendar', 'qrcode', 'checkin', 'idphoto', 'bmi', 'diet', 'exam'] },
-  { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'compound', 'rmb', 'percent', 'base', 'currency', 'unit'] }
+  { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
 
 const TOOLS = [
@@ -23,6 +26,15 @@ const TOOLS = [
     iconType: 'mortgage',
     keywords: '房贷公积金商贷组合贷等额本息等额本金提前还款LPR月供',
     page: '/pages/tools/mortgage/mortgage'
+  },
+  {
+    id: 'utility',
+    name: '气费电费',
+    shortName: '气费电费',
+    icon: '💡',
+    iconType: 'utility',
+    keywords: '房产生活气费电费天然气阶梯电价阶梯气价居民用电用气城市',
+    page: '/packageFootprint/pages/utility/utility'
   },
   {
     id: 'fitout',
@@ -186,8 +198,17 @@ const TOOLS = [
     shortName: '复利',
     icon: '📈',
     iconType: 'compound',
-    keywords: '复利理财本金年利率存款投资利息滚存',
-    page: '/pages/tools/compound/compound'
+    keywords: '银行理财复利计算器本金年利率存款投资利息滚存',
+    page: '/packageFootprint/pages/compound/compound'
+  },
+  {
+    id: 'deposit',
+    name: '银行存款利息',
+    shortName: '存款利息',
+    icon: '💰',
+    iconType: 'deposit',
+    keywords: '银行理财存款利息计算器活期整存整取挂牌利率本息',
+    page: '/packageFootprint/pages/deposit/deposit'
   },
   {
     id: 'duedate',
@@ -457,19 +478,34 @@ function decorateTools(list, favoriteIds) {
   return (list || []).map((item) => withFavoriteState(item, ids))
 }
 
+function readRecommendIds() {
+  if (typeof wx === 'undefined' || !wx.getStorageSync) return DEFAULT_RECOMMEND_TOOL_IDS.slice()
+  try {
+    const raw = wx.getStorageSync(RECOMMEND_KEY)
+    if (raw && raw.custom && Array.isArray(raw.ids)) {
+      return raw.ids.filter((id) => getToolById(id)).slice(0, MAX_RECOMMEND_TOOLS)
+    }
+  } catch (e) {}
+  return DEFAULT_RECOMMEND_TOOL_IDS.slice()
+}
+
+function writeRecommendIds(ids, custom) {
+  const next = (ids || []).filter((id) => getToolById(id)).slice(0, MAX_RECOMMEND_TOOLS)
+  if (typeof wx === 'undefined' || !wx.setStorageSync) return next
+  try {
+    wx.setStorageSync(RECOMMEND_KEY, { custom: !!custom, ids: next })
+  } catch (e) {}
+  return next
+}
+
+function applyRecommendResult(result) {
+  if (result && result.custom) return writeRecommendIds(result.ids || [], true)
+  return writeRecommendIds(DEFAULT_RECOMMEND_TOOL_IDS, false)
+}
+
 function getRecommendTools() {
-  const favoriteIds = getFavoriteToolIds()
-  const favored = new Set(favoriteIds)
-  const seen = new Set()
-  const list = []
-  favoriteIds.concat(RECOMMEND_TOOL_IDS).forEach((id) => {
-    if (seen.has(id)) return
-    const tool = getToolById(id)
-    if (!tool) return
-    seen.add(id)
-    list.push(withFavoriteState(tool, favored))
-  })
-  return list
+  const favoriteIds = new Set(getFavoriteToolIds())
+  return readRecommendIds().map((id) => withFavoriteState(getToolById(id), favoriteIds)).filter(Boolean)
 }
 
 function groupTools(list) {
@@ -529,6 +565,8 @@ module.exports = {
   TOOLS,
   CATEGORIES,
   MAX_FAVORITE_TOOLS,
+  MAX_RECOMMEND_TOOLS,
+  applyRecommendResult,
   getToolById,
   searchTools,
   groupTools,

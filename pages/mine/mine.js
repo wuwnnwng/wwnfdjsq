@@ -9,7 +9,6 @@ const {
   rememberProfile,
   loadNotices
 } = require('../../utils/points')
-const { unreadCount } = require('../../utils/noticeInbox')
 const {
   getThemeId,
   setThemeId,
@@ -48,7 +47,7 @@ Page({
   loadUnread(ticket) {
     loadNotices().then((res) => {
       if (ticket !== this._ticket) return
-      const count = unreadCount(res.list)
+      const count = (res.list || []).filter((item) => item.unread).length
       this.setData({
         unreadCount: count,
         unreadText: count > 99 ? '99+' : String(count)
@@ -191,6 +190,17 @@ Page({
     })
   },
 
+  onOpenAccount() {
+    wx.openOfficialAccountProfile({
+      username: 'gh_fa389030533b',
+      fail(err) {
+        const msg = (err && err.errMsg) || ''
+        if (msg.indexOf('cancel') >= 0) return
+        wx.showToast({ title: '暂无法打开公众号', icon: 'none' })
+      }
+    })
+  },
+
   onOpenErshou() {
     wx.navigateToMiniProgram({
       appId: 'wx663931c101197d69',
@@ -201,6 +211,11 @@ Page({
         wx.showToast({ title: '暂无法打开同城二手', icon: 'none' })
       }
     })
+  },
+
+  onRecommend() {
+    if (!this.data.loggedIn || !this.data.admin) return
+    wx.navigateTo({ url: '/pages/mine/recommend' })
   },
 
   onUsers() {

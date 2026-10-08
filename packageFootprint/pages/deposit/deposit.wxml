@@ -1,0 +1,93 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-top">
+        <view class="conv-hero-id">
+          <view class="tool-icon-wrap tool-icon-deposit">
+            <text class="tool-icon">💰</text>
+          </view>
+          <view class="conv-hero-copy">
+            <view class="conv-kicker">本金 · 挂牌利率 · 存期</view>
+            <view class="conv-title">银行存款利息</view>
+          </view>
+        </view>
+      </view>
+      <block wx:if="{{result && result.valid}}">
+        <view class="conv-eq">{{result.formulaText}}</view>
+        <view class="conv-result">{{result.heroText}}</view>
+        <view class="conv-result-unit">本息合计 · 利息 {{result.interestText}} 元</view>
+      </block>
+      <view class="tool-note warn" wx:elif="{{result && !result.valid}}">{{result.message}}</view>
+    </view>
+
+    <ad-banner theme="{{theme}}" />
+
+    <view class="panel">
+      <view class="field field-stack">
+        <text class="field-label">存款方式</text>
+        <view class="seg-row cols-2 field-seg">
+          <view class="seg-item {{kind === 'fixed' ? 'active' : ''}}" bindtap="onSelectKind" data-kind="fixed">整存整取</view>
+          <view class="seg-item {{kind === 'demand' ? 'active' : ''}}" bindtap="onSelectKind" data-kind="demand">活期</view>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">本金</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{principal}}" data-field="principal" bindinput="onInput" placeholder="例如 100000" />
+          <text class="field-unit">元</text>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">年利率</text>
+        <view class="field-control">
+          <input class="field-input" type="digit" value="{{rate}}" data-field="rate" bindinput="onInput" placeholder="按银行挂牌填写" />
+          <text class="field-unit">%</text>
+        </view>
+      </view>
+      <view class="field" wx:if="{{kind === 'demand'}}">
+        <text class="field-label">存款天数</text>
+        <view class="field-control">
+          <input class="field-input" type="number" value="{{days}}" data-field="days" bindinput="onInput" placeholder="例如 30" />
+          <text class="field-unit">天</text>
+        </view>
+      </view>
+      <view class="field field-stack" wx:else>
+        <text class="field-label">存期</text>
+        <view class="seg-row cols-3 field-seg">
+          <view
+            wx:for="{{terms}}"
+            wx:key="key"
+            class="seg-item {{termKey === item.key ? 'active' : ''}}"
+            bindtap="onSelectTerm"
+            data-key="{{item.key}}"
+          >{{item.name}}</view>
+        </view>
+      </view>
+      <view class="tool-note">整存整取按到期单利估算，提前支取通常改按活期。活期按一年 360 天计息。利率请填银行当日挂牌价。</view>
+    </view>
+
+    <view class="panel" wx:if="{{result && result.valid}}">
+      <view class="section-title">利息明细</view>
+      <view class="result-row">
+        <view class="result-row-label">存款本金</view>
+        <view class="result-row-value">{{result.principalText}} 元</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">年利率</view>
+        <view class="result-row-value">{{result.rateText}}%</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">存期</view>
+        <view class="result-row-value">{{result.termText}}</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">利息</view>
+        <view class="result-row-value">{{result.interestText}} 元</view>
+      </view>
+      <view class="result-row">
+        <view class="result-row-label">本息合计</view>
+        <view class="result-row-value">{{result.totalText}} 元</view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

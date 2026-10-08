@@ -57,7 +57,16 @@
     </view>
   </scroll-view>
 
-  <view wx:else class="play-wrap">
+  <page-container
+    show="{{playing}}"
+    overlay="{{false}}"
+    position="center"
+    duration="{{0}}"
+    custom-style="width:100%;height:100%;"
+    bindbeforeleave="onBackGallery"
+  >
+  <view class="play-page theme-{{theme}}">
+  <view class="play-wrap">
     <view class="play-head">
       <view class="play-back" bindtap="onBackGallery">‹ 换一张</view>
       <view class="play-title">{{puzzleName}}</view>
@@ -115,10 +124,12 @@
     <view class="done-banner" wx:if="{{solved}}">拼好了，可以导出卡片或暂存</view>
   </view>
 
-  <view class="save-card-bar doodle-bar" wx:if="{{playing}}">
+  <view class="save-card-bar doodle-bar">
     <view class="ghost-btn" bindtap="onSaveDraft">暂存 {{sessions.length}}/5</view>
     <view class="primary-btn save-card-btn" bindtap="onSaveCard">{{savingCard ? '正在保存…' : '导出卡片'}}</view>
   </view>
+  </view>
+  </page-container>
 
   <canvas type="2d" id="puzzleArt" class="puzzle-art-canvas"></canvas>
   <canvas type="2d" id="puzzleThumbs" class="puzzle-thumbs-canvas"></canvas>

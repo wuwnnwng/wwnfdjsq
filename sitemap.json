@@ -109,7 +109,17 @@
     },
     {
       "action": "allow",
-      "page": "pages/tools/compound/compound",
+      "page": "packageFootprint/pages/compound/compound",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "packageFootprint/pages/deposit/deposit",
+      "priority": 60
+    },
+    {
+      "action": "allow",
+      "page": "packageFootprint/pages/utility/utility",
       "priority": 60
     },
     {

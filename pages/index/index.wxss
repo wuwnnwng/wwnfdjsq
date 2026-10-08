@@ -207,6 +207,8 @@ page {
 .tool-icon-rmb { background: linear-gradient(135deg, #fef3c7, #f59e0b); }
 .tool-icon-calc { background: linear-gradient(135deg, #ccfbf1, #5eead4); }
 .tool-icon-compound { background: linear-gradient(135deg, #d1fae5, #10b981); }
+.tool-icon-deposit { background: linear-gradient(135deg, #fef3c7, #f59e0b); }
+.tool-icon-utility { background: linear-gradient(135deg, #fef3c7, #38bdf8); }
 .tool-icon-duedate { background: linear-gradient(135deg, #fce7f3, #f472b6); }
 .tool-icon-safeperiod { background: linear-gradient(135deg, #ede9fe, #a78bfa); }
 .tool-icon-pension { background: linear-gradient(135deg, #fef3c7, #f59e0b); }

@@ -1,6 +1,5 @@
-const { loadNotices, removeNotice } = require('../../utils/points')
+const { loadNotices, markNoticesRead, removeNotice } = require('../../utils/points')
 const { getThemeId, applyThemeChrome } = require('../../utils/theme')
-const { readInbox, writeInbox, stamp, presentNotices } = require('../../utils/noticeInbox')
 
 function timeText(value) {
   const time = Number(value) || 0
@@ -28,7 +27,7 @@ Page({
   load() {
     loadNotices().then((res) => {
       const canManage = !!res.canManage
-      const list = presentNotices(res.list, canManage).map((item) => Object.assign({}, item, {
+      const list = (res.list || []).map((item) => Object.assign({}, item, {
         time: timeText(item.updatedAt)
       }))
       this.setData({
@@ -41,20 +40,24 @@ Page({
   },
 
   onReadAll() {
-    const inbox = readInbox()
     const list = this.data.list || []
-    if (!list.length) {
+    const ids = list.filter((item) => item.unread).map((item) => item.id)
+    if (!ids.length) {
       wx.showToast({ title: '没有未读消息', icon: 'none' })
       return
     }
-    list.forEach((item) => {
-      inbox.read[item.id] = stamp(item) || Date.now()
+    if (this._busy) return
+    this._busy = true
+    markNoticesRead(ids).then(() => {
+      this._busy = false
+      this.setData({
+        list: list.map((item) => Object.assign({}, item, { unread: false }))
+      })
+      wx.showToast({ title: '已全部标为已读', icon: 'none' })
+    }).catch((err) => {
+      this._busy = false
+      wx.showToast({ title: (err && err.message) || '没有标成已读', icon: 'none' })
     })
-    writeInbox(inbox)
-    this.setData({
-      list: list.map((item) => Object.assign({}, item, { unread: false }))
-    })
-    wx.showToast({ title: '已全部标为已读', icon: 'none' })
   },
 
   onDelete() {
@@ -89,41 +92,16 @@ Page({
     })
   },
 
-  onClear() {
-    if (this.data.canManage) return
-    const list = this.data.list || []
-    if (!list.length) {
-      wx.showToast({ title: '没有可清除的消息', icon: 'none' })
-      return
-    }
-    wx.showModal({
-      title: '清除消息',
-      content: '清除后，这些通知不再显示在这里。',
-      confirmText: '清除',
-      confirmColor: '#ef4444',
-      success: (res) => {
-        if (!res.confirm) return
-        const inbox = readInbox()
-        list.forEach((item) => {
-          inbox.hidden[item.id] = stamp(item) || Date.now()
-        })
-        writeInbox(inbox)
-        this.setData({ list: [] })
-        wx.showToast({ title: '已清除', icon: 'none' })
-      }
-    })
-  },
-
   onOpen(e) {
     const id = e.currentTarget.dataset.id
     const list = this.data.list || []
     const item = list.find((row) => row.id === id)
     if (!item || !item.unread) return
-    const inbox = readInbox()
-    inbox.read[id] = stamp(item) || Date.now()
-    writeInbox(inbox)
     this.setData({
       list: list.map((row) => row.id === id ? Object.assign({}, row, { unread: false }) : row)
+    })
+    markNoticesRead([id]).catch(() => {
+      this.load()
     })
   },
 

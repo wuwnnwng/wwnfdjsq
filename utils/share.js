@@ -451,10 +451,26 @@ function getPuzzleToolShare() {
 }
 
 function getCompoundToolShare() {
-  const path = '/pages/tools/compound/compound'
+  const path = '/packageFootprint/pages/compound/compound'
   return {
     appMessage: buildToolShareAppMessage(path, '复利计算器'),
     timeline: buildToolShareTimeline(path, '复利计算器')
+  }
+}
+
+function getDepositToolShare() {
+  const path = '/packageFootprint/pages/deposit/deposit'
+  return {
+    appMessage: buildToolShareAppMessage(path, '银行存款利息'),
+    timeline: buildToolShareTimeline(path, '银行存款利息')
+  }
+}
+
+function getUtilityToolShare() {
+  const path = '/packageFootprint/pages/utility/utility'
+  return {
+    appMessage: buildToolShareAppMessage(path, '气费电费'),
+    timeline: buildToolShareTimeline(path, '气费电费')
   }
 }
 
@@ -844,6 +860,8 @@ module.exports = {
   getCanvasToolShare,
   getPuzzleToolShare,
   getCompoundToolShare,
+  getDepositToolShare,
+  getUtilityToolShare,
   getDueDateToolShare,
   getSafePeriodToolShare,
   getPensionToolShare,

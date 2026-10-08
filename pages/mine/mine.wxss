@@ -138,7 +138,9 @@ page {
 .mark.service { background: #60a5fa; }
 .mark.bell { background: #38bdf8; }
 .mark.bird { background: #34d399; }
+.mark.account { background: #07c160; }
 .mark.market { background: #fb923c; }
+.mark.rec { background: #f59e0b; }
 .mark.users { background: var(--color-brand-soft); }
 .mark.out { background: #fda4af; }
 

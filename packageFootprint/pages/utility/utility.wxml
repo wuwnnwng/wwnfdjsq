@@ -1,0 +1,84 @@
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-id">
+        <view class="tool-icon-wrap tool-icon-utility">
+          <text class="tool-icon">💡</text>
+        </view>
+        <view class="conv-hero-copy">
+          <view class="conv-kicker">居民用电 · 管道天然气</view>
+          <view class="conv-title">气费电费</view>
+        </view>
+      </view>
+      <view class="city-search">
+        <input
+          class="city-input"
+          value="{{keyword}}"
+          placeholder="搜索区县，如 黔西"
+          placeholder-class="city-input-placeholder"
+          confirm-type="search"
+          bindinput="onSearch"
+        />
+        <view class="city-clear" wx:if="{{keyword}}" bindtap="onClearSearch">×</view>
+      </view>
+      <view class="match-list" wx:if="{{keyword}}">
+        <view
+          class="match-row"
+          wx:for="{{matches}}"
+          wx:key="place"
+          bindtap="onPickMatch"
+          data-province="{{item.province}}"
+          data-city="{{item.city}}"
+          data-county="{{item.county}}"
+        >{{item.place}}</view>
+        <view class="tool-note" wx:if="{{!matches.length}}">没有找到这个城市</view>
+      </view>
+      <picker wx:else mode="multiSelector" range="{{pickerRange}}" value="{{pickerValue}}" bindcolumnchange="onColumn" bindchange="onPick">
+        <view class="city-place">
+          <text class="city-name">{{place}}</text>
+          <text class="city-caret">切换城市</text>
+        </view>
+      </picker>
+      <view class="conv-eq">省 / 市 / 区县三级选择 · 全国 {{cityTotal}} 个区县</view>
+    </view>
+
+    <ad-banner theme="{{theme}}" />
+
+    <view class="panel">
+      <view class="fee-title">电费</view>
+      <block wx:if="{{elec}}">
+        <view class="fee-cycle">{{elec.cycle}}</view>
+        <view class="fee-row" wx:for="{{elec.tiers}}" wx:key="name">
+          <view class="fee-copy">
+            <view class="fee-name">{{item.name}}</view>
+            <view class="fee-range">{{item.range}}</view>
+          </view>
+          <view class="fee-price">{{item.price}}<text class="fee-unit"> 元/千瓦时</text></view>
+        </view>
+        <view class="tool-note" wx:if="{{elec.note}}">{{elec.note}}</view>
+      </block>
+      <view class="tool-note" wx:else>该市居民电价暂未收录。请以当地供电公司公示和电费账单为准。</view>
+    </view>
+
+    <view class="panel">
+      <view class="fee-title">气费</view>
+      <block wx:if="{{gas}}">
+        <view class="fee-cycle">{{gas.cycle}}</view>
+        <view class="fee-row" wx:for="{{gas.tiers}}" wx:key="name">
+          <view class="fee-copy">
+            <view class="fee-name">{{item.name}}</view>
+            <view class="fee-range">{{item.range}}</view>
+          </view>
+          <view class="fee-price">{{item.price}}<text class="fee-unit"> 元/立方米</text></view>
+        </view>
+        <view class="tool-note" wx:if="{{gas.note}}">{{gas.note}}</view>
+      </block>
+      <view class="tool-note" wx:else>这个区县还没有查到单独的居民气价公示，不用其他区县的价格代替。请以当地燃气公司公示和气费账单为准。</view>
+    </view>
+
+    <view class="panel">
+      <view class="fee-title">免责说明</view>
+      <view class="disclaimer">{{disclaimer}}</view>
+    </view>
+  </scroll-view>
+</view>

@@ -1,4 +1,4 @@
-const { FREQUENCIES, calculateCompound } = require('../../../utils/compoundCalc')
+const { FREQUENCIES, calculateCompound } = require('../../utils/compoundCalc')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCompoundToolShare } = require('../../../utils/share')
 const { createLastInput } = require('../../../utils/toolLastInput')

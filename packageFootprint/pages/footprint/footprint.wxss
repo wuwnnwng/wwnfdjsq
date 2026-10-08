@@ -42,6 +42,35 @@
   min-height: 0;
 }
 
+.bank-entry {
+  margin-top: 0;
+  margin-bottom: 16rpx;
+  padding: 8rpx 8rpx 12rpx;
+}
+
+.bank-entry .chip-title {
+  padding: 16rpx 16rpx 8rpx;
+}
+
+.bank-row {
+  display: flex;
+  align-items: center;
+  min-height: 88rpx;
+  padding: 0 16rpx;
+}
+
+.bank-name {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.bank-chevron {
+  font-size: 36rpx;
+  color: var(--color-muted);
+}
+
 .chip-panel {
   margin-top: 0;
   margin-bottom: 16rpx;

@@ -529,6 +529,12 @@ function buildXieJiYiJi(input) {
   }
 
   const gods = [].concat(meta.jiShenList || [], meta.xiongShaList || [])
+  if (gods.indexOf('四废') >= 0) {
+    return emptyResult(
+      ['安葬', '祭祀', '开生坟', '入殓', '移柩', '成服', '除服', '破土', '迁坟'],
+      ['余事勿取']
+    )
+  }
   const hasDe = gods.some((name) => DE_GODS[name])
   const gan = ganZhi.charAt(0)
   const zhi = ganZhi.charAt(1)

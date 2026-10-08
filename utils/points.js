@@ -254,8 +254,20 @@ function loadUsers(page) {
   return callPoints('users', { page: page || 1 })
 }
 
+function loadRecommend() {
+  return callPoints('recommend')
+}
+
+function saveRecommend(ids) {
+  return callPoints('recommendSave', { ids: ids || [] })
+}
+
 function loadNotices() {
   return callPoints('notices')
+}
+
+function markNoticesRead(ids) {
+  return callPoints('noticeRead', { ids: ids || [] })
 }
 
 function loadNoticeManage() {
@@ -306,7 +318,10 @@ module.exports = {
   clearUserProfile,
   uploadAvatar,
   loadUsers,
+  loadRecommend,
+  saveRecommend,
   loadNotices,
+  markNoticesRead,
   loadNoticeManage,
   saveNotice,
   removeNotice,

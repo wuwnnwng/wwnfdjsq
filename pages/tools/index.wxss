@@ -259,6 +259,14 @@
   background: linear-gradient(135deg, #d1fae5, #10b981);
 }
 
+.tool-icon-deposit {
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+}
+
+.tool-icon-utility {
+  background: linear-gradient(135deg, #fef3c7, #38bdf8);
+}
+
 .tool-icon-duedate {
   background: linear-gradient(135deg, #fce7f3, #f472b6);
 }

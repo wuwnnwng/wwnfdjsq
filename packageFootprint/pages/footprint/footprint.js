@@ -35,6 +35,12 @@ Page({
     savingCard: false
   },
 
+  onOpenBank(e) {
+    const url = e.currentTarget.dataset.page
+    if (!url) return
+    wx.navigateTo({ url })
+  },
+
   onLoad() {
     enableShareMenu()
     const litSet = readLitSet()

@@ -1,8 +1,16 @@
 {
+  "timeout": 20,
   "permissions": {
     "openapi": [
       "security.imgSecCheck",
       "security.msgSecCheck"
     ]
-  }
+  },
+  "triggers": [
+    {
+      "name": "purgeNotices",
+      "type": "timer",
+      "config": "0 30 3 * * * *"
+    }
+  ]
 }

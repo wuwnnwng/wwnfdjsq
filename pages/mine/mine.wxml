@@ -54,9 +54,19 @@
         <text class="row-name">好鸟哥</text>
         <text class="chevron">›</text>
       </view>
+      <view class="row" bindtap="onOpenAccount">
+        <view class="mark account">公</view>
+        <text class="row-name">公众号</text>
+        <text class="chevron">›</text>
+      </view>
       <view class="row" bindtap="onOpenErshou">
         <view class="mark market">市</view>
         <text class="row-name">同城二手</text>
+        <text class="chevron">›</text>
+      </view>
+      <view class="row" wx:if="{{loggedIn && admin}}" bindtap="onRecommend">
+        <view class="mark rec">荐</view>
+        <text class="row-name">推荐设置</text>
         <text class="chevron">›</text>
       </view>
       <view class="row" wx:if="{{loggedIn && admin}}" bindtap="onUsers">

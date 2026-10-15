@@ -1,5 +1,5 @@
 const { inspectImage } = require('../../utils/idphotoCheck')
-const { checkImage, RISKY_TEXT } = require('../../../utils/imageSec')
+const { checkImage, RISKY_TEXT } = require('../../utils/imageSec')
 const { deliver } = require('../../utils/idphotoBridge')
 
 const GUIDE = [

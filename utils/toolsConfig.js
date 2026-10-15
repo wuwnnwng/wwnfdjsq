@@ -504,8 +504,14 @@ function applyRecommendResult(result) {
 }
 
 function getRecommendTools() {
-  const favoriteIds = new Set(getFavoriteToolIds())
-  return readRecommendIds().map((id) => withFavoriteState(getToolById(id), favoriteIds)).filter(Boolean)
+  const favoriteList = getFavoriteToolIds()
+  const favoriteIds = new Set(favoriteList)
+  const ids = favoriteList.slice()
+  readRecommendIds().forEach((id) => {
+    if (favoriteIds.has(id)) return
+    ids.push(id)
+  })
+  return ids.map((id) => withFavoriteState(getToolById(id), favoriteIds)).filter(Boolean)
 }
 
 function groupTools(list) {

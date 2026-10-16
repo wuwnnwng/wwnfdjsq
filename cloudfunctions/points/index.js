@@ -350,16 +350,35 @@ async function removeNoticeBundle(id) {
   await db.collection(NOTICES).doc(id).remove()
 }
 
+async function removeOlder(name, field, cutoff) {
+  let removed = 0
+  for (let round = 0; round < 8; round++) {
+    const found = await db.collection(name).limit(100).get()
+    const rows = (found.data || []).filter((item) => {
+      const stamp = Number(item[field]) || 0
+      return stamp > 0 && stamp < cutoff
+    })
+    if (!rows.length) break
+    await Promise.all(rows.map((row) => db.collection(name).doc(row._id).remove().catch(() => null)))
+    removed += rows.length
+    if ((found.data || []).length < 100) break
+  }
+  return removed
+}
+
 async function purgeExpiredNotices() {
   await ensureCollection(NOTICES)
   await ensureCollection(NOTICE_READS)
   const cutoff = Date.now() - NOTICE_KEEP_MS
-  const found = await db.collection(NOTICES).where({ updatedAt: _.lt(cutoff) }).limit(50).get()
-  const rows = found.data || []
+  const found = await db.collection(NOTICES).limit(100).get()
+  const rows = (found.data || []).filter((item) => {
+    const stamp = Number(item.updatedAt) || 0
+    return stamp > 0 && stamp < cutoff
+  })
   for (let i = 0; i < rows.length; i++) {
     await removeNoticeBundle(rows[i]._id)
   }
-  const leftover = await removeMatched(NOTICE_READS, { readAt: _.lt(cutoff) })
+  const leftover = await removeOlder(NOTICE_READS, 'readAt', cutoff)
   return { notices: rows.length, reads: leftover }
 }
 
@@ -454,6 +473,7 @@ async function handle(event) {
   }
 
   if (action === 'notices') {
+    try { await purgeExpiredNotices() } catch (e) {}
     const rows = (await noticeRows()).filter((item) => item.published)
     const reads = await readMap(openid)
     const canManage = active && doc.admin
@@ -491,6 +511,7 @@ async function handle(event) {
   if (action === 'noticeManage') {
     if (!active) return { ok: false, message: '请先登录' }
     if (!doc.admin) return { ok: false, message: '没有管理权限' }
+    try { await purgeExpiredNotices() } catch (e) {}
     return { ok: true, list: (await noticeRows()).map(noticeItem) }
   }
 

@@ -295,6 +295,10 @@
   background: linear-gradient(135deg, #ccfbf1, #2dd4bf);
 }
 
+.tool-icon-iq {
+  background: linear-gradient(135deg, #e0e7ff, #6366f1);
+}
+
 .tool-icon-bark {
   background: linear-gradient(135deg, #ffedd5, #fdba74);
 }

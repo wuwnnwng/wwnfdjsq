@@ -209,6 +209,11 @@
     },
     {
       "action": "allow",
+      "page": "packageFocus/pages/iq/iq",
+      "priority": 40
+    },
+    {
+      "action": "allow",
       "page": "packageBark/pages/bark/bark",
       "priority": 40
     },

@@ -1,0 +1,147 @@
+<page-container
+  show="{{retainBack}}"
+  overlay="{{false}}"
+  duration="{{0}}"
+  z-index="1"
+  custom-style="height:0;width:0;overflow:hidden;opacity:0;background:transparent;"
+  bindbeforeleave="onRetainBack"
+/>
+<view class="page page-shell theme-{{theme}}">
+  <scroll-view scroll-y class="tool-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="panel conv-hero">
+      <view class="conv-hero-id">
+        <view class="tool-icon-wrap tool-icon-iq">
+          <text class="tool-icon">🧩</text>
+        </view>
+        <view class="conv-hero-copy">
+          <view class="conv-kicker">娱乐 · 先做题再出结果</view>
+          <view class="conv-title">IQ智力测试</view>
+        </view>
+      </view>
+      <block wx:if="{{stage === 'pick'}}">
+        <view class="conv-eq">按真实年龄选卷</view>
+        <view class="conv-result">成人 / 儿童</view>
+      </block>
+      <block wx:elif="{{stage === 'quiz'}}">
+        <view class="conv-eq">{{formName}} · {{ageText}}</view>
+        <view class="conv-result">第 {{no}} / {{total}} 题</view>
+        <view class="conv-result-unit">{{domainName}}</view>
+      </block>
+      <block wx:else>
+        <view class="conv-eq">{{result.formName}} · {{result.ageText}}</view>
+        <view class="conv-result">{{result.report ? result.index : '不作估算'}}</view>
+        <view class="conv-result-unit" wx:if="{{result.report}}">估算指数，区间 {{result.low}}–{{result.high}}</view>
+        <view class="conv-result-unit" wx:else>对了 {{result.raw}} / {{result.total}} 题</view>
+      </block>
+    </view>
+
+    <ad-banner theme="{{theme}}" />
+
+    <view class="panel" wx:if="{{stage === 'pick'}}">
+      <view class="iq-lead">儿童和成人不是同一份卷。选错年龄，结果就不能和同龄人的难度对照。</view>
+      <view class="iq-group">儿童测试</view>
+      <view
+        class="cat-card {{index % 2 ? 'tone-accent' : ''}}"
+        wx:for="{{childForms}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onStart"
+      >
+        <view class="cat-copy">
+          <view class="cat-name">{{item.ageText}}</view>
+          <view class="cat-hint">{{item.hint}} 共 {{item.total}} 题。</view>
+        </view>
+        <view class="cat-go">开始</view>
+      </view>
+      <view class="iq-group">成人测试</view>
+      <view
+        class="cat-card tone-accent"
+        wx:for="{{adultForms}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onStart"
+      >
+        <view class="cat-copy">
+          <view class="cat-name">{{item.ageText}}</view>
+          <view class="cat-hint">{{item.hint}} 共 {{item.total}} 题。</view>
+        </view>
+        <view class="cat-go">开始</view>
+      </view>
+      <view class="iq-note">做完 16 题才出结果。中途可以返回修改。不限时，避免把反应速度算进推理。</view>
+    </view>
+
+    <view class="panel" wx:elif="{{stage === 'quiz'}}">
+      <view class="back-link" bindtap="onBack">‹ 返回</view>
+      <view class="iq-bar"><view class="iq-bar-on" style="width: {{progress}}%;"></view></view>
+      <view class="q-prompt">{{prompt}}</view>
+      <view class="fig" wx:if="{{rows.length}}">
+        <view class="fig-row" wx:for="{{rows}}" wx:for-item="row" wx:key="n">
+          <text class="fig-cell" wx:for="{{row.cells}}" wx:for-item="cell" wx:key="i">{{cell.text}}</text>
+        </view>
+      </view>
+      <view
+        class="quiz-opt {{item.on ? 'is-on' : ''}}"
+        wx:for="{{options}}"
+        wx:key="key"
+        data-index="{{index}}"
+        bindtap="onPick"
+      >
+        <view class="quiz-opt-main">
+          <text class="quiz-opt-key">{{item.key}}</text>
+          <text class="quiz-opt-text">{{item.text}}</text>
+        </view>
+      </view>
+      <view class="iq-nav">
+        <view class="iq-nav-btn {{canPrev ? '' : 'is-off'}}" bindtap="onPrev">上一题</view>
+        <view class="iq-nav-btn is-main" bindtap="onNext">{{isLast ? '查看结果' : '下一题'}}</view>
+      </view>
+    </view>
+
+    <block wx:else>
+      <view class="panel">
+        <view class="iq-score-line">对了 {{result.raw}} / {{result.total}} 题</view>
+        <view class="iq-level" wx:if="{{result.report}}">{{result.levelText}}</view>
+        <view class="iq-level" wx:else>四选一即使随机点，也大约能对 4 题。这次对的题数还没有明显高于随机，所以不估算指数。</view>
+        <view class="iq-note" wx:if="{{result.ceiling}}">已经达到本卷能区分的上限，只能说明高于这份短卷的量程。</view>
+        <view class="iq-note" wx:if="{{result.floorHit}}">已经低到本卷能区分的下限。短卷看不出更细的差别。</view>
+        <view
+          class="iq-domain"
+          wx:for="{{result.domains}}"
+          wx:key="id"
+        >
+          <view class="iq-domain-top">
+            <text>{{item.name}}</text>
+            <text>{{item.correct}} / {{item.total}}</text>
+          </view>
+          <view class="iq-domain-label">{{item.label}}</view>
+        </view>
+      </view>
+
+      <view class="panel">
+        <view class="iq-group">计分是怎么来的</view>
+        <view class="iq-note">这份卷按该年龄能稳定完成的难度编写。同龄里比较典型的表现，按对 10 题估算为 100。每多对或少对约 2.5 题，指数大约加减 15。题目只有 16 道，单次结果会上下波动大约 13 分，所以给出区间。</view>
+        <view class="iq-note">70 以下和 130 以上的差别，这套短卷区分不开。它不是韦氏智力测验、瑞文测验，也不能用于诊断、升学或招聘。</view>
+      </view>
+
+      <view class="panel" wx:if="{{result.misses.length}}">
+        <view class="iq-miss-toggle" bindtap="onToggleMisses">{{showMisses ? '收起答错的题' : '查看答错的题'}}</view>
+        <block wx:if="{{showMisses}}">
+          <view class="iq-miss" wx:for="{{result.misses}}" wx:key="no">
+            <view class="iq-miss-no">第 {{item.no}} 题 · {{item.domain}}</view>
+            <view class="iq-miss-prompt">{{item.prompt}}</view>
+            <view class="iq-miss-line">你的选择：{{item.yours}}</view>
+            <view class="iq-miss-line">参考答案：{{item.right}}</view>
+            <view class="iq-note">{{item.note}}</view>
+          </view>
+        </block>
+      </view>
+
+      <view class="panel">
+        <view class="iq-nav">
+          <view class="iq-nav-btn" bindtap="onRetry">重新选择</view>
+          <button class="iq-nav-btn is-main iq-share" open-type="share">分享</button>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+</view>

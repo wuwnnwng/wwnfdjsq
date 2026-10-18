@@ -2,6 +2,7 @@ const { evaluateScientificExpression } = require('../../../utils/calcEngine')
 const { getThemeId, applyThemeChrome } = require('../../../utils/theme')
 const { enableShareMenu, getCalcToolShare } = require('../../../utils/share')
 const { createLastInput } = require('../../../utils/toolLastInput')
+const { addHistory, removeHistory, presentHistory } = require('../../../utils/calcHistory')
 
 function buildKeys(keyboardMode, invOn) {
   const switchKey =
@@ -120,7 +121,14 @@ Page({
     keys: buildKeys('basic', false),
     expression: '',
     displayValue: '0',
-    errorText: ''
+    errorText: '',
+    historyOpen: false,
+    historyKeyword: '',
+    historyTotal: 0,
+    historyMatch: 0,
+    historyPage: 1,
+    historyPageCount: 1,
+    historyRows: []
   },
 
   onLoad() {
@@ -128,13 +136,13 @@ Page({
     const saved = lastInput.restore()
     const keyboardMode = saved.keyboardMode === 'scientific' ? 'scientific' : 'basic'
     const invOn = !!saved.invOn
-    this.setData({
+    this.setData(Object.assign({
       keyboardMode,
       invOn,
       keys: buildKeys(keyboardMode, invOn),
       expression: saved.expression != null ? saved.expression : '',
       displayValue: saved.displayValue != null ? saved.displayValue : saved.expression || '0'
-    })
+    }, presentHistory('', 1)))
   },
 
   onShow() {
@@ -216,8 +224,69 @@ Page({
     )
   },
 
+  historyView(keyword, page) {
+    return presentHistory(keyword == null ? this.data.historyKeyword : keyword, page || this.data.historyPage)
+  },
+
+  onToggleHistory() {
+    const historyOpen = !this.data.historyOpen
+    this.setData(Object.assign({ historyOpen }, this.historyView(this.data.historyKeyword, historyOpen ? 1 : this.data.historyPage)))
+  },
+
+  onHistoryInput(e) {
+    const historyKeyword = (e.detail && e.detail.value) || ''
+    this.setData(Object.assign({ historyKeyword }, this.historyView(historyKeyword, 1)))
+  },
+
+  onHistoryClear() {
+    this.setData(Object.assign({ historyKeyword: '' }, this.historyView('', 1)))
+  },
+
+  onHistoryPrev() {
+    if (this.data.historyPage <= 1) return
+    this.setData(this.historyView(this.data.historyKeyword, this.data.historyPage - 1))
+  },
+
+  onHistoryNext() {
+    if (this.data.historyPage >= this.data.historyPageCount) return
+    this.setData(this.historyView(this.data.historyKeyword, this.data.historyPage + 1))
+  },
+
+  onContinueHistory(e) {
+    const id = e.currentTarget.dataset.id
+    const row = (this.data.historyRows || []).find((item) => item.id === id)
+    if (!row) return
+    this.setData({
+      historyOpen: false,
+      expression: row.result,
+      displayValue: row.result,
+      errorText: ''
+    }, () => this.persistCalc())
+  },
+
+  onDeleteHistory(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+    wx.showModal({
+      title: '删除记录',
+      content: '删除后无法恢复。',
+      confirmText: '删除',
+      confirmColor: '#ef4444',
+      success: (res) => {
+        if (!res.confirm) return
+        const removed = removeHistory(id)
+        if (!removed.ok) {
+          wx.showToast({ title: removed.message || '没有删除成功', icon: 'none' })
+          return
+        }
+        this.setData(this.historyView(this.data.historyKeyword, this.data.historyPage))
+      }
+    })
+  },
+
   calculate() {
-    const result = evaluateScientificExpression(this.data.expression)
+    const source = this.data.expression
+    const result = evaluateScientificExpression(source)
     if (!result.ok) {
       this.setData({
         errorText: result.error || '无法计算',
@@ -225,11 +294,14 @@ Page({
       }, () => this.persistCalc())
       return
     }
-    this.setData({
+    const saved = addHistory(source, result.value)
+    const history = this.historyView(this.data.historyKeyword, this.data.historyPage)
+    if (!saved.ok && saved.message) wx.showToast({ title: saved.message, icon: 'none' })
+    this.setData(Object.assign({
       expression: result.value,
       displayValue: result.value,
       errorText: ''
-    }, () => this.persistCalc())
+    }, history), () => this.persistCalc())
   },
 
   onShareAppMessage() {

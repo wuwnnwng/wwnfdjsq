@@ -5,10 +5,49 @@
     <view class="calc-error" wx:if="{{errorText}}">{{errorText}}</view>
   </view>
 
+  <view class="calc-tools">
+    <view class="calc-tool" bindtap="onToggleHistory">{{historyOpen ? '返回计算' : '查询记录'}}</view>
+    <text class="calc-tool-count">已保存 {{historyTotal}} 条</text>
+  </view>
+
   <scroll-view scroll-y class="calc-scroll" enhanced show-scrollbar="{{false}}">
     <ad-banner theme="{{theme}}" />
 
-    <view class="calc-keyboard panel">
+    <view class="calc-history panel" wx:if="{{historyOpen}}">
+      <view class="calc-search">
+        <input
+          class="calc-search-input"
+          value="{{historyKeyword}}"
+          placeholder="搜索算式或结果"
+          placeholder-class="calc-search-placeholder"
+          confirm-type="search"
+          bindinput="onHistoryInput"
+        />
+        <view class="calc-search-clear" wx:if="{{historyKeyword}}" bindtap="onHistoryClear">清空</view>
+      </view>
+      <view class="calc-history-meta" wx:if="{{historyKeyword && historyMatch}}">找到 {{historyMatch}} 条</view>
+      <view class="calc-history-empty" wx:if="{{!historyRows.length}}">
+        {{historyKeyword ? '没有匹配的记录' : '算完会自动保存在这台手机上'}}
+      </view>
+      <view class="calc-history-item" wx:for="{{historyRows}}" wx:key="id">
+        <view class="calc-history-main" bindtap="onContinueHistory" data-id="{{item.id}}">
+          <view class="calc-history-expr">{{item.expression}}</view>
+          <view class="calc-history-result">= {{item.result}}</view>
+          <view class="calc-history-time">{{item.timeText}}</view>
+        </view>
+        <view class="calc-history-actions">
+          <view class="calc-history-go" bindtap="onContinueHistory" data-id="{{item.id}}">继续计算</view>
+          <view class="calc-history-del" catchtap="onDeleteHistory" data-id="{{item.id}}">删除</view>
+        </view>
+      </view>
+      <view class="calc-pager" wx:if="{{historyPageCount > 1}}">
+        <view class="calc-page-btn {{historyPage <= 1 ? 'is-off' : ''}}" bindtap="onHistoryPrev">上一页</view>
+        <text class="calc-page-text">{{historyPage}} / {{historyPageCount}}</text>
+        <view class="calc-page-btn {{historyPage >= historyPageCount ? 'is-off' : ''}}" bindtap="onHistoryNext">下一页</view>
+      </view>
+    </view>
+
+    <view class="calc-keyboard panel" wx:else>
       <view
         class="calc-key tone-{{item.tone || 'default'}} {{item.subLabel ? 'has-sub' : ''}}"
         wx:for="{{keys}}"

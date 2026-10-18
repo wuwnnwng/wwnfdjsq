@@ -121,7 +121,8 @@
       "root": "packageFocus",
       "name": "focus",
       "pages": [
-        "pages/focus/focus"
+        "pages/focus/focus",
+        "pages/iq/iq"
       ]
     },
     {

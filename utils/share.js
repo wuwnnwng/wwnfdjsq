@@ -132,6 +132,7 @@ function packageRoot(path) {
   if (route.indexOf('packageTravel/') === 0) return 'packageTravel'
   if (route.indexOf('packageMbti/') === 0) return 'packageMbti'
   if (route.indexOf('packageCheckin/') === 0) return 'packageCheckin'
+  if (route.indexOf('packageFocus/') === 0) return 'packageFocus'
   return 'main'
 }
 

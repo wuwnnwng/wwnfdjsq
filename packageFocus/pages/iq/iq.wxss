@@ -1,0 +1,254 @@
+@import "../../../pages/tools/tool-common.wxss";
+@import "../../../pages/tools/calc-kit.wxss";
+
+.tool-icon-iq {
+  background: linear-gradient(135deg, #e0e7ff, #6366f1);
+}
+
+.iq-lead,
+.iq-note,
+.iq-level,
+.iq-domain-label,
+.iq-miss-prompt,
+.iq-miss-line {
+  font-size: 24rpx;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+
+.iq-lead {
+  color: var(--color-ink);
+}
+
+.iq-group {
+  margin-top: 22rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.cat-card {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 18rpx;
+  padding: 26rpx 22rpx;
+  border-radius: 20rpx;
+  background: var(--color-card);
+  border: 1rpx solid var(--color-line);
+  border-left: 10rpx solid var(--color-brand);
+}
+
+.cat-card.tone-accent {
+  border-left-color: var(--color-accent);
+}
+
+.cat-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.cat-name {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.cat-hint {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+
+.cat-go {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.cat-card:active {
+  opacity: 0.86;
+}
+
+.back-link {
+  margin-bottom: 12rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.iq-bar {
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: var(--color-soft);
+  overflow: hidden;
+}
+
+.iq-bar-on {
+  height: 100%;
+  background: var(--color-brand);
+}
+
+.q-prompt {
+  margin-top: 18rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+.fig {
+  margin-top: 18rpx;
+  padding: 18rpx;
+  border-radius: 16rpx;
+  background: var(--color-soft);
+}
+
+.fig-row {
+  display: flex;
+  justify-content: center;
+  gap: 12rpx;
+  margin-top: 10rpx;
+}
+
+.fig-row:first-child {
+  margin-top: 0;
+}
+
+.fig-cell {
+  min-width: 64rpx;
+  padding: 8rpx 10rpx;
+  border-radius: 12rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+  background: var(--color-card);
+}
+
+.quiz-opt {
+  margin-top: 16rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 16rpx;
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-line);
+}
+
+.quiz-opt.is-on {
+  border-color: var(--color-brand);
+  background: var(--color-soft);
+}
+
+.quiz-opt-main {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.quiz-opt-key {
+  flex-shrink: 0;
+  width: 40rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.quiz-opt-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  line-height: 1.55;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.iq-nav {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.iq-nav-btn {
+  flex: 1;
+  padding: 18rpx 0;
+  border-radius: 16rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+  background: var(--color-soft);
+}
+
+.iq-nav-btn.is-main {
+  color: var(--color-on-brand);
+  background: var(--color-brand);
+}
+
+.iq-nav-btn.is-off {
+  color: var(--color-muted);
+}
+
+button.iq-share {
+  margin: 0;
+  line-height: 1.4;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+
+.iq-share::after {
+  border: none;
+}
+
+.iq-score-line {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.iq-level {
+  margin-top: 12rpx;
+}
+
+.iq-domain {
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.iq-domain-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.iq-miss-toggle {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.iq-miss {
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid var(--color-line);
+}
+
+.iq-miss-no {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+
+.iq-miss-prompt {
+  margin-top: 8rpx;
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.iq-note {
+  margin-top: 10rpx;
+}

@@ -12,7 +12,7 @@ const CATEGORIES = [
   { id: 'travel', name: '出行', toolIds: ['fuel', 'oilprice', 'toll', 'guide'] },
   { id: 'house', name: '房产生活', toolIds: ['mortgage', 'utility', 'fitout', 'housetax', 'tax'] },
   { id: 'bank', name: '银行理财', toolIds: ['compound', 'deposit'] },
-  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'bark', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
+  { id: 'fun', name: '娱乐', toolIds: ['mbti', 'focus', 'iq', 'bark', 'chance', 'drinkwheel', 'footprint', 'canvas', 'puzzle'] },
   { id: 'daily', name: '日常工具', toolIds: ['retire', 'pension', 'calendar', 'qrcode', 'checkin', 'idphoto', 'bmi', 'diet', 'exam'] },
   { id: 'calc', name: '计算工具', toolIds: ['safeperiod', 'duedate', 'age', 'datetime', 'calc', 'rmb', 'percent', 'base', 'currency', 'unit'] }
 ]
@@ -306,6 +306,15 @@ const TOOLS = [
     iconType: 'focus',
     keywords: '综合脑力自测脑力测试记忆力反应力空间思维空间力专注力趣味娱乐',
     page: '/packageFocus/pages/focus/focus'
+  },
+  {
+    id: 'iq',
+    name: 'IQ智力测试',
+    shortName: '智力测试',
+    icon: '🧩',
+    iconType: 'iq',
+    keywords: 'IQ智力测试智商成人儿童少年推理词语数量空间逻辑趣味娱乐',
+    page: '/packageFocus/pages/iq/iq'
   },
   {
     id: 'bark',

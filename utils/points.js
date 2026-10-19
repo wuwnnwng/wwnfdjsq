@@ -124,6 +124,68 @@ function writeState(state) {
   return next
 }
 
+function avatarFilePath(fileID) {
+  let hash = 2166136261
+  const text = String(fileID || '')
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  return `${wx.env.USER_DATA_PATH}/avatar_${(hash >>> 0).toString(16)}.jpg`
+}
+
+function accessFile(path) {
+  try {
+    wx.getFileSystemManager().accessSync(path)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+function forgetAvatarFile(fileID) {
+  if (!fileID || String(fileID).indexOf('cloud://') !== 0) return
+  try {
+    wx.getFileSystemManager().unlinkSync(avatarFilePath(fileID))
+  } catch (e) {}
+}
+
+function loadAvatarFile(fileID) {
+  return new Promise((resolve) => {
+    const id = String(fileID || '')
+    if (id.indexOf('cloud://') !== 0) {
+      resolve(id && id.indexOf('http') !== 0 ? id : '')
+      return
+    }
+    const path = avatarFilePath(id)
+    if (accessFile(path)) {
+      resolve(path)
+      return
+    }
+    if (!wx.cloud || typeof wx.cloud.downloadFile !== 'function') {
+      resolve('')
+      return
+    }
+    wx.cloud.downloadFile({
+      fileID: id,
+      success: (res) => {
+        const temp = res && res.tempFilePath
+        if (!temp) {
+          resolve('')
+          return
+        }
+        wx.getFileSystemManager().copyFile({
+          srcPath: temp,
+          destPath: path,
+          success: () => resolve(path),
+          fail: () => resolve('')
+        })
+      },
+      fail: () => resolve('')
+    })
+  })
+}
+
 function saveAvatarUrl(fileID, url) {
   if (!url) return readState()
   const state = readState()
@@ -308,6 +370,8 @@ module.exports = {
   readProfile,
   rememberProfile,
   saveAvatarUrl,
+  loadAvatarFile,
+  forgetAvatarFile,
   syncPoints,
   loginAccount,
   logoutAccount,

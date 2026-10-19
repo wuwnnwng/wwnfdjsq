@@ -49,6 +49,9 @@
               class="puzzle-thumb-img"
               src="{{item.thumbPath}}"
               mode="aspectFill"
+              lazy-load
+              data-index="{{index}}"
+              binderror="onThumbError"
             />
           </view>
           <view class="puzzle-name">{{item.name}}</view>

@@ -1,7 +1,7 @@
 <view class="page theme-{{theme}} {{themeFading ? 'is-theme-fading' : ''}}">
   <scroll-view scroll-y class="scroll" show-scrollbar="{{false}}">
     <view class="profile" bindtap="onEdit">
-      <image wx:if="{{loggedIn && avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" />
+      <image wx:if="{{loggedIn && avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" lazy-load binderror="onAvatarError" />
       <view wx:else class="avatar avatar-guest">
         <text class="avatar-watermark">便民</text>
       </view>

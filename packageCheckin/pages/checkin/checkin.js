@@ -916,6 +916,13 @@ Page({
       })
   },
 
+  onQrError() {
+    const event = this.data.event
+    this.setData({ qrFileID: '' }, () => {
+      if (event && event.id) this.drawQr(`CKIN:${event.id}`)
+    })
+  },
+
   loadCodeImage(eventId) {
     if (!eventId) return
     callCheckin('getCodeImage', { eventId, envVersion: miniEnv() })

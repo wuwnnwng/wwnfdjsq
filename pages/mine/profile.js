@@ -1,4 +1,4 @@
-const { readState, saveUserProfile, uploadAvatar } = require('../../utils/points')
+const { readState, saveUserProfile, uploadAvatar, loadAvatarFile, forgetAvatarFile } = require('../../utils/points')
 const { getThemeId, applyThemeChrome } = require('../../utils/theme')
 
 Page({
@@ -26,7 +26,7 @@ Page({
       return
     }
     const stored = state.avatar || ''
-    const showAvatar = state.avatarUrl || (stored.indexOf('cloud://') === 0 ? '' : stored)
+    const showAvatar = stored.indexOf('cloud://') === 0 || stored.indexOf('http') === 0 ? '' : stored
     if (this._ready) return
     this._ready = true
     this._draftNick = state.nick || ''
@@ -35,6 +35,30 @@ Page({
       draftNick: state.nick || '',
       avatar: showAvatar,
       avatarId: stored
+    })
+    if (stored.indexOf('cloud://') !== 0) return
+    loadAvatarFile(stored).then((path) => {
+      if (!path || this.data.avatarId !== stored || this.data.draftAvatar) return
+      this.setData({ avatar: path })
+    })
+  },
+
+  onAvatarError() {
+    if (this.data.draftAvatar) {
+      this.setData({ draftAvatar: '' })
+      return
+    }
+    const id = this.data.avatarId
+    if (!id || this._avatarRetried) {
+      this.setData({ avatar: '' })
+      return
+    }
+    this._avatarRetried = true
+    forgetAvatarFile(id)
+    this.setData({ avatar: '' })
+    loadAvatarFile(id).then((path) => {
+      if (!path || this.data.avatarId !== id || this.data.draftAvatar) return
+      this.setData({ avatar: path })
     })
   },
 

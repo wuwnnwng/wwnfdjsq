@@ -108,9 +108,18 @@ function ensureFile(kind) {
 
 function createInnerAudio(src, volume) {
   const audio = wx.createInnerAudioContext()
-  audio.src = src
+  audio._ready = false
+  audio._dead = false
   audio.volume = volume
   audio.obeyMuteSwitch = false
+  audio.onCanplay(() => {
+    audio._ready = true
+  })
+  audio.onError(() => {
+    audio._dead = true
+    audio._ready = false
+  })
+  audio.src = src
   return audio
 }
 
@@ -177,18 +186,6 @@ function createGameSfx() {
     const volume = kind === 'wheelTick' ? 0.72 : 0.88
     pools[kind] = [createInnerAudio(src, volume), createInnerAudio(src, volume), createInnerAudio(src, volume)]
     cursors[kind] = 0
-    const warmup = pools[kind][0]
-    const prev = warmup.volume
-    warmup.volume = 0
-    warmup.play()
-    setTimeout(() => {
-      try {
-        warmup.stop()
-        warmup.volume = prev
-      } catch (err) {
-        // ignore
-      }
-    }, 30)
   }
 
   function prepare() {
@@ -299,17 +296,22 @@ function createGameSfx() {
   function playInner(kind) {
     const pool = pools[kind]
     if (!pool || !pool.length) return false
-    const audio = pool[(cursors[kind] || 0) % pool.length]
-    cursors[kind] = (cursors[kind] || 0) + 1
-    if (!audio) return false
-    try {
-      audio.stop()
-      audio.seek(0)
-      audio.play()
-      return true
-    } catch (e) {
-      return false
+    let tries = pool.length
+    while (tries > 0) {
+      const audio = pool[(cursors[kind] || 0) % pool.length]
+      cursors[kind] = (cursors[kind] || 0) + 1
+      tries -= 1
+      if (!audio || audio._dead || !audio._ready) continue
+      try {
+        audio.stop()
+        audio.seek(0)
+        audio.play()
+        return true
+      } catch (e) {
+        audio._dead = true
+      }
     }
+    return false
   }
 
   function play(kind) {

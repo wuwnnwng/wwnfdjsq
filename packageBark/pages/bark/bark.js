@@ -56,16 +56,22 @@ Page({
     if (!item) return
     this.stopAudio(true)
     const audio = wx.createInnerAudioContext()
-    audio.src = item.src
-    audio.loop = true
     audio.obeyMuteSwitch = false
+    let started = false
+    const start = () => {
+      if (started || this._audio !== audio) return
+      started = true
+      audio.loop = true
+      audio.play()
+    }
+    audio.onCanplay(start)
     audio.onError(() => {
       if (this._audio !== audio) return
       this.stopAudio()
       wx.showToast({ title: '这台设备暂时播不了', icon: 'none' })
     })
     this._audio = audio
-    audio.play()
+    audio.src = item.src
     this.setData({ playingId: id, playingName: item.name })
     if (wx.vibrateShort) wx.vibrateShort({ type: 'light' })
   },

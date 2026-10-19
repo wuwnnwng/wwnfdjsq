@@ -110,6 +110,7 @@ Page({
   },
 
   onCamError() {
+    this.setData({ cameraOn: false })
     wx.showToast({ title: '没有打开相机', icon: 'none' })
   },
 

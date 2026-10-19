@@ -60,9 +60,18 @@ function ensureTickFile() {
 
 function createInnerAudio(src) {
   const audio = wx.createInnerAudioContext()
-  audio.src = src
+  audio._ready = false
+  audio._dead = false
   audio.volume = 0.85
   audio.obeyMuteSwitch = false
+  audio.onCanplay(() => {
+    audio._ready = true
+  })
+  audio.onError(() => {
+    audio._dead = true
+    audio._ready = false
+  })
+  audio.src = src
   return audio
 }
 
@@ -90,18 +99,6 @@ function createPickerTick() {
     const src = ensureTickFile()
     if (!src) return
     pool = [createInnerAudio(src), createInnerAudio(src), createInnerAudio(src)]
-    const warmup = pool[0]
-    const prev = warmup.volume
-    warmup.volume = 0
-    warmup.play()
-    setTimeout(() => {
-      try {
-        warmup.stop()
-        warmup.volume = prev
-      } catch (err) {
-        // ignore
-      }
-    }, 30)
   }
 
   function prepare() {
@@ -132,17 +129,23 @@ function createPickerTick() {
   }
 
   function playInner() {
-    const audio = pool[cursor % pool.length]
-    cursor += 1
-    if (!audio) return false
-    try {
-      audio.stop()
-      audio.seek(0)
-      audio.play()
-      return true
-    } catch (e) {
-      return false
+    if (!pool.length) return false
+    let tries = pool.length
+    while (tries > 0) {
+      const audio = pool[cursor % pool.length]
+      cursor += 1
+      tries -= 1
+      if (!audio || audio._dead || !audio._ready) continue
+      try {
+        audio.stop()
+        audio.seek(0)
+        audio.play()
+        return true
+      } catch (e) {
+        audio._dead = true
+      }
     }
+    return false
   }
 
   function play() {

@@ -1,7 +1,7 @@
 <view class="page theme-{{theme}}">
   <button wx:if="{{needPrivacy}}" class="avatar-pick" bindtap="onOpenPrivacy" hover-class="none">
     <view class="preview">
-      <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
+      <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" lazy-load binderror="onAvatarError" />
       <view wx:else class="avatar avatar-guest">
         <text class="avatar-watermark">便民</text>
       </view>
@@ -11,7 +11,7 @@
   </button>
   <button wx:else class="avatar-pick" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" hover-class="none">
     <view class="preview">
-      <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" />
+      <image wx:if="{{draftAvatar || avatar}}" class="avatar" src="{{draftAvatar || avatar}}" mode="aspectFill" lazy-load binderror="onAvatarError" />
       <view wx:else class="avatar avatar-guest">
         <text class="avatar-watermark">便民</text>
       </view>

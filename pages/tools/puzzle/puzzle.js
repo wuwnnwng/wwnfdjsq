@@ -146,6 +146,12 @@ Page({
     this.renderNextThumb()
   },
 
+  onThumbError(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    if (!(index >= 0)) return
+    this.setData({ [`puzzles[${index}].thumbPath`]: '' })
+  },
+
   renderNextThumb() {
     const ctx = this._thumbCtx
     const canvas = this._thumbCanvas

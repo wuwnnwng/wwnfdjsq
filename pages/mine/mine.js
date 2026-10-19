@@ -4,8 +4,9 @@ const {
   formatUntil,
   loginAccount,
   logoutAccount,
-  saveAvatarUrl,
   readProfile,
+  loadAvatarFile,
+  forgetAvatarFile,
   rememberProfile,
   loadNotices
 } = require('../../utils/points')
@@ -92,13 +93,15 @@ Page({
     const pageNick = this.data.nick || ''
     let nick = state.nick || profile.nick || ''
     let stored = state.avatar || profile.avatar || ''
-    let showAvatar = state.avatarUrl || profile.avatarUrl || ''
+    let showAvatar = ''
     if (!loggedIn) {
       if (!nick) nick = pageNick
       if (!stored) stored = this.data.avatarId || ''
-      if (!showAvatar && pageAvatar.indexOf('http') === 0) showAvatar = pageAvatar
     }
-    if (!showAvatar && stored && stored.indexOf('cloud://') !== 0) showAvatar = stored
+    if (stored && stored.indexOf('cloud://') !== 0 && stored.indexOf('http') !== 0) showAvatar = stored
+    if (loggedIn && stored && stored === this.data.avatarId && pageAvatar && pageAvatar.indexOf('http') !== 0) {
+      showAvatar = pageAvatar
+    }
     if (nick || stored || showAvatar) {
       rememberProfile({
         openid: state.openid || profile.openid || '',
@@ -116,16 +119,26 @@ Page({
       points: loggedIn ? (state.points || 0) : 0,
       adFreeText: loggedIn ? formatUntil(state.adFreeUntil) : ''
     })
-    if (!loggedIn || stored.indexOf('cloud://') !== 0 || !wx.cloud || typeof wx.cloud.getTempFileURL !== 'function') return
-    wx.cloud.getTempFileURL({
-      fileList: [stored],
-      success: (res) => {
-        const url = res && res.fileList && res.fileList[0] && res.fileList[0].tempFileURL
-        if (!url || !this.data.loggedIn || this.data.avatarId !== stored) return
-        saveAvatarUrl(stored, url)
-        rememberProfile({ nick, avatar: stored, avatarUrl: url })
-        this.setData({ avatar: url })
-      }
+    if (!loggedIn || stored.indexOf('cloud://') !== 0) return
+    const ticket = stored
+    loadAvatarFile(ticket).then((path) => {
+      if (!path || !this.data.loggedIn || this.data.avatarId !== ticket) return
+      this.setData({ avatar: path })
+    })
+  },
+
+  onAvatarError() {
+    const id = this.data.avatarId
+    if (!id || this._avatarRetried) {
+      this.setData({ avatar: '' })
+      return
+    }
+    this._avatarRetried = true
+    forgetAvatarFile(id)
+    this.setData({ avatar: '' })
+    loadAvatarFile(id).then((path) => {
+      if (!path || !this.data.loggedIn || this.data.avatarId !== id) return
+      this.setData({ avatar: path })
     })
   },
 

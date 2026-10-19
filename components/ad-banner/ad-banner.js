@@ -52,6 +52,8 @@ Component({
       this.setData({ ready: true })
     },
 
-    onErrorAd() {}
+    onErrorAd() {
+      this.setData({ mount: false, ready: false })
+    }
   }
 })

@@ -96,7 +96,7 @@
         </view>
         <view class="qr-wrap" wx:if="{{isOwner}}">
           <view class="qr-box">
-            <image wx:if="{{qrFileID}}" class="qr-canvas" src="{{qrFileID}}" mode="aspectFit" />
+            <image wx:if="{{qrFileID}}" class="qr-canvas" src="{{qrFileID}}" mode="aspectFit" binderror="onQrError" />
             <canvas wx:else type="2d" id="checkinQr" class="qr-canvas"></canvas>
             <view class="qr-download" bindtap="onSaveQr">↓</view>
           </view>

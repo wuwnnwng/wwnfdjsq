@@ -178,6 +178,27 @@
         <view class="tool-note">每一维取更高的一侧。两侧相同或非常接近时，记作内向、直觉、情感、随性，并标为均衡。</view>
       </view>
 
+      <view class="panel" wx:if="{{result.romance.length || result.confidant.length}}">
+        <view class="section-title">适合谈恋爱</view>
+        <view class="tool-note">外向和内向对调，计划感和随性也对调，看世界的方式还是同一类。这是偏好参照，不是配对鉴定，也不能预测一段关系成不成。</view>
+        <view class="pair" wx:for="{{result.romance}}" wx:key="code" bindtap="onPreview" data-code="{{item.code}}">
+          <view class="pair-code" style="background: {{item.color}}; color: {{item.ink}};">{{item.code}}</view>
+          <view class="pair-copy">
+            <view class="pair-name">{{item.name}}</view>
+            <view class="pair-line">{{item.line}}</view>
+          </view>
+        </view>
+        <view class="section-title gap">适合交心的朋友</view>
+        <view class="tool-note">主导功能和你相同，或正好把你第二顺手的功能当作主业。话更容易落到同一层。</view>
+        <view class="pair" wx:for="{{result.confidant}}" wx:key="code" bindtap="onPreview" data-code="{{item.code}}">
+          <view class="pair-code" style="background: {{item.color}}; color: {{item.ink}};">{{item.code}}</view>
+          <view class="pair-copy">
+            <view class="pair-name">{{item.name}}</view>
+            <view class="pair-line">{{item.line}}</view>
+          </view>
+        </view>
+      </view>
+
       <view class="tabs">
         <view
           wx:for="{{tabs}}"

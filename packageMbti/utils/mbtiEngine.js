@@ -1,5 +1,6 @@
 const { QUESTIONS } = require('../data/questions')
 const { TYPES, GROUPS, GROUP_ORDER, FUNCTIONS } = require('../data/types')
+const { listBonds } = require('../data/bonds')
 
 const WEIGHTS = [2, 1, 0, -1, -2]
 const ROLES = ['主导', '辅助', '第三', '劣势']
@@ -249,6 +250,8 @@ function presentType(type) {
     stackText: functions.slice(0, 2).map((item) => `${item.role} ${item.code}`).join(' · '),
     best: (type.best || []).map(linkType).filter(Boolean),
     grow: (type.grow || []).map(linkType).filter(Boolean),
+    romance: listBonds(type.code, 'romance').map(linkType).filter(Boolean),
+    confidant: listBonds(type.code, 'confidant').map(linkType).filter(Boolean),
     siblings: TYPES.filter((item) => item.group === type.group && item.code !== type.code).map(linkType).filter(Boolean)
   }
 }
@@ -416,6 +419,13 @@ function formatClipboard(result) {
   }
   if (result.summary) {
     lines.push(result.summary)
+    lines.push('')
+  }
+  if (result.romance && result.romance.length) {
+    lines.push('适合谈恋爱：' + result.romance.map((item) => `${item.code} ${item.name}`).join('、'))
+  }
+  if (result.confidant && result.confidant.length) {
+    lines.push('适合交心的朋友：' + result.confidant.map((item) => `${item.code} ${item.name}`).join('、'))
     lines.push('')
   }
   lines.push('免责声明：趣味自测，仅供参考，非心理诊断，也不是 MBTI 官方测评。')

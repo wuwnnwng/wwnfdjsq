@@ -105,6 +105,13 @@
   color: var(--color-muted);
 }
 
+.summary-note {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
 .summary-sub {
   margin-top: 12rpx;
   font-size: 24rpx;

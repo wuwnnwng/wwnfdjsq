@@ -75,6 +75,7 @@ const lastInput = createLastInput('mortgage', [
   'providentAmount',
   'providentYears',
   'providentRate',
+  'valueDate',
   'originalYears',
   'firstRepaymentDate',
   'manualAnnualRate',
@@ -118,6 +119,7 @@ Page({
     providentRateAuto: true,
 
     originalYears: '30',
+    valueDate: '',
     firstRepaymentDate: '',
     manualAnnualRate: '',
     hasManualRate: false,
@@ -145,7 +147,8 @@ Page({
     derivedRemainingMonths: '--',
     derivedMessage: '',
 
-    showFirstDatePicker: false
+    showFirstDatePicker: false,
+    datePickFor: 'first'
   },
 
   onLoad() {
@@ -158,7 +161,7 @@ Page({
     const dd = String(now.getDate()).padStart(2, '0')
     const today = `${now.getFullYear()}-${mm}-${dd}`
     const saved = lastInput.restore()
-    const patch = Object.assign({ firstRepaymentDate: today }, saved)
+    const patch = Object.assign({ firstRepaymentDate: today, valueDate: today }, saved)
     if (patch.loanType) Object.assign(patch, this.loanTypePatch(patch.loanType))
     patch.hasManualRate = String(patch.manualAnnualRate || '').trim() !== ''
     Object.assign(patch, this.syncLoanRates(patch))
@@ -332,7 +335,8 @@ Page({
       commercialRate: input.commercialRate || '',
       providentAmount: input.providentAmount || '',
       providentYears: input.providentYears || '',
-      providentRate: input.providentRate || ''
+      providentRate: input.providentRate || '',
+      valueDate: input.valueDate || ''
     }
   },
 
@@ -510,8 +514,12 @@ Page({
     })
   },
 
+  onOpenValueDatePicker() {
+    this.setData({ showFirstDatePicker: true, datePickFor: 'value' })
+  },
+
   onOpenFirstDatePicker() {
-    this.setData({ showFirstDatePicker: true })
+    this.setData({ showFirstDatePicker: true, datePickFor: 'first' })
   },
 
   onHideFirstDatePicker() {
@@ -520,9 +528,10 @@ Page({
 
   onFirstDateConfirm(e) {
     const value = (e.detail && e.detail.value) || ''
+    const field = this.data.datePickFor === 'value' ? 'valueDate' : 'firstRepaymentDate'
     this.setData(
       {
-        firstRepaymentDate: value,
+        [field]: value,
         showFirstDatePicker: false
       },
       () => {
@@ -646,6 +655,10 @@ Page({
       wx.showToast({ title: '先息后本仅支持商贷', icon: 'none' })
       return false
     }
+    if (this.data.method === 'interestFirst' && !this.data.valueDate) {
+      wx.showToast({ title: '请选择起息日', icon: 'none' })
+      return false
+    }
 
     const needCommercial = loanType === 'commercial' || loanType === 'combo'
     const needProvident = loanType === 'provident' || loanType === 'combo'
@@ -730,7 +743,8 @@ Page({
       commercialRate,
       providentAmount,
       providentYears,
-      providentRate
+      providentRate,
+      valueDate
     } = this.data
 
     const shareInput = {
@@ -742,7 +756,8 @@ Page({
       commercialRate,
       providentAmount,
       providentYears,
-      providentRate
+      providentRate,
+      valueDate
     }
 
     const result = calculateMortgage(shareInput)

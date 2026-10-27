@@ -37,7 +37,7 @@
       </view>
       <view class="tip-block">
         <view class="tip-name">先息后本</view>
-        <view class="tip-text">贷款期内每月只偿还利息，到期时一次性偿还全部本金。前期月供压力较小，但到期需准备较大一笔本金。</view>
+        <view class="tip-text">贷款期内只还利息，到期一次性偿还本金。利息按日计算：日利率=年利率÷360，每月按起息日到下一还款日的实际天数。</view>
       </view>
       <view class="tip-confirm" bindtap="onHideMethodTip">我知道了</view>
     </view>
@@ -136,6 +136,13 @@
               bindtap="onMethodChange"
             >先息后本</view>
           </view>
+          <view class="field" wx:if="{{method === 'interestFirst'}}">
+            <text class="field-label">起息日</text>
+            <view class="field-control" bindtap="onOpenValueDatePicker">
+              <text class="picker-value {{valueDate ? '' : 'placeholder'}}">{{valueDate || '请选择日期'}}</text>
+            </view>
+          </view>
+          <view class="field-hint" wx:if="{{method === 'interestFirst'}}">先息后本按日计息，日利率=年利率÷360，每月按实际天数</view>
         </view>
 
         <view class="sub-block" wx:if="{{showCommercial}}">
@@ -230,6 +237,7 @@
             </view>
           </view>
           <view class="field-hint" wx:if="{{providentRateAuto}}">已按首套公积金利率回显，可修改</view>
+          <view class="field-hint">公积金按日计息，日利率=年利率÷360，每月按30天</view>
         </view>
 
         <view class="inline-row">
@@ -478,8 +486,8 @@
 
   <date-picker
     show="{{showFirstDatePicker}}"
-    title="选择首次还款日期"
-    value="{{firstRepaymentDate}}"
+    title="{{datePickFor === 'value' ? '选择起息日' : '选择首次还款日期'}}"
+    value="{{datePickFor === 'value' ? valueDate : firstRepaymentDate}}"
     start="1990-01-01"
     end="2100-12-31"
     bindconfirm="onFirstDateConfirm"

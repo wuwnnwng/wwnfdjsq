@@ -31,6 +31,8 @@ function formatMoneyWithComma(n) {
 const MIN_LOAN_YEARS = 1
 const MAX_LOAN_YEARS = 40
 const METHOD_LIST = ['equalInterest', 'equalPrincipal', 'interestFirst']
+const DAY_BASIS = 360
+const MONTH_DAYS = 30
 
 function isValidLoanYears(years) {
   const n = Number(years)
@@ -39,6 +41,48 @@ function isValidLoanYears(years) {
 
 function normalizeMethod(method) {
   return METHOD_LIST.indexOf(method) >= 0 ? method : 'equalInterest'
+}
+
+function annualToMonthRate(annualRatePercent) {
+  return toNumber(annualRatePercent) / 100 / 12
+}
+
+function annualToDayRate(annualRatePercent) {
+  return toNumber(annualRatePercent) / 100 / DAY_BASIS
+}
+
+function normalizeBasis(basis) {
+  if (basis === 'day30' || basis === 'dayActual') return basis
+  return 'month'
+}
+
+function periodRate(annualRatePercent, basis) {
+  const normalized = normalizeBasis(basis)
+  if (normalized === 'month') return annualToMonthRate(annualRatePercent)
+  return annualToDayRate(annualRatePercent) * MONTH_DAYS
+}
+
+function daysBetween(startStr, endStr) {
+  const start = parseDateParts(startStr)
+  const end = parseDateParts(endStr)
+  if (!start || !end) return MONTH_DAYS
+  const from = Date.UTC(start.year, start.month - 1, start.day)
+  const to = Date.UTC(end.year, end.month - 1, end.day)
+  const days = Math.round((to - from) / 86400000)
+  return days > 0 ? days : MONTH_DAYS
+}
+
+function basisNote(label, basis) {
+  if (basis === 'dayActual') {
+    return `${label}按日计息，日利率=年利率÷360，每期按实际天数`
+  }
+  if (basis === 'day30') {
+    return `${label}按日计息，日利率=年利率÷360，每月按30天`
+  }
+  if (basis === 'month') {
+    return `${label}按月计息，月利率=年利率÷12`
+  }
+  return ''
 }
 
 function emptyLoanResult() {
@@ -67,11 +111,15 @@ function pushScheduleItem(schedule, month, payment, principalPart, interest, rem
 /**
  * 按「元 + 期数」计算单笔贷款 减少月供 年限不变
  */
-function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
+function calculateLoanByYuan(principalYuan, months, annualRatePercent, method, calcOptions) {
   const principal = round2(toNumber(principalYuan))
   const totalMonths = Math.max(0, Math.round(toNumber(months)))
-  const monthlyRate = toNumber(annualRatePercent) / 100 / 12
+  const options = calcOptions || {}
+  const basis = normalizeBasis(options.basis)
+  const monthlyRate = periodRate(annualRatePercent, basis === 'dayActual' ? 'day30' : basis)
+  const dayRate = annualToDayRate(annualRatePercent)
   const normalizedMethod = normalizeMethod(method)
+  let cursor = options.startDate || ''
 
   if (principal <= 0 || totalMonths <= 0) {
     return emptyLoanResult()
@@ -96,9 +144,16 @@ function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
       pushScheduleItem(schedule, i, payment, principalPart, interest, remaining)
     }
   } else if (normalizedMethod === 'interestFirst') {
-    // 先息后本：前期只还利息，到期一次还清本金
+    // 先息后本：日利率 = 年利率 / 360。有起息日时按本期实际天数，否则按 30 天。
+    const useActual = basis === 'dayActual' && !!parseDateParts(cursor)
     for (let i = 1; i <= totalMonths; i += 1) {
-      const interest = remaining * monthlyRate
+      let days = MONTH_DAYS
+      if (useActual) {
+        const next = addMonthsToDate(cursor, 1)
+        days = daysBetween(cursor, next)
+        cursor = next
+      }
+      const interest = remaining * dayRate * days
       const principalPart = i === totalMonths ? remaining : 0
       const payment = principalPart + interest
 
@@ -106,6 +161,7 @@ function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
       totalPayment += payment
       totalInterest += interest
       pushScheduleItem(schedule, i, payment, principalPart, interest, remaining)
+      schedule[schedule.length - 1].days = days
     }
   } else {
     // 等额本息
@@ -138,6 +194,9 @@ function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
     principal: round2(principal),
     months: totalMonths,
     monthlyRate,
+    basis: normalizedMethod === 'interestFirst'
+      ? (basis === 'dayActual' && parseDateParts(options.startDate || '') ? 'dayActual' : 'day30')
+      : basis,
     firstMonthPayment: schedule[0] ? schedule[0].payment : 0,
     lastMonthPayment: schedule.length ? schedule[schedule.length - 1].payment : 0,
     totalPayment: round2(totalPayment),
@@ -149,12 +208,13 @@ function calculateLoanByYuan(principalYuan, months, annualRatePercent, method) {
 /**
  * 单笔贷款计算（金额单位：万元，年限：年）
  */
-function calculateLoan(principalWan, years, annualRatePercent, method) {
+function calculateLoan(principalWan, years, annualRatePercent, method, calcOptions) {
   return calculateLoanByYuan(
     toNumber(principalWan) * 10000,
     toNumber(years) * 12,
     annualRatePercent,
-    method
+    method,
+    calcOptions
   )
 }
 
@@ -206,6 +266,15 @@ function buildMortgageResult({
   const lastMonthPayment = schedule.length ? schedule[schedule.length - 1].payment : 0
   const principalRatio = totalPayment > 0 ? (totalPrincipal / totalPayment) * 100 : 0
   const interestRatio = totalPayment > 0 ? (totalInterest / totalPayment) * 100 : 0
+  const interestNotes = []
+  if (loanType === 'remaining') {
+    if (commercial.principal > 0) {
+      interestNotes.push(basisNote(method === 'interestFirst' ? '先息后本' : '', commercial.basis))
+    }
+  } else {
+    if (commercial.principal > 0) interestNotes.push(basisNote('商贷', commercial.basis))
+    if (provident.principal > 0) interestNotes.push(basisNote('公积金', provident.basis))
+  }
 
   return {
     mode: mode || 'new',
@@ -233,6 +302,7 @@ function buildMortgageResult({
         method === 'equalPrincipal' && schedule.length > 1
           ? formatMoneyWithComma(schedule[0].payment - schedule[1].payment)
           : '0.00',
+      interestNote: interestNotes.filter(Boolean).join('。'),
       ...(extra.display || {})
     }
   }
@@ -253,7 +323,11 @@ function calculateMortgage(options) {
       options.commercialAmount,
       options.commercialYears,
       options.commercialRate,
-      method
+      method,
+      {
+        basis: method === 'interestFirst' ? 'dayActual' : 'month',
+        startDate: options.valueDate || ''
+      }
     )
   }
 
@@ -262,7 +336,8 @@ function calculateMortgage(options) {
       options.providentAmount,
       options.providentYears,
       options.providentRate,
-      method
+      method,
+      { basis: 'day30' }
     )
   }
 
@@ -321,10 +396,9 @@ function resolveNextRepaymentDate(firstRepaymentDate, paidMonths) {
 }
 
 /**
- * 已还期数（按年月差，不含“当月再 +1”）
- * 例：首次 2021-09，当前 2026-08
- * → (2026-2021)*12 + (8-9) = 59 期
- * → 剩余 360-59=301 期 → 25.08 年
+ * 已还期数。先按年月差计算，还款日当天及之后，本月这一期也算已到。
+ * 例：首次 2021-09-27，当前 2026-10-26 → 61 期，剩余 299 期
+ * 当前 2026-10-27 → 62 期，剩余 298 期
  */
 function countPaidMonths(firstRepaymentDate, now = new Date()) {
   const start = parseDateParts(firstRepaymentDate)
@@ -332,7 +406,11 @@ function countPaidMonths(firstRepaymentDate, now = new Date()) {
 
   const nowYear = now.getFullYear()
   const nowMonth = now.getMonth() + 1
-  return (nowYear - start.year) * 12 + (nowMonth - start.month)
+  const nowDay = now.getDate()
+  let paid = (nowYear - start.year) * 12 + (nowMonth - start.month)
+  const dueDay = Math.min(start.day, new Date(Date.UTC(nowYear, nowMonth, 0)).getUTCDate())
+  if (nowDay >= dueDay) paid += 1
+  return paid
 }
 
 /**
@@ -376,7 +454,7 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
       return { ok: false, message: '请填写有效的当前执行利率' }
     }
     annualRatePercent = manualAnnualRate
-    monthlyRate = annualRatePercent / 100 / 12
+    monthlyRate = periodRate(annualRatePercent, method === 'interestFirst' ? 'day30' : 'month')
   } else {
     // 先息后本每月通常不还本金，允许最近一次还款本金为 0
     if (method === 'interestFirst') {
@@ -392,8 +470,18 @@ function deriveRemainingLoanInfo(options, now = new Date()) {
     }
 
     beginPrincipal = remainingPrincipal + monthPrincipal
-    monthlyRate = monthInterest / beginPrincipal
-    annualRatePercent = monthlyRate * 12 * 100
+    if (method === 'interestFirst') {
+      const paid = countPaidMonths(firstRepaymentDate, now)
+      const end = addMonthsToDate(firstRepaymentDate, Math.max(paid, 1) - 1)
+      const start = addMonthsToDate(end, -1)
+      const days = daysBetween(start, end)
+      const dayRate = beginPrincipal > 0 ? monthInterest / beginPrincipal / days : 0
+      monthlyRate = dayRate * MONTH_DAYS
+      annualRatePercent = dayRate * DAY_BASIS * 100
+    } else {
+      monthlyRate = beginPrincipal > 0 ? monthInterest / beginPrincipal : 0
+      annualRatePercent = monthlyRate * 12 * 100
+    }
   }
 
   const totalMonths = Math.round(originalYears * 12)
@@ -461,8 +549,8 @@ function monthsNeededForEqualInterest(principal, monthlyPayment, monthlyRate) {
 /**
  * 部分提前还款后：缩短年限（月供基本不变）
  */
-function recalculateShortenTerm(newPrincipal, baseline, annualRatePercent, method) {
-  const monthlyRate = toNumber(annualRatePercent) / 100 / 12
+function recalculateShortenTerm(newPrincipal, baseline, annualRatePercent, method, calcOptions) {
+  const monthlyRate = periodRate(annualRatePercent, method === 'interestFirst' ? 'day30' : 'month')
   let months
 
   if (method === 'equalPrincipal') {
@@ -488,17 +576,22 @@ function recalculateShortenTerm(newPrincipal, baseline, annualRatePercent, metho
 
   return {
     ok: true,
-    loan: calculateLoanByYuan(newPrincipal, months, annualRatePercent, method)
+    loan: calculateLoanByYuan(newPrincipal, months, annualRatePercent, method, calcOptions)
   }
 }
 
 /**
  * 一次性提前还清：当期利息 + 全部剩余本金，形成 1 期结清计划
  */
-function buildFullPrepayLoan(remainingPrincipal, annualRatePercent) {
+function buildFullPrepayLoan(remainingPrincipal, annualRatePercent, calcOptions) {
+  const options = calcOptions || {}
+  const basis = normalizeBasis(options.basis)
   const principal = round2(remainingPrincipal)
-  const monthlyRate = toNumber(annualRatePercent) / 100 / 12
-  const interest = round2(principal * monthlyRate)
+  const days = basis === 'dayActual' ? (options.days > 0 ? options.days : MONTH_DAYS) : MONTH_DAYS
+  const monthlyRate = basis === 'month'
+    ? annualToMonthRate(annualRatePercent)
+    : annualToDayRate(annualRatePercent) * days
+  const interest = round2(principal * (basis === 'month' ? monthlyRate : annualToDayRate(annualRatePercent) * days))
   const payment = round2(principal + interest)
   const schedule = []
   pushScheduleItem(schedule, 1, payment, principal, interest, 0)
@@ -507,6 +600,7 @@ function buildFullPrepayLoan(remainingPrincipal, annualRatePercent) {
     principal,
     months: 1,
     monthlyRate,
+    basis,
     firstMonthPayment: payment,
     lastMonthPayment: payment,
     totalPayment: payment,
@@ -569,11 +663,21 @@ function calculateRemainingMortgage(options) {
     return { ok: false, message: derived.message }
   }
 
+  const nextRepaymentDate = resolveNextRepaymentDate(
+    derived.firstRepaymentDate,
+    derived.paidMonths
+  )
+  const accrualStart = method === 'interestFirst' ? addMonthsToDate(nextRepaymentDate, -1) : ''
+  const calcOptions = method === 'interestFirst'
+    ? { basis: 'dayActual', startDate: accrualStart }
+    : { basis: 'month' }
+
   const baseline = calculateLoanByYuan(
     derived.remainingPrincipal,
     derived.remainingMonths,
     derived.annualRatePercent,
-    method
+    method,
+    calcOptions
   )
 
   const early = parseEarlyRepaymentOptions(options, derived.remainingPrincipal)
@@ -583,16 +687,15 @@ function calculateRemainingMortgage(options) {
 
   let loan = baseline
   let earlyInfo = null
-  const nextRepaymentDate = resolveNextRepaymentDate(
-    derived.firstRepaymentDate,
-    derived.paidMonths
-  )
 
   // 是否提前还款
   if (early.enabled) {
     // 一次性结清
     if (early.prepayType === 'full') {
-      loan = buildFullPrepayLoan(derived.remainingPrincipal, derived.annualRatePercent)
+      loan = buildFullPrepayLoan(derived.remainingPrincipal, derived.annualRatePercent, {
+        basis: calcOptions.basis,
+        days: method === 'interestFirst' ? daysBetween(accrualStart, nextRepaymentDate) : MONTH_DAYS
+      })
       earlyInfo = {
         enabled: true,
         prepayType: 'full',
@@ -613,14 +716,20 @@ function calculateRemainingMortgage(options) {
           afterPrincipal,
           derived.remainingMonths,
           derived.annualRatePercent,
-          method
+          method,
+          method === 'interestFirst'
+            ? { basis: 'dayActual', startDate: nextRepaymentDate }
+            : calcOptions
         )
       } else {
         const shortened = recalculateShortenTerm(
           afterPrincipal,
           baseline,
           derived.annualRatePercent,
-          method
+          method,
+          method === 'interestFirst'
+            ? { basis: 'dayActual', startDate: nextRepaymentDate }
+            : calcOptions
         )
         if (!shortened.ok) {
           return { ok: false, message: shortened.message }

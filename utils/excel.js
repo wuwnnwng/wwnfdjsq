@@ -273,6 +273,7 @@ function buildSummaryRecords(payload) {
   rows.push(kv(interestLabel, display.totalInterest || ''))
   rows.push(kv(totalLabel, display.totalPayment || ''))
   rows.push(kv('还款期数', payload.months || 0, true))
+  if (display.interestNote) rows.push(kv('计息方式', display.interestNote))
 
   if (payload.isCombo) {
     rows.push(kv('商贷月供（首月）', payload.commercialFirst || ''))

@@ -638,7 +638,8 @@ function encodeShareInput(shareInput) {
         cr: shareInput.commercialRate || '',
         pa: shareInput.providentAmount || '',
         py: shareInput.providentYears || '',
-        pr: shareInput.providentRate || ''
+        pr: shareInput.providentRate || '',
+        vd: shareInput.valueDate || ''
       }
     }
     return `p=${encodeURIComponent(JSON.stringify(snap))}`
@@ -677,7 +678,8 @@ function parseShareInputQuery(query) {
       commercialRate: snap.cr || '',
       providentAmount: snap.pa || '',
       providentYears: snap.py || '',
-      providentRate: snap.pr || ''
+      providentRate: snap.pr || '',
+      valueDate: snap.vd || ''
     }
   } catch (e) {
     return null
@@ -713,7 +715,8 @@ function rebuildResultFromShareInput(input) {
       commercialRate: input.commercialRate,
       providentAmount: input.providentAmount,
       providentYears: input.providentYears,
-      providentRate: input.providentRate
+      providentRate: input.providentRate,
+      valueDate: input.valueDate
     })
     if (!result || !result.totalPrincipal) return null
     result.shareInput = input

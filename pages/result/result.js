@@ -10,6 +10,7 @@ const {
   resolvePageQuery,
   isShareLanding
 } = require('../../utils/share')
+const { parseNoticePageQuery, buildNoticePage, scheduleRemindRows, ensureMortgageRemind, toggleMortgageRemind, requestMortgageSubscribe } = require('../../utils/mortgageNotice')
 const { getThemeId, getTheme, applyThemeChrome } = require('../../utils/theme')
 const {
   MAX_PLANS,
@@ -105,6 +106,7 @@ Page({
     confettiPieces: [],
     planNameDraft: '',
     planNameMaxLen: NAME_MAX_LEN,
+    remindHint: '',
     fromShare: false,
     canExport: false,
     splitDetail: {
@@ -126,8 +128,18 @@ Page({
   },
 
   applyEnterResult(pageOptions) {
+    const own = pageOptions || {}
+    const noticeInput = parseNoticePageQuery(own)
+    if (noticeInput) {
+      const noticed = rebuildResultFromShareInput(noticeInput)
+      if (noticed) {
+        wx.setStorageSync('mortgageResult', noticed)
+        this.applyLocalResult(noticed, { fromShare: true })
+        return true
+      }
+    }
     if (this.data.ready) return true
-    const query = resolvePageQuery(pageOptions || {})
+    const query = resolvePageQuery(own)
 
     const shareInput = parseShareInputQuery(query)
     if (shareInput) {
@@ -206,6 +218,15 @@ Page({
     const fromShare = !!options.fromShare
 
     const fullSchedule = decorateSchedule(result.schedule)
+    const remindRows = scheduleRemindRows(result)
+    const dateByMonth = {}
+    remindRows.forEach((row) => {
+      dateByMonth[row.month] = row.repayDate
+    })
+    fullSchedule.forEach((item) => {
+      item.repayDate = dateByMonth[item.month] || ''
+      item.remind = false
+    })
     const isRemaining = result.mode === 'remaining' || result.loanType === 'remaining'
     const isCombo = result.loanType === 'combo'
     const early = result.earlyRepayment || null
@@ -231,6 +252,7 @@ Page({
 
     this.shareInput = result.shareInput || null
     this.rawResult = result
+    this._remindPage = buildNoticePage(result.shareInput)
     this.pieData = {
       principal: result.totalPrincipal,
       interest: result.totalInterest
@@ -273,7 +295,8 @@ Page({
       showAllSchedule: false,
       fullSchedule,
       visibleSchedule: [],
-      canExport: fullSchedule.length > 0
+      canExport: fullSchedule.length > 0,
+      remindHint: ''
     }, () => this.drawPieIfReady())
     this.scheduleInterestPopup({
       isEarlyRepayment,
@@ -287,6 +310,76 @@ Page({
         : {},
       loanTypeLabel,
       methodLabel: METHOD_LABEL[result.method] || ''
+    })
+    this.syncRepayRemind(result)
+  },
+
+  syncRepayRemind(result) {
+    if (!this._remindPage) return
+    ensureMortgageRemind(result).then((body) => {
+      if (!body || !body.ok || !Array.isArray(body.months)) return
+      this.applyRemindMonths(body.months)
+    })
+  },
+
+  applyRemindMonths(months) {
+    const picked = {}
+    ;(months || []).forEach((month) => {
+      picked[Number(month)] = true
+    })
+    const mark = (list) => (list || []).map((item) => ({
+      ...item,
+      remind: !!picked[item.month]
+    }))
+    const fullSchedule = mark(this.data.fullSchedule)
+    const nearest = fullSchedule.find((item) => item.remind)
+    const chosen = fullSchedule.filter((item) => item.remind)
+    let remindHint = ''
+    if (nearest && chosen.length === 1) remindHint = `已记下第${nearest.month}期 ${nearest.repayDate}`
+    if (nearest && chosen.length > 1) {
+      remindHint = `已提醒 ${chosen.length} 期，最近第${nearest.month}期 ${nearest.repayDate}`
+    }
+    this.setData({
+      fullSchedule,
+      visibleSchedule: this.data.showAllSchedule ? fullSchedule : this.data.visibleSchedule,
+      remindHint
+    })
+  },
+
+  onToggleRemind(e) {
+    const month = Number(e.currentTarget.dataset.month)
+    const item = (this.data.fullSchedule || []).find((row) => row.month === month)
+    if (!item || !item.repayDate || !this._remindPage || this._remindLock) return
+    const next = !item.remind
+    const save = () => {
+      this._remindLock = true
+      toggleMortgageRemind({
+        page: this._remindPage,
+        on: next,
+        month: item.month,
+        repayDate: item.repayDate,
+        payment: item.payment
+      }).then((body) => {
+        this._remindLock = false
+        if (!body || body.ok === false) {
+          wx.showToast({ title: (body && body.message) || '提醒没有记下', icon: 'none' })
+          return
+        }
+        const months = (this.data.fullSchedule || []).filter((row) => row.remind).map((row) => row.month)
+        if (next) months.push(month)
+        this.applyRemindMonths(next ? months : months.filter((value) => value !== month))
+      })
+    }
+    if (!next) {
+      save()
+      return
+    }
+    requestMortgageSubscribe().then((accepted) => {
+      if (!accepted) {
+        wx.showToast({ title: '需要允许才能提醒', icon: 'none' })
+        return
+      }
+      save()
     })
   },
 
@@ -523,11 +616,13 @@ Page({
       return
     }
 
-    unlockWithRewardedAd(this).then((ok) => {
-      if (!ok) return
-      this.setData({
-        showAllSchedule: true,
-        visibleSchedule: this.data.fullSchedule
+    requestMortgageSubscribe().then(() => {
+      unlockWithRewardedAd(this).then((ok) => {
+        if (!ok) return
+        this.setData({
+          showAllSchedule: true,
+          visibleSchedule: this.data.fullSchedule
+        })
       })
     })
   },

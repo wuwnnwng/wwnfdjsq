@@ -112,6 +112,7 @@
           <view class="section-desc" wx:if="{{isFullPrepay}}">共 1 期结清计划</view>
           <view class="section-desc" wx:elif="{{isPartialPrepay}}">共 {{months}} 期（第 1 期为提前还款，其后为剩余月供）</view>
           <view class="section-desc" wx:else>共 {{months}} 期{{isRemaining ? '（剩余）' : ''}}{{isCombo ? '；点击利息可查看拆分' : ''}}</view>
+          <view class="section-desc" wx:if="{{remindHint}}">{{remindHint}}，还款日中午提醒</view>
         </view>
         <view class="toggle" bindtap="onToggleSchedule">{{showAllSchedule ? '收起' : '展开'}}</view>
       </view>
@@ -122,6 +123,7 @@
         <text class="col">本金</text>
         <text class="col">利息{{isCombo ? ' · 点我' : ''}}</text>
         <text class="col">剩余</text>
+        <text class="col remind">提醒</text>
       </view>
 
       <scroll-view scroll-y class="table-body" wx:if="{{showAllSchedule}}">
@@ -135,6 +137,11 @@
             catchtap="onInterestTap"
           >{{item.interestText}}</text>
           <text class="col">{{item.remainingText}}</text>
+          <text
+            class="col remind {{item.remind ? 'is-on' : ''}}"
+            data-month="{{item.month}}"
+            catchtap="onToggleRemind"
+          >{{item.remind ? '开' : '关'}}</text>
         </view>
       </scroll-view>
     </view>

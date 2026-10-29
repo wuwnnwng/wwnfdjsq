@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "openapi": [
+      "subscribeMessage.send"
+    ]
+  },
+  "timeout": 60,
+  "triggers": [
+    {
+      "name": "oilCheck",
+      "type": "timer",
+      "config": "0 0 12 * * * *"
+    }
+  ]
+}

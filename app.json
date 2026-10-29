@@ -154,5 +154,10 @@
       ]
     }
   },
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {
+    "add-mini-tip": "/components/add-mini-tip/add-mini-tip",
+    "ad-banner": "/components/ad-banner/ad-banner",
+    "date-picker": "/components/date-picker/date-picker"
+  }
 }

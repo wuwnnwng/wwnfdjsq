@@ -96,9 +96,7 @@ Page({
   },
 
   onGoOilPrice() {
-    wx.navigateTo({
-      url: '/packageTravel/pages/oilprice/oilprice'
-    })
+    require('../../../utils/oilNotice').openOilPrice()
   },
 
   onGoToll() {

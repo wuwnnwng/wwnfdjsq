@@ -241,6 +241,17 @@
   color: var(--color-muted);
 }
 
+.col.remind {
+  flex: 0 0 64rpx;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.col.remind.is-on {
+  color: var(--color-brand-soft);
+  font-weight: 700;
+}
+
 .interest-text {
   color: var(--color-accent);
 }

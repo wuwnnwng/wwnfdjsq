@@ -428,6 +428,10 @@ function openToolItem(item) {
     return
   }
   if (openMiniProgram(item.miniProgramAppId)) return
+  if (item.page && String(item.page).indexOf('pages/oilprice/oilprice') >= 0) {
+    require('./oilNotice').openOilPrice(item.page)
+    return
+  }
   if (item.page) {
     wx.navigateTo({ url: item.page })
     return

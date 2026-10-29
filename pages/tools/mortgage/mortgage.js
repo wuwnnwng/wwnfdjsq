@@ -28,6 +28,7 @@ const {
   removePlan
 } = require('../../../utils/plans')
 const { createLastInput } = require('../../../utils/toolLastInput')
+const { finishMortgageResult } = require('../../../utils/mortgageNotice')
 
 const PROVIDENT_FIRST_HOME = {
   withinFive: '2.10',
@@ -148,7 +149,8 @@ Page({
     derivedMessage: '',
 
     showFirstDatePicker: false,
-    datePickFor: 'first'
+    datePickFor: 'first',
+    calculating: false
   },
 
   onLoad() {
@@ -728,12 +730,19 @@ Page({
   },
 
   onCalculate() {
+    if (this._calculating) return
+    this._calculating = true
+    this.setData({ calculating: true })
+
     if (this.data.calcMode === 'remaining') {
       this.calculateRemaining()
       return
     }
 
-    if (!this.validateNewLoan()) return
+    if (!this.validateNewLoan()) {
+      this.releaseCalculate()
+      return
+    }
 
     const {
       loanType,
@@ -764,15 +773,19 @@ Page({
 
     if (result.totalPrincipal <= 0) {
       wx.showToast({ title: '请输入有效贷款金额', icon: 'none' })
+      this.releaseCalculate()
       return
     }
 
     result.shareInput = shareInput
-    this.goResult(result)
+    finishMortgageResult(this, result)
   },
 
   calculateRemaining() {
-    if (!this.validateRemainingLoan()) return
+    if (!this.validateRemainingLoan()) {
+      this.releaseCalculate()
+      return
+    }
 
     const shareInput = {
       mode: 'remaining',
@@ -793,17 +806,24 @@ Page({
 
     if (!ok) {
       wx.showToast({ title: message || '计算失败', icon: 'none' })
+      this.releaseCalculate()
       return
     }
 
     result.shareInput = shareInput
-    this.goResult(result)
+    finishMortgageResult(this, result)
+  },
+
+  releaseCalculate() {
+    this._calculating = false
+    if (this.data.calculating) this.setData({ calculating: false })
   },
 
   goResult(result) {
     wx.setStorageSync('mortgageResult', result)
     wx.navigateTo({
-      url: '/pages/result/result'
+      url: '/pages/result/result',
+      complete: () => this.releaseCalculate()
     })
   }
 })

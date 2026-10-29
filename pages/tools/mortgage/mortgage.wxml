@@ -136,14 +136,14 @@
               bindtap="onMethodChange"
             >先息后本</view>
           </view>
-          <view class="field" wx:if="{{method === 'interestFirst'}}">
-            <text class="field-label">起息日</text>
-            <view class="field-control" bindtap="onOpenValueDatePicker">
-              <text class="picker-value {{valueDate ? '' : 'placeholder'}}">{{valueDate || '请选择日期'}}</text>
-            </view>
-          </view>
-          <view class="field-hint" wx:if="{{method === 'interestFirst'}}">先息后本按日计息，日利率=年利率÷360，每月按实际天数</view>
         </view>
+        <view class="field" wx:if="{{method === 'interestFirst'}}">
+          <text class="field-label">起息日</text>
+          <view class="field-control" bindtap="onOpenValueDatePicker">
+            <text class="picker-value {{valueDate ? '' : 'placeholder'}}">{{valueDate || '请选择日期'}}</text>
+          </view>
+        </view>
+        <view class="field-hint" wx:if="{{method === 'interestFirst'}}">先息后本按日计息，日利率=年利率÷360，每月按实际天数</view>
 
         <view class="sub-block" wx:if="{{showCommercial}}">
           <view class="sub-title" wx:if="{{loanType === 'combo'}}">商业贷款</view>
@@ -480,7 +480,7 @@
   </scroll-view>
 
   <view class="footer-block">
-    <button class="primary-btn" bindtap="onCalculate">开始计算</button>
+    <button class="primary-btn" bindtap="onCalculate" disabled="{{calculating}}" hover-class="none">开始计算</button>
     <view class="disclaimer">计算结果仅供参考，实际以银行审批为准</view>
   </view>
 
